@@ -18,6 +18,14 @@ Run the tests:
 python3 -m unittest discover -s tests -v
 ```
 
+Run a report on a CSV: see [`docs/using-analystos.md`](docs/using-analystos.md).
+
+Try the worked example:
+
+```
+python3 -m analystos fixtures/golden
+```
+
 ## Layout
 
 | Path | What's in it |

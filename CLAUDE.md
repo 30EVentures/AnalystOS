@@ -7,6 +7,7 @@ design is in `docs/architecture.md`; the plan is in `ROADMAP.md`.
 
 ## How to run
 
+- This repo lives at the nested path `~/AnalystOS/AnalystOS`. `cd` there first.
 - Language: Python 3 (developed on 3.14). Standard library only for now.
 - Tests:
 
@@ -22,6 +23,8 @@ design is in `docs/architecture.md`; the plan is in `ROADMAP.md`.
   `spec.md` (goal + "Done when" checks) written *before* any code.
 - Small commits on a branch; open a pull request for review. Never commit to
   `main` directly.
+- The `gh` CLI is not installed. After `git push`, open the pull request from
+  the URL git prints, and merge it in the browser.
 - Every analytical conclusion must eventually carry a citation to its source.
   Not relevant yet — no analysis code exists — but it is the core rule.
 
@@ -33,6 +36,7 @@ design is in `docs/architecture.md`; the plan is in `ROADMAP.md`.
 
 ## Where things are
 
+- `analystos/`            — the code, one folder per layer (`l0/`, `l1/`, …)
 - `docs/architecture.md`  — the L0–L6 layer model
 - `docs/decisions.md`     — dated log of choices and why
 - `specs/<slice>/spec.md` — what each slice does and how it's checked

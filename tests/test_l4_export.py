@@ -3,7 +3,7 @@
 import re
 import unittest
 
-from analystos.l4.export import render_section
+from analystos.l4.export import render_html, render_section
 
 
 class RenderSectionTest(unittest.TestCase):
@@ -77,6 +77,30 @@ class RenderSectionTest(unittest.TestCase):
         ]
         out = render_section("Notes", one)
         self.assertIn("Going concern status: no material uncertainty. [1]", out)
+
+
+    # --- render_html (slice 13) ---
+
+    def test_render_html_has_title_paragraphs_and_footnotes(self):  # slice 13 #2
+        page = render_html(render_section("Revenue", self.findings))
+        self.assertIn("<!doctype html>", page)
+        self.assertIn("<h1>Revenue</h1>", page)
+        self.assertIn("FY2024 revenue was 4200000.0.", page)
+        self.assertIn('href="#fn1"', page)   # marker links to footnote
+        self.assertIn('<p id="fn1">', page)  # footnote has the anchor
+
+    def test_render_html_escapes_special_characters(self):  # slice 13 #3
+        findings = [
+            {
+                "text": "R&D <spend> was {answer}.",
+                "answer": "1 & 2",
+                "citation": {"source": "x" * 64, "row": 2, "column": "r&d"},
+            }
+        ]
+        page = render_html(render_section("A & B", findings))
+        self.assertIn("<h1>A &amp; B</h1>", page)
+        self.assertIn("R&amp;D &lt;spend&gt; was 1 &amp; 2.", page)
+        self.assertNotIn("<spend>", page)
 
 
 if __name__ == "__main__":

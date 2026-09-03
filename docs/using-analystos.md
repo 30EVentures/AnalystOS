@@ -78,8 +78,12 @@ has no comma after it.
 python3 -m analystos jobs/my-first-job
 ```
 
-It prints the section and writes it to `jobs/my-first-job/section.md`. Open
-that file, or send it.
+It prints the section and writes two files into `jobs/my-first-job/`:
+
+- `section.md` — the plain-text version.
+- `section.html` — a formatted page, which **opens in your browser
+  automatically**. To get a PDF: in the browser, **File → Print → Save as
+  PDF** (or press **Cmd+P**).
 
 ---
 

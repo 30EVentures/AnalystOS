@@ -90,6 +90,16 @@ class PipelineTest(unittest.TestCase):
         run_job(job, evidence_dir=self.tmp / "ev")
         self.assertFalse((job / "section.md").exists())
 
+    def test_entrypoint_also_writes_section_html(self):  # slice 13 #1
+        job = self._golden_copy()
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            code = main([str(job)])
+        self.assertEqual(code, 0)
+        page = (job / "section.html").read_text(encoding="utf-8")
+        self.assertIn("<!doctype html>", page)
+        self.assertIn("<h1>", page)
+
     # --- ask dispatch: growth / ratio (slice 12) ---
 
     def test_run_job_dispatches_growth_and_ratio_asks(self):  # slice 12 #5

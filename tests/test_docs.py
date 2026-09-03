@@ -17,6 +17,7 @@ class UsingDocTest(unittest.TestCase):
             "python3 -m analystos ",
             "job.json",
             "section.md",
+            "section.html",
             "{answer}",
         ):
             self.assertIn(needle, text, f"guide is missing {needle!r} - is it stale?")

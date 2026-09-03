@@ -14,13 +14,14 @@ returns the section as a string.
 """
 
 import json
+import subprocess
 import sys
 from pathlib import Path
 
 from analystos.l0.store import store
 from analystos.l1.extract import extract_table
 from analystos.l2.answer import answer_growth, answer_lookup, answer_ratio
-from analystos.l4.export import render_section
+from analystos.l4.export import render_html, render_section
 
 
 def _run_ask(rows, source, ask):
@@ -75,10 +76,15 @@ def main(argv=None):
         return 2
     job_dir = Path(argv[0])
     section = run_job(job_dir)
-    out_path = job_dir / "section.md"
-    out_path.write_text(section, encoding="utf-8")
+    md_path = job_dir / "section.md"
+    html_path = job_dir / "section.html"
+    md_path.write_text(section, encoding="utf-8")
+    html_path.write_text(render_html(section), encoding="utf-8")
     print(section)
-    print(f"\n(written to {out_path})", file=sys.stderr)
+    print(f"\n(written to {md_path} and {html_path})", file=sys.stderr)
+    # Open the page for the person running it; never during tests (no terminal).
+    if sys.platform == "darwin" and sys.stdout.isatty():
+        subprocess.run(["open", str(html_path)], check=False)
     return 0
 
 

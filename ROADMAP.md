@@ -26,7 +26,8 @@ Run it: `python3 -m analystos fixtures/golden`
 - Slice 9  — scaffold a job.json from a CSV                 ✓ done (PR #9)
 - Slice 10 — write the section to a file automatically      ✓ done (PR #10)
 - Slice 11 — a one-page "how to use this"                   ✓ done (PR #11)
-- Slice 12 — L2 computed metrics (growth %, ratio %)        ← in progress
+- Slice 12 — L2 computed metrics (growth %, ratio %)        ✓ done (PR #12)
+- Slice 13 — styled section.html that auto-opens (→ PDF via Print)  ← in progress
 
 ## R1 — trusted on one desk (Oct–Dec 2026)
 

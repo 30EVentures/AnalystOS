@@ -22,3 +22,6 @@ env/
 
 # Evidence store — stored source files never go in git
 evidence/
+
+# Ad-hoc job folders (real data stays off GitHub); fixtures/golden/ is committed
+jobs/

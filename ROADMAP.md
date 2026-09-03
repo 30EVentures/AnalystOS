@@ -14,12 +14,18 @@ Prove the core loop on one real document set, in front of 3–5 real analysts.
 - Slice 5 — L2: answer one question with a citation  ✓ done (PR #5)
 - Slice 6 — L4: export one working-paper section with the citation trail  ✓ done (PR #6)
 - Slice 7 — the AAO manifest + a local Python check  ✓ done (PR #7)
-- Slice 8 — glue: one command runs L0→L4 on the golden set  ← in progress
+- Slice 8 — glue: one command runs L0→L4 on the golden set  ✓ done (PR #8)
 
-**Build complete when all 8 land.** **Milestone done when:** a real analyst
-completes one real task end to end and reaches for it again unprompted.
+**Build complete (8/8).** **Milestone done when:** a real analyst completes one
+real task end to end and reaches for it again unprompted.
 
 Run it: `python3 -m analystos fixtures/golden`
+
+### NOW+ — make it usable by an analyst (not just a developer)
+
+- Slice 9  — scaffold a job.json from a CSV                 ← in progress
+- Slice 10 — write the section to a file automatically
+- Slice 11 — a one-page "how to use this"
 
 ## R1 — trusted on one desk (Oct–Dec 2026)
 

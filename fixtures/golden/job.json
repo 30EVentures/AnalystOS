@@ -1,0 +1,15 @@
+{
+  "title": "Revenue and cost review — Northwind Traders",
+  "source": "income_statement.csv",
+  "schema": {
+    "period": "text",
+    "revenue": "number",
+    "cogs": "number",
+    "opex": "number"
+  },
+  "asks": [
+    { "text": "FY2024 revenue was {answer}.", "where": ["period", "FY2024"], "select": "revenue" },
+    { "text": "FY2024 cost of goods sold was {answer}.", "where": ["period", "FY2024"], "select": "cogs" },
+    { "text": "FY2023 revenue was {answer}.", "where": ["period", "FY2023"], "select": "revenue" }
+  ]
+}

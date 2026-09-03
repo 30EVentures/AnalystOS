@@ -12,8 +12,8 @@ Prove the core loop on one real document set, in front of 3–5 real analysts.
 - Slice 3 — L0: retrieve a source by its hash        ✓ done (PR #3)
 - Slice 4 — L1: extract one table to structured data ✓ done (PR #4)
 - Slice 5 — L2: answer one question with a citation  ✓ done (PR #5)
-- Slice 6 — L4: export one working-paper section with the citation trail  ← in progress
-- Slice 7 — the FlashyOS AAO manifest, validated in CI
+- Slice 6 — L4: export one working-paper section with the citation trail  ✓ done (PR #6)
+- Slice 7 — the AAO manifest + a local Python check  ← in progress
 - Slice 8 — glue: run slices 2–6 on the golden set with one command
 
 **Done when:** a real analyst completes one real task end to end and reaches

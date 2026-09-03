@@ -1,0 +1,23 @@
+{
+  "aao": "0.1",
+  "name": "Solwayholdings",
+  "slug": "solwayholdings",
+  "description": "Solwayholdings on the FlashyOS mesh.",
+  "accountableTo": "calebsolway@gmail.com",
+  "roles": [
+    {
+      "name": "integration",
+      "family": "engineering",
+      "purpose": "Builds and maintains what this organisation runs on the mesh, and says when something is missing.",
+      "capabilities": ["build", "deploy", "report"],
+      "humanApprovalAtOrAbove": "LOW"
+    },
+    {
+      "name": "coordination",
+      "family": "operations",
+      "purpose": "Proposes work with other organisations and carries a human decision back to them.",
+      "capabilities": ["propose", "accept", "decline"],
+      "humanApprovalAtOrAbove": "LOW"
+    }
+  ]
+}

@@ -24,8 +24,8 @@ Run it: `python3 -m analystos fixtures/golden`
 ### NOW+ — make it usable by an analyst (not just a developer)
 
 - Slice 9  — scaffold a job.json from a CSV                 ✓ done (PR #9)
-- Slice 10 — write the section to a file automatically      ← in progress
-- Slice 11 — a one-page "how to use this"
+- Slice 10 — write the section to a file automatically      ✓ done (PR #10)
+- Slice 11 — a one-page "how to use this"                   ← in progress
 
 ## R1 — trusted on one desk (Oct–Dec 2026)
 

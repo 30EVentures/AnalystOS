@@ -19,8 +19,36 @@ from pathlib import Path
 
 from analystos.l0.store import store
 from analystos.l1.extract import extract_table
-from analystos.l2.answer import answer_lookup
+from analystos.l2.answer import answer_growth, answer_lookup, answer_ratio
 from analystos.l4.export import render_section
+
+
+def _run_ask(rows, source, ask):
+    """Dispatch one ask by its ``kind`` (default ``"lookup"``)."""
+    kind = ask.get("kind", "lookup")
+    if kind == "lookup":
+        return answer_lookup(
+            rows, source=source, where=tuple(ask["where"]), select=ask["select"]
+        )
+    if kind == "growth":
+        return answer_growth(
+            rows,
+            source=source,
+            key_column=ask["key_column"],
+            from_key=ask["from"],
+            to_key=ask["to"],
+            value_column=ask["value_column"],
+        )
+    if kind == "ratio":
+        return answer_ratio(
+            rows,
+            source=source,
+            key_column=ask["key_column"],
+            key=ask["key"],
+            numerator=ask["numerator"],
+            denominator=ask["denominator"],
+        )
+    raise ValueError(f"unknown ask kind: {kind!r}")
 
 
 def run_job(job_dir, evidence_dir=None):
@@ -34,12 +62,7 @@ def run_job(job_dir, evidence_dir=None):
 
     findings = []
     for ask in job["asks"]:
-        result = answer_lookup(                             # L2
-            rows,
-            source=source_hash,
-            where=tuple(ask["where"]),
-            select=ask["select"],
-        )
+        result = _run_ask(rows, source_hash, ask)           # L2
         findings.append({"text": ask["text"], **result})
 
     return render_section(job["title"], findings)           # L4

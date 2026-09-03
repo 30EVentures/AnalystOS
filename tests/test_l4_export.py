@@ -50,6 +50,23 @@ class RenderSectionTest(unittest.TestCase):
             render_section("X", bad)
         self.assertIn("answer", str(cm.exception))
 
+    def test_multi_cell_citation_renders_as_computed_from(self):  # slice 12 #4
+        findings = [
+            {
+                "text": "Revenue grew {answer}% year over year.",
+                "answer": 114.2,
+                "citation": [
+                    {"source": self.src, "row": 3, "column": "revenue"},
+                    {"source": self.src, "row": 4, "column": "revenue"},
+                ],
+            }
+        ]
+        out = render_section("Growth", findings)
+        self.assertIn("Revenue grew 114.2% year over year. [1]", out)
+        self.assertIn("[1] computed from: ", out)
+        self.assertIn(f'source {self.src} - row 3, column "revenue"', out)
+        self.assertIn(f'source {self.src} - row 4, column "revenue"', out)
+
     def test_non_number_answer_is_rendered_as_text(self):  # any answer type
         one = [
             {

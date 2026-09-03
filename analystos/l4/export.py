@@ -8,17 +8,23 @@ The caller supplies a title and a list of *findings*. Each finding is a dict::
         "citation": {"source": <hash>, "row": 3, "column": "revenue"},
     }
 
+A ``citation`` is either one cell (a dict) or, for a computed metric, a list
+of the cells it was derived from.
+
 ``render_section`` fills each ``{answer}`` in, appends a numbered ``[n]``
 marker, and lists the citations as footnotes underneath. It returns the
 section as a string; it does not write a file.
 """
 
 
+def _one_cell(cell):
+    return f'source {cell["source"]} - row {cell["row"]}, column "{cell["column"]}"'
+
+
 def _footnote(n, citation):
-    return (
-        f'[{n}] source {citation["source"]} - '
-        f'row {citation["row"]}, column "{citation["column"]}"'
-    )
+    if isinstance(citation, list):
+        return f"[{n}] computed from: " + "; ".join(_one_cell(c) for c in citation)
+    return f"[{n}] {_one_cell(citation)}"
 
 
 def render_section(title, findings):

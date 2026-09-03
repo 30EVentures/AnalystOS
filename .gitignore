@@ -19,3 +19,6 @@ env/
 
 # Local env files
 .env
+
+# Evidence store — stored source files never go in git
+evidence/

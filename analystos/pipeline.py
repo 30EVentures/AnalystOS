@@ -50,7 +50,12 @@ def main(argv=None):
     if len(argv) != 1:
         print("usage: python3 -m analystos <job-dir>", file=sys.stderr)
         return 2
-    print(run_job(argv[0]))
+    job_dir = Path(argv[0])
+    section = run_job(job_dir)
+    out_path = job_dir / "section.md"
+    out_path.write_text(section, encoding="utf-8")
+    print(section)
+    print(f"\n(written to {out_path})", file=sys.stderr)
     return 0
 
 

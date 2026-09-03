@@ -1,9 +1,36 @@
-"""L2 - answer a structured lookup over L1 rows, with a citation.
+"""L2 - answers over L1 rows, each carrying a citation.
 
-The smallest real reasoning step: given the typed rows from L1, find one value
-and hand it back together with a citation that says exactly where it came from
-- which source, which row, which column.
+``answer_lookup`` finds one cell. ``answer_growth`` and ``answer_ratio`` do the
+one bit of arithmetic an income-statement report always needs - a year-over-year
+percent change and a same-row percentage (margin, cost ratio) - and cite the
+input cells they were computed from.
 """
+
+
+def _cell(source, i, column):
+    """A citation to one cell: CSV line number is the row index + 2 (header = 1)."""
+    return {"source": source, "row": i + 2, "column": column}
+
+
+def _require_columns(rows, *columns):
+    if not rows:
+        raise ValueError("no rows to search")
+    have = list(rows[0].keys())
+    for col in columns:
+        if col not in have:
+            raise ValueError(f"column {col!r} is not in the rows (have: {have})")
+
+
+def _row_index(rows, key_column, key):
+    """Index of the single row where ``key_column == key``; raise otherwise."""
+    hits = [i for i, row in enumerate(rows) if row[key_column] == key]
+    if not hits:
+        raise ValueError(f"no row where {key_column!r} == {key!r}")
+    if len(hits) > 1:
+        raise ValueError(
+            f"{len(hits)} rows where {key_column!r} == {key!r}; expected exactly one"
+        )
+    return hits[0]
 
 
 def answer_lookup(rows, *, source, where, select):
@@ -43,4 +70,45 @@ def answer_lookup(rows, *, source, where, select):
     return {
         "answer": rows[i][select],
         "citation": {"source": source, "row": i + 2, "column": select},
+    }
+
+
+def answer_growth(rows, *, source, key_column, from_key, to_key, value_column):
+    """Percent change in ``value_column`` from the ``from_key`` row to the
+    ``to_key`` row, rounded to one decimal place.
+
+    ``citation`` is a list of the two input cells. Raises ``ValueError`` on an
+    absent column, no/many matching rows, or a zero base value.
+    """
+    _require_columns(rows, key_column, value_column)
+    i_from = _row_index(rows, key_column, from_key)
+    i_to = _row_index(rows, key_column, to_key)
+    base = rows[i_from][value_column]
+    if base == 0:
+        raise ValueError(f"cannot compute growth: {value_column!r} is 0 in the base row")
+    pct = round((rows[i_to][value_column] - base) / base * 100, 1)
+    return {
+        "answer": pct,
+        "citation": [
+            _cell(source, i_from, value_column),
+            _cell(source, i_to, value_column),
+        ],
+    }
+
+
+def answer_ratio(rows, *, source, key_column, key, numerator, denominator):
+    """``numerator / denominator`` for one row, as a percent, one decimal place.
+
+    ``citation`` is a list of the two input cells. Raises ``ValueError`` on an
+    absent column, no/many matching rows, or a zero denominator.
+    """
+    _require_columns(rows, key_column, numerator, denominator)
+    i = _row_index(rows, key_column, key)
+    den = rows[i][denominator]
+    if den == 0:
+        raise ValueError(f"cannot compute ratio: {denominator!r} is 0")
+    pct = round(rows[i][numerator] / den * 100, 1)
+    return {
+        "answer": pct,
+        "citation": [_cell(source, i, numerator), _cell(source, i, denominator)],
     }

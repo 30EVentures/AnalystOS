@@ -6,6 +6,7 @@ specs/slice-10/spec.md (main writes section.md).
 
 import contextlib
 import io
+import json
 import shutil
 import subprocess
 import sys
@@ -88,6 +89,48 @@ class PipelineTest(unittest.TestCase):
         job = self._golden_copy()
         run_job(job, evidence_dir=self.tmp / "ev")
         self.assertFalse((job / "section.md").exists())
+
+    # --- ask dispatch: growth / ratio (slice 12) ---
+
+    def test_run_job_dispatches_growth_and_ratio_asks(self):  # slice 12 #5
+        job = self.tmp / "job"
+        job.mkdir()
+        (job / "fin.csv").write_text(
+            "period,revenue,cogs\nFY2023,26974,11618\nFY2024,60922,16621\n",
+            encoding="utf-8",
+        )
+        (job / "job.json").write_text(
+            json.dumps(
+                {
+                    "title": "Computed",
+                    "source": "fin.csv",
+                    "schema": {"period": "text", "revenue": "number", "cogs": "number"},
+                    "asks": [
+                        {
+                            "kind": "growth",
+                            "text": "Revenue grew {answer}% YoY.",
+                            "key_column": "period",
+                            "from": "FY2023",
+                            "to": "FY2024",
+                            "value_column": "revenue",
+                        },
+                        {
+                            "kind": "ratio",
+                            "text": "FY2024 cost ratio was {answer}%.",
+                            "key_column": "period",
+                            "key": "FY2024",
+                            "numerator": "cogs",
+                            "denominator": "revenue",
+                        },
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+        out = run_job(job, evidence_dir=self.tmp / "ev")
+        self.assertIn("Revenue grew 125.9% YoY. [1]", out)  # (60922-26974)/26974*100
+        self.assertIn("FY2024 cost ratio was 27.3%. [2]", out)  # 16621/60922*100
+        self.assertIn("[1] computed from: ", out)
 
 
 if __name__ == "__main__":

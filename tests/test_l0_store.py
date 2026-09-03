@@ -1,11 +1,15 @@
-"""Tests for L0 store - one per "Done when" check in specs/slice-2/spec.md."""
+"""Tests for L0 store + retrieve.
+
+One test per "Done when" check in specs/slice-2/spec.md (store) and
+specs/slice-3/spec.md (retrieve).
+"""
 
 import hashlib
 import tempfile
 import unittest
 from pathlib import Path
 
-from analystos.l0.store import store
+from analystos.l0.store import retrieve, store
 
 
 class StoreTest(unittest.TestCase):
@@ -53,6 +57,22 @@ class StoreTest(unittest.TestCase):
     def test_missing_file_raises(self):  # guard rail
         with self.assertRaises(FileNotFoundError):
             store(self.tmp / "nope.txt", self.evidence)
+
+    # --- retrieve (slice 3) ---
+
+    def test_retrieve_returns_the_original_bytes(self):  # Done when #1
+        digest = store(self.source, self.evidence)
+        self.assertEqual(retrieve(digest, self.evidence), self.source.read_bytes())
+
+    def test_retrieve_unknown_hash_raises(self):  # Done when #2
+        with self.assertRaises(FileNotFoundError):
+            retrieve("0" * 64, self.evidence)
+
+    def test_store_then_retrieve_roundtrip_on_binary(self):  # not just text
+        blob = self.tmp / "pic.bin"
+        blob.write_bytes(bytes(range(256)) * 8)
+        digest = store(blob, self.evidence)
+        self.assertEqual(retrieve(digest, self.evidence), blob.read_bytes())
 
 
 if __name__ == "__main__":

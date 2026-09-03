@@ -41,3 +41,20 @@ def store(path, evidence_dir=None) -> str:
         shutil.copyfile(src, dest)
 
     return digest
+
+
+def retrieve(digest, evidence_dir=None) -> bytes:
+    """Return the bytes stored under ``digest``.
+
+    Raises ``FileNotFoundError`` if nothing is stored under that hash - the
+    caller gets a clear failure, never the wrong file or empty bytes.
+
+    ``evidence_dir`` overrides where to look (tests use a temp folder).
+    """
+    dest_dir = Path(evidence_dir) if evidence_dir is not None else DEFAULT_EVIDENCE_DIR
+    blob = dest_dir / digest
+
+    if not blob.is_file():
+        raise FileNotFoundError(f"nothing stored under {digest}")
+
+    return blob.read_bytes()

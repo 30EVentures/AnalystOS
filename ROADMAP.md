@@ -8,8 +8,8 @@ disagree, **this file wins**. Windows are targets, not commitments.
 Prove the core loop on one real document set, in front of 3–5 real analysts.
 
 - Slice 1 — repo skeleton + test harness            ✓ done (PR #1)
-- Slice 2 — L0: store one source, return its hash    ← in progress
-- Slice 3 — L0: retrieve a source by its hash
+- Slice 2 — L0: store one source, return its hash    ✓ done (PR #2)
+- Slice 3 — L0: retrieve a source by its hash        ← in progress
 - Slice 4 — L1: extract one table to structured data
 - Slice 5 — L2: answer one question with a citation
 - Slice 6 — L4: export one working-paper section with the citation trail

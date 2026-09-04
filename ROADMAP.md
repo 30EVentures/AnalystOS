@@ -54,7 +54,7 @@ testable product that already covers four real document formats.
   recognized columns; also fixes the format-scale risk (see decisions.md)  ✓ done (PR #21)
 - Slice 20 — the API: `api/analyze.py` (Flask, on Vercel)  ✓ done (PR #22)
 - Slice 21 — the upload page on `site/`  ✓ done (PR #23)
-- Slice 22 — access gating (not public on day one)
+- Slice 22 — access gating (not public on day one)  ✓ done (PR #25)
 
 **→ MVP live here: upload a CSV/Excel/Word/PowerPoint file in a browser,
 get a cited report back.**

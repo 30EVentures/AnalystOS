@@ -56,6 +56,20 @@ real accounts — that's R1/R2 territory per `ROADMAP.md`, not this slice.
    on-page error treatment Slice 21 already built for a `400`.
 6. `python3 -m unittest discover -s tests -v` passes (with the venv active).
 
+## Verified beyond the test suite
+
+Drove a real Chromium browser (Playwright) against the real `api/analyze.py`
+Flask app, served with `ANALYSTOS_ACCESS_CODE` actually set in its
+environment, alongside `site/` on one origin: a wrong code produced the
+readable "missing or invalid access code" message inline (not the report
+view); the correct code produced the real cited report; reloading the page
+in the *same* browser context pre-filled the code from `localStorage` and a
+resubmit succeeded with no retyping; and a *fresh* context with no stored
+code started with an empty field and got the same readable error on
+submit. Also confirmed directly (not just by reading the code) that the
+wrong code supplied in a request never appears anywhere in that request's
+response body.
+
 ## Not in this slice
 
 - Real user accounts, per-analyst identity, or anything that could answer

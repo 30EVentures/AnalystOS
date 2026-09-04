@@ -84,6 +84,13 @@ class ExtractTableTest(unittest.TestCase):
         rows = extract_table(path, {"period": "text", "net_income": "number"})
         self.assertEqual(rows[0]["net_income"], -4368.0)
 
+    def test_dollar_sign_outside_the_parens_is_still_negative(self):
+        # found via a real Word-document value: the $ sits outside the
+        # parens ("$(4,368)"), not inside ("($4,368)") like the case above
+        path = self._csv('period,net_income\nFY2023,"$(4,368)"\n')
+        rows = extract_table(path, {"period": "text", "net_income": "number"})
+        self.assertEqual(rows[0]["net_income"], -4368.0)
+
     def test_garbage_after_cleaning_still_raises_with_original_value(self):
         path = self._csv('period,revenue\nFY2024,"1,234abc"\n')
         with self.assertRaises(ValueError) as cm:

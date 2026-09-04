@@ -38,17 +38,22 @@ class Rows(list):
 def _clean_number_token(value):
     """Normalize a spreadsheet-style number string before parsing as a float.
 
-    Strips thousands commas, a leading ``$``, a trailing ``%``, and turns
+    Strips thousands commas, a ``$``, a trailing ``%``, and turns
     parenthesized values negative - the accounting convention for a loss.
+    The ``$`` can sit outside the parentheses ("$(4,368)") or inside
+    ("($4,368)") - real documents use both - so the negative-parens check
+    runs after stripping an *outer* ``$``, and again for an inner one.
     """
     v = value.strip()
-    negative = v.startswith("(") and v.endswith(")")
-    if negative:
-        v = v[1:-1].strip()
     if v.startswith("$"):
         v = v[1:].strip()
     if v.endswith("%"):
         v = v[:-1].strip()
+    negative = v.startswith("(") and v.endswith(")")
+    if negative:
+        v = v[1:-1].strip()
+        if v.startswith("$"):
+            v = v[1:].strip()
     v = v.replace(",", "")
     if negative and v and not v.startswith("-"):
         v = "-" + v

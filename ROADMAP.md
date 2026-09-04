@@ -28,13 +28,30 @@ Run it: `python3 -m analystos fixtures/golden`
 - Slice 11 — a one-page "how to use this"                   ✓ done (PR #11)
 - Slice 12 — L2 computed metrics (growth %, ratio %)        ✓ done (PR #12)
 - Slice 13 — styled section.html that auto-opens (→ PDF via Print)  ✓ done (PR #13)
-- Slice 15 — harden for real-world data + executive-ready numbers   ← in progress
+- Slice 15 — harden for real-world data + executive-ready numbers   ✓ done (PR #16)
 
 ### Site
 
 - `site/` — early-access landing page, live at
-  [analyst-os-phi.vercel.app](https://analyst-os-phi.vercel.app) (PR #14),
+  [analyst-os-phi.vercel.app](https://analyst-os-phi.vercel.app) (PR #14, #17),
   deploys automatically from `main`.
+
+### Live MVP — upload a document, get a report, in a browser
+
+Decision record: `docs/decisions.md`, 2026-09-04. Python + Vercel (Flask, not
+FastAPI); structured formats (Excel/Word/PowerPoint) trusted directly, PDF
+extraction always confirmed by a person before it's cited; real `.pdf`
+output via `reportlab`.
+
+- Slice 16 — L1: Excel (.xlsx) input, first dependency (`openpyxl`)  ← in progress
+- Slice 17 — L1: Word (.docx) table input
+- Slice 18 — L1: PowerPoint (.pptx) table input
+- Slice 19 — L1: PDF input — extraction + human confirm-before-cite step
+- Slice 20 — L4: real `.pdf` output (`reportlab`)
+- Slice 21 — report templates: auto-generate the standard asks from recognized columns
+- Slice 22 — the API: `api/analyze.py` (Flask, on Vercel)
+- Slice 23 — the upload page on `site/`
+- Slice 24 — access gating (not public on day one)
 
 ## R1 — trusted on one desk (Oct–Dec 2026)
 

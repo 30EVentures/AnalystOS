@@ -1,0 +1,3 @@
+# AnalystOS's first third-party dependencies. See docs/decisions.md for why
+# each one was added and what it's for. Pin exact versions.
+openpyxl==3.1.5

@@ -15,6 +15,9 @@ import unittest
 from pathlib import Path
 
 from openpyxl import Workbook
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 
 from analystos.l0.store import hash_of
 from analystos.pipeline import build_report, main, run_job
@@ -120,6 +123,67 @@ class PipelineTest(unittest.TestCase):
                     "title": "From Excel",
                     "source": "data.xlsx",
                     "schema": {"period": "text", "revenue": "number"},
+                    "asks": [
+                        {"text": "Revenue was {answer}.", "format": "usd",
+                         "where": ["period", "FY2024"], "select": "revenue"}
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+        out = run_job(job, evidence_dir=self.tmp / "ev")
+        self.assertIn("Revenue was $4.2M.", out)
+
+    # --- .pdf source + confirm-before-cite gate (slice 23) ---
+
+    def _make_pdf(self, path, rows):
+        data = [[str(v) for v in row] for row in rows]
+        t = Table(data)
+        t.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.5, colors.black)]))
+        SimpleDocTemplate(str(path), pagesize=letter).build([t])
+
+    def test_pdf_source_without_confirmation_raises(self):
+        job = self.tmp / "pdf-job"
+        job.mkdir()
+        self._make_pdf(job / "data.pdf", [["period", "revenue"], ["FY2024", "4200000"]])
+        with self.assertRaises(ValueError) as cm:
+            build_report(
+                job / "data.pdf", {"period": "text", "revenue": "number"}, "From PDF",
+                asks=[{"text": "Revenue was {answer}.", "format": "usd",
+                       "where": ["period", "FY2024"], "select": "revenue"}],
+                evidence_dir=self.tmp / "ev",
+            )
+        message = str(cm.exception)
+        self.assertIn("pdf_confirmed", message)
+        self.assertIn("FY2024", message)  # the actual extracted value is shown, not hidden
+        self.assertIn("4200000", message)
+
+    def test_pdf_source_with_confirmation_proceeds(self):
+        job = self.tmp / "pdf-job-confirmed"
+        job.mkdir()
+        pdf_path = job / "data.pdf"
+        self._make_pdf(pdf_path, [["period", "revenue"], ["FY2024", "4200000"]])
+        out = build_report(
+            pdf_path, {"period": "text", "revenue": "number"}, "From PDF",
+            asks=[{"text": "Revenue was {answer}.", "format": "usd",
+                   "where": ["period", "FY2024"], "select": "revenue"}],
+            evidence_dir=self.tmp / "ev",
+            extract_options={"pdf_confirmed": True},
+        )
+        self.assertIn("Revenue was $4.2M.", out)
+        self.assertIn(hash_of(pdf_path), out)  # cites the real PDF, same as any other format
+
+    def test_run_job_reads_a_confirmed_pdf_source(self):
+        job = self.tmp / "pdf-run-job"
+        job.mkdir()
+        self._make_pdf(job / "data.pdf", [["period", "revenue"], ["FY2024", "4200000"]])
+        (job / "job.json").write_text(
+            json.dumps(
+                {
+                    "title": "From PDF",
+                    "source": "data.pdf",
+                    "schema": {"period": "text", "revenue": "number"},
+                    "pdf_confirmed": True,
                     "asks": [
                         {"text": "Revenue was {answer}.", "format": "usd",
                          "where": ["period", "FY2024"], "select": "revenue"}

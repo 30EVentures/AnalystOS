@@ -105,6 +105,19 @@ extracted table and explicitly confirmed it.
    unchanged, not newly wired in this slice.
 6. `python3 -m unittest discover -s tests -v` passes (with the venv active).
 
+## Verified beyond the test suite
+
+Ran the actual CLI (`python3 -m analystos <job-dir>`) against a real PDF
+built with `reportlab` and an `income_statement` template job, twice. First
+run, no `"pdf_confirmed"`: it refused with the exact designed message,
+showing the real extracted table (`FY2023 | 1000000.0 | 280000.0`, etc.) —
+not a mock, not a generic error. Added `"pdf_confirmed": true` to job.json
+and re-ran: a complete, correctly-computed report came back (revenue,
+net income, both YoY growth asks), `section.md`/`section.html` were written
+to disk, and every footnote cited the real PDF's real SHA-256 hash — the
+exact same citation machinery every other format already uses, with no
+PDF-specific code below L1.
+
 ## Not in this slice
 
 - **Correcting a misread value.** The gate is accept-or-reject, not

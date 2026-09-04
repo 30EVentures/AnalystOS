@@ -2,6 +2,41 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-04 — PDF input: pdfplumber, and pulling reportlab forward (Slice 23)
+
+`pdfplumber==0.11.10` for table extraction — verified directly before
+writing the extractor, not just read about: a real bordered table built with
+`reportlab` and read back with `pdfplumber.page.extract_tables()` came back
+as exactly the right rows. Installs with no system dependencies — its own
+deps (`pdfminer.six`, `Pillow`, `pypdfium2`) all ship self-contained wheels,
+no Poppler/Ghostscript/Java needed - the same Vercel-serverless-friendly
+reasoning already used to pick `reportlab` over `weasyprint` for output.
+Rejected `camelot` (needs Ghostscript) and `tabula-py` (needs Java) for that
+same reason.
+
+Also added `reportlab==5.0.1` now, a slice early — but for tests only. Every
+other format extractor's tests build their own fixture file at test time
+with that format's own writer library (`openpyxl` for `.xlsx`, etc.); a real
+PDF table `pdfplumber` can reliably detect needs actual ruling lines, so
+*something* has to write a real PDF for `tests/test_l1_extract_pdf.py`.
+Using the PDF-writing library already decided on for Slice 24 beat inventing
+a second, throwaway one just for tests. Slice 24 is still the slice that
+wires `reportlab` into `analystos/l4/export.py` for real report output.
+
+Because a PDF table is inferred from visual layout, not a real structured
+object, `analystos.pipeline.build_report` refuses to build a report from a
+`.pdf` source until the job explicitly says `"pdf_confirmed": true` - a
+non-interactive flag, not a terminal prompt, since the CLI's execution model
+has no `input()` anywhere and shouldn't gain one just for this. The error
+raised without that flag includes the actual extracted table, so the
+"confirm" step is real: whoever runs it sees exactly what needs reviewing
+before they can flip the flag and re-run. Correcting a misread value isn't
+supported yet - accept-as-extracted-or-don't-use-it - and `.pdf` stays
+unsupported by `api/analyze.py`/`site/upload.html`, since a stateless HTTP
+request has no natural place for this kind of human-in-the-loop gate without
+a real review UI (already named in `ROADMAP.md` as the reason PDF was pushed
+after the MVP).
+
 ## 2026-09-04 — Access gating: one shared code, not accounts (Slice 22)
 
 `api/analyze.py` and `site/upload.html` went live in Slices 20-21 with no

@@ -17,7 +17,7 @@ from pathlib import Path
 from openpyxl import Workbook
 
 from analystos.l0.store import hash_of
-from analystos.pipeline import main, run_job
+from analystos.pipeline import build_report, main, run_job
 
 REPO = Path(__file__).resolve().parents[1]
 GOLDEN = REPO / "fixtures" / "golden"
@@ -171,6 +171,29 @@ class PipelineTest(unittest.TestCase):
         with self.assertRaises(ValueError) as cm:
             run_job(job, evidence_dir=self.tmp / "ev")
         self.assertIn("asks", str(cm.exception))
+
+    def test_build_report_with_an_empty_asks_list_is_valid_not_missing(self):
+        # asks=[] means "given, just empty" - must not be treated the same
+        # as "no asks given" (bool([]) is False, which is the trap here)
+        job = self.tmp / "empty-asks-job"
+        job.mkdir()
+        (job / "data.csv").write_text("period,revenue\nFY2024,100\n", encoding="utf-8")
+        out = build_report(
+            job / "data.csv", {"period": "text", "revenue": "number"}, "X",
+            asks=[], evidence_dir=self.tmp / "ev",
+        )
+        self.assertIn("# X", out)  # ran fine, just produced an empty body
+
+    def test_build_report_with_both_asks_and_template_raises(self):
+        job = self.tmp / "both-job"
+        job.mkdir()
+        (job / "data.csv").write_text("period,revenue\nFY2024,100\n", encoding="utf-8")
+        with self.assertRaises(ValueError) as cm:
+            build_report(
+                job / "data.csv", {"period": "text", "revenue": "number"}, "X",
+                asks=[], template="income_statement", evidence_dir=self.tmp / "ev",
+            )
+        self.assertIn("exactly one", str(cm.exception))
 
     def test_unsupported_source_extension_raises(self):
         job = self.tmp / "bad-ext-job"

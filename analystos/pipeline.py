@@ -11,10 +11,14 @@ Instead of ``"asks"``, a job may give ``"template": "income_statement"`` to
 generate the standard asks from whatever line items are recognized in the
 source - see analystos.templates.
 
-``run_job`` reads the job, stores the source (L0), extracts its table with
-the extractor matching the source file's extension (L1), answers each ask
-with a citation (L2), and renders one section (L4). It returns the section
-as a string.
+``build_report`` is the actual pipeline: given a source file, a schema, and
+either ``asks`` or a ``template``, it stores the source (L0), extracts its
+table with the extractor matching the file's extension (L1), answers each
+ask with a citation (L2), and renders one section (L4). ``run_job`` is a thin
+wrapper that reads those arguments from a job.json file; the HTTP API
+(api/analyze.py) calls ``build_report`` directly from an uploaded file
+instead - both drive the identical pipeline, so there is exactly one
+implementation of "how a report gets built," not two.
 """
 
 import json
@@ -81,29 +85,61 @@ def _run_ask(rows, source, ask):
     raise ValueError(f"unknown ask kind: {kind!r}")
 
 
-def run_job(job_dir, evidence_dir=None):
-    """Run the full pipeline for the job in ``job_dir``; return the section text."""
-    job_dir = Path(job_dir)
-    job = json.loads((job_dir / "job.json").read_text(encoding="utf-8"))
+def build_report(
+    source_path,
+    schema,
+    title,
+    *,
+    asks=None,
+    template=None,
+    currency_unit="actual",
+    evidence_dir=None,
+    extract_options=None,
+):
+    """Run L0 -> L1 -> L2 -> L4 for one source file; return the section text.
 
-    source_path = job_dir / job["source"]
-    source_hash = store(source_path, evidence_dir)                    # L0
-    rows = _extract_rows(source_path, job["schema"], job)             # L1
+    Exactly one of ``asks`` or ``template`` is required. ``extract_options``
+    is passed through to the L1 extractor for format-specific choices
+    (``sheet``, ``table_index``, ``slide_index``) - see the individual
+    extractors in ``analystos.l1``.
+    """
+    if (asks is None) == (template is None):
+        raise ValueError('exactly one of "asks" or "template" is required')
 
-    if "asks" in job:
-        asks = job["asks"]
-    elif "template" in job:
-        asks = build_asks(job["template"], rows)
-    else:
-        raise ValueError("job.json needs either \"asks\" or \"template\"")
+    source_path = Path(source_path)
+    source_hash = store(source_path, evidence_dir)                          # L0
+    rows = _extract_rows(source_path, schema, extract_options or {})        # L1
+
+    if template:
+        asks = build_asks(template, rows)
 
     findings = []
     for ask in asks:
-        result = _run_ask(rows, source_hash, ask)                     # L2
+        result = _run_ask(rows, source_hash, ask)                          # L2
         findings.append({"text": ask["text"], "format": ask.get("format"), **result})
 
-    currency_unit = job.get("currency_unit", "actual")
-    return render_section(job["title"], findings, currency_unit)      # L4
+    return render_section(title, findings, currency_unit)                   # L4
+
+
+def run_job(job_dir, evidence_dir=None):
+    """Run the job in ``job_dir`` (reads job.json); return the section text.
+
+    ``build_report`` raises if job.json has neither "asks" nor "template"
+    (or both) - see there for the exact message.
+    """
+    job_dir = Path(job_dir)
+    job = json.loads((job_dir / "job.json").read_text(encoding="utf-8"))
+
+    return build_report(
+        job_dir / job["source"],
+        job["schema"],
+        job["title"],
+        asks=job.get("asks"),
+        template=job.get("template"),
+        currency_unit=job.get("currency_unit", "actual"),
+        evidence_dir=evidence_dir,
+        extract_options=job,
+    )
 
 
 def main(argv=None):

@@ -59,6 +59,22 @@ no build step, matching how `site/index.html` is already written.
    one `fetch` to `/api/analyze`.
 5. `python3 -m unittest discover -s tests -v` passes (with the venv active).
 
+## Verified beyond the test suite
+
+Drove a real Chromium browser (Playwright) against the real `api/analyze.py`
+Flask app served locally alongside `site/` on one origin (so the page's
+relative `fetch('/api/analyze')` resolves exactly as it will under Vercel):
+uploaded a real matching CSV through the actual `<input type="file">` and
+confirmed the returned, cited report rendered inside the iframe (revenue,
+margins, and the YoY growth ask all present with footnote markers); then
+uploaded a CSV missing the schema's declared columns and confirmed a
+readable error message appeared on the page instead of a raw JSON dump or a
+silent failure. The only console/network anomaly seen was the Google Fonts
+stylesheet failing to load — `fonts.googleapis.com` isn't reachable from
+this sandboxed test environment; that `<link>` already exists unchanged in
+`site/index.html` from before this slice, so it isn't a regression, and it
+will resolve normally once deployed.
+
 ## Not in this slice
 
 - Auto-detecting or guessing `schema` from the uploaded file's actual

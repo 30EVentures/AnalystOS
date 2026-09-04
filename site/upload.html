@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Try AnalystOS — upload a document, get a cited report</title>
+<meta name="description" content="Upload a CSV, Excel, Word, or PowerPoint document and get a cited report back, right in your browser.">
+<link rel="canonical" href="https://analyst-os-phi.vercel.app/upload.html">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%232F5CE0%22>▸</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --paper:#F3F4F7; --surface:#FBFBFD; --raised:#FFFFFF;
+  --ink:#10151F; --graphite:#565E6B; --faint:#8A93A1;
+  --hairline:#D9DCE3; --hairline-strong:#C3C8D2;
+  --institutional:#1B3A6B; --signal:#2F5CE0; --signal-ink:#22326b;
+  --amber:#A9631A; --amber-ink:#8a5115; --good:#1C7A57;
+  --font-display:"Newsreader",Georgia,"Times New Roman",serif;
+  --font-sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --measure:62ch; --pad:clamp(1.25rem,5vw,4rem);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0B0F16; --surface:#121824; --raised:#161D2B;
+  --ink:#E9ECF2; --graphite:#9AA4B4; --faint:#6C7787;
+  --hairline:#25303F; --hairline-strong:#33404F;
+  --institutional:#A8C1EA; --signal:#7297FF; --signal-ink:#b9caff;
+  --amber:#D79A5C; --amber-ink:#E4B27E; --good:#57C79E;
+}}
+:root[data-theme="dark"]{
+  --paper:#0B0F16; --surface:#121824; --raised:#161D2B;
+  --ink:#E9ECF2; --graphite:#9AA4B4; --faint:#6C7787;
+  --hairline:#25303F; --hairline-strong:#33404F;
+  --institutional:#A8C1EA; --signal:#7297FF; --signal-ink:#b9caff;
+  --amber:#D79A5C; --amber-ink:#E4B27E; --good:#57C79E;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--font-sans);font-size:1.05rem;line-height:1.6;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+h1,h2{font-family:var(--font-display);font-weight:500;text-wrap:balance;line-height:1.15;margin:0}
+p{margin:0}
+a{color:var(--signal);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--signal) 35%,transparent)}
+a:hover{border-bottom-color:var(--signal)}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--signal);outline-offset:2px;border-radius:2px}
+.mono{font-family:var(--font-mono)}
+.wrap{max-width:48rem;margin:0 auto;padding:0 var(--pad)}
+.eyebrow{font-family:var(--font-mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+
+header.top{border-bottom:1px solid var(--hairline);position:sticky;top:0;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);z-index:10}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:1.1rem var(--pad);max-width:48rem;margin:0 auto}
+.wordmark{font-family:var(--font-sans);font-weight:600;font-size:1.15rem;letter-spacing:-.01em;display:inline-flex;align-items:baseline;gap:.12em;color:var(--ink);border-bottom:none}
+.wordmark .os{font-family:var(--font-mono);font-weight:500;font-size:.78em;border:1px solid var(--hairline-strong);border-radius:3px;padding:0 .28em;color:var(--signal-ink)}
+.caret{color:var(--signal)}
+.btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:8px;padding:.6rem 1.15rem;font-size:.92rem;font-weight:600;border:1px solid var(--signal);background:var(--signal);color:#fff;border-bottom:none;cursor:pointer}
+.btn:hover{filter:brightness(1.06)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--hairline-strong)}
+.btn:disabled{opacity:.55;cursor:not-allowed;filter:none}
+
+main{padding:clamp(2.5rem,6vw,4rem) 0 5rem}
+.page-head{margin-bottom:2.2rem}
+.page-head h1{font-size:clamp(1.9rem,4.5vw,2.5rem);margin:.6rem 0 .8rem}
+.page-head p{color:var(--graphite);max-width:52ch;line-height:1.6}
+
+.form-card{border:1px solid var(--hairline);border-radius:12px;background:var(--surface);padding:1.8rem 1.6rem}
+.field{margin-bottom:1.3rem}
+.field:last-of-type{margin-bottom:0}
+.field label{display:block;font-family:var(--font-mono);font-size:.78rem;letter-spacing:.03em;color:var(--graphite);margin-bottom:.45rem}
+.field .hint{font-family:var(--font-mono);font-size:.74rem;color:var(--faint);margin-top:.5rem;line-height:1.6}
+input[type=file],input[type=text],select,textarea{
+  width:100%;font-family:var(--font-mono);font-size:.88rem;
+  padding:.6rem .7rem;border:1px solid var(--hairline-strong);border-radius:8px;
+  background:var(--raised);color:var(--ink);
+}
+textarea{min-height:7.5rem;resize:vertical;line-height:1.5}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+@media (max-width:520px){.row2{grid-template-columns:1fr}}
+.submit-row{margin-top:1.6rem;display:flex;align-items:center;gap:1rem}
+#status{font-family:var(--font-mono);font-size:.82rem;color:var(--faint)}
+
+#error{
+  margin-top:1.4rem;border:1px solid color-mix(in srgb,var(--amber) 45%,var(--hairline-strong));
+  border-radius:8px;padding:.9rem 1.1rem;background:color-mix(in srgb,var(--amber) 8%,var(--surface));
+  color:var(--amber-ink);font-size:.92rem;line-height:1.5;
+}
+#result{margin-top:2.2rem}
+#result h2{font-size:1.15rem;margin-bottom:.9rem}
+#report-frame{width:100%;min-height:70vh;border:1px solid var(--hairline);border-radius:12px;background:#fff}
+
+[hidden]{display:none!important}
+
+footer{border-top:1px solid var(--hairline);padding:2rem 0 3rem;margin-top:2rem}
+footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);line-height:1.7;max-width:60ch}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="topbar">
+    <a class="wordmark" href="index.html">Analyst<span class="os">OS</span><span class="caret">▸</span></a>
+    <a class="btn ghost" href="index.html">← Back to site</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="page-head">
+      <p class="eyebrow">Live preview</p>
+      <h1>Upload a document, get a cited report.</h1>
+      <p>Pick a CSV, Excel, Word, or PowerPoint file, tell it which columns hold what, and this calls the real <code class="mono">/api/analyze</code> endpoint — the same pipeline the CLI runs. Nothing you upload is stored; it's processed for this one request and discarded.</p>
+    </div>
+
+    <form id="analyze-form" class="form-card">
+      <div class="field">
+        <label for="file">Document</label>
+        <input type="file" id="file" name="file" accept=".csv,.xlsx,.docx,.pptx" required>
+        <p class="hint">.csv, .xlsx, .docx, or .pptx. No file handy? <a href="data:text/csv;charset=utf-8,period%2Crevenue%2Ccost_of_revenue%2Cgross_profit%2Coperating_expenses%2Coperating_income%2Cnet_income%0AFY2023%2C1000000%2C400000%2C600000%2C250000%2C350000%2C280000%0AFY2024%2C1250000%2C475000%2C775000%2C300000%2C475000%2C390000%0A" download="sample-income-statement.csv">download a sample CSV</a> that matches the schema below.</p>
+      </div>
+
+      <div class="field">
+        <label for="schema">Schema (JSON: column name → "text" or "number")</label>
+        <textarea id="schema" name="schema" spellcheck="false">{"period": "text", "revenue": "number", "cost_of_revenue": "number", "gross_profit": "number", "operating_expenses": "number", "operating_income": "number", "net_income": "number"}</textarea>
+        <p class="hint">Must match the column names in your file exactly. Edit this to match your own document.</p>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label for="title">Title (optional)</label>
+          <input type="text" id="title" name="title" placeholder="Review of your-file.csv">
+        </div>
+        <div class="field">
+          <label for="currency_unit">Currency scale</label>
+          <select id="currency_unit" name="currency_unit">
+            <option value="actual" selected>Actual (no scaling)</option>
+            <option value="thousands">Data is in thousands</option>
+            <option value="millions">Data is in millions</option>
+          </select>
+        </div>
+      </div>
+
+      <input type="hidden" name="template" value="income_statement">
+      <p class="hint">Template: <span class="mono">income_statement</span> — the only one that exists yet.</p>
+
+      <div class="submit-row">
+        <button type="submit" class="btn">Generate report ▸</button>
+        <span id="status" hidden>Generating…</span>
+      </div>
+
+      <div id="error" role="alert" hidden></div>
+    </form>
+
+    <div id="result" hidden>
+      <h2>Report</h2>
+      <iframe id="report-frame" title="Generated report"></iframe>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="fine">This page is a live, unauthenticated preview — anyone with this URL can use it. Uploaded files are processed for one request only and never written to persistent storage.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var form = document.getElementById('analyze-form');
+  var submitBtn = form.querySelector('button[type="submit"]');
+  var statusEl = document.getElementById('status');
+  var errorEl = document.getElementById('error');
+  var resultEl = document.getElementById('result');
+  var frame = document.getElementById('report-frame');
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    errorEl.hidden = true;
+    resultEl.hidden = true;
+    submitBtn.disabled = true;
+    statusEl.hidden = false;
+
+    var body = new FormData(form);
+
+    fetch('/api/analyze', { method: 'POST', body: body })
+      .then(function (resp) {
+        return resp.json().then(function (data) {
+          if (!resp.ok) {
+            throw new Error(data.error || ('request failed with status ' + resp.status));
+          }
+          return data;
+        });
+      })
+      .then(function (data) {
+        frame.srcdoc = data.html;
+        resultEl.hidden = false;
+      })
+      .catch(function (err) {
+        errorEl.textContent = err.message || 'Something went wrong. Please try again.';
+        errorEl.hidden = false;
+      })
+      .finally(function () {
+        submitBtn.disabled = false;
+        statusEl.hidden = true;
+      });
+  });
+})();
+</script>
+
+</body>
+</html>

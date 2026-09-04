@@ -59,7 +59,7 @@ testable product that already covers four real document formats.
 **→ MVP live here: upload a CSV/Excel/Word/PowerPoint file in a browser,
 get a cited report back.**
 
-- Slice 23 — L1: PDF input — extraction + human confirm-before-cite step
+- Slice 23 — L1: PDF input — extraction + human confirm-before-cite step  ✓ done (PR #27)
 - Slice 24 — L4: real `.pdf` output (`reportlab`)
 
 ## R1 — trusted on one desk (Oct–Dec 2026)

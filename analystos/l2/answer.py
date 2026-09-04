@@ -7,9 +7,23 @@ input cells they were computed from.
 """
 
 
-def _cell(source, i, column):
-    """A citation to one cell: CSV line number is the row index + 2 (header = 1)."""
-    return {"source": source, "row": i + 2, "column": column}
+def _row_num(rows, i):
+    """The citation row number for ``rows[i]``.
+
+    L1 extractors (``analystos.l1.schema.Rows``) attach the *real* source row
+    as ``rows.row_nums`` - authoritative even when rows were skipped (a blank
+    spreadsheet row), so it is always used when present. Hand-built plain
+    lists (as in this module's own tests) have no such attribute; for those,
+    fall back to the CSV assumption that no rows were ever skipped (header is
+    row 1, so position 0 is row 2).
+    """
+    row_nums = getattr(rows, "row_nums", None)
+    return row_nums[i] if row_nums is not None else i + 2
+
+
+def _cell(rows, i, column, source):
+    """A citation to one cell."""
+    return {"source": source, "row": _row_num(rows, i), "column": column}
 
 
 def _require_columns(rows, *columns):
@@ -60,7 +74,7 @@ def answer_lookup(rows, *, source, where, select):
     if not hits:
         raise ValueError(f"no row where {match_col!r} == {match_val!r}")
     if len(hits) > 1:
-        lines = [i + 2 for i in hits]
+        lines = [_row_num(rows, i) for i in hits]
         raise ValueError(
             f"{len(hits)} rows where {match_col!r} == {match_val!r} "
             f"(lines {lines}); expected exactly one"
@@ -69,7 +83,7 @@ def answer_lookup(rows, *, source, where, select):
     i = hits[0]
     return {
         "answer": rows[i][select],
-        "citation": {"source": source, "row": i + 2, "column": select},
+        "citation": _cell(rows, i, select, source),
     }
 
 
@@ -100,8 +114,8 @@ def answer_growth(rows, *, source, key_column, from_key, to_key, value_column):
     return {
         "answer": pct,
         "citation": [
-            _cell(source, i_from, value_column),
-            _cell(source, i_to, value_column),
+            _cell(rows, i_from, value_column, source),
+            _cell(rows, i_to, value_column, source),
         ],
     }
 
@@ -120,5 +134,8 @@ def answer_ratio(rows, *, source, key_column, key, numerator, denominator):
     pct = round(rows[i][numerator] / den * 100, 1)
     return {
         "answer": pct,
-        "citation": [_cell(source, i, numerator), _cell(source, i, denominator)],
+        "citation": [
+            _cell(rows, i, numerator, source),
+            _cell(rows, i, denominator, source),
+        ],
     }

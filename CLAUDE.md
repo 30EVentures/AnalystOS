@@ -8,7 +8,18 @@ design is in `docs/architecture.md`; the plan is in `ROADMAP.md`.
 ## How to run
 
 - This repo lives at the nested path `~/AnalystOS/AnalystOS`. `cd` there first.
-- Language: Python 3 (developed on 3.14). Standard library only for now.
+- Language: Python 3 (developed on 3.14).
+- Since Slice 16, AnalystOS has third-party dependencies (see `requirements.txt`
+  and `docs/decisions.md`). Set up the virtual environment once:
+
+  ```
+  python3 -m venv .venv
+  source .venv/bin/activate
+  python3 -m pip install -r requirements.txt
+  ```
+
+  `source .venv/bin/activate` again at the start of every session before
+  running tests or the app — a fresh terminal doesn't have it active.
 - Tests:
 
   ```
@@ -31,8 +42,9 @@ design is in `docs/architecture.md`; the plan is in `ROADMAP.md`.
 ## Boundaries — ask before changing
 
 - `fixtures/golden/` is the regression set. Add cases; do not edit existing ones.
-- Do not add third-party packages or a virtual environment unless that is the
-  explicit point of the slice.
+- Dependencies are now allowed when a slice's explicit point is adding one
+  (Slice 16 opened this). Pin an exact version in `requirements.txt` and
+  record *why* in `docs/decisions.md` every time - don't add one quietly.
 
 ## Where things are
 

@@ -2,6 +2,36 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-04 — First third-party dependencies: a live MVP, multi-format input
+
+Ending the stdlib-only period from Slice 1. Reason: a live, browser-based MVP
+("upload a document, get a report") needs things the standard library
+genuinely doesn't do well — reading Excel/Word/PowerPoint/PDF files, and
+running a web server.
+
+- **Hosting: Python + Vercel**, not a separate always-on server (Render/Fly).
+  Keeps everything on one host Caleb already knows. Consequence: Vercel's
+  Python functions are WSGI, so the web layer will be **Flask**, not FastAPI.
+  Free-tier functions time out at 10s — fine for CSV/Excel/Word/PowerPoint
+  (sub-second), a real constraint once PDF extraction is in the request path;
+  revisit hosting then if it becomes an issue.
+- **Input formats, in order: Excel → Word → PowerPoint → PDF.** The first
+  three are structured data (a cell/table object, not an inferred layout) —
+  same reliability guarantee as CSV, no review step needed. **PDF is
+  different**: table extraction infers column boundaries from a page's visual
+  layout and can be wrong. Because the product's entire premise is "every
+  number is defensible," a PDF-extracted table is never cited directly — it's
+  shown to a person to confirm or correct first. Scanned/image PDFs (which
+  need OCR) are explicitly out of scope: OCR is slow and would blow the
+  10-second Vercel limit, and it's a different, heavier problem.
+- **Output: a real generated `.pdf`**, not "open the HTML and print." Chosen
+  library: **`reportlab`**, not `weasyprint` — weasyprint needs system
+  graphics libraries (Cairo/Pango) that don't reliably install on Vercel's
+  serverless functions; reportlab is pure Python with no system dependencies,
+  so it won't work locally and silently fail in production.
+- Each dependency is added in the slice that needs it, pinned exactly in
+  `requirements.txt`, with the reason recorded here - not all at once.
+
 ## 2026-09-03 — Build in Python
 
 Chosen over TypeScript / Node for the first slices.

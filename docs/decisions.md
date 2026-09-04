@@ -9,9 +9,16 @@ on a column whose values are actually raw dollars (or vice versa), and
 nothing catches it. The result isn't an error - it's a confidently wrong
 number (a $150,000 loss rendered as "($150.0B)"). This is exactly the
 failure mode the whole hardening effort is meant to prevent, and it isn't
-fixed yet. Candidate for the report-template slice (21): a template that
-generates the asks could also know - or sanity-check - the expected scale,
-rather than leaving it to whoever writes `job.json` to get right by hand.
+fixed yet. Candidate for the report-template slice (renumbered to 19 - moved
+earlier when PDF was pushed after the MVP): a template that generates the
+asks could also know - or sanity-check - the expected scale, rather than
+leaving it to whoever writes `job.json` to get right by hand.
+
+**Update, same day, demoing Slice 18:** hit the identical mistake again -
+`usd_millions` on raw-dollar PowerPoint figures produced "$4,200.0B" instead
+of "$4.2M", no error either time. Two for two. This is not a one-off typo
+risk, it is a genuinely easy mistake, which raises the priority of fixing it
+in Slice 19 rather than just documenting it.
 
 ## 2026-09-04 — First third-party dependencies: a live MVP, multi-format input
 

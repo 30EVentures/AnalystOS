@@ -43,15 +43,24 @@ FastAPI); structured formats (Excel/Word/PowerPoint) trusted directly, PDF
 extraction always confirmed by a person before it's cited; real `.pdf`
 output via `reportlab`.
 
+Reordered 2026-09-04: PDF (input + output) moved to *after* the MVP ships,
+not before — it needs its own review-step UI and shouldn't gate a live,
+testable product that already covers four real document formats.
+
 - Slice 16 — L1: Excel (.xlsx) input, first dependency (`openpyxl`)  ✓ done (PR #18)
-- Slice 17 — L1: Word (.docx) table input  ← in progress
-- Slice 18 — L1: PowerPoint (.pptx) table input
-- Slice 19 — L1: PDF input — extraction + human confirm-before-cite step
-- Slice 20 — L4: real `.pdf` output (`reportlab`)
-- Slice 21 — report templates: auto-generate the standard asks from recognized columns
-- Slice 22 — the API: `api/analyze.py` (Flask, on Vercel)
-- Slice 23 — the upload page on `site/`
-- Slice 24 — access gating (not public on day one)
+- Slice 17 — L1: Word (.docx) table input  ✓ done (PR #19)
+- Slice 18 — L1: PowerPoint (.pptx) table input  ← in progress
+- Slice 19 — report templates: auto-generate the standard asks from
+  recognized columns; also fixes the format-scale risk (see decisions.md)
+- Slice 20 — the API: `api/analyze.py` (Flask, on Vercel)
+- Slice 21 — the upload page on `site/`
+- Slice 22 — access gating (not public on day one)
+
+**→ MVP live here: upload a CSV/Excel/Word/PowerPoint file in a browser,
+get a cited report back.**
+
+- Slice 23 — L1: PDF input — extraction + human confirm-before-cite step
+- Slice 24 — L4: real `.pdf` output (`reportlab`)
 
 ## R1 — trusted on one desk (Oct–Dec 2026)
 

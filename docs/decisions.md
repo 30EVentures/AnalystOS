@@ -2,6 +2,27 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-04 — PDF output: reportlab put to its actual use (Slice 24)
+
+`reportlab`, pinned since Slice 23 for test fixtures only, is now used for
+its actual intended purpose: `analystos.l4.export.render_pdf` builds a real
+generated `.pdf` from a rendered section - a title, one paragraph per
+finding, a rule, then footnotes - mirroring `render_html`'s layout via a
+shared `_parse_section` helper so there is exactly one place that parses a
+section string, not two. Verified directly before finalizing this design:
+built a real `reportlab` document with a superscript marker and a bold
+footnote number, then read the exact expected text back out with
+`pdfplumber` - title, body sentence, and footnote citation all present.
+
+Scoped to L4/CLI only, matching Slice 23's own discipline: `api/analyze.py`
+and `site/upload.html` are untouched. A real PDF *download* on the live
+site is a genuine, separate product decision (a new API response shape, a
+UI affordance) worth its own scoped slice, not a rider on this one - until
+then the live MVP's only path to a PDF is still the browser's own Print.
+`[n]` footnote markers render as plain superscripts in the PDF, not
+clickable links like the HTML version's same-page anchors - a PDF has no
+equivalent low-effort mechanism, a disclosed gap, not an oversight.
+
 ## 2026-09-04 — PDF input: pdfplumber, and pulling reportlab forward (Slice 23)
 
 `pdfplumber==0.11.10` for table extraction — verified directly before

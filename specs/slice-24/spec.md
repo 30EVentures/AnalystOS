@@ -79,6 +79,17 @@ the exact same parsed section structure.
    there.
 6. `python3 -m unittest discover -s tests -v` passes (with the venv active).
 
+## Verified beyond the test suite
+
+Ran the real CLI (`python3 -m analystos <job-dir>`) against a real copy of
+the golden fixture and rendered the resulting `section.pdf` to an image
+(via `pdfplumber`'s own page-to-image, not just text extraction) to look at
+it directly - not just confirm the text round-trips. It's a real, legible
+one-page PDF: the title, three body sentences each with a correctly
+positioned superscript footnote marker, a horizontal rule, and three gray
+footnotes citing the real SHA-256 source hash - matching the design intent
+exactly, not just passing an assertion.
+
 ## Not in this slice
 
 - **A "Download PDF" button on the live site, or a PDF-returning API

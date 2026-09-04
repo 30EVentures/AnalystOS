@@ -1,9 +1,12 @@
 """Tests for L4 render_section - one per "Done when" in specs/slice-6/spec.md."""
 
+import io
 import re
 import unittest
 
-from analystos.l4.export import render_html, render_section
+import pdfplumber
+
+from analystos.l4.export import render_html, render_pdf, render_section
 
 
 class RenderSectionTest(unittest.TestCase):
@@ -186,6 +189,36 @@ class RenderSectionTest(unittest.TestCase):
         self.assertIn("<h1>A &amp; B</h1>", page)
         self.assertIn("R&amp;D &lt;spend&gt; was 1 &amp; 2.", page)
         self.assertNotIn("<spend>", page)
+
+    # --- render_pdf (slice 24) ---
+
+    def test_render_pdf_returns_real_pdf_bytes(self):  # Done when #1
+        pdf_bytes = render_pdf(render_section("Revenue", self.findings))
+        self.assertTrue(pdf_bytes.startswith(b"%PDF-"))
+
+    def test_render_pdf_round_trips_title_body_and_footnotes(self):  # Done when #2
+        pdf_bytes = render_pdf(render_section("Revenue", self.findings))
+        with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+            text = "\n".join(page.extract_text() or "" for page in pdf.pages)
+        self.assertIn("Revenue", text)
+        self.assertIn("FY2024 revenue was 4200000.0.", text)
+        self.assertIn("FY2023 revenue was 3560000.0.", text)
+        self.assertIn(f'source {self.src} - row 3, column "revenue"', text)
+        self.assertIn(f'source {self.src} - row 2, column "revenue"', text)
+
+    def test_render_pdf_escapes_special_characters(self):  # Done when #2, cross-check with HTML
+        findings = [
+            {
+                "text": "R&D <spend> was {answer}.",
+                "answer": "1 & 2",
+                "citation": {"source": "x" * 64, "row": 2, "column": "r&d"},
+            }
+        ]
+        pdf_bytes = render_pdf(render_section("A & B", findings))
+        with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+            text = "\n".join(page.extract_text() or "" for page in pdf.pages)
+        self.assertIn("A & B", text)
+        self.assertIn("R&D <spend> was 1 & 2.", text)
 
 
 if __name__ == "__main__":

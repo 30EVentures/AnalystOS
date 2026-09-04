@@ -39,13 +39,26 @@ with it - there is no per-sentence choice left to get wrong.
 marker, and lists the citations as footnotes underneath. It returns the
 section as a string; it does not write a file.
 
-``render_html`` turns that string into a standalone, printable HTML page. It
-is purpose-built for the format ``render_section`` produces - not a general
-Markdown renderer.
+``render_html`` turns that string into a standalone, printable HTML page.
+``render_pdf`` turns it into a real generated PDF - not "open the HTML and
+print" (see docs/decisions.md, Slice 24) - with `reportlab`. Both are
+purpose-built for the format ``render_section`` produces - not a general
+Markdown renderer - and both render the exact same parsed structure
+(``_parse_section``): a title, body paragraphs, and footnote lines. A `[n]`
+marker becomes a same-page anchor link in the HTML but only a plain
+superscript in the PDF - a PDF has no equivalent low-effort mechanism, a
+disclosed gap, not an oversight.
 """
 
 import html
+import io
 import re
+from xml.sax.saxutils import escape as xml_escape
+
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.platypus import HRFlowable, Paragraph, SimpleDocTemplate, Spacer
 
 _MARKER_RE = re.compile(r"\[(\d+)\]")
 _FOOTNOTE_RE = re.compile(r"^\[(\d+)\]\s*(.*)$")
@@ -180,8 +193,13 @@ def _note_html(line):
     )
 
 
-def render_html(section_md):
-    """Render a section produced by ``render_section`` as a standalone HTML page."""
+def _parse_section(section_md):
+    """Split a rendered section into (title, body paragraphs, footnote lines).
+
+    Shared by every L4 renderer (``render_html``, ``render_pdf``) - each is
+    just a different rendering of this same parsed structure, so there is
+    exactly one place that does the parsing.
+    """
     body_part, _, notes_part = section_md.partition("\n---\n")
     chunks = [c.strip() for c in body_part.strip().split("\n\n") if c.strip()]
 
@@ -193,16 +211,69 @@ def render_html(section_md):
         else:
             paragraphs.append(chunk)
 
+    notes = [line.strip() for line in notes_part.strip().split("\n") if line.strip()]
+    return title, paragraphs, notes
+
+
+def render_html(section_md):
+    """Render a section produced by ``render_section`` as a standalone HTML page."""
+    title, paragraphs, notes = _parse_section(section_md)
+
     esc_title = html.escape(title)
     body = "\n".join(f"<p>{_para_html(p)}</p>" for p in paragraphs)
-    notes = "\n".join(
-        _note_html(line) for line in notes_part.strip().split("\n") if line.strip()
-    )
+    notes_html = "\n".join(_note_html(line) for line in notes)
 
     return (
         "<!doctype html>\n"
         '<html lang="en">\n<head>\n<meta charset="utf-8">\n'
         f"<title>{esc_title}</title>\n<style>{_STYLE}</style>\n</head>\n<body>\n"
         f"<h1>{esc_title}</h1>\n{body}\n<hr>\n"
-        f'<div class="footnotes">\n{notes}\n</div>\n</body>\n</html>\n'
+        f'<div class="footnotes">\n{notes_html}\n</div>\n</body>\n</html>\n'
     )
+
+
+_FOOTNOTE_STYLE = ParagraphStyle(
+    "AnalystOSFootnote", fontSize=8, leading=11, textColor=colors.HexColor("#555555")
+)
+
+
+def _para_pdf_markup(text):
+    """Escape a body paragraph for reportlab's markup and turn ``[n]`` into a superscript."""
+    esc = xml_escape(text)
+    return _MARKER_RE.sub(lambda m: f"<super>{m.group(1)}</super>", esc)
+
+
+def _note_pdf_markup(line):
+    """Turn a ``[n] ...`` footnote line into reportlab markup with a bold number."""
+    m = _FOOTNOTE_RE.match(line.strip())
+    if not m:
+        return xml_escape(line.strip())
+    n, rest = m.group(1), xml_escape(m.group(2))
+    return f"<b>{n}.</b> {rest}"
+
+
+def render_pdf(section_md):
+    """Render a section produced by ``render_section`` as real PDF bytes.
+
+    A real generated PDF via ``reportlab`` - not "open the HTML and print"
+    (see docs/decisions.md, Slice 24). Returns bytes; does not write a file,
+    same contract as ``render_section`` returning a string.
+    """
+    title, paragraphs, notes = _parse_section(section_md)
+    styles = getSampleStyleSheet()
+
+    story = [Paragraph(xml_escape(title), styles["Title"]), Spacer(1, 16)]
+    for paragraph in paragraphs:
+        story.append(Paragraph(_para_pdf_markup(paragraph), styles["BodyText"]))
+        story.append(Spacer(1, 10))
+    if notes:
+        story.append(Spacer(1, 8))
+        story.append(HRFlowable(width="100%", color=colors.HexColor("#cccccc")))
+        story.append(Spacer(1, 10))
+        for line in notes:
+            story.append(Paragraph(_note_pdf_markup(line), _FOOTNOTE_STYLE))
+            story.append(Spacer(1, 3))
+
+    buf = io.BytesIO()
+    SimpleDocTemplate(buf, pagesize=letter, title=title).build(story)
+    return buf.getvalue()

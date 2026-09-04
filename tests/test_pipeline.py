@@ -14,6 +14,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import pdfplumber
 from openpyxl import Workbook
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
@@ -104,6 +105,18 @@ class PipelineTest(unittest.TestCase):
         page = (job / "section.html").read_text(encoding="utf-8")
         self.assertIn("<!doctype html>", page)
         self.assertIn("<h1>", page)
+
+    def test_entrypoint_also_writes_a_real_section_pdf(self):  # slice 24 #4
+        job = self._golden_copy()
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            code = main([str(job)])
+        self.assertEqual(code, 0)
+        pdf_bytes = (job / "section.pdf").read_bytes()
+        self.assertTrue(pdf_bytes.startswith(b"%PDF-"))
+        with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+            text = "\n".join(page.extract_text() or "" for page in pdf.pages)
+        self.assertIn("Revenue and cost review", text)
 
     # --- ask dispatch: growth / ratio (slice 12) ---
 

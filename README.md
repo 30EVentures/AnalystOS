@@ -8,6 +8,11 @@ trail that survives review.
 
 Early build. Working through the **NOW** milestone — see [`ROADMAP.md`](ROADMAP.md).
 
+**Live:** [analyst-os-phi.vercel.app](https://analyst-os-phi.vercel.app) — the
+early-access landing page (`site/index.html`), deployed on Vercel from this
+repo's `main` branch (Output Directory: `site`). Redeploys automatically on
+every push.
+
 ## Getting started
 
 Requires Python 3.11+ (developed on 3.14). No third-party packages yet.

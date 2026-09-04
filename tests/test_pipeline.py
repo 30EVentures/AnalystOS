@@ -14,6 +14,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from openpyxl import Workbook
+
 from analystos.l0.store import hash_of
 from analystos.pipeline import main, run_job
 
@@ -101,6 +103,93 @@ class PipelineTest(unittest.TestCase):
         self.assertIn("<h1>", page)
 
     # --- ask dispatch: growth / ratio (slice 12) ---
+
+    # --- source format dispatch by extension + templates + currency_unit (slice 19) ---
+
+    def test_run_job_reads_an_xlsx_source(self):
+        job = self.tmp / "xlsx-job"
+        job.mkdir()
+        wb = Workbook()
+        ws = wb.active
+        ws.append(["period", "revenue"])
+        ws.append(["FY2024", 4200000])
+        wb.save(job / "data.xlsx")
+        (job / "job.json").write_text(
+            json.dumps(
+                {
+                    "title": "From Excel",
+                    "source": "data.xlsx",
+                    "schema": {"period": "text", "revenue": "number"},
+                    "asks": [
+                        {"text": "Revenue was {answer}.", "format": "usd",
+                         "where": ["period", "FY2024"], "select": "revenue"}
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+        out = run_job(job, evidence_dir=self.tmp / "ev")
+        self.assertIn("Revenue was $4.2M.", out)
+
+    def test_run_job_uses_a_template_when_no_asks_are_given(self):
+        job = self.tmp / "template-job"
+        job.mkdir()
+        (job / "data.csv").write_text(
+            "period,revenue,net_income\nFY2023,26974,4368\nFY2024,60922,29760\n",
+            encoding="utf-8",
+        )
+        (job / "job.json").write_text(
+            json.dumps(
+                {
+                    "title": "Auto-generated",
+                    "source": "data.csv",
+                    "schema": {"period": "text", "revenue": "number", "net_income": "number"},
+                    "template": "income_statement",
+                    "currency_unit": "actual",
+                }
+            ),
+            encoding="utf-8",
+        )
+        out = run_job(job, evidence_dir=self.tmp / "ev")
+        self.assertIn("FY2024 revenue was $60.9K.", out)
+        self.assertIn("Revenue grew 125.9% from FY2023 to FY2024.", out)
+
+    def test_run_job_with_neither_asks_nor_template_raises(self):
+        job = self.tmp / "bad-job"
+        job.mkdir()
+        (job / "data.csv").write_text("period,revenue\nFY2024,100\n", encoding="utf-8")
+        (job / "job.json").write_text(
+            json.dumps(
+                {
+                    "title": "X",
+                    "source": "data.csv",
+                    "schema": {"period": "text", "revenue": "number"},
+                }
+            ),
+            encoding="utf-8",
+        )
+        with self.assertRaises(ValueError) as cm:
+            run_job(job, evidence_dir=self.tmp / "ev")
+        self.assertIn("asks", str(cm.exception))
+
+    def test_unsupported_source_extension_raises(self):
+        job = self.tmp / "bad-ext-job"
+        job.mkdir()
+        (job / "data.txt").write_text("not a real source format", encoding="utf-8")
+        (job / "job.json").write_text(
+            json.dumps(
+                {
+                    "title": "X",
+                    "source": "data.txt",
+                    "schema": {"period": "text"},
+                    "asks": [],
+                }
+            ),
+            encoding="utf-8",
+        )
+        with self.assertRaises(ValueError) as cm:
+            run_job(job, evidence_dir=self.tmp / "ev")
+        self.assertIn(".txt", str(cm.exception))
 
     def test_run_job_dispatches_growth_and_ratio_asks(self):  # slice 12 #5
         job = self.tmp / "job"

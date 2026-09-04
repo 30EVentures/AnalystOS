@@ -19,6 +19,8 @@ class UsingDocTest(unittest.TestCase):
             "section.md",
             "section.html",
             "{answer}",
+            "template",
+            "currency_unit",
         ):
             self.assertIn(needle, text, f"guide is missing {needle!r} - is it stale?")
 

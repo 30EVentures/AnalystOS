@@ -69,13 +69,13 @@ class RenderSectionTest(unittest.TestCase):
 
     # --- number formatting (slice 15) ---
 
-    def test_format_usd_millions_scales_and_abbreviates(self):
+    def test_format_usd_scales_and_abbreviates(self):
         findings = [{
             "text": "FY2025 revenue was {answer}.", "answer": 130497.0,
-            "format": "usd_millions",
+            "format": "usd",
             "citation": {"source": self.src, "row": 4, "column": "revenue"},
         }]
-        out = render_section("Revenue", findings)
+        out = render_section("Revenue", findings, currency_unit="millions")
         self.assertIn("FY2025 revenue was $130.5B.", out)
 
     def test_format_percent_appends_percent_sign(self):
@@ -90,11 +90,42 @@ class RenderSectionTest(unittest.TestCase):
     def test_format_negative_renders_in_parentheses(self):
         findings = [{
             "text": "Net income was {answer}.", "answer": -50.0,
-            "format": "usd_millions",
+            "format": "usd",
+            "citation": {"source": self.src, "row": 2, "column": "net_income"},
+        }]
+        out = render_section("Loss", findings, currency_unit="millions")
+        self.assertIn("Net income was ($50.0M).", out)
+
+    def test_currency_unit_actual_is_the_default(self):
+        # 150000 raw dollars, no currency_unit given -> $150.0K, not $150.0M
+        findings = [{
+            "text": "Net income was {answer}.", "answer": -150000.0,
+            "format": "usd",
             "citation": {"source": self.src, "row": 2, "column": "net_income"},
         }]
         out = render_section("Loss", findings)
-        self.assertIn("Net income was ($50.0M).", out)
+        self.assertIn("Net income was ($150.0K).", out)
+
+    def test_currency_unit_applies_to_every_usd_finding_in_the_section(self):
+        # the whole point: one setting, every usd figure in the report scales
+        # the same way - no per-sentence choice to get wrong
+        findings = [
+            {"text": "Revenue was {answer}.", "answer": 130497.0, "format": "usd",
+             "citation": {"source": self.src, "row": 4, "column": "revenue"}},
+            {"text": "Net income was {answer}.", "answer": 72880.0, "format": "usd",
+             "citation": {"source": self.src, "row": 4, "column": "net_income"}},
+        ]
+        out = render_section("Summary", findings, currency_unit="millions")
+        self.assertIn("Revenue was $130.5B.", out)
+        self.assertIn("Net income was $72.9B.", out)
+
+    def test_unknown_currency_unit_raises(self):
+        findings = [{
+            "text": "X was {answer}.", "answer": 1.0, "format": "usd",
+            "citation": {"source": self.src, "row": 2, "column": "x"},
+        }]
+        with self.assertRaises(ValueError):
+            render_section("X", findings, currency_unit="pesos")
 
     def test_format_number_adds_thousands_commas(self):
         findings = [{

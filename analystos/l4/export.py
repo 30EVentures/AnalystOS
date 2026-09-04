@@ -6,7 +6,7 @@ The caller supplies a title and a list of *findings*. Each finding is a dict::
         "text": "Total FY2024 revenue was {answer}.",   # must contain {answer}
         "answer": 4200000.0,
         "citation": {"source": <hash>, "row": 3, "column": "revenue"},
-        "format": "usd_millions",                       # optional
+        "format": "usd",                                # optional
     }
 
 A ``citation`` is either one cell (a dict) or, for a computed metric, a list
@@ -18,12 +18,22 @@ replaces ``{answer}``:
 - omitted        -> ``str(answer)``, unchanged (the old behaviour)
 - ``"number"``    -> thousands commas: ``4,200,000``
 - ``"percent"``   -> one decimal plus a percent sign: ``57.1%``
-- ``"usd"``       -> ``answer`` is already raw dollars: ``$1.2K`` / ``$4.2M`` / ``$1.3B``
-- ``"usd_millions"`` -> ``answer`` is expressed in millions of dollars (how
-  most income statements report): scaled the same way
+- ``"usd"``       -> a dollar amount, compactly scaled: ``$1.2K`` / ``$4.2M`` / ``$1.3B``
 
 A negative value renders in parentheses under any format - ``($500.3M)`` -
 the standard accounting convention for a loss.
+
+``"usd"`` alone does not say what scale the raw number is *in* - a table's
+"revenue" column might hold ``4200000`` meaning $4.2M, or ``4200000`` meaning
+$4.2M-in-millions ($4.2 trillion). Getting this wrong produces a confidently
+wrong figure, not an error (see docs/decisions.md, 2026-09-04 - hit twice
+while demoing before this fix). So it is never guessed or set per finding:
+``render_section`` takes one ``currency_unit`` for the *whole* section -
+``"actual"`` (default, raw dollars), ``"thousands"``, or ``"millions"`` - and
+every ``"usd"``-formatted answer in it is scaled the same way. Set it once,
+by reading what the source document itself says ("$ in millions" is standard
+on a real income statement), and every figure in the report is consistent
+with it - there is no per-sentence choice left to get wrong.
 
 ``render_section`` fills each ``{answer}`` in, appends a numbered ``[n]``
 marker, and lists the citations as footnotes underneath. It returns the
@@ -59,7 +69,8 @@ hr{border:0;border-top:1px solid #ccc;margin:2.5rem 0 1.25rem}
 """
 
 
-_FORMATS = ("number", "percent", "usd", "usd_millions")
+_FORMATS = ("number", "percent", "usd")
+_CURRENCY_UNITS = {"actual": 1, "thousands": 1_000, "millions": 1_000_000}
 
 
 def _compact_usd(raw_dollars):
@@ -73,7 +84,7 @@ def _compact_usd(raw_dollars):
     return f"${raw_dollars:,.2f}"
 
 
-def _format_number(value, spec):
+def _format_number(value, spec, currency_unit="actual"):
     """Render ``value`` per ``spec`` (see module docstring); ``None`` = unchanged.
 
     Falls back to ``str(value)`` for a non-numeric answer even if a format was
@@ -94,9 +105,12 @@ def _format_number(value, spec):
     elif spec == "number":
         body = f"{n:,.0f}" if n == int(n) else f"{n:,.1f}"
     elif spec == "usd":
-        body = _compact_usd(n)
-    elif spec == "usd_millions":
-        body = _compact_usd(n * 1_000_000)
+        if currency_unit not in _CURRENCY_UNITS:
+            raise ValueError(
+                f"unknown currency_unit {currency_unit!r}; "
+                f"expected one of {tuple(_CURRENCY_UNITS)}"
+            )
+        body = _compact_usd(n * _CURRENCY_UNITS[currency_unit])
     else:
         raise ValueError(f"unknown format {spec!r}; expected one of {_FORMATS}")
 
@@ -113,8 +127,14 @@ def _footnote(n, citation):
     return f"[{n}] {_one_cell(citation)}"
 
 
-def render_section(title, findings):
-    """Return the section as text: heading, body with ``[n]`` markers, footnotes."""
+def render_section(title, findings, currency_unit="actual"):
+    """Return the section as text: heading, body with ``[n]`` markers, footnotes.
+
+    ``currency_unit`` - ``"actual"`` (default), ``"thousands"``, or
+    ``"millions"`` - is the scale every ``"usd"``-formatted finding's answer
+    is expressed in; see the module docstring for why this is a single
+    section-wide setting rather than a per-finding choice.
+    """
     body = []
     footnotes = []
     for n, finding in enumerate(findings, start=1):
@@ -123,7 +143,7 @@ def render_section(title, findings):
             raise ValueError(
                 f"finding {n}: text has no {{answer}} placeholder: {text!r}"
             )
-        rendered = _format_number(finding["answer"], finding.get("format"))
+        rendered = _format_number(finding["answer"], finding.get("format"), currency_unit)
         body.append(text.replace("{answer}", rendered) + f" [{n}]")
         footnotes.append(_footnote(n, finding["citation"]))
 

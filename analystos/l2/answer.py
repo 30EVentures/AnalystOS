@@ -78,7 +78,11 @@ def answer_growth(rows, *, source, key_column, from_key, to_key, value_column):
     ``to_key`` row, rounded to one decimal place.
 
     ``citation`` is a list of the two input cells. Raises ``ValueError`` on an
-    absent column, no/many matching rows, or a zero base value.
+    absent column, no/many matching rows, a zero base value, or a negative
+    base value - a percent change computed from a loss (or any negative
+    base) is mathematically defined but routinely misleading (a move from a
+    $50M loss to a $30M profit is not "-160% growth"), so it is refused
+    rather than silently reported.
     """
     _require_columns(rows, key_column, value_column)
     i_from = _row_index(rows, key_column, from_key)
@@ -86,6 +90,12 @@ def answer_growth(rows, *, source, key_column, from_key, to_key, value_column):
     base = rows[i_from][value_column]
     if base == 0:
         raise ValueError(f"cannot compute growth: {value_column!r} is 0 in the base row")
+    if base < 0:
+        raise ValueError(
+            f"cannot compute a percent change from a negative base "
+            f"({value_column!r} = {base} in the {from_key!r} row) - state the "
+            f"change in absolute terms instead"
+        )
     pct = round((rows[i_to][value_column] - base) / base * 100, 1)
     return {
         "answer": pct,

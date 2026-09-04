@@ -70,6 +70,18 @@ Change two things:
 Add as many `asks` as you want. Put a comma between entries; the **last** entry
 has no comma after it.
 
+**Making numbers readable.** Add an optional `"format"` to any ask so the
+number prints properly instead of raw (`4200000.0`):
+
+- `"usd_millions"` — your data is in millions of dollars (how most income
+  statements report): prints as `$4.2M` / `$1.3B`.
+- `"usd"` — your data is already in raw dollars: same abbreviation, no scaling.
+- `"percent"` — adds a `%` sign (growth and margin asks return a percent number).
+- `"number"` — adds thousands commas: `4,200,000`.
+
+A negative value always prints in parentheses — `($4.2M)` — the standard way
+of showing a loss.
+
 ---
 
 ## Step 3 — run it

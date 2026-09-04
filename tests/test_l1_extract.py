@@ -63,6 +63,41 @@ class ExtractTableTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             extract_table(path, {"period": "date"})
 
+    # --- real-world spreadsheet formats (slice 15) ---
+
+    def test_thousands_comma_is_accepted(self):
+        # the number is quoted so the embedded commas don't split the CSV column
+        path = self._csv('period,revenue\nFY2024,"4,200,000"\n')
+        rows = extract_table(path, {"period": "text", "revenue": "number"})
+        self.assertEqual(rows[0]["revenue"], 4200000.0)
+
+    def test_leading_dollar_and_trailing_percent_are_accepted(self):
+        path = self._csv('period,revenue,margin\nFY2024,"$4200000",57.1%\n')
+        rows = extract_table(
+            path, {"period": "text", "revenue": "number", "margin": "number"}
+        )
+        self.assertEqual(rows[0]["revenue"], 4200000.0)
+        self.assertEqual(rows[0]["margin"], 57.1)
+
+    def test_parenthesized_value_is_negative(self):
+        path = self._csv('period,net_income\nFY2023,"(4,368)"\n')
+        rows = extract_table(path, {"period": "text", "net_income": "number"})
+        self.assertEqual(rows[0]["net_income"], -4368.0)
+
+    def test_garbage_after_cleaning_still_raises_with_original_value(self):
+        path = self._csv('period,revenue\nFY2024,"1,234abc"\n')
+        with self.assertRaises(ValueError) as cm:
+            extract_table(path, {"period": "text", "revenue": "number"})
+        self.assertIn("1,234abc", str(cm.exception))
+
+    def test_utf8_bom_does_not_corrupt_the_first_header(self):
+        path = self.tmp / "table.csv"
+        path.write_text(
+            "period,revenue\nFY2024,4200000\n", encoding="utf-8-sig"
+        )  # Excel's "CSV UTF-8" export adds this BOM
+        rows = extract_table(path, {"period": "text", "revenue": "number"})
+        self.assertEqual(rows[0], {"period": "FY2024", "revenue": 4200000.0})
+
 
 if __name__ == "__main__":
     unittest.main()

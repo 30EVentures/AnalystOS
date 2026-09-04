@@ -27,7 +27,14 @@ Run it: `python3 -m analystos fixtures/golden`
 - Slice 10 — write the section to a file automatically      ✓ done (PR #10)
 - Slice 11 — a one-page "how to use this"                   ✓ done (PR #11)
 - Slice 12 — L2 computed metrics (growth %, ratio %)        ✓ done (PR #12)
-- Slice 13 — styled section.html that auto-opens (→ PDF via Print)  ← in progress
+- Slice 13 — styled section.html that auto-opens (→ PDF via Print)  ✓ done (PR #13)
+- Slice 15 — harden for real-world data + executive-ready numbers   ← in progress
+
+### Site
+
+- `site/` — early-access landing page, live at
+  [analyst-os-phi.vercel.app](https://analyst-os-phi.vercel.app) (PR #14),
+  deploys automatically from `main`.
 
 ## R1 — trusted on one desk (Oct–Dec 2026)
 

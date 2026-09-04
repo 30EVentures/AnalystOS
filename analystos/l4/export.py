@@ -6,10 +6,24 @@ The caller supplies a title and a list of *findings*. Each finding is a dict::
         "text": "Total FY2024 revenue was {answer}.",   # must contain {answer}
         "answer": 4200000.0,
         "citation": {"source": <hash>, "row": 3, "column": "revenue"},
+        "format": "usd_millions",                       # optional
     }
 
 A ``citation`` is either one cell (a dict) or, for a computed metric, a list
 of the cells it was derived from.
+
+``format`` is optional and controls how ``answer`` is rendered before it
+replaces ``{answer}``:
+
+- omitted        -> ``str(answer)``, unchanged (the old behaviour)
+- ``"number"``    -> thousands commas: ``4,200,000``
+- ``"percent"``   -> one decimal plus a percent sign: ``57.1%``
+- ``"usd"``       -> ``answer`` is already raw dollars: ``$1.2K`` / ``$4.2M`` / ``$1.3B``
+- ``"usd_millions"`` -> ``answer`` is expressed in millions of dollars (how
+  most income statements report): scaled the same way
+
+A negative value renders in parentheses under any format - ``($500.3M)`` -
+the standard accounting convention for a loss.
 
 ``render_section`` fills each ``{answer}`` in, appends a numbered ``[n]``
 marker, and lists the citations as footnotes underneath. It returns the
@@ -45,6 +59,50 @@ hr{border:0;border-top:1px solid #ccc;margin:2.5rem 0 1.25rem}
 """
 
 
+_FORMATS = ("number", "percent", "usd", "usd_millions")
+
+
+def _compact_usd(raw_dollars):
+    """Render a raw dollar amount as $X.XK / $X.XM / $X.XB, else $X.XX."""
+    if raw_dollars >= 1_000_000_000:
+        return f"${raw_dollars / 1_000_000_000:,.1f}B"
+    if raw_dollars >= 1_000_000:
+        return f"${raw_dollars / 1_000_000:,.1f}M"
+    if raw_dollars >= 1_000:
+        return f"${raw_dollars / 1_000:,.1f}K"
+    return f"${raw_dollars:,.2f}"
+
+
+def _format_number(value, spec):
+    """Render ``value`` per ``spec`` (see module docstring); ``None`` = unchanged.
+
+    Falls back to ``str(value)`` for a non-numeric answer even if a format was
+    requested, so a text finding with a stray "format" key never crashes.
+    """
+    if not spec:
+        return str(value)
+    try:
+        n = float(value)
+    except (TypeError, ValueError):
+        return str(value)
+
+    negative = n < 0
+    n = abs(n)
+
+    if spec == "percent":
+        body = f"{n:,.1f}%"
+    elif spec == "number":
+        body = f"{n:,.0f}" if n == int(n) else f"{n:,.1f}"
+    elif spec == "usd":
+        body = _compact_usd(n)
+    elif spec == "usd_millions":
+        body = _compact_usd(n * 1_000_000)
+    else:
+        raise ValueError(f"unknown format {spec!r}; expected one of {_FORMATS}")
+
+    return f"({body})" if negative else body
+
+
 def _one_cell(cell):
     return f'source {cell["source"]} - row {cell["row"]}, column "{cell["column"]}"'
 
@@ -65,7 +123,8 @@ def render_section(title, findings):
             raise ValueError(
                 f"finding {n}: text has no {{answer}} placeholder: {text!r}"
             )
-        body.append(text.replace("{answer}", str(finding["answer"])) + f" [{n}]")
+        rendered = _format_number(finding["answer"], finding.get("format"))
+        body.append(text.replace("{answer}", rendered) + f" [{n}]")
         footnotes.append(_footnote(n, finding["citation"]))
 
     return (

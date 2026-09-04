@@ -117,6 +117,15 @@ class AnswerLookupTest(unittest.TestCase):
                 numerator="cogs", denominator="revenue",
             )
 
+    def test_growth_from_a_negative_base_raises(self):  # slice 15 hardening
+        rows = self.rows + [{"period": "FY2025", "revenue": -50.0, "cogs": 0.0}]
+        with self.assertRaises(ValueError) as cm:
+            answer_growth(
+                rows, source=self.src, key_column="period",
+                from_key="FY2025", to_key="FY2024", value_column="revenue",
+            )
+        self.assertIn("negative base", str(cm.exception))
+
 
 if __name__ == "__main__":
     unittest.main()

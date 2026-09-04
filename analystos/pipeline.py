@@ -3,7 +3,7 @@
 A *job* is a directory holding:
 
     job.json        title, source filename, schema, and asks (or a template)
-    <source file>   the table - .csv, .xlsx, .docx, or .pptx
+    <source file>   the table - .csv, .xlsx, .docx, .pptx, or .pdf
 
 Each ask is ``{"text": "... {answer} ...", "where": [column, value],
 "select": column}`` (or a "growth"/"ratio" kind - see analystos.l2.answer).
@@ -19,6 +19,13 @@ wrapper that reads those arguments from a job.json file; the HTTP API
 (api/analyze.py) calls ``build_report`` directly from an uploaded file
 instead - both drive the identical pipeline, so there is exactly one
 implementation of "how a report gets built," not two.
+
+A ``.pdf`` source is different: pdfplumber *infers* a table's shape from the
+page's visual layout rather than reading a real table object, so it can be
+wrong in ways the other formats can't be. ``build_report`` refuses to go past
+L1 for a PDF source unless the job says ``"pdf_confirmed": true`` - a person
+has to have looked at the actual extracted table (the error raised without
+that flag shows it) before it can be cited. See ``specs/slice-23/spec.md``.
 """
 
 import json
@@ -29,6 +36,7 @@ from pathlib import Path
 from analystos.l0.store import store
 from analystos.l1.extract import extract_table
 from analystos.l1.extract_docx import extract_table_docx
+from analystos.l1.extract_pdf import extract_table_pdf
 from analystos.l1.extract_pptx import extract_table_pptx
 from analystos.l1.extract_xlsx import extract_table_xlsx
 from analystos.l2.answer import answer_growth, answer_lookup, answer_ratio
@@ -52,9 +60,28 @@ def _extract_rows(source_path, schema, job):
             slide_index=job.get("slide_index"),
             table_index=job.get("table_index", 0),
         )
+    if suffix == ".pdf":
+        return extract_table_pdf(
+            source_path,
+            schema,
+            page=job.get("page"),
+            table_index=job.get("table_index", 0),
+        )
     raise ValueError(
-        f"unsupported source file type {suffix!r}; expected .csv, .xlsx, .docx, or .pptx"
+        f"unsupported source file type {suffix!r}; "
+        "expected .csv, .xlsx, .docx, .pptx, or .pdf"
     )
+
+
+def _pdf_preview(rows):
+    """Render extracted PDF rows as plain text for the confirm-before-cite error."""
+    if not rows:
+        return "(no rows)"
+    headers = list(rows[0].keys())
+    lines = ["  |  ".join(headers)]
+    for row_num, row in zip(rows.row_nums, rows):
+        lines.append(f"[row {row_num}]  " + "  |  ".join(str(row[h]) for h in headers))
+    return "\n".join(lines)
 
 
 def _run_ask(rows, source, ask):
@@ -100,15 +127,27 @@ def build_report(
 
     Exactly one of ``asks`` or ``template`` is required. ``extract_options``
     is passed through to the L1 extractor for format-specific choices
-    (``sheet``, ``table_index``, ``slide_index``) - see the individual
-    extractors in ``analystos.l1``.
+    (``sheet``, ``table_index``, ``slide_index``, ``page``) - see the
+    individual extractors in ``analystos.l1`` - and also carries
+    ``pdf_confirmed`` for the PDF confirm-before-cite gate below.
     """
     if (asks is None) == (template is None):
         raise ValueError('exactly one of "asks" or "template" is required')
 
+    extract_options = extract_options or {}
     source_path = Path(source_path)
     source_hash = store(source_path, evidence_dir)                          # L0
-    rows = _extract_rows(source_path, schema, extract_options or {})        # L1
+    rows = _extract_rows(source_path, schema, extract_options)              # L1
+
+    if source_path.suffix.lower() == ".pdf" and not extract_options.get("pdf_confirmed"):
+        raise ValueError(
+            "PDF-extracted tables must be confirmed by a person before use - "
+            "a PDF has no real table object, so extraction can misread it in "
+            "ways the other formats can't. Review the table below; if it's "
+            'correct, add "pdf_confirmed": true to job.json and re-run '
+            "(AnalystOS never edits or guesses a PDF-derived value itself):\n\n"
+            f"{_pdf_preview(rows)}"
+        )
 
     if template:
         asks = build_asks(template, rows)

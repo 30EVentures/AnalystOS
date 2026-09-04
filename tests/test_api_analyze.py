@@ -71,6 +71,15 @@ class AnalyzeEndpointTest(unittest.TestCase):
         self.assertEqual(resp.status_code, 400)
         self.assertIn(".txt", resp.get_json()["error"])
 
+    def test_pdf_is_still_rejected(self):  # Slice 23: not wired into the API yet, on purpose
+        data = {
+            "file": (io.BytesIO(b"%PDF-1.4 not a real pdf"), "data.pdf"),
+            "schema": json.dumps({"period": "text"}),
+        }
+        resp = self._post(data)
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn(".pdf", resp.get_json()["error"])
+
     def test_missing_schema_is_a_clean_400(self):  # Done when #4
         data = {"file": (_csv_bytes("period\nFY2024\n"), "data.csv")}
         resp = self._post(data)

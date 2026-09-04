@@ -60,7 +60,7 @@ testable product that already covers four real document formats.
 get a cited report back.**
 
 - Slice 23 — L1: PDF input — extraction + human confirm-before-cite step  ✓ done (PR #27)
-- Slice 24 — L4: real `.pdf` output (`reportlab`)
+- Slice 24 — L4: real `.pdf` output (`reportlab`)  ✓ done (PR #29)
 
 ## R1 — trusted on one desk (Oct–Dec 2026)
 

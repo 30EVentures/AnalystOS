@@ -40,7 +40,7 @@ from analystos.l1.extract_pdf import extract_table_pdf
 from analystos.l1.extract_pptx import extract_table_pptx
 from analystos.l1.extract_xlsx import extract_table_xlsx
 from analystos.l2.answer import answer_growth, answer_lookup, answer_ratio
-from analystos.l4.export import render_html, render_section
+from analystos.l4.export import render_html, render_pdf, render_section
 from analystos.templates import build_asks
 
 
@@ -190,10 +190,12 @@ def main(argv=None):
     section = run_job(job_dir)
     md_path = job_dir / "section.md"
     html_path = job_dir / "section.html"
+    pdf_path = job_dir / "section.pdf"
     md_path.write_text(section, encoding="utf-8")
     html_path.write_text(render_html(section), encoding="utf-8")
+    pdf_path.write_bytes(render_pdf(section))
     print(section)
-    print(f"\n(written to {md_path} and {html_path})", file=sys.stderr)
+    print(f"\n(written to {md_path}, {html_path}, and {pdf_path})", file=sys.stderr)
     # Open the page for the person running it; never during tests (no terminal).
     if sys.platform == "darwin" and sys.stdout.isatty():
         subprocess.run(["open", str(html_path)], check=False)

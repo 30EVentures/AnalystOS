@@ -64,7 +64,7 @@ def run_job(job_dir, evidence_dir=None):
     findings = []
     for ask in job["asks"]:
         result = _run_ask(rows, source_hash, ask)           # L2
-        findings.append({"text": ask["text"], **result})
+        findings.append({"text": ask["text"], "format": ask.get("format"), **result})
 
     return render_section(job["title"], findings)           # L4
 

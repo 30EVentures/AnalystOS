@@ -67,6 +67,60 @@ class RenderSectionTest(unittest.TestCase):
         self.assertIn(f'source {self.src} - row 3, column "revenue"', out)
         self.assertIn(f'source {self.src} - row 4, column "revenue"', out)
 
+    # --- number formatting (slice 15) ---
+
+    def test_format_usd_millions_scales_and_abbreviates(self):
+        findings = [{
+            "text": "FY2025 revenue was {answer}.", "answer": 130497.0,
+            "format": "usd_millions",
+            "citation": {"source": self.src, "row": 4, "column": "revenue"},
+        }]
+        out = render_section("Revenue", findings)
+        self.assertIn("FY2025 revenue was $130.5B.", out)
+
+    def test_format_percent_appends_percent_sign(self):
+        findings = [{
+            "text": "Gross margin was {answer}.", "answer": 57.142857,
+            "format": "percent",
+            "citation": {"source": self.src, "row": 3, "column": "margin"},
+        }]
+        out = render_section("Margin", findings)
+        self.assertIn("Gross margin was 57.1%.", out)
+
+    def test_format_negative_renders_in_parentheses(self):
+        findings = [{
+            "text": "Net income was {answer}.", "answer": -50.0,
+            "format": "usd_millions",
+            "citation": {"source": self.src, "row": 2, "column": "net_income"},
+        }]
+        out = render_section("Loss", findings)
+        self.assertIn("Net income was ($50.0M).", out)
+
+    def test_format_number_adds_thousands_commas(self):
+        findings = [{
+            "text": "Headcount was {answer}.", "answer": 29600,
+            "format": "number",
+            "citation": {"source": self.src, "row": 2, "column": "headcount"},
+        }]
+        out = render_section("Headcount", findings)
+        self.assertIn("Headcount was 29,600.", out)
+
+    def test_no_format_is_unchanged(self):  # backward compatible with pre-slice-15 findings
+        findings = [{
+            "text": "FY2024 revenue was {answer}.", "answer": 4200000.0,
+            "citation": {"source": self.src, "row": 3, "column": "revenue"},
+        }]
+        out = render_section("Revenue", findings)
+        self.assertIn("FY2024 revenue was 4200000.0.", out)
+
+    def test_unknown_format_raises(self):
+        findings = [{
+            "text": "X was {answer}.", "answer": 1.0, "format": "euros",
+            "citation": {"source": self.src, "row": 2, "column": "x"},
+        }]
+        with self.assertRaises(ValueError):
+            render_section("X", findings)
+
     def test_non_number_answer_is_rendered_as_text(self):  # any answer type
         one = [
             {

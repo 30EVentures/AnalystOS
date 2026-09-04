@@ -1,4 +1,5 @@
-"""Slice 21 - the upload page must stay in step with api/analyze.py's contract."""
+"""Slice 21/22 - the upload page must stay in step with api/analyze.py's contract,
+including the Slice 22 access-code header."""
 
 import unittest
 from pathlib import Path
@@ -24,6 +25,8 @@ class UploadPageTest(unittest.TestCase):
             ".xlsx",
             ".docx",
             ".pptx",
+            "X-Access-Code",
+            "access-code",
         ):
             self.assertIn(needle, text, f"upload page is missing {needle!r} - is it stale?")
 

@@ -72,7 +72,7 @@ main{padding:clamp(2.5rem,6vw,4rem) 0 5rem}
 .field:last-of-type{margin-bottom:0}
 .field label{display:block;font-family:var(--font-mono);font-size:.78rem;letter-spacing:.03em;color:var(--graphite);margin-bottom:.45rem}
 .field .hint{font-family:var(--font-mono);font-size:.74rem;color:var(--faint);margin-top:.5rem;line-height:1.6}
-input[type=file],input[type=text],select,textarea{
+input[type=file],input[type=text],input[type=password],select,textarea{
   width:100%;font-family:var(--font-mono);font-size:.88rem;
   padding:.6rem .7rem;border:1px solid var(--hairline-strong);border-radius:8px;
   background:var(--raised);color:var(--ink);
@@ -116,6 +116,12 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
     </div>
 
     <form id="analyze-form" class="form-card">
+      <div class="field">
+        <label for="access-code">Access code</label>
+        <input type="password" id="access-code" autocomplete="off">
+        <p class="hint">Preview access is code-gated. Entered once per browser — remembered locally after a successful submit, never sent anywhere but this request.</p>
+      </div>
+
       <div class="field">
         <label for="file">Document</label>
         <input type="file" id="file" name="file" accept=".csv,.xlsx,.docx,.pptx" required>
@@ -163,18 +169,26 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
 
 <footer>
   <div class="wrap">
-    <p class="fine">This page is a live, unauthenticated preview — anyone with this URL can use it. Uploaded files are processed for one request only and never written to persistent storage.</p>
+    <p class="fine">This page is a private preview gated by a shared access code — it isn't meant to withstand a targeted attempt to guess the code, only to keep it off search engines and drive-by visitors. Uploaded files are processed for one request only and never written to persistent storage.</p>
   </div>
 </footer>
 
 <script>
 (function () {
+  var ACCESS_CODE_KEY = 'analystos_access_code';
+
   var form = document.getElementById('analyze-form');
   var submitBtn = form.querySelector('button[type="submit"]');
   var statusEl = document.getElementById('status');
   var errorEl = document.getElementById('error');
   var resultEl = document.getElementById('result');
   var frame = document.getElementById('report-frame');
+  var accessCodeInput = document.getElementById('access-code');
+
+  try {
+    var savedCode = localStorage.getItem(ACCESS_CODE_KEY);
+    if (savedCode) accessCodeInput.value = savedCode;
+  } catch (e) { /* localStorage unavailable (private mode, etc.) - just ask each time */ }
 
   form.addEventListener('submit', function (event) {
     event.preventDefault();
@@ -184,9 +198,14 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
     submitBtn.disabled = true;
     statusEl.hidden = false;
 
+    var accessCode = accessCodeInput.value;
     var body = new FormData(form);
 
-    fetch('/api/analyze', { method: 'POST', body: body })
+    fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'X-Access-Code': accessCode },
+      body: body,
+    })
       .then(function (resp) {
         return resp.json().then(function (data) {
           if (!resp.ok) {
@@ -196,6 +215,7 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
         });
       })
       .then(function (data) {
+        try { localStorage.setItem(ACCESS_CODE_KEY, accessCode); } catch (e) { /* ignore */ }
         frame.srcdoc = data.html;
         resultEl.hidden = false;
       })

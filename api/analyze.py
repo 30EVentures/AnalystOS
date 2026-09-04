@@ -1,6 +1,11 @@
 """The live MVP's one HTTP endpoint: upload a document, get a cited report.
 
     POST /api/analyze
+    header:
+        X-Access-Code   required - must match the ANALYSTOS_ACCESS_CODE
+                        environment variable (see Slice 22's spec) - this is
+                        a single shared code for the whole preview cohort,
+                        not per-user auth
     multipart/form-data:
         file            required - the document (.csv, .xlsx, .docx, .pptx)
         schema          required - a JSON object, e.g.
@@ -14,16 +19,18 @@
 Nothing from a request is written to persistent storage. The upload is saved
 to a private temp directory for the life of the request only, and that
 directory is deleted before the response is returned - on success *or*
-failure. There is no access control yet (Slice 22); do not share this URL
-widely until there is.
+failure.
 
 Response: ``{"section": "...", "html": "...", "source_hash": "..."}`` on
-success (200), or ``{"error": "..."}`` on a bad request (400) or an
-unexpected failure (500) - the message is never more detail than what
-``ValueError`` already gives; nothing about the server internals leaks.
+success (200), or ``{"error": "..."}`` on a bad request (400), a missing or
+wrong access code (401), a misconfigured server (500), or an unexpected
+pipeline failure (400, using ``ValueError``'s own message) - nothing about
+the server internals leaks.
 """
 
+import hmac
 import json
+import os
 import shutil
 import sys
 import tempfile
@@ -46,9 +53,20 @@ app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10 MB - generous for a ta
 
 _ALLOWED_EXTENSIONS = {".csv", ".xlsx", ".docx", ".pptx"}
 
+_ACCESS_CODE_ENV_VAR = "ANALYSTOS_ACCESS_CODE"
+
 
 @app.post("/api/analyze")
 def analyze():
+    configured_code = os.environ.get(_ACCESS_CODE_ENV_VAR)
+    if not configured_code:
+        # Fail closed: an unset env var must never mean "open to everyone."
+        return jsonify(error="access gating is not configured on this server"), 500
+
+    supplied_code = request.headers.get("X-Access-Code", "")
+    if not hmac.compare_digest(supplied_code, configured_code):
+        return jsonify(error="missing or invalid access code"), 401
+
     upload = request.files.get("file")
     if upload is None or not upload.filename:
         return jsonify(error="no file uploaded (form field name must be 'file')"), 400

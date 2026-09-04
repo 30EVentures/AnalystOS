@@ -2,6 +2,28 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-04 — Access gating: one shared code, not accounts (Slice 22)
+
+`api/analyze.py` and `site/upload.html` went live in Slices 20-21 with no
+access control at all, deliberately deferred to this slice. The gate: a
+single shared secret, read from the `ANALYSTOS_ACCESS_CODE` environment
+variable and required as an `X-Access-Code` header on every request,
+compared with `hmac.compare_digest` and **fail-closed** (a `500`, not open
+access) if the variable is ever unset.
+
+- Real per-analyst accounts are out of scope here on purpose - this is a
+  small, hands-on preview with a handful of real analysts (`ROADMAP.md`'s
+  NOW milestone), not a public product. Accounts are R1/R2 work, once there's
+  an actual cohort to manage identity for.
+- No rate limiting on the code itself - accepted, disclosed tradeoff. The
+  point is keeping this off search engines and drive-by visitors, not
+  standing up to a targeted attacker who's decided to guess it.
+- One manual step this repo's code can't do for itself: `ANALYSTOS_ACCESS_CODE`
+  has to actually be set on the live Vercel project (dashboard -> Settings ->
+  Environment Variables) before the deployed endpoint is gated for real -
+  same category of "only confirmable post-deploy" residual risk Slices 20-21
+  already flagged.
+
 ## 2026-09-04 — How Python actually deploys on Vercel (researched before Slice 20)
 
 Checked Vercel's own docs rather than guessing, since the Root Directory

@@ -36,33 +36,73 @@ This creates a folder `jobs/my-first-job/` holding a copy of your CSV and a
 ## Step 2 — edit the job
 
 Open `jobs/my-first-job/job.json` in a text editor (TextEdit, VS Code — **not**
-the Terminal). It looks like this:
+the Terminal). There are two ways to fill it in.
+
+### The fast way: a template
+
+If your table looks like an income statement (a period column, and any of
+revenue / cost of revenue / gross profit / operating expenses / operating
+income / net income, however they're labeled), skip `asks` entirely:
+
+```
+{
+  "title": "Review of your.csv",
+  "source": "your.csv",
+  "schema": { "period": "text", "revenue": "number", "net_income": "number" },
+  "template": "income_statement",
+  "currency_unit": "actual"
+}
+```
+
+This generates the standard questions automatically — the latest period's
+figures, year-over-year growth, margins — for whichever line items it
+recognizes. Nothing is invented: a line item it doesn't recognize is simply
+left out.
+
+**`currency_unit` matters and only has one right answer per table.** It says
+what scale the numbers in your table *are* — look at what your source
+document itself says (a real income statement almost always states this,
+e.g. "$ in millions"):
+
+- `"actual"` — the numbers are already raw dollars (`4200000` means $4.2M).
+- `"thousands"` — the numbers are in thousands (`4200` means $4.2M).
+- `"millions"` — the numbers are in millions (`4.2` means $4.2M).
+
+Get this wrong and every dollar figure in the report is confidently wrong by
+a factor of 1,000 or 1,000,000 - not an error, just a wrong number. Check it
+against the source before you run the job.
+
+### The manual way: write your own questions
+
+For anything a template doesn't cover, write `asks` yourself:
 
 ```
 {
   "title": "Review of your.csv",
   "source": "your.csv",
   "schema": { "period": "text", "revenue": "number" },
+  "currency_unit": "actual",
   "asks": [
     { "text": "period Q1 revenue was {answer}.",
+      "format": "usd",
       "where": ["period", "Q1"],
       "select": "revenue" }
   ]
 }
 ```
 
-Change two things:
-
 - **`title`** — what this section is about.
 - **`asks`** — one entry per fact you want. Each entry has:
   - `text` — the sentence to write. `{answer}` is where the number lands.
   - `where` — `[column, value]`: find the row where *column* equals *value*.
   - `select` — the column whose value is the answer.
+  - `format` (optional) — see below.
 
 **Worked example** — *"give me revenue for the FY2024 row"*:
 
 ```
 { "text": "FY2024 revenue was {answer}.",
+  "format": "usd",
   "where": ["period", "FY2024"],
   "select": "revenue" }
 ```
@@ -73,9 +113,8 @@ has no comma after it.
 **Making numbers readable.** Add an optional `"format"` to any ask so the
 number prints properly instead of raw (`4200000.0`):
 
-- `"usd_millions"` — your data is in millions of dollars (how most income
-  statements report): prints as `$4.2M` / `$1.3B`.
-- `"usd"` — your data is already in raw dollars: same abbreviation, no scaling.
+- `"usd"` — a dollar amount: prints as `$4.2M` / `$1.3B`, scaled by the job's
+  one `currency_unit` (see above) — never set per-ask.
 - `"percent"` — adds a `%` sign (growth and margin asks return a percent number).
 - `"number"` — adds thousands commas: `4,200,000`.
 

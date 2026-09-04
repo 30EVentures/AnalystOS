@@ -43,8 +43,8 @@ FastAPI); structured formats (Excel/Word/PowerPoint) trusted directly, PDF
 extraction always confirmed by a person before it's cited; real `.pdf`
 output via `reportlab`.
 
-- Slice 16 — L1: Excel (.xlsx) input, first dependency (`openpyxl`)  ← in progress
-- Slice 17 — L1: Word (.docx) table input
+- Slice 16 — L1: Excel (.xlsx) input, first dependency (`openpyxl`)  ✓ done (PR #18)
+- Slice 17 — L1: Word (.docx) table input  ← in progress
 - Slice 18 — L1: PowerPoint (.pptx) table input
 - Slice 19 — L1: PDF input — extraction + human confirm-before-cite step
 - Slice 20 — L4: real `.pdf` output (`reportlab`)

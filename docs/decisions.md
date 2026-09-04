@@ -2,6 +2,17 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-04 — Known risk: nothing verifies a "format" matches the data's real scale
+
+Found while demoing Slice 17: an ask can declare `"format": "usd_millions"`
+on a column whose values are actually raw dollars (or vice versa), and
+nothing catches it. The result isn't an error - it's a confidently wrong
+number (a $150,000 loss rendered as "($150.0B)"). This is exactly the
+failure mode the whole hardening effort is meant to prevent, and it isn't
+fixed yet. Candidate for the report-template slice (21): a template that
+generates the asks could also know - or sanity-check - the expected scale,
+rather than leaving it to whoever writes `job.json` to get right by hand.
+
 ## 2026-09-04 — First third-party dependencies: a live MVP, multi-format input
 
 Ending the stdlib-only period from Slice 1. Reason: a live, browser-based MVP

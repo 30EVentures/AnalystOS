@@ -74,6 +74,7 @@ header.top{border-bottom:1px solid var(--hairline);position:sticky;top:0;backgro
 .btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:8px;padding:.6rem 1.15rem;font-size:.92rem;font-weight:600;border:1px solid var(--signal);background:var(--signal);color:#fff;border-bottom:none}
 .btn:hover{filter:brightness(1.06)}
 .btn.ghost{background:transparent;color:var(--ink);border-color:var(--hairline-strong)}
+.topbar-ctas{display:flex;gap:.7rem;flex-wrap:wrap;justify-content:flex-end}
 
 /* hero */
 .hero{padding:clamp(3rem,8vw,6rem) 0 clamp(2.5rem,6vw,4rem)}
@@ -149,7 +150,10 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
 <header class="top">
   <div class="topbar">
     <span class="wordmark">Analyst<span class="os">OS</span><span class="caret">▸</span></span>
-    <a class="btn" href="#access">Get early access</a>
+    <span class="topbar-ctas">
+      <a class="btn ghost" href="upload.html">Try it now →</a>
+      <a class="btn" href="#access">Get early access</a>
+    </span>
   </div>
 </header>
 

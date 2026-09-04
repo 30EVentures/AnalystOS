@@ -51,8 +51,8 @@ testable product that already covers four real document formats.
 - Slice 17 — L1: Word (.docx) table input  ✓ done (PR #19)
 - Slice 18 — L1: PowerPoint (.pptx) table input  ✓ done (PR #20)
 - Slice 19 — report templates: auto-generate the standard asks from
-  recognized columns; also fixes the format-scale risk (see decisions.md)  ← in progress
-- Slice 20 — the API: `api/analyze.py` (Flask, on Vercel)
+  recognized columns; also fixes the format-scale risk (see decisions.md)  ✓ done (PR #21)
+- Slice 20 — the API: `api/analyze.py` (Flask, on Vercel)  ← in progress
 - Slice 21 — the upload page on `site/`
 - Slice 22 — access gating (not public on day one)
 

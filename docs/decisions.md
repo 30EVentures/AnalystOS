@@ -2,6 +2,38 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-04 — How Python actually deploys on Vercel (researched before Slice 20)
+
+Checked Vercel's own docs rather than guessing, since the Root Directory
+picker earlier already showed guessing wrong costs a real deploy cycle.
+Findings, current as of this date:
+
+- Vercel supports file-based Python functions in an `/api` directory:
+  each `.py` file there becomes its own route (`api/analyze.py` ->
+  `/api/analyze`). The file must define a top-level `app` (WSGI/ASGI) or
+  `application` (WSGI) object, or a `handler` class extending
+  `BaseHTTPRequestHandler`. Flask's `app` object satisfies this directly.
+- **Caveat found in the same docs**: if Vercel detects a Python "framework
+  preset" for the project (from a matching dependency in `requirements.txt`),
+  the framework takes over *all* routing, and `/api/*.py` stops being
+  treated as file-based functions. Our project was already configured as a
+  static site (Output Directory override to `site/`, from the earlier
+  Root Directory workaround) before `flask` was ever added to
+  `requirements.txt` - the working assumption is that an already-configured
+  project keeps its existing routing rather than being silently
+  reclassified, since Vercel's own docs describe the file-based `/api` model
+  specifically as being for "existing projects." **This is not confirmed by
+  an actual deploy** - only verifiable once it's live.
+- Added `vercel.json` with an explicit `functions` config for `api/*.py`
+  (the exact pattern shown in Vercel's docs) rather than relying purely on
+  auto-detection, to make the intent unambiguous.
+- Chose the file-based `app.py`-style entrypoint (Flask, WSGI) specifically
+  because it means requests are parsed through Flask's own `request.files`
+  API - the same code path whether running via `flask run` locally or
+  wrapped by Vercel's Python runtime - rather than hand-parsing multipart
+  form data against a raw `BaseHTTPRequestHandler`, which would be Vercel
+  runtime-specific and much easier to get subtly wrong.
+
 ## 2026-09-04 — Known risk: nothing verifies a "format" matches the data's real scale
 
 Found while demoing Slice 17: an ask can declare `"format": "usd_millions"`

@@ -83,6 +83,8 @@ textarea{min-height:6rem;resize:vertical;line-height:1.5}
 @media (max-width:520px){.row2{grid-template-columns:1fr}}
 .file-row{display:flex;gap:.8rem;align-items:flex-start;flex-wrap:wrap}
 .file-row input[type=file]{flex:1 1 14rem}
+.checkbox-label{display:flex!important;align-items:center;gap:.55rem;font-family:var(--font-sans)!important;font-size:.95rem!important;color:var(--ink)!important;letter-spacing:normal!important;text-transform:none!important;font-weight:600;cursor:pointer}
+.checkbox-label input[type=checkbox]{width:auto;margin:0}
 .submit-row{margin-top:1.6rem;display:flex;align-items:center;gap:1rem}
 #status,#detect-status{font-family:var(--font-mono);font-size:.82rem;color:var(--faint)}
 
@@ -126,7 +128,7 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
     <div class="page-head">
       <p class="eyebrow">Live preview</p>
       <h1>Upload a document, get a cited report.</h1>
-      <p>CSV, Excel, Word, PowerPoint, or PDF — pick a file, detect its columns, check the preview, and generate. Nothing you upload is stored; each request is processed and discarded. A PDF's table is inferred rather than read directly, so its preview carries a quick note — otherwise every format works the same way.</p>
+      <p>CSV, Excel, Word, PowerPoint, or PDF — any document, table-shaped or not. By default it's read as real text and analyzed by a model whose every number is independently checked against the source. Nothing you upload is stored; each request is processed and discarded.</p>
     </div>
 
     <form id="analyze-form" class="form-card">
@@ -138,24 +140,39 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
 
       <div class="field">
         <label for="file">Document</label>
-        <div class="file-row">
-          <input type="file" id="file" name="file" accept=".csv,.xlsx,.docx,.pptx,.pdf" required>
-          <button type="button" class="btn small" id="detect-btn">Detect columns ▸</button>
-        </div>
+        <input type="file" id="file" name="file" accept=".csv,.xlsx,.docx,.pptx,.pdf" required>
         <p class="hint">.csv, .xlsx, .docx, .pptx, or .pdf. No file handy? <a href="data:text/csv;charset=utf-8,period%2Crevenue%2Ccost_of_revenue%2Cgross_profit%2Coperating_expenses%2Coperating_income%2Cnet_income%0AFY2023%2C1000000%2C400000%2C600000%2C250000%2C350000%2C280000%0AFY2024%2C1250000%2C475000%2C775000%2C300000%2C475000%2C390000%0A" download="sample-income-statement.csv">download a sample CSV</a> to try.</p>
-        <span id="detect-status" hidden>Detecting columns…</span>
-        <div id="detect-error" role="alert" hidden></div>
-        <div id="pdf-warning" hidden></div>
-        <div id="preview-wrap" hidden>
-          <table id="preview-table"></table>
-        </div>
-        <p id="preview-note" hidden></p>
       </div>
 
       <div class="field">
-        <label for="schema">Schema (JSON: column name → "text" or "number")</label>
-        <textarea id="schema" name="schema" spellcheck="false" placeholder='Pick a file and click &quot;Detect columns&quot; to fill this in automatically.'></textarea>
-        <p class="hint">Filled in automatically once columns are detected — edit it if a column's type was guessed wrong.</p>
+        <label class="checkbox-label" for="tabular-toggle">
+          <input type="checkbox" id="tabular-toggle">
+          This file is a table shaped like an income statement — use the fixed template instead
+        </label>
+        <p class="hint">Leave unchecked for anything else — memos, slide decks, contracts, any document. It's read as real text and analyzed by a model whose every number is independently checked against the source. Check this only for a CSV/Excel-style income statement, to skip the model and use the original column-by-column template.</p>
+      </div>
+
+      <div id="tabular-fields" hidden>
+        <div class="field">
+          <div class="file-row">
+            <button type="button" class="btn small" id="detect-btn">Detect columns ▸</button>
+          </div>
+          <span id="detect-status" hidden>Detecting columns…</span>
+          <div id="detect-error" role="alert" hidden></div>
+          <div id="pdf-warning" hidden></div>
+          <div id="preview-wrap" hidden>
+            <table id="preview-table"></table>
+          </div>
+          <p id="preview-note" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="schema">Schema (JSON: column name → "text" or "number")</label>
+          <textarea id="schema" name="schema" spellcheck="false" placeholder='Pick a file and click &quot;Detect columns&quot; to fill this in automatically.'></textarea>
+          <p class="hint">Filled in automatically once columns are detected — edit it if a column's type was guessed wrong.</p>
+        </div>
+
+        <p class="hint">Template: <span class="mono">income_statement</span> — the only fixed template that exists.</p>
       </div>
 
       <div class="row2">
@@ -173,9 +190,7 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
         </div>
       </div>
 
-      <input type="hidden" name="template" value="income_statement">
       <input type="hidden" name="pdf_confirmed" id="pdf-confirmed" value="">
-      <p class="hint">Template: <span class="mono">income_statement</span> — the only one that exists yet.</p>
 
       <div class="submit-row">
         <button type="submit" class="btn">Generate report ▸</button>
@@ -211,6 +226,8 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
   var accessCodeInput = document.getElementById('access-code');
 
   var fileInput = document.getElementById('file');
+  var tabularToggle = document.getElementById('tabular-toggle');
+  var tabularFields = document.getElementById('tabular-fields');
   var detectBtn = document.getElementById('detect-btn');
   var detectStatusEl = document.getElementById('detect-status');
   var detectErrorEl = document.getElementById('detect-error');
@@ -246,6 +263,10 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
   }
 
   fileInput.addEventListener('change', resetPreview);
+
+  tabularToggle.addEventListener('change', function () {
+    tabularFields.hidden = !tabularToggle.checked;
+  });
 
   function renderPreview(schema, preview) {
     var columns = Object.keys(schema);
@@ -334,6 +355,11 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
 
     var accessCode = accessCodeInput.value;
     var body = new FormData(form);
+    if (tabularToggle.checked) {
+      body.set('template', 'income_statement');
+    } else {
+      body.delete('schema');
+    }
 
     fetch('/api/analyze', {
       method: 'POST',

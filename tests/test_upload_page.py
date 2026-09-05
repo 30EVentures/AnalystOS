@@ -14,6 +14,11 @@ class UploadPageTest(unittest.TestCase):
         self.assertTrue(PAGE.is_file(), f"{PAGE} is missing")
 
     def test_page_matches_the_api_contract(self):
+        # "template" is deliberately not a static form field any more (slice
+        # 26 made omitting it the new narrated-analysis default) - the page
+        # only sends it when the "tabular-toggle" checkbox says the upload
+        # is a table, so its presence is asserted via that JS wiring instead
+        # of a literal name="template" attribute.
         text = PAGE.read_text(encoding="utf-8")
         for needle in (
             "/api/analyze",
@@ -21,7 +26,8 @@ class UploadPageTest(unittest.TestCase):
             'name="file"',
             'name="schema"',
             'name="title"',
-            'name="template"',
+            "tabular-toggle",
+            "body.set('template', 'income_statement')",
             'name="currency_unit"',
             'name="pdf_confirmed"',
             ".csv",

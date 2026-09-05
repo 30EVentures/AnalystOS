@@ -79,8 +79,6 @@ input[type=file],input[type=text],input[type=password],select,textarea{
   background:var(--raised);color:var(--ink);
 }
 textarea{min-height:6rem;resize:vertical;line-height:1.5}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
-@media (max-width:520px){.row2{grid-template-columns:1fr}}
 .file-row{display:flex;gap:.8rem;align-items:flex-start;flex-wrap:wrap}
 .file-row input[type=file]{flex:1 1 14rem}
 .checkbox-label{display:flex!important;align-items:center;gap:.55rem;font-family:var(--font-sans)!important;font-size:.95rem!important;color:var(--ink)!important;letter-spacing:normal!important;text-transform:none!important;font-weight:600;cursor:pointer}
@@ -172,14 +170,6 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
           <p class="hint">Filled in automatically once columns are detected — edit it if a column's type was guessed wrong.</p>
         </div>
 
-        <p class="hint">Template: <span class="mono">income_statement</span> — the only fixed template that exists.</p>
-      </div>
-
-      <div class="row2">
-        <div class="field">
-          <label for="title">Title (optional)</label>
-          <input type="text" id="title" name="title" placeholder="Review of your-file.csv">
-        </div>
         <div class="field">
           <label for="currency_unit">Currency scale</label>
           <select id="currency_unit" name="currency_unit">
@@ -187,7 +177,15 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
             <option value="thousands">Data is in thousands</option>
             <option value="millions">Data is in millions</option>
           </select>
+          <p class="hint">Only for a table whose numbers are pre-scaled by a header note (e.g. "figures in thousands"). Doesn't apply otherwise.</p>
         </div>
+
+        <p class="hint">Template: <span class="mono">income_statement</span> — the only fixed template that exists.</p>
+      </div>
+
+      <div class="field">
+        <label for="title">Title (optional)</label>
+        <input type="text" id="title" name="title" placeholder="Review of your-file.csv">
       </div>
 
       <input type="hidden" name="pdf_confirmed" id="pdf-confirmed" value="">

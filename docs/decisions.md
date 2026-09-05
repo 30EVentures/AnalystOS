@@ -2,6 +2,31 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-05 — The narrated path always uses "actual" currency scale
+
+Found on the first successful real report: every dollar figure came back
+1000x too large ($18.4B instead of $18.4M for a real "$18,400,000" quoted
+directly from the source memo) - all math was verified correct
+independently (confirmed by hand: 29.6% growth, 59.8% share, 5.2%
+non-renewal rate, $8.7M profit all check out), so this was a display bug,
+not a verification bug. Cause: the upload page's "Currency scale" dropdown
+was set to "Data is in thousands," and `build_report` passed that straight
+through to the narrated path's renderer, multiplying an already-real
+number by 1,000.
+
+That control only ever made sense for the old table-driven path, where a
+CSV/Excel table's own header can say "figures in thousands" - a real,
+if old-fashioned, accounting convention. It has no meaning for the
+narrated path: `analyze_document`'s quoted `value`s are always the literal
+number as it's written in the source text, never something pre-scaled by
+a stated convention. Fixed in `analystos/pipeline.py` by hardcoding
+`"actual"` for `render_narrated_section` regardless of what's passed in -
+the parameter is accepted but ignored on this path, matching how the
+narrated default already ignores `schema`. Also moved the "Currency scale"
+control in `site/upload.html` behind the same "this file is a table"
+checkbox as the rest of the old-path-only UI, so it's not visible (and
+can't be mis-set) for a narrated upload at all.
+
 ## 2026-09-05 — Every segment field is required, not just "type" (real live 400)
 
 The first real, paid call to `write_report` - after `ANTHROPIC_API_KEY` was

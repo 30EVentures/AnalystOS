@@ -191,5 +191,19 @@ handle every combination of which optional properties are present. Fixed
 by making every property required and adding explicit `has_value`/
 `has_total` booleans in place of "is this key present at all" - see
 `docs/decisions.md`, 2026-09-05, and the note at the top of
-`analystos/l2/analyze.py`. A real end-to-end run against a non-tabular
-`.docx` memo is still the open item this was blocking.
+`analystos/l2/analyze.py`.
+
+That schema fix unblocked the actual end-to-end run against the non-tabular
+`.docx` memo, which produced a real report. Hand-checking every computed
+figure against the source's real numbers confirmed the core guarantee held
+on genuine model output, not just mocked tests (29.6% QoQ growth, 59.8%
+segment share, 5.2% non-renewal rate, $8.65M operating profit - all exactly
+right). But every dollar figure was rendered 1000x too large ($18.4B
+instead of $18.4M) - the upload page's "Currency scale" control (meant for
+a CSV/Excel table whose header says "figures in thousands") had been left
+set to "Data is in thousands," and the narrated path applied it anyway even
+though its quoted values are always already-real numbers. Fixed by forcing
+`"actual"` on the narrated path regardless of what's passed in, and moving
+that control behind the same "this file is a table" checkbox as the rest
+of the old-path-only UI. See `docs/decisions.md`, 2026-09-05 ("The
+narrated path always uses "actual" currency scale").

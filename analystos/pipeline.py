@@ -136,7 +136,12 @@ def build_report(
     if asks is None and template is None:
         document_text = extract_document_text(source_path)                  # L1 (text)
         segments = analyze_document(document_text, title, client=llm_client)  # L2 (verified)
-        return render_narrated_section(title, source_hash, segments, currency_unit)  # L4
+        # currency_unit ("thousands"/"millions") means "the source data is
+        # pre-scaled by this factor" - true of a CSV/Excel table whose
+        # header says "figures in thousands," never of a quoted number
+        # copied verbatim from prose (it's already the real, actual value).
+        # Applying it here would silently inflate every dollar figure.
+        return render_narrated_section(title, source_hash, segments, "actual")  # L4
 
     schema, rows = extract_any(source_path, schema, extract_options)        # L1 (table)
 

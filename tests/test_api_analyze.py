@@ -14,6 +14,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+
 from api.analyze import _ACCESS_CODE_ENV_VAR, app
 
 _TEST_ACCESS_CODE = "test-access-code"
@@ -21,6 +25,17 @@ _TEST_ACCESS_CODE = "test-access-code"
 
 def _csv_bytes(text):
     return io.BytesIO(text.encode("utf-8"))
+
+
+def _make_pdf_bytes(rows):
+    """Build a real, minimal ruled-table PDF in memory for upload tests."""
+    buf = io.BytesIO()
+    data = [[str(v) for v in row] for row in rows]
+    t = Table(data)
+    t.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.5, colors.black)]))
+    SimpleDocTemplate(buf, pagesize=letter).build([t])
+    buf.seek(0)
+    return buf
 
 
 class AnalyzeEndpointTest(unittest.TestCase):
@@ -71,20 +86,30 @@ class AnalyzeEndpointTest(unittest.TestCase):
         self.assertEqual(resp.status_code, 400)
         self.assertIn(".txt", resp.get_json()["error"])
 
-    def test_pdf_is_still_rejected(self):  # Slice 23: not wired into the API yet, on purpose
+    def test_pdf_without_confirmation_is_a_clean_400(self):  # slice 25
+        data = {"file": (_make_pdf_bytes([["period", "revenue"], ["FY2024", "4200000"]]), "data.pdf")}
+        resp = self._post(data)
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("pdf_confirmed", resp.get_json()["error"])
+
+    def test_pdf_with_confirmation_returns_a_cited_report(self):  # slice 25
         data = {
-            "file": (io.BytesIO(b"%PDF-1.4 not a real pdf"), "data.pdf"),
-            "schema": json.dumps({"period": "text"}),
+            "file": (_make_pdf_bytes([["period", "revenue"], ["FY2024", "4200000"]]), "data.pdf"),
+            "pdf_confirmed": "true",
+            "template": "income_statement",
         }
         resp = self._post(data)
-        self.assertEqual(resp.status_code, 400)
-        self.assertIn(".pdf", resp.get_json()["error"])
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("FY2024 revenue was $4.2M.", resp.get_json()["section"])
 
-    def test_missing_schema_is_a_clean_400(self):  # Done when #4
-        data = {"file": (_csv_bytes("period\nFY2024\n"), "data.csv")}
+    def test_missing_schema_auto_detects(self):  # slice 25
+        data = {
+            "file": (_csv_bytes("period,revenue\nFY2024,4200000\n"), "data.csv"),
+            "template": "income_statement",
+        }
         resp = self._post(data)
-        self.assertEqual(resp.status_code, 400)
-        self.assertIn("schema", resp.get_json()["error"])
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("FY2024 revenue was $4.2M.", resp.get_json()["section"])
 
     def test_invalid_schema_json_is_a_clean_400(self):  # Done when #4
         data = {

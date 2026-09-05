@@ -22,17 +22,15 @@ import pdfplumber
 from analystos.l1.schema import apply_schema
 
 
-def extract_table_pdf(path, schema, page=None, table_index=0):
-    """Read one table from the PDF at ``path``; return its rows as typed dicts.
-
-    ``schema`` maps column name -> ``"number"`` or ``"text"``.
+def _raw_rows(path, page=None, table_index=0):
+    """Read one table from the PDF at ``path`` into ``(headers,
+    numbered_raw_rows)`` - no schema applied yet. Shared by
+    ``extract_table_pdf`` and, for schema auto-detection,
+    ``analystos.l1.detect.extract_any``.
 
     Without ``page`` (0-based), every table across the document (in page
     order) is numbered 0, 1, ... and ``table_index`` picks among them. With
     ``page``, only tables on that one page are considered.
-
-    Raises ``ValueError`` on an unknown schema type, a missing required
-    column, a bad value, no table at the requested index, or an empty table.
     """
     with pdfplumber.open(path) as pdf:
         pages = [pdf.pages[page]] if page is not None else list(pdf.pages)
@@ -56,4 +54,20 @@ def extract_table_pdf(path, schema, page=None, table_index=0):
                 continue  # a blank row
             numbered.append((row_num, {h: (c or "").strip() for h, c in zip(headers, row)}))
 
+    return headers, numbered
+
+
+def extract_table_pdf(path, schema, page=None, table_index=0):
+    """Read one table from the PDF at ``path``; return its rows as typed dicts.
+
+    ``schema`` maps column name -> ``"number"`` or ``"text"``.
+
+    Without ``page`` (0-based), every table across the document (in page
+    order) is numbered 0, 1, ... and ``table_index`` picks among them. With
+    ``page``, only tables on that one page are considered.
+
+    Raises ``ValueError`` on an unknown schema type, a missing required
+    column, a bad value, no table at the requested index, or an empty table.
+    """
+    headers, numbered = _raw_rows(path, page=page, table_index=table_index)
     return apply_schema(numbered, headers, schema)

@@ -26,6 +26,11 @@ wrong in ways the other formats can't be. ``build_report`` refuses to go past
 L1 for a PDF source unless the job says ``"pdf_confirmed": true`` - a person
 has to have looked at the actual extracted table (the error raised without
 that flag shows it) before it can be cited. See ``specs/slice-23/spec.md``.
+
+``schema`` is optional. Given, it's used exactly as before. Omitted, it's
+guessed from the source's own data (``analystos.l1.detect.extract_any``) -
+so a job, or an API call, doesn't have to declare one at all. See
+``specs/slice-25/spec.md``.
 """
 
 import json
@@ -34,43 +39,10 @@ import sys
 from pathlib import Path
 
 from analystos.l0.store import store
-from analystos.l1.extract import extract_table
-from analystos.l1.extract_docx import extract_table_docx
-from analystos.l1.extract_pdf import extract_table_pdf
-from analystos.l1.extract_pptx import extract_table_pptx
-from analystos.l1.extract_xlsx import extract_table_xlsx
+from analystos.l1.detect import extract_any
 from analystos.l2.answer import answer_growth, answer_lookup, answer_ratio
 from analystos.l4.export import render_html, render_pdf, render_section
 from analystos.templates import build_asks
-
-
-def _extract_rows(source_path, schema, job):
-    """Dispatch to the extractor matching ``source_path``'s file extension."""
-    suffix = source_path.suffix.lower()
-    if suffix == ".csv":
-        return extract_table(source_path, schema)
-    if suffix == ".xlsx":
-        return extract_table_xlsx(source_path, schema, sheet=job.get("sheet"))
-    if suffix == ".docx":
-        return extract_table_docx(source_path, schema, table_index=job.get("table_index", 0))
-    if suffix == ".pptx":
-        return extract_table_pptx(
-            source_path,
-            schema,
-            slide_index=job.get("slide_index"),
-            table_index=job.get("table_index", 0),
-        )
-    if suffix == ".pdf":
-        return extract_table_pdf(
-            source_path,
-            schema,
-            page=job.get("page"),
-            table_index=job.get("table_index", 0),
-        )
-    raise ValueError(
-        f"unsupported source file type {suffix!r}; "
-        "expected .csv, .xlsx, .docx, .pptx, or .pdf"
-    )
 
 
 def _pdf_preview(rows):
@@ -114,8 +86,8 @@ def _run_ask(rows, source, ask):
 
 def build_report(
     source_path,
-    schema,
-    title,
+    schema=None,
+    title=None,
     *,
     asks=None,
     template=None,
@@ -125,27 +97,32 @@ def build_report(
 ):
     """Run L0 -> L1 -> L2 -> L4 for one source file; return the section text.
 
-    Exactly one of ``asks`` or ``template`` is required. ``extract_options``
-    is passed through to the L1 extractor for format-specific choices
-    (``sheet``, ``table_index``, ``slide_index``, ``page``) - see the
-    individual extractors in ``analystos.l1`` - and also carries
-    ``pdf_confirmed`` for the PDF confirm-before-cite gate below.
+    Exactly one of ``asks`` or ``template`` is required. ``schema`` is
+    optional - omitted, it's guessed from the source's own data (see the
+    module docstring). ``extract_options`` is passed through to the L1
+    extractor for format-specific choices (``sheet``, ``table_index``,
+    ``slide_index``, ``page``) - see the individual extractors in
+    ``analystos.l1`` - and also carries ``pdf_confirmed`` for the PDF
+    confirm-before-cite gate below.
     """
     if (asks is None) == (template is None):
         raise ValueError('exactly one of "asks" or "template" is required')
 
     extract_options = extract_options or {}
     source_path = Path(source_path)
+    title = title or f"Review of {source_path.name}"
     source_hash = store(source_path, evidence_dir)                          # L0
-    rows = _extract_rows(source_path, schema, extract_options)              # L1
+    schema, rows = extract_any(source_path, schema, extract_options)        # L1
 
     if source_path.suffix.lower() == ".pdf" and not extract_options.get("pdf_confirmed"):
         raise ValueError(
             "PDF-extracted tables must be confirmed by a person before use - "
             "a PDF has no real table object, so extraction can misread it in "
             "ways the other formats can't. Review the table below; if it's "
-            'correct, add "pdf_confirmed": true to job.json and re-run '
-            "(AnalystOS never edits or guesses a PDF-derived value itself):\n\n"
+            "correct, resubmit with the PDF confirmed - job.json's "
+            '"pdf_confirmed": true for the CLI, or the "Detect columns" '
+            "step for the live site - AnalystOS never edits or guesses a "
+            "PDF-derived value itself:\n\n"
             f"{_pdf_preview(rows)}"
         )
 
@@ -164,15 +141,16 @@ def run_job(job_dir, evidence_dir=None):
     """Run the job in ``job_dir`` (reads job.json); return the section text.
 
     ``build_report`` raises if job.json has neither "asks" nor "template"
-    (or both) - see there for the exact message.
+    (or both) - see there for the exact message. Both "schema" and "title"
+    are optional in job.json now too - see ``build_report``'s docstring.
     """
     job_dir = Path(job_dir)
     job = json.loads((job_dir / "job.json").read_text(encoding="utf-8"))
 
     return build_report(
         job_dir / job["source"],
-        job["schema"],
-        job["title"],
+        job.get("schema"),
+        job.get("title"),
         asks=job.get("asks"),
         template=job.get("template"),
         currency_unit=job.get("currency_unit", "actual"),

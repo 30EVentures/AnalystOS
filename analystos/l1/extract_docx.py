@@ -18,13 +18,11 @@ from docx import Document
 from analystos.l1.schema import apply_schema
 
 
-def extract_table_docx(path, schema, table_index=0):
-    """Read table ``table_index`` from the .docx at ``path``; return its rows
-    as a list of typed dicts.
-
-    ``schema`` maps column name -> ``"number"`` or ``"text"``. Raises
-    ``ValueError`` on an unknown schema type, a missing required column, a
-    bad value, no table at ``table_index``, or an empty table.
+def _raw_rows(path, table_index=0):
+    """Read table ``table_index`` from the .docx at ``path`` into
+    ``(headers, numbered_raw_rows)`` - no schema applied yet. Shared by
+    ``extract_table_docx`` and, for schema auto-detection,
+    ``analystos.l1.detect.extract_any``.
     """
     doc = Document(path)
     if table_index >= len(doc.tables):
@@ -45,4 +43,16 @@ def extract_table_docx(path, schema, table_index=0):
             continue  # a blank row
         numbered.append((row_num, {h: c.text.strip() for h, c in zip(headers, cells)}))
 
+    return headers, numbered
+
+
+def extract_table_docx(path, schema, table_index=0):
+    """Read table ``table_index`` from the .docx at ``path``; return its rows
+    as a list of typed dicts.
+
+    ``schema`` maps column name -> ``"number"`` or ``"text"``. Raises
+    ``ValueError`` on an unknown schema type, a missing required column, a
+    bad value, no table at ``table_index``, or an empty table.
+    """
+    headers, numbered = _raw_rows(path, table_index=table_index)
     return apply_schema(numbered, headers, schema)

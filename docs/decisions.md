@@ -2,6 +2,45 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-04 — Universal upload: auto-detected schema, PDF's constraint
+generalized instead of special-cased (Slice 25)
+
+Prompted directly by feedback that an analyst shouldn't have to know which
+of 4 extensions were accepted or hand-type an exact JSON schema before the
+system would touch their file - and that's correct once a table is
+extracted, format has never mattered to L0/L2/L4. Two real changes:
+
+- **Schema auto-detection, not elimination.** `analystos.l1.schema.guess_schema`
+  guesses `"number"` vs `"text"` per column using the exact same
+  `_clean_number_token` cleaning `apply_schema` already applies when typing
+  a value - so a guessed schema and a hand-typed one behave identically once
+  resolved. An explicit schema is still honored exactly as before; nothing
+  is guessed when one is given. `analystos/scaffold.py`'s own CSV-only
+  guessing heuristic (duplicated since Slice 9) was replaced by this shared
+  one - a real behavior improvement in passing, since scaffold's own
+  `float(value)` check missed `$`/comma/`%`/paren-formatted numbers that
+  the shared cleaner already handled correctly.
+- **PDF's real constraint (a table inferred from layout, not read from a
+  real object, so it can be misread) doesn't go away - it becomes universal
+  instead of PDF-only.** Every format now gets a preview step
+  (`POST /api/extract`) before a report is generated, not just PDF; PDF's
+  preview additionally carries a warning. This is what actually let PDF
+  join `api/analyze.py`/`site/upload.html` for the first time - the
+  "PDF needs its own review-step UI" gap Slices 20/21/23 all flagged is
+  closed by this same mechanism, since every format already needed one.
+  The confirm-before-cite gate itself (Slice 23) is unchanged in behavior;
+  it's satisfied via a `pdf_confirmed` form field once the browser has
+  shown the preview, the same way Slice 23's CLI job.json flag always did.
+
+Found and fixed a real bug while building this: `guess_schema` originally
+scanned its `numbered_raw_rows` argument once per header, silently starving
+every header after the first when called with a one-shot generator
+(`scaffold.py` passed `enumerate(rows, ...)` directly) - only the first
+column ever got real data, everything else guessed "text". Fixed by
+materializing the argument inside `guess_schema` itself, so no caller has
+to know it's scanned more than once; a regression test
+(`test_a_one_shot_iterator_still_works_for_every_header`) locks this in.
+
 ## 2026-09-04 — PDF output: reportlab put to its actual use (Slice 24)
 
 `reportlab`, pinned since Slice 23 for test fixtures only, is now used for

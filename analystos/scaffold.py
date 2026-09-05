@@ -14,21 +14,7 @@ import shutil
 import sys
 from pathlib import Path
 
-
-def _looks_number(value):
-    try:
-        float(value)
-        return True
-    except ValueError:
-        return False
-
-
-def _guess_schema(rows, headers):
-    schema = {}
-    for col in headers:
-        values = [r[col].strip() for r in rows if (r.get(col) or "").strip()]
-        schema[col] = "number" if values and all(map(_looks_number, values)) else "text"
-    return schema
+from analystos.l1.schema import guess_schema
 
 
 def _example_asks(rows, schema):
@@ -67,7 +53,7 @@ def scaffold(csv_path, dest_dir):
         headers = reader.fieldnames or []
         rows = list(reader)
 
-    schema = _guess_schema(rows, headers)
+    schema = guess_schema(enumerate(rows, start=2), headers)
     job = {
         "title": f"Review of {csv_path.name}",
         "source": csv_path.name,

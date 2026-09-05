@@ -1,4 +1,21 @@
-"""The live MVP's one HTTP endpoint: upload a document, get a cited report.
+"""The live MVP's HTTP endpoints: upload a document, get a cited report.
+
+    POST /api/extract
+    header:
+        X-Access-Code   required - same code as /api/analyze below
+    multipart/form-data:
+        file            required - any of SUPPORTED_EXTENSIONS
+
+    A preview step, not a report: extracts the table and guesses its schema
+    (analystos.l1.detect.extract_any), returns them for a person to look at
+    before generating anything. Nothing is stored, nothing is cited - see
+    specs/slice-25/spec.md for why every format gets this step now, not just
+    PDF.
+
+    Response: ``{"schema": {...}, "preview": [{"row": n, "cells": {...}}],
+    "warning": "..."|null}`` on success (200) - ``warning`` is set for a
+    ``.pdf`` source, since its table is inferred from layout and can be
+    misread - or ``{"error": "..."}`` on a bad request/access failure.
 
     POST /api/analyze
     header:
@@ -7,14 +24,19 @@
                         a single shared code for the whole preview cohort,
                         not per-user auth
     multipart/form-data:
-        file            required - the document (.csv, .xlsx, .docx, .pptx)
-        schema          required - a JSON object, e.g.
-                        {"period": "text", "revenue": "number"}
+        file            required - any of SUPPORTED_EXTENSIONS
+        schema          optional - a JSON object, e.g.
+                        {"period": "text", "revenue": "number"}; omitted,
+                        it's guessed the same way /api/extract's preview is
         title           optional - defaults to "Review of <filename>"
         template         optional - defaults to "income_statement" (the only
                         one that exists yet - see analystos.templates)
         currency_unit   optional - "actual" (default) / "thousands" / "millions"
                         - see analystos.l4.export for why this matters
+        pdf_confirmed   required for a .pdf source - "true" once a person has
+                        seen /api/extract's preview of it; see
+                        analystos.pipeline for the confirm-before-cite gate
+                        this satisfies
 
 Nothing from a request is written to persistent storage. The upload is saved
 to a private temp directory for the life of the request only, and that
@@ -45,19 +67,25 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+from analystos.l1.detect import SUPPORTED_EXTENSIONS, extract_any  # noqa: E402
 from analystos.l4.export import render_html  # noqa: E402
 from analystos.pipeline import build_report  # noqa: E402
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10 MB - generous for a table
 
-_ALLOWED_EXTENSIONS = {".csv", ".xlsx", ".docx", ".pptx"}
-
 _ACCESS_CODE_ENV_VAR = "ANALYSTOS_ACCESS_CODE"
+_PREVIEW_ROW_LIMIT = 200  # a preview, not the whole table - keeps the response small
+_PDF_WARNING = (
+    "This table was extracted from a PDF, which has no real table object - "
+    "extraction infers column boundaries from the page's layout and can "
+    "occasionally misread it. Check the preview below before generating."
+)
 
 
-@app.post("/api/analyze")
-def analyze():
+def _access_denied():
+    """Return an error response if the request's access code is missing or
+    wrong; ``None`` if it's fine. Shared by both routes below."""
     configured_code = os.environ.get(_ACCESS_CODE_ENV_VAR)
     if not configured_code:
         # Fail closed: an unset env var must never mean "open to everyone."
@@ -66,35 +94,80 @@ def analyze():
     supplied_code = request.headers.get("X-Access-Code", "")
     if not hmac.compare_digest(supplied_code, configured_code):
         return jsonify(error="missing or invalid access code"), 401
+    return None
 
+
+def _require_upload():
+    """Return ``(upload, None)`` or ``(None, error_response)``."""
     upload = request.files.get("file")
     if upload is None or not upload.filename:
-        return jsonify(error="no file uploaded (form field name must be 'file')"), 400
+        return None, (jsonify(error="no file uploaded (form field name must be 'file')"), 400)
 
     suffix = Path(upload.filename).suffix.lower()
-    if suffix not in _ALLOWED_EXTENSIONS:
-        return (
+    if suffix not in SUPPORTED_EXTENSIONS:
+        return None, (
             jsonify(
                 error=f"unsupported file type {suffix!r}; "
-                f"expected one of {sorted(_ALLOWED_EXTENSIONS)}"
+                f"expected one of {sorted(SUPPORTED_EXTENSIONS)}"
             ),
             400,
         )
+    return upload, None
+
+
+@app.post("/api/extract")
+def extract():
+    denied = _access_denied()
+    if denied:
+        return denied
+
+    upload, error = _require_upload()
+    if error:
+        return error
+
+    tmp_dir = Path(tempfile.mkdtemp(prefix="analystos-"))
+    try:
+        tmp_path = tmp_dir / upload.filename
+        upload.save(tmp_path)
+        schema, rows = extract_any(tmp_path)
+    except ValueError as exc:
+        return jsonify(error=str(exc)), 400
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)  # never keep the upload
+
+    preview = [
+        {"row": row_num, "cells": row} for row_num, row in zip(rows.row_nums, rows)
+    ][:_PREVIEW_ROW_LIMIT]
+    warning = _PDF_WARNING if Path(upload.filename).suffix.lower() == ".pdf" else None
+    return jsonify(schema=schema, preview=preview, warning=warning)
+
+
+@app.post("/api/analyze")
+def analyze():
+    denied = _access_denied()
+    if denied:
+        return denied
+
+    upload, error = _require_upload()
+    if error:
+        return error
 
     schema_raw = request.form.get("schema")
-    if not schema_raw:
-        return jsonify(error="'schema' form field is required, e.g. "
-                              '{"period":"text","revenue":"number"}'), 400
-    try:
-        schema = json.loads(schema_raw)
-        if not isinstance(schema, dict):
-            raise ValueError("schema must be a JSON object")
-    except (json.JSONDecodeError, ValueError):
-        return jsonify(error="'schema' form field must be a JSON object"), 400
+    schema = None
+    if schema_raw:
+        try:
+            schema = json.loads(schema_raw)
+            if not isinstance(schema, dict):
+                raise ValueError("schema must be a JSON object")
+        except (json.JSONDecodeError, ValueError):
+            return jsonify(error="'schema' form field must be a JSON object"), 400
 
     title = request.form.get("title") or f"Review of {upload.filename}"
     template = request.form.get("template", "income_statement")
     currency_unit = request.form.get("currency_unit", "actual")
+    pdf_confirmed = request.form.get("pdf_confirmed", "").strip().lower() in (
+        "1", "true", "yes", "on",
+    )
 
     tmp_dir = Path(tempfile.mkdtemp(prefix="analystos-"))
     try:
@@ -108,6 +181,7 @@ def analyze():
             template=template,
             currency_unit=currency_unit,
             evidence_dir=tmp_dir / "evidence",
+            extract_options={"pdf_confirmed": pdf_confirmed},
         )
     except ValueError as exc:
         return jsonify(error=str(exc)), 400

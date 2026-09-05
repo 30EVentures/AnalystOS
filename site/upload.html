@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Try AnalystOS — upload a document, get a cited report</title>
-<meta name="description" content="Upload a CSV, Excel, Word, or PowerPoint document and get a cited report back, right in your browser.">
+<meta name="description" content="Upload a CSV, Excel, Word, PowerPoint, or PDF document and get a cited report back, right in your browser — no schema to type by hand.">
 <link rel="canonical" href="https://analyst-os-phi.vercel.app/upload.html">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%232F5CE0%22>▸</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,6 +61,7 @@ header.top{border-bottom:1px solid var(--hairline);position:sticky;top:0;backgro
 .btn:hover{filter:brightness(1.06)}
 .btn.ghost{background:transparent;color:var(--ink);border-color:var(--hairline-strong)}
 .btn:disabled{opacity:.55;cursor:not-allowed;filter:none}
+.btn.small{padding:.45rem .85rem;font-size:.82rem}
 
 main{padding:clamp(2.5rem,6vw,4rem) 0 5rem}
 .page-head{margin-bottom:2.2rem}
@@ -77,17 +78,30 @@ input[type=file],input[type=text],input[type=password],select,textarea{
   padding:.6rem .7rem;border:1px solid var(--hairline-strong);border-radius:8px;
   background:var(--raised);color:var(--ink);
 }
-textarea{min-height:7.5rem;resize:vertical;line-height:1.5}
+textarea{min-height:6rem;resize:vertical;line-height:1.5}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
 @media (max-width:520px){.row2{grid-template-columns:1fr}}
+.file-row{display:flex;gap:.8rem;align-items:flex-start;flex-wrap:wrap}
+.file-row input[type=file]{flex:1 1 14rem}
 .submit-row{margin-top:1.6rem;display:flex;align-items:center;gap:1rem}
-#status{font-family:var(--font-mono);font-size:.82rem;color:var(--faint)}
+#status,#detect-status{font-family:var(--font-mono);font-size:.82rem;color:var(--faint)}
 
-#error{
+#error,#detect-error{
   margin-top:1.4rem;border:1px solid color-mix(in srgb,var(--amber) 45%,var(--hairline-strong));
   border-radius:8px;padding:.9rem 1.1rem;background:color-mix(in srgb,var(--amber) 8%,var(--surface));
   color:var(--amber-ink);font-size:.92rem;line-height:1.5;
 }
+#pdf-warning{
+  margin-top:.9rem;border:1px solid color-mix(in srgb,var(--amber) 45%,var(--hairline-strong));
+  border-radius:8px;padding:.8rem 1rem;background:color-mix(in srgb,var(--amber) 8%,var(--surface));
+  color:var(--amber-ink);font-size:.86rem;line-height:1.5;
+}
+#preview-wrap{margin-top:.9rem;overflow-x:auto;border:1px solid var(--hairline);border-radius:8px}
+#preview-table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:.8rem}
+#preview-table th,#preview-table td{padding:.5rem .7rem;text-align:left;border-bottom:1px solid var(--hairline);white-space:nowrap}
+#preview-table thead th{color:var(--graphite);background:var(--raised);font-weight:600}
+#preview-note{font-family:var(--font-mono);font-size:.74rem;color:var(--faint);margin-top:.5rem}
+
 #result{margin-top:2.2rem}
 #result h2{font-size:1.15rem;margin-bottom:.9rem}
 #report-frame{width:100%;min-height:70vh;border:1px solid var(--hairline);border-radius:12px;background:#fff}
@@ -112,7 +126,7 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
     <div class="page-head">
       <p class="eyebrow">Live preview</p>
       <h1>Upload a document, get a cited report.</h1>
-      <p>Pick a CSV, Excel, Word, or PowerPoint file, tell it which columns hold what, and this calls the real <code class="mono">/api/analyze</code> endpoint — the same pipeline the CLI runs. Nothing you upload is stored; it's processed for this one request and discarded.</p>
+      <p>CSV, Excel, Word, PowerPoint, or PDF — pick a file, detect its columns, check the preview, and generate. Nothing you upload is stored; each request is processed and discarded. A PDF's table is inferred rather than read directly, so its preview carries a quick note — otherwise every format works the same way.</p>
     </div>
 
     <form id="analyze-form" class="form-card">
@@ -124,14 +138,24 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
 
       <div class="field">
         <label for="file">Document</label>
-        <input type="file" id="file" name="file" accept=".csv,.xlsx,.docx,.pptx" required>
-        <p class="hint">.csv, .xlsx, .docx, or .pptx. No file handy? <a href="data:text/csv;charset=utf-8,period%2Crevenue%2Ccost_of_revenue%2Cgross_profit%2Coperating_expenses%2Coperating_income%2Cnet_income%0AFY2023%2C1000000%2C400000%2C600000%2C250000%2C350000%2C280000%0AFY2024%2C1250000%2C475000%2C775000%2C300000%2C475000%2C390000%0A" download="sample-income-statement.csv">download a sample CSV</a> that matches the schema below.</p>
+        <div class="file-row">
+          <input type="file" id="file" name="file" accept=".csv,.xlsx,.docx,.pptx,.pdf" required>
+          <button type="button" class="btn small" id="detect-btn">Detect columns ▸</button>
+        </div>
+        <p class="hint">.csv, .xlsx, .docx, .pptx, or .pdf. No file handy? <a href="data:text/csv;charset=utf-8,period%2Crevenue%2Ccost_of_revenue%2Cgross_profit%2Coperating_expenses%2Coperating_income%2Cnet_income%0AFY2023%2C1000000%2C400000%2C600000%2C250000%2C350000%2C280000%0AFY2024%2C1250000%2C475000%2C775000%2C300000%2C475000%2C390000%0A" download="sample-income-statement.csv">download a sample CSV</a> to try.</p>
+        <span id="detect-status" hidden>Detecting columns…</span>
+        <div id="detect-error" role="alert" hidden></div>
+        <div id="pdf-warning" hidden></div>
+        <div id="preview-wrap" hidden>
+          <table id="preview-table"></table>
+        </div>
+        <p id="preview-note" hidden></p>
       </div>
 
       <div class="field">
         <label for="schema">Schema (JSON: column name → "text" or "number")</label>
-        <textarea id="schema" name="schema" spellcheck="false">{"period": "text", "revenue": "number", "cost_of_revenue": "number", "gross_profit": "number", "operating_expenses": "number", "operating_income": "number", "net_income": "number"}</textarea>
-        <p class="hint">Must match the column names in your file exactly. Edit this to match your own document.</p>
+        <textarea id="schema" name="schema" spellcheck="false" placeholder='Pick a file and click &quot;Detect columns&quot; to fill this in automatically.'></textarea>
+        <p class="hint">Filled in automatically once columns are detected — edit it if a column's type was guessed wrong.</p>
       </div>
 
       <div class="row2">
@@ -150,6 +174,7 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
       </div>
 
       <input type="hidden" name="template" value="income_statement">
+      <input type="hidden" name="pdf_confirmed" id="pdf-confirmed" value="">
       <p class="hint">Template: <span class="mono">income_statement</span> — the only one that exists yet.</p>
 
       <div class="submit-row">
@@ -185,13 +210,122 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
   var frame = document.getElementById('report-frame');
   var accessCodeInput = document.getElementById('access-code');
 
+  var fileInput = document.getElementById('file');
+  var detectBtn = document.getElementById('detect-btn');
+  var detectStatusEl = document.getElementById('detect-status');
+  var detectErrorEl = document.getElementById('detect-error');
+  var pdfWarningEl = document.getElementById('pdf-warning');
+  var previewWrapEl = document.getElementById('preview-wrap');
+  var previewTableEl = document.getElementById('preview-table');
+  var previewNoteEl = document.getElementById('preview-note');
+  var schemaEl = document.getElementById('schema');
+  var pdfConfirmedEl = document.getElementById('pdf-confirmed');
+
+  var previewedFingerprint = null; // set once /api/extract succeeds for the current file
+
   try {
     var savedCode = localStorage.getItem(ACCESS_CODE_KEY);
     if (savedCode) accessCodeInput.value = savedCode;
   } catch (e) { /* localStorage unavailable (private mode, etc.) - just ask each time */ }
 
+  function fileFingerprint(file) {
+    return file ? [file.name, file.size, file.lastModified].join('|') : null;
+  }
+
+  function isPdf(file) {
+    return !!file && /\.pdf$/i.test(file.name);
+  }
+
+  function resetPreview() {
+    previewedFingerprint = null;
+    pdfConfirmedEl.value = '';
+    pdfWarningEl.hidden = true;
+    previewWrapEl.hidden = true;
+    previewNoteEl.hidden = true;
+    previewTableEl.innerHTML = '';
+  }
+
+  fileInput.addEventListener('change', resetPreview);
+
+  function renderPreview(schema, preview) {
+    var columns = Object.keys(schema);
+    var thead = '<thead><tr>' + columns.map(function (c) {
+      return '<th>' + c + ' <span style="font-weight:400">(' + schema[c] + ')</span></th>';
+    }).join('') + '</tr></thead>';
+    var shown = preview.slice(0, 10);
+    var tbody = '<tbody>' + shown.map(function (r) {
+      return '<tr>' + columns.map(function (c) {
+        return '<td>' + (r.cells[c] === undefined ? '' : r.cells[c]) + '</td>';
+      }).join('') + '</tr>';
+    }).join('') + '</tbody>';
+    previewTableEl.innerHTML = thead + tbody;
+    previewWrapEl.hidden = false;
+    if (preview.length > shown.length) {
+      previewNoteEl.textContent = 'Showing ' + shown.length + ' of ' + preview.length + ' extracted rows.';
+      previewNoteEl.hidden = false;
+    } else {
+      previewNoteEl.hidden = true;
+    }
+  }
+
+  detectBtn.addEventListener('click', function () {
+    var file = fileInput.files[0];
+    if (!file) {
+      detectErrorEl.textContent = 'Pick a file first.';
+      detectErrorEl.hidden = false;
+      return;
+    }
+
+    detectErrorEl.hidden = true;
+    detectStatusEl.hidden = false;
+    detectBtn.disabled = true;
+
+    var body = new FormData();
+    body.append('file', file);
+
+    fetch('/api/extract', {
+      method: 'POST',
+      headers: { 'X-Access-Code': accessCodeInput.value },
+      body: body,
+    })
+      .then(function (resp) {
+        return resp.json().then(function (data) {
+          if (!resp.ok) {
+            throw new Error(data.error || ('request failed with status ' + resp.status));
+          }
+          return data;
+        });
+      })
+      .then(function (data) {
+        schemaEl.value = JSON.stringify(data.schema, null, 2);
+        renderPreview(data.schema, data.preview);
+        if (data.warning) {
+          pdfWarningEl.textContent = data.warning;
+          pdfWarningEl.hidden = false;
+        } else {
+          pdfWarningEl.hidden = true;
+        }
+        previewedFingerprint = fileFingerprint(file);
+        if (isPdf(file)) pdfConfirmedEl.value = 'true';
+      })
+      .catch(function (err) {
+        detectErrorEl.textContent = err.message || 'Could not detect columns. Please try again.';
+        detectErrorEl.hidden = false;
+      })
+      .finally(function () {
+        detectBtn.disabled = false;
+        detectStatusEl.hidden = true;
+      });
+  });
+
   form.addEventListener('submit', function (event) {
     event.preventDefault();
+
+    var file = fileInput.files[0];
+    // Only trust the confirmation if it was earned by the file actually being submitted.
+    if (fileFingerprint(file) !== previewedFingerprint) {
+      pdfConfirmedEl.value = '';
+    }
 
     errorEl.hidden = true;
     resultEl.hidden = true;

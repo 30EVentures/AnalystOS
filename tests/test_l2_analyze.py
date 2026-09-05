@@ -7,6 +7,9 @@ with no ANTHROPIC_API_KEY at all.
 import unittest
 from types import SimpleNamespace
 
+import anthropic
+import httpx2
+
 from analystos.l2.analyze import analyze_document
 
 DOCUMENT = (
@@ -140,6 +143,21 @@ class AnalyzeDocumentTest(unittest.TestCase):
         client = SimpleNamespace(messages=SimpleNamespace(create=lambda **kwargs: response))
         with self.assertRaises(ValueError):
             analyze_document(DOCUMENT, TITLE, client=client)
+
+    def test_an_anthropic_api_error_becomes_a_clean_valueerror(self):
+        # A hit spend limit, a bad key, a rate limit, or an outage all raise
+        # some anthropic.APIError subclass - none of those should reach the
+        # caller as a raw, unhandled exception (api/analyze.py only catches
+        # ValueError and would otherwise surface this as a bare 500).
+        request = httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
+
+        def _raise(**kwargs):
+            raise anthropic.APIConnectionError(request=request)
+
+        client = SimpleNamespace(messages=SimpleNamespace(create=_raise))
+        with self.assertRaises(ValueError) as cm:
+            analyze_document(DOCUMENT, TITLE, client=client)
+        self.assertIn("temporarily unavailable", str(cm.exception))
 
 
 if __name__ == "__main__":

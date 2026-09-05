@@ -2,6 +2,23 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-05 — Anthropic API failures fail clean, not with a raw 500
+
+Follow-up to Slice 26, prompted by setting up the real `ANTHROPIC_API_KEY`
+and a monthly spend cap: `analyze_document` only wrapped verification
+failures in `ValueError`, which is what `api/analyze.py` converts to a
+clean `400`. A failure in the API call itself - a hit spend limit, a bad or
+revoked key, a rate limit, an Anthropic-side outage - raises some
+`anthropic.APIError` subclass instead, which would have passed through
+uncaught and surfaced as a raw, unhandled `500`. Fixed by catching
+`anthropic.APIError` (the common base for every SDK-raised failure - status
+errors and connection errors alike) around the one API call and re-raising
+as a `ValueError` with a generic message ("analysis is temporarily
+unavailable") - never the raw exception, which can carry account or request
+detail that shouldn't reach a client response. Means hitting your own spend
+cap now fails the same clean way every other pipeline error already does,
+instead of looking like the site is broken.
+
 ## 2026-09-05 — Narrated analysis: read any document, verify every number (Slice 26)
 
 Prompted directly by a live gap: the only template (`income_statement`)

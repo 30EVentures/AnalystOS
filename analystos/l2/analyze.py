@@ -232,19 +232,30 @@ def analyze_document(document_text, title, client=None):
     ``client`` is an optional pre-built ``anthropic.Anthropic``-compatible
     object - tests pass a mock here so the verification logic runs with no
     real API call, no cost, and no network dependency. Raises ``ValueError``
-    if nothing the model returned survives verification.
+    if nothing the model returned survives verification, or if the API call
+    itself fails (a bad/missing key, a hit spend limit, a rate limit, or an
+    Anthropic-side outage) - callers already turn a ``ValueError`` into a
+    clean, honest response; letting an ``anthropic.APIError`` through
+    unconverted would instead surface as a raw, unhandled server error.
     """
     client = client or anthropic.Anthropic()
     normalized_document = _normalize(document_text)
 
-    response = client.messages.create(
-        model=_MODEL,
-        max_tokens=4096,
-        system=_SYSTEM_PROMPT,
-        tools=[_TOOL],
-        tool_choice={"type": "tool", "name": "write_report"},
-        messages=[{"role": "user", "content": f'Title: "{title}"\n\n{document_text}'}],
-    )
+    try:
+        response = client.messages.create(
+            model=_MODEL,
+            max_tokens=4096,
+            system=_SYSTEM_PROMPT,
+            tools=[_TOOL],
+            tool_choice={"type": "tool", "name": "write_report"},
+            messages=[{"role": "user", "content": f'Title: "{title}"\n\n{document_text}'}],
+        )
+    except anthropic.APIError as exc:
+        # Never echo the raw exception - it can carry account/request detail
+        # that shouldn't reach a client response.
+        raise ValueError(
+            "analysis is temporarily unavailable - please try again shortly"
+        ) from exc
 
     tool_use = next((b for b in response.content if b.type == "tool_use"), None)
     if tool_use is None:

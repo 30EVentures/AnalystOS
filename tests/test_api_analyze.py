@@ -16,6 +16,8 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
+import anthropic
+import httpx2
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
@@ -136,6 +138,24 @@ class AnalyzeEndpointTest(unittest.TestCase):
 
         self.assertEqual(resp.status_code, 200)
         self.assertIn("Revenue was $4.2M.", resp.get_json()["section"])
+
+    def test_anthropic_api_failure_is_a_clean_400_not_a_500(self):  # slice 26 follow-up
+        # A hit spend limit, a bad key, or an outage must not surface as a
+        # raw, unhandled server error - see analystos.l2.analyze's own tests
+        # for the underlying ValueError conversion this relies on.
+        request = httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
+
+        def _raise(**kw):
+            raise anthropic.APIConnectionError(request=request)
+
+        fake_client = SimpleNamespace(messages=SimpleNamespace(create=_raise))
+
+        with patch("analystos.l2.analyze.anthropic.Anthropic", return_value=fake_client):
+            data = {"file": (_csv_bytes("period,revenue\nFY2024,4200000\n"), "data.csv")}
+            resp = self._post(data)
+
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("temporarily unavailable", resp.get_json()["error"])
 
     def test_invalid_schema_json_is_a_clean_400(self):  # Done when #4
         data = {

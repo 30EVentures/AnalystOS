@@ -62,6 +62,25 @@ get a cited report back.**
 - Slice 23 — L1: PDF input — extraction + human confirm-before-cite step  ✓ done (PR #27)
 - Slice 24 — L4: real `.pdf` output (`reportlab`)  ✓ done (PR #29)
 
+### Beyond the original MVP — no format/shape restrictions
+
+Prompted by live use: the original MVP's one template (`income_statement`)
+only worked on data shaped like an income statement. Fixed in two steps,
+both recorded in full in `docs/decisions.md`, 2026-09-05.
+
+- Slice 25 — universal upload: auto-detected schema (no more hand-typed
+  JSON), every format treated the same, PDF joins the live site/API for
+  the first time  ✓ done (PR #31)
+- Slice 26 — narrated analysis: read any document, table-shaped or not;
+  a model chooses what's worth reporting, but every number is either a
+  real quote verified against the source or a computed value with its
+  arithmetic independently recomputed - never taken on the model's word.
+  New required secret (`ANTHROPIC_API_KEY`, on Vercel) and a real, small,
+  ongoing per-report cost  ✓ done (PR #33)
+
+**→ Any of the five supported formats, any shape of data, now produces a
+real, cited report - the original "income statement only" limit is gone.**
+
 ## R1 — trusted on one desk (Oct–Dec 2026)
 
 Attestation v1 (answers the seven AAO questions); weekly test cohort ~15;

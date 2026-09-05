@@ -238,7 +238,19 @@ def analyze_document(document_text, title, client=None):
     clean, honest response; letting an ``anthropic.APIError`` through
     unconverted would instead surface as a raw, unhandled server error.
     """
-    client = client or anthropic.Anthropic()
+    if client is None:
+        client = anthropic.Anthropic()
+        # A missing/empty ANTHROPIC_API_KEY doesn't raise anthropic.APIError -
+        # the SDK can't even build an authenticated request, so it raises a
+        # plain TypeError from inside messages.create() instead, which the
+        # except clause below never sees. Catch the real cause here, before
+        # that call, so a misconfigured deployment still fails clean. Tests
+        # patch anthropic.Anthropic itself with a bare stand-in that has no
+        # api_key attribute at all - getattr's default leaves those alone.
+        if getattr(client, "api_key", "present") is None:
+            raise ValueError(
+                "analysis is temporarily unavailable - please try again shortly"
+            )
     normalized_document = _normalize(document_text)
 
     try:

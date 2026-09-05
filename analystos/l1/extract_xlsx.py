@@ -33,13 +33,13 @@ def _cell_to_raw(cell):
     return str(value).strip()
 
 
-def extract_table_xlsx(path, schema, sheet=None):
-    """Read the sheet at ``path``; return its rows as a list of typed dicts.
+def _raw_rows(path, sheet=None):
+    """Read the sheet at ``path`` into ``(headers, numbered_raw_rows)`` - no
+    schema applied yet. Shared by ``extract_table_xlsx`` and, for schema
+    auto-detection, ``analystos.l1.detect.extract_any``.
 
-    ``schema`` maps column name -> ``"number"`` or ``"text"``. ``sheet``
-    selects a sheet by name; the workbook's first sheet is used otherwise.
-    Raises ``ValueError`` on an unknown schema type, a missing required
-    column, a bad value, or an empty sheet.
+    ``sheet`` selects a sheet by name; the workbook's first sheet is used
+    otherwise. Raises ``ValueError`` on an empty sheet.
     """
     wb = load_workbook(path, read_only=True, data_only=True)
     try:
@@ -63,4 +63,16 @@ def extract_table_xlsx(path, schema, sheet=None):
     finally:
         wb.close()
 
+    return headers, numbered
+
+
+def extract_table_xlsx(path, schema, sheet=None):
+    """Read the sheet at ``path``; return its rows as a list of typed dicts.
+
+    ``schema`` maps column name -> ``"number"`` or ``"text"``. ``sheet``
+    selects a sheet by name; the workbook's first sheet is used otherwise.
+    Raises ``ValueError`` on an unknown schema type, a missing required
+    column, a bad value, or an empty sheet.
+    """
+    headers, numbered = _raw_rows(path, sheet=sheet)
     return apply_schema(numbered, headers, schema)

@@ -111,6 +111,27 @@ detected automatically instead of typed.
    proof the `_raw_rows` split didn't change behavior.
 7. `python3 -m unittest discover -s tests -v` passes (with the venv active).
 
+## Verified beyond the test suite
+
+Drove a real Chromium browser (Playwright) against the real API, served
+locally alongside `site/`: uploaded a real CSV with **no schema ever
+typed**, clicked "Detect columns," confirmed the auto-filled schema and
+preview table showed the real values, then "Generate report" produced the
+real cited report. Repeated with a real `reportlab`-built PDF: the preview
+step additionally showed the misread-risk warning; "Generate report"
+produced a real cited report from it too - the first time a PDF has ever
+gone through the live upload page. Also confirmed a PDF submitted *without*
+clicking "Detect columns" first still fails cleanly with the
+confirm-required message, shown through the same error element as any other
+failure - the safety gate holds even if the UI step is skipped.
+
+Found and fixed two real issues this way, not just by reading the code:
+a bug where `guess_schema` silently starved every column after the first
+when given a one-shot iterator (see `docs/decisions.md`), and a confusing
+error message that told a browser user to edit a `job.json` file that, in
+that context, doesn't exist - reworded to name both the CLI and the live
+site's own step.
+
 ## Not in this slice
 
 - **Editing extracted cell values in the preview.** Still read-only, same

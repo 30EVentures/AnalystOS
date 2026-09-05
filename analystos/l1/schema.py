@@ -113,3 +113,35 @@ def _as_str(value):
     if value is None:
         return ""
     return value if isinstance(value, str) else str(value)
+
+
+def _looks_like_number(value):
+    try:
+        float(_clean_number_token(value))
+        return True
+    except ValueError:
+        return False
+
+
+def guess_schema(numbered_raw_rows, headers):
+    """Guess a schema from raw extracted data, one format's worth of it.
+
+    A column is ``"number"`` if every non-empty value in it parses as one -
+    using the exact same cleaning (thousands commas, ``$``, ``%``, parens)
+    ``apply_schema`` itself uses to type a value, so a guessed schema and a
+    hand-typed one behave identically once resolved. A column with no
+    non-empty values, or any value that doesn't parse, is ``"text"`` -
+    nothing is guessed as a number on partial evidence.
+
+    Used by ``analystos.l1.detect.extract_any`` (and ``analystos.scaffold``)
+    when the caller doesn't supply an explicit schema; never runs when one
+    is given - an explicit schema is never second-guessed.
+    """
+    numbered_raw_rows = list(numbered_raw_rows)  # scanned once per header below
+    schema = {}
+    for h in headers:
+        if not h:
+            continue
+        values = [v for v in (_as_str(raw.get(h)).strip() for _, raw in numbered_raw_rows) if v]
+        schema[h] = "number" if values and all(_looks_like_number(v) for v in values) else "text"
+    return schema

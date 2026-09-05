@@ -1,5 +1,6 @@
-"""Slice 21/22 - the upload page must stay in step with api/analyze.py's contract,
-including the Slice 22 access-code header."""
+"""Slice 21/22/25 - the upload page must stay in step with api/analyze.py's
+contract, including the access-code header and the /api/extract preview
+step that fills the schema field in automatically."""
 
 import unittest
 from pathlib import Path
@@ -16,15 +17,18 @@ class UploadPageTest(unittest.TestCase):
         text = PAGE.read_text(encoding="utf-8")
         for needle in (
             "/api/analyze",
+            "/api/extract",
             'name="file"',
             'name="schema"',
             'name="title"',
             'name="template"',
             'name="currency_unit"',
+            'name="pdf_confirmed"',
             ".csv",
             ".xlsx",
             ".docx",
             ".pptx",
+            ".pdf",
             "X-Access-Code",
             "access-code",
         ):

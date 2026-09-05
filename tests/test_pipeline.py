@@ -208,6 +208,37 @@ class PipelineTest(unittest.TestCase):
         out = run_job(job, evidence_dir=self.tmp / "ev")
         self.assertIn("Revenue was $4.2M.", out)
 
+    # --- schema auto-detection + no-title default (slice 25) ---
+
+    def test_build_report_with_no_schema_auto_detects(self):
+        job = self.tmp / "no-schema-job"
+        job.mkdir()
+        (job / "data.csv").write_text(
+            "period,revenue\nFY2023,1000000\nFY2024,1250000\n", encoding="utf-8"
+        )
+        out = build_report(
+            job / "data.csv",
+            title="Auto-detected",
+            asks=[{"text": "Revenue was {answer}.", "format": "usd",
+                   "where": ["period", "FY2024"], "select": "revenue"}],
+            evidence_dir=self.tmp / "ev",
+        )
+        self.assertIn("Revenue was $1.2M.", out)  # "revenue" guessed as a number
+
+    def test_run_job_with_no_schema_or_title_in_job_json(self):
+        job = self.tmp / "bare-job"
+        job.mkdir()
+        (job / "data.csv").write_text(
+            "period,revenue\nFY2023,1000000\nFY2024,1250000\n", encoding="utf-8"
+        )
+        (job / "job.json").write_text(
+            json.dumps({"source": "data.csv", "template": "income_statement"}),
+            encoding="utf-8",
+        )
+        out = run_job(job, evidence_dir=self.tmp / "ev")
+        self.assertIn("# Review of data.csv", out)  # default title
+        self.assertIn("Revenue grew 25.0% from FY2023 to FY2024.", out)
+
     def test_run_job_uses_a_template_when_no_asks_are_given(self):
         job = self.tmp / "template-job"
         job.mkdir()

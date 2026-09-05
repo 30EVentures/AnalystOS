@@ -22,17 +22,15 @@ def _tables_on(slide):
     return [shape.table for shape in slide.shapes if shape.has_table]
 
 
-def extract_table_pptx(path, schema, slide_index=None, table_index=0):
-    """Read one table from the deck at ``path``; return its rows as typed dicts.
-
-    ``schema`` maps column name -> ``"number"`` or ``"text"``.
+def _raw_rows(path, slide_index=None, table_index=0):
+    """Read one table from the deck at ``path`` into ``(headers,
+    numbered_raw_rows)`` - no schema applied yet. Shared by
+    ``extract_table_pptx`` and, for schema auto-detection,
+    ``analystos.l1.detect.extract_any``.
 
     Without ``slide_index``, every table in the deck (in slide order) is
     numbered 0, 1, ... and ``table_index`` picks among them. With
     ``slide_index`` (0-based), only tables on that one slide are considered.
-
-    Raises ``ValueError`` on an unknown schema type, a missing required
-    column, a bad value, no table at the requested index, or an empty table.
     """
     prs = Presentation(path)
     slides = [prs.slides[slide_index]] if slide_index is not None else list(prs.slides)
@@ -58,4 +56,20 @@ def extract_table_pptx(path, schema, slide_index=None, table_index=0):
             continue  # a blank row
         numbered.append((row_num, {h: c.text.strip() for h, c in zip(headers, cells)}))
 
+    return headers, numbered
+
+
+def extract_table_pptx(path, schema, slide_index=None, table_index=0):
+    """Read one table from the deck at ``path``; return its rows as typed dicts.
+
+    ``schema`` maps column name -> ``"number"`` or ``"text"``.
+
+    Without ``slide_index``, every table in the deck (in slide order) is
+    numbered 0, 1, ... and ``table_index`` picks among them. With
+    ``slide_index`` (0-based), only tables on that one slide are considered.
+
+    Raises ``ValueError`` on an unknown schema type, a missing required
+    column, a bad value, no table at the requested index, or an empty table.
+    """
+    headers, numbered = _raw_rows(path, slide_index=slide_index, table_index=table_index)
     return apply_schema(numbered, headers, schema)

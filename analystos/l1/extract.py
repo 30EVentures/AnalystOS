@@ -15,6 +15,18 @@ from pathlib import Path
 from analystos.l1.schema import apply_schema
 
 
+def _raw_rows(path):
+    """Read the CSV at ``path`` into ``(headers, numbered_raw_rows)`` - no
+    schema applied yet. Shared by ``extract_table`` and, for schema
+    auto-detection, ``analystos.l1.detect.extract_any``.
+    """
+    with Path(path).open(newline="", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        headers = reader.fieldnames or []
+        numbered = [(row_num, dict(row)) for row_num, row in enumerate(reader, start=2)]
+    return headers, numbered
+
+
 def extract_table(path, schema):
     """Read the CSV at ``path``; return its rows as a list of typed dicts.
 
@@ -22,9 +34,5 @@ def extract_table(path, schema):
     CSV that are not in the schema are ignored. Raises ``ValueError`` on an
     unknown schema type, a missing required column, or a bad value.
     """
-    with Path(path).open(newline="", encoding="utf-8-sig") as f:
-        reader = csv.DictReader(f)
-        headers = reader.fieldnames or []
-        numbered = [(row_num, dict(row)) for row_num, row in enumerate(reader, start=2)]
-
+    headers, numbered = _raw_rows(path)
     return apply_schema(numbered, headers, schema)

@@ -281,6 +281,30 @@ class PipelineTest(unittest.TestCase):
         self.assertIn("# X", out)
         self.assertIn("revenue", out)
 
+    def test_narrated_default_always_uses_actual_currency_scale(self):  # slice 26 follow-up
+        # The narrated path's quoted values are always literal, already-real
+        # numbers copied verbatim from the source text - never data
+        # pre-scaled by a "figures in thousands" header convention, unlike
+        # the old template path. A currency_unit other than "actual" must
+        # never apply here, no matter what the caller passes in.
+        job = self.tmp / "narrated-currency-job"
+        job.mkdir()
+        (job / "data.csv").write_text("period,revenue\nFY2024,18400000\n", encoding="utf-8")
+
+        tool_use = SimpleNamespace(type="tool_use", input={"segments": [{
+            "type": "quote", "display": "inline", "label": "Revenue",
+            "exact_text": "18400000", "has_value": True, "value": 18400000.0,
+            "sentence": "Revenue was {value}.", "format": "usd",
+        }]})
+        response = SimpleNamespace(content=[tool_use])
+        fake_client = SimpleNamespace(messages=SimpleNamespace(create=lambda **kw: response))
+
+        out = build_report(
+            job / "data.csv", title="X", evidence_dir=self.tmp / "ev",
+            llm_client=fake_client, currency_unit="thousands",
+        )
+        self.assertIn("Revenue was $18.4M.", out)
+
     def test_both_asks_and_template_still_raises(self):  # unchanged guard
         job = self.tmp / "both-still-bad-job"
         job.mkdir()

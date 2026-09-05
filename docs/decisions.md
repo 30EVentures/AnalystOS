@@ -2,6 +2,27 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-05 — Upload page: narrated analysis is now the default, not just the API's
+
+Found while preparing a real live test: `site/upload.html` had a hardcoded
+`<input type="hidden" name="template" value="income_statement">`, sent on
+every submit regardless of the schema field's contents. `api/analyze.py`
+already treats an omitted `template` as the new Slice 26 narrated-analysis
+default, but the live page could never actually omit it - every upload,
+table-shaped or not, was silently forced through the old column-by-column
+path. A non-tabular document (a memo, a slide deck) would fail there since
+there's no table to extract, which is exactly the case the new default
+exists to handle.
+
+Fixed by removing the hardcoded field. The page now defaults to the
+narrated path (no `template`, no `schema` sent) and only sends
+`template=income_statement` when a new "this file is a table shaped like an
+income statement" checkbox is explicitly checked - which is also the only
+case that shows the Detect columns/schema UI at all. `tests/test_upload_page.py`
+updated to match: it no longer asserts a static `name="template"` attribute
+exists (there isn't one any more) and instead asserts the checkbox and the
+JS that conditionally sets `template` are both present.
+
 ## 2026-09-05 — Anthropic API failures fail clean, not with a raw 500
 
 Follow-up to Slice 26, prompted by setting up the real `ANTHROPIC_API_KEY`

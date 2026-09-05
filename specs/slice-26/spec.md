@@ -178,3 +178,18 @@ it through the real pipeline (not just isolated unit assertions):
 - **Actually setting `ANTHROPIC_API_KEY` on the live Vercel project.** Same
   category as `ANTHROPIC_ACCESS_CODE` before it - a manual dashboard step
   for after this merges.
+
+### Found on the first real, paid live call
+
+Everything above was verified with a realistic *mocked* model response - it
+never actually validated the real `write_report` tool schema against
+Anthropic's live API. The first real call, once a working `ANTHROPIC_API_KEY`
+was actually in place, came back `400 Schema is too complex` - the original
+schema required only `"type"` on each segment, leaving twelve genuinely
+optional properties, and Anthropic's strict-mode grammar compiler has to
+handle every combination of which optional properties are present. Fixed
+by making every property required and adding explicit `has_value`/
+`has_total` booleans in place of "is this key present at all" - see
+`docs/decisions.md`, 2026-09-05, and the note at the top of
+`analystos/l2/analyze.py`. A real end-to-end run against a non-tabular
+`.docx` memo is still the open item this was blocking.

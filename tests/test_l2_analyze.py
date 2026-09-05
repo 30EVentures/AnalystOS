@@ -33,7 +33,7 @@ class AnalyzeDocumentTest(unittest.TestCase):
     def test_a_real_quote_is_verified_and_kept(self):  # Done when #2
         segments = [{
             "type": "quote", "display": "inline", "label": "Revenue",
-            "exact_text": "$10,000,000", "value": 10000000.0,
+            "exact_text": "$10,000,000", "has_value": True, "value": 10000000.0,
             "sentence": "Q4 revenue was {value}.", "format": "usd",
         }]
         out = analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
@@ -81,6 +81,38 @@ class AnalyzeDocumentTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
 
+    def test_percent_of_total_with_has_total_true_and_a_real_quoted_total_is_kept(self):
+        segments = [{
+            "type": "computed", "display": "inline", "label": "Share",
+            "operation": "percent_of_total",
+            "operands": [{"exact_text": "$8,000,000", "value": 8000000.0}],
+            "has_total": True, "total_exact_text": "$10,000,000", "total_value": 10000000.0,
+            "result": 80.0,
+            "sentence": "Q3 revenue was {value} of Q4's.",
+            "format": "percent",
+        }]
+        out = analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
+        self.assertEqual(len(out), 1)
+        self.assertAlmostEqual(out[0]["value"], 80.0)
+        self.assertIn("$10,000,000", out[0]["citation"])
+
+    def test_percent_of_total_with_has_total_false_is_rejected(self):
+        # has_total is the explicit flag that replaced "was total_exact_text
+        # given at all" - a percent_of_total claim that leaves it false
+        # (even if total_exact_text/total_value happen to be filled with
+        # placeholders) must not be treated as a real, cited total.
+        segments = [{
+            "type": "computed", "display": "inline", "label": "Share",
+            "operation": "percent_of_total",
+            "operands": [{"exact_text": "$10,000,000", "value": 10000000.0}],
+            "has_total": False, "total_exact_text": "", "total_value": 0,
+            "result": 50.0,
+            "sentence": "Revenue was {value} of the total.",
+            "format": "percent",
+        }]
+        with self.assertRaises(ValueError):
+            analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
+
     def test_computed_operand_not_actually_in_document_is_rejected(self):
         segments = [{
             "type": "computed", "display": "inline", "label": "Growth",
@@ -99,7 +131,7 @@ class AnalyzeDocumentTest(unittest.TestCase):
     def test_missing_placeholder_is_rejected(self):
         segments = [{
             "type": "quote", "display": "inline", "label": "Revenue",
-            "exact_text": "$10,000,000", "value": 10000000.0,
+            "exact_text": "$10,000,000", "has_value": True, "value": 10000000.0,
             "sentence": "Q4 revenue was strong.",  # no {value} placeholder
             "format": "usd",
         }]
@@ -116,7 +148,7 @@ class AnalyzeDocumentTest(unittest.TestCase):
             {"type": "prose", "text": "Momentum continued into the following quarter."},
             {
                 "type": "quote", "display": "inline", "label": "Revenue",
-                "exact_text": "$10,000,000", "value": 10000000.0,
+                "exact_text": "$10,000,000", "has_value": True, "value": 10000000.0,
                 "sentence": "Revenue was {value}.", "format": "usd",
             },
         ]
@@ -127,7 +159,7 @@ class AnalyzeDocumentTest(unittest.TestCase):
     def test_stat_display_qualitative_quote_with_no_value_is_kept(self):
         segments = [{
             "type": "quote", "display": "stat", "label": "Headcount",
-            "exact_text": "40 people",
+            "exact_text": "40 people", "has_value": False,
         }]
         out = analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
         self.assertEqual(len(out), 1)

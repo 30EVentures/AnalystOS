@@ -126,7 +126,7 @@ class AnalyzeEndpointTest(unittest.TestCase):
         # a fast, offline, deterministic test - no real API call.
         tool_use = SimpleNamespace(type="tool_use", input={"segments": [{
             "type": "quote", "display": "inline", "label": "Revenue",
-            "exact_text": "4200000", "value": 4200000.0,
+            "exact_text": "4200000", "has_value": True, "value": 4200000.0,
             "sentence": "Revenue was {value}.", "format": "usd",
         }]})
         fake_response = SimpleNamespace(content=[tool_use])

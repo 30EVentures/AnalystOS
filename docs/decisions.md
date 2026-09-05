@@ -2,6 +2,37 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-05 — Every segment field is required, not just "type" (real live 400)
+
+The first real, paid call to `write_report` - after `ANTHROPIC_API_KEY` was
+finally working and the previous logging fix let the real error surface -
+came back `400 Bad Request: "Schema is too complex."` from Anthropic
+itself, not from any bug this codebase's own error handling could catch.
+The original `_TOOL["input_schema"]` required only `"type"` on each
+segment, leaving twelve properties genuinely optional (`display`, `label`,
+`value`, `operands`, `total_exact_text`, ...). Strict-mode tool use
+compiles the schema into a grammar, and a schema with that many optional
+properties on one object forces the compiler to represent every possible
+combination of which ones are present - exactly the kind of blowup real
+users have hit and reported upstream (this is a known, if under-documented,
+strict/structured-output limitation, not unique to this schema).
+
+No mocked test could have caught this - every test in
+`tests/test_l2_analyze.py` patches `client.messages.create` directly, so
+the real schema is never sent to Anthropic's real validator. This is the
+first defect only a genuine, paid API call could surface.
+
+Fixed by making every property required and replacing "is this key present"
+with explicit `has_value`/`has_total` booleans - a segment that doesn't use
+a field still supplies a placeholder (`""`, `0`, `[]`, `"none"`) and the
+flag says whether to look at it. This removes the combinatorial optionality
+entirely (every segment object now has exactly one shape) at the cost of a
+longer system prompt and a few more required keys. `_verify_quote` and
+`_verify_computed` in `analystos/l2/analyze.py` now branch on the explicit
+flags instead of key absence; existing tests updated to set them. Added
+dedicated positive/negative tests for `has_total` specifically, since that
+branch (`percent_of_total`) had no direct test coverage before.
+
 ## 2026-09-05 — Log the real Anthropic failure server-side, not just a generic message
 
 Found immediately after the previous fix went live: the client-facing

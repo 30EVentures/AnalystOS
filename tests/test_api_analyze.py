@@ -13,6 +13,8 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
@@ -87,7 +89,12 @@ class AnalyzeEndpointTest(unittest.TestCase):
         self.assertIn(".txt", resp.get_json()["error"])
 
     def test_pdf_without_confirmation_is_a_clean_400(self):  # slice 25
-        data = {"file": (_make_pdf_bytes([["period", "revenue"], ["FY2024", "4200000"]]), "data.pdf")}
+        # Explicit template - this tests the *old* table-driven path's
+        # confirm-before-cite gate specifically, not the slice 26 default.
+        data = {
+            "file": (_make_pdf_bytes([["period", "revenue"], ["FY2024", "4200000"]]), "data.pdf"),
+            "template": "income_statement",
+        }
         resp = self._post(data)
         self.assertEqual(resp.status_code, 400)
         self.assertIn("pdf_confirmed", resp.get_json()["error"])
@@ -110,6 +117,25 @@ class AnalyzeEndpointTest(unittest.TestCase):
         resp = self._post(data)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("FY2024 revenue was $4.2M.", resp.get_json()["section"])
+
+    def test_missing_template_runs_the_narrated_default(self):  # slice 26
+        # No "template" at all -> the new narrated-analysis default. Patches
+        # the Anthropic client used inside analystos.l2.analyze so this stays
+        # a fast, offline, deterministic test - no real API call.
+        tool_use = SimpleNamespace(type="tool_use", input={"segments": [{
+            "type": "quote", "display": "inline", "label": "Revenue",
+            "exact_text": "4200000", "value": 4200000.0,
+            "sentence": "Revenue was {value}.", "format": "usd",
+        }]})
+        fake_response = SimpleNamespace(content=[tool_use])
+        fake_client = SimpleNamespace(messages=SimpleNamespace(create=lambda **kw: fake_response))
+
+        with patch("analystos.l2.analyze.anthropic.Anthropic", return_value=fake_client):
+            data = {"file": (_csv_bytes("period,revenue\nFY2024,4200000\n"), "data.csv")}
+            resp = self._post(data)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("Revenue was $4.2M.", resp.get_json()["section"])
 
     def test_invalid_schema_json_is_a_clean_400(self):  # Done when #4
         data = {

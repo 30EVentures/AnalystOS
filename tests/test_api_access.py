@@ -14,9 +14,13 @@ _REAL_CODE = "correct-code"
 
 
 def _valid_form():
+    # Explicit template: this file tests access gating itself, not analysis -
+    # the old table-driven path needs no real API call, keeping these tests
+    # fast and offline. See tests/test_api_analyze.py for the slice 26 default.
     return {
         "file": (io.BytesIO(b"period,revenue\nFY2024,100\n"), "data.csv"),
         "schema": json.dumps({"period": "text", "revenue": "number"}),
+        "template": "income_statement",
     }
 
 

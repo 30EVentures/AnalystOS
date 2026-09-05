@@ -31,6 +31,19 @@ that flag shows it) before it can be cited. See ``specs/slice-23/spec.md``.
 guessed from the source's own data (``analystos.l1.detect.extract_any``) -
 so a job, or an API call, doesn't have to declare one at all. See
 ``specs/slice-25/spec.md``.
+
+Neither ``asks`` nor ``template`` given at all - not even ``"auto"`` - is no
+longer an error. It's the new default: the source is read as plain text,
+whatever shape it actually is (``analystos.l1.document_text``, not forced
+into a table), analyzed by a model that can only feature a number it can
+prove is real (``analystos.l2.analyze`` - every quote checked against the
+actual source text, every computed value independently recomputed, never
+the model's own arithmetic taken on faith), and rendered the same way any
+other section is (``analystos.l4.export.render_narrated_section``). See
+``specs/slice-26/spec.md``. This doesn't apply to a ``.pdf`` source's
+existing table-extraction gate above - reading a PDF's plain text (what
+this path does) has none of the column-boundary-inference risk table
+extraction does, so no confirmation step is needed here.
 """
 
 import json
@@ -40,8 +53,10 @@ from pathlib import Path
 
 from analystos.l0.store import store
 from analystos.l1.detect import extract_any
+from analystos.l1.document_text import extract_document_text
+from analystos.l2.analyze import analyze_document
 from analystos.l2.answer import answer_growth, answer_lookup, answer_ratio
-from analystos.l4.export import render_html, render_pdf, render_section
+from analystos.l4.export import render_html, render_narrated_section, render_pdf, render_section
 from analystos.templates import build_asks
 
 
@@ -94,25 +109,36 @@ def build_report(
     currency_unit="actual",
     evidence_dir=None,
     extract_options=None,
+    llm_client=None,
 ):
     """Run L0 -> L1 -> L2 -> L4 for one source file; return the section text.
 
-    Exactly one of ``asks`` or ``template`` is required. ``schema`` is
-    optional - omitted, it's guessed from the source's own data (see the
-    module docstring). ``extract_options`` is passed through to the L1
-    extractor for format-specific choices (``sheet``, ``table_index``,
-    ``slide_index``, ``page``) - see the individual extractors in
-    ``analystos.l1`` - and also carries ``pdf_confirmed`` for the PDF
-    confirm-before-cite gate below.
+    Giving neither ``asks`` nor ``template`` runs the new default: a
+    document-text read plus a verified, model-assisted analysis - see the
+    module docstring. Giving exactly one of them runs the original,
+    schema/table-driven path unchanged. Giving both is still an error.
+    ``schema`` is optional there too - omitted, it's guessed from the
+    source's own data (see the module docstring). ``extract_options`` is
+    passed through to the L1 extractor for format-specific choices
+    (``sheet``, ``table_index``, ``slide_index``, ``page``) and also
+    carries ``pdf_confirmed`` for the PDF confirm-before-cite gate.
+    ``llm_client`` is passed through to ``analyze_document`` - tests supply
+    a mock there; production leaves it unset and a real client is built.
     """
-    if (asks is None) == (template is None):
+    if asks is not None and template is not None:
         raise ValueError('exactly one of "asks" or "template" is required')
 
     extract_options = extract_options or {}
     source_path = Path(source_path)
     title = title or f"Review of {source_path.name}"
     source_hash = store(source_path, evidence_dir)                          # L0
-    schema, rows = extract_any(source_path, schema, extract_options)        # L1
+
+    if asks is None and template is None:
+        document_text = extract_document_text(source_path)                  # L1 (text)
+        segments = analyze_document(document_text, title, client=llm_client)  # L2 (verified)
+        return render_narrated_section(title, source_hash, segments, currency_unit)  # L4
+
+    schema, rows = extract_any(source_path, schema, extract_options)        # L1 (table)
 
     if source_path.suffix.lower() == ".pdf" and not extract_options.get("pdf_confirmed"):
         raise ValueError(
@@ -140,9 +166,10 @@ def build_report(
 def run_job(job_dir, evidence_dir=None):
     """Run the job in ``job_dir`` (reads job.json); return the section text.
 
-    ``build_report`` raises if job.json has neither "asks" nor "template"
-    (or both) - see there for the exact message. Both "schema" and "title"
-    are optional in job.json now too - see ``build_report``'s docstring.
+    ``build_report`` raises only if job.json has *both* "asks" and
+    "template" - having neither now runs the new document-analysis default
+    (see ``build_report``'s docstring). "schema" and "title" are optional
+    in job.json too.
     """
     job_dir = Path(job_dir)
     job = json.loads((job_dir / "job.json").read_text(encoding="utf-8"))

@@ -13,6 +13,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 
 import pdfplumber
 from openpyxl import Workbook
@@ -262,23 +263,34 @@ class PipelineTest(unittest.TestCase):
         self.assertIn("FY2024 revenue was $60.9K.", out)
         self.assertIn("Revenue grew 125.9% from FY2023 to FY2024.", out)
 
-    def test_run_job_with_neither_asks_nor_template_raises(self):
-        job = self.tmp / "bad-job"
+    def test_neither_asks_nor_template_runs_the_narrated_default(self):  # slice 26
+        job = self.tmp / "bare-narrated-job"
         job.mkdir()
         (job / "data.csv").write_text("period,revenue\nFY2024,100\n", encoding="utf-8")
-        (job / "job.json").write_text(
-            json.dumps(
-                {
-                    "title": "X",
-                    "source": "data.csv",
-                    "schema": {"period": "text", "revenue": "number"},
-                }
-            ),
-            encoding="utf-8",
+
+        # A qualitative quote (no "value" key at all) just needs a real exact_text.
+        tool_use = SimpleNamespace(type="tool_use", input={"segments": [{
+            "type": "quote", "display": "inline", "label": "Revenue", "exact_text": "revenue",
+        }]})
+        response = SimpleNamespace(content=[tool_use])
+        fake_client = SimpleNamespace(messages=SimpleNamespace(create=lambda **kw: response))
+
+        out = build_report(
+            job / "data.csv", title="X", evidence_dir=self.tmp / "ev", llm_client=fake_client,
         )
+        self.assertIn("# X", out)
+        self.assertIn("revenue", out)
+
+    def test_both_asks_and_template_still_raises(self):  # unchanged guard
+        job = self.tmp / "both-still-bad-job"
+        job.mkdir()
+        (job / "data.csv").write_text("period,revenue\nFY2024,100\n", encoding="utf-8")
         with self.assertRaises(ValueError) as cm:
-            run_job(job, evidence_dir=self.tmp / "ev")
-        self.assertIn("asks", str(cm.exception))
+            build_report(
+                job / "data.csv", {"period": "text", "revenue": "number"}, "X",
+                asks=[], template="income_statement", evidence_dir=self.tmp / "ev",
+            )
+        self.assertIn("exactly one", str(cm.exception))
 
     def test_build_report_with_an_empty_asks_list_is_valid_not_missing(self):
         # asks=[] means "given, just empty" - must not be treated the same

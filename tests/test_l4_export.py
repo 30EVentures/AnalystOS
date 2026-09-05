@@ -6,7 +6,7 @@ import unittest
 
 import pdfplumber
 
-from analystos.l4.export import render_html, render_pdf, render_section
+from analystos.l4.export import render_html, render_narrated_section, render_pdf, render_section
 
 
 class RenderSectionTest(unittest.TestCase):
@@ -219,6 +219,60 @@ class RenderSectionTest(unittest.TestCase):
             text = "\n".join(page.extract_text() or "" for page in pdf.pages)
         self.assertIn("A & B", text)
         self.assertIn("R&D <spend> was 1 & 2.", text)
+
+
+    # --- render_narrated_section (slice 26) ---
+
+    def test_render_narrated_section_renders_stat_inline_and_prose(self):
+        segments = [
+            {"type": "prose", "text": "A strong quarter overall."},
+            {"type": "quote", "display": "stat", "label": "Headcount", "text": "40 people",
+             "citation": "40 people"},
+            {"type": "computed", "display": "inline", "label": "Growth",
+             "sentence": "Revenue grew {value} quarter over quarter.", "value": 25.0,
+             "format": "percent", "citation": ["$8,000,000", "$10,000,000"]},
+        ]
+        out = render_narrated_section("Q4 Review", self.src, segments)
+        self.assertIn("# Q4 Review", out)
+        self.assertIn("A strong quarter overall.", out)
+        self.assertNotIn("[1]", out.split("\n\n")[1])  # prose carries no footnote marker
+        self.assertIn("**Headcount:** 40 people [1]", out)
+        self.assertIn("Revenue grew 25.0% quarter over quarter. [2]", out)
+        self.assertIn(f'[1] source {self.src} - "40 people"', out)
+        self.assertIn(
+            f'[2] computed from: source {self.src} - "$8,000,000"; '
+            f'source {self.src} - "$10,000,000"',
+            out,
+        )
+
+    def test_render_narrated_section_is_readable_by_render_html(self):
+        segments = [{
+            "type": "quote", "display": "inline", "label": "Revenue",
+            "sentence": "Revenue was {value}.", "value": 4200000.0, "format": "usd",
+            "citation": "4,200,000",
+        }]
+        section = render_narrated_section("Narrated", self.src, segments)
+        page = render_html(section)
+        self.assertIn("<h1>Narrated</h1>", page)
+        self.assertIn("Revenue was $4.2M.", page)
+
+    def test_stat_label_bold_markup_is_rendered_not_shown_literally(self):
+        # Regression: found live - a stat line's "**Label:**" was showing up
+        # as literal asterisks in the HTML/PDF output instead of being bold.
+        segments = [{
+            "type": "quote", "display": "stat", "label": "Headcount",
+            "text": "40 people", "citation": "40 people",
+        }]
+        section = render_narrated_section("Narrated", self.src, segments)
+        page = render_html(section)
+        self.assertIn("<strong>Headcount:</strong>", page)
+        self.assertNotIn("**", page)
+
+        pdf_bytes = render_pdf(section)
+        with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+            text = "\n".join(p.extract_text() or "" for p in pdf.pages)
+        self.assertIn("Headcount: 40 people", text)
+        self.assertNotIn("**", text)
 
 
 if __name__ == "__main__":

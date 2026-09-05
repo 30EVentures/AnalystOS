@@ -2,6 +2,25 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-05 — Log the real Anthropic failure server-side, not just a generic message
+
+Found immediately after the previous fix went live: the client-facing
+message ("analysis is temporarily unavailable") is deliberately generic -
+it has to be, since `anthropic.APIError`'s own text can carry account/
+request detail that shouldn't reach a client response. But that means a
+bad key, missing billing, a rate limit, a wrong model name, and a real
+Anthropic-side outage are now genuinely indistinguishable from the outside
+- including to me, debugging this from outside Vercel's dashboard. Nothing
+printed the real exception anywhere, so a handled `ValueError` left no
+trace at all in the function logs.
+
+Fixed by printing the real `anthropic.APIError` (`repr(exc)` - the SDK's
+own error text, which does include the useful part like an HTTP status
+code) to stderr before converting it, right where it's caught in
+`analystos/l2/analyze.py`. Server logs only, never the response body -
+that boundary is unchanged. Vercel's function logs are the actual next
+diagnostic step for the real live-test failure this follows.
+
 ## 2026-09-05 — A missing API key must fail clean too, not just a bad call
 
 Found via a real live test: the first Anthropic error-handling fix only

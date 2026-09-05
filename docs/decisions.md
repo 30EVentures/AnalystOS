@@ -2,6 +2,27 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-05 — A missing API key must fail clean too, not just a bad call
+
+Found via a real live test: the first Anthropic error-handling fix only
+caught `anthropic.APIError` around `client.messages.create(...)`, on the
+assumption that any auth problem would come back from Anthropic's server as
+an API-shaped error (`AuthenticationError`, a subclass of `APIError`). A
+completely missing or empty `ANTHROPIC_API_KEY` doesn't reach the server at
+all - the SDK can't build an authenticated request and raises a plain
+`TypeError` ("Could not resolve authentication method") from inside that
+same call, which the `except anthropic.APIError` clause never sees. That
+crashed as a raw, unhandled Flask 500 instead of the intended clean 400.
+
+Fixed in `analystos/l2/analyze.py` by checking the constructed client's
+`api_key` *before* the call, only on the production path (`client=None`,
+where a real `anthropic.Anthropic()` is built) - tests that patch in a
+bare stand-in client have no `api_key` attribute at all, so
+`getattr(client, "api_key", "present")` leaves them alone and this doesn't
+change any existing test's behavior. Confirmed the exact `TypeError`
+reproduces with the fix reverted and the new test in place, and that it's
+gone with the fix applied.
+
 ## 2026-09-05 — Upload page: narrated analysis is now the default, not just the API's
 
 Found while preparing a real live test: `site/upload.html` had a hardcoded

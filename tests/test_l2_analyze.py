@@ -144,6 +144,22 @@ class AnalyzeDocumentTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             analyze_document(DOCUMENT, TITLE, client=client)
 
+    def test_a_missing_api_key_becomes_a_clean_valueerror_not_a_raw_crash(self):
+        # A missing/empty ANTHROPIC_API_KEY doesn't raise anthropic.APIError -
+        # the SDK's messages.create() raises a plain TypeError instead
+        # ("Could not resolve authentication method"), which the APIError
+        # handler below never sees. Only reproducible by leaving `client`
+        # unset (None), since that's the only path that builds a real
+        # anthropic.Anthropic() instead of taking a test's mock.
+        import os
+        from unittest.mock import patch
+
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("ANTHROPIC_API_KEY", None)
+            with self.assertRaises(ValueError) as cm:
+                analyze_document(DOCUMENT, TITLE, client=None)
+        self.assertIn("temporarily unavailable", str(cm.exception))
+
     def test_an_anthropic_api_error_becomes_a_clean_valueerror(self):
         # A hit spend limit, a bad key, a rate limit, or an outage all raise
         # some anthropic.APIError subclass - none of those should reach the

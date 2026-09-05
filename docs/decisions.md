@@ -2,6 +2,80 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-05 — Narrated analysis: read any document, verify every number (Slice 26)
+
+Prompted directly by a live gap: the only template (`income_statement`)
+requires a period-like column, so a file that's genuinely tabular but isn't
+shaped like an income statement (a company/revenue/employee list, say)
+failed cleanly rather than producing a report. Working through what "no
+restrictions" should actually mean landed on a real architecture change,
+not an addition - `docs/architecture.md`'s L2 was already described as
+"retrieval + analysis... every claim points back into L0"; what shipped
+through Slice 25 was a deliberately thin first slice of that, not its
+ceiling.
+
+**What changed, and why, in the order the design actually evolved during
+building:**
+
+- **Not forced into a table.** `analystos/l1/document_text.py` reads a
+  document's real text content - paragraphs, bullet points, table cells
+  rendered as readable text - the same way for all five supported formats.
+  A memo or a slide deck with no table at all now reads the same as a
+  spreadsheet; nothing requires row/column structure to exist.
+- **A model reads the whole thing and decides what matters; it never
+  supplies a number.** `analystos/l2/analyze.py` sends the real document
+  text to Claude and gets back a structured list of segments (via strict
+  tool use, not free text) - each a quote, a computed value, or plain
+  connective prose. A quote gives `exact_text` the model claims is verbatim
+  in the source; this code checks that with an actual substring match
+  against the real text - not "the model says so." A computed value (a
+  sum, a ratio, a growth rate, a share of total) gives its own raw operands
+  the same way, *plus* the operation and the model's claimed result - and
+  this code *independently recomputes* that arithmetic and checks it
+  matches. This second check is the reason a citation alone isn't enough:
+  it proves a quote is real, but says nothing about whether math performed
+  on top of it is correct - a real gap surfaced explicitly while designing
+  this, not caught by accident. Prose is scanned for stray digits and
+  rejected if any appear - no number ever reaches the report without going
+  through one of the two checks above. A segment that fails verification is
+  dropped, not shown, not retried; a report where *nothing* survives is a
+  real `ValueError`, never a silent partial success.
+- **A number renders as a number when that's the point.** Each segment
+  carries its own `"display"`: `"stat"` for a standalone labeled figure,
+  `"inline"` for a sentence with context. The model chooses per figure,
+  not a global setting.
+- **Model: Claude Sonnet 5, not Opus 5** - overriding Anthropic's own
+  default-to-Opus guidance for one disclosed, concrete reason:
+  `api/analyze.py` runs as a Vercel function with a real 10-second
+  wall-clock ceiling. Opus 5's always-on extended thinking makes that a
+  real timeout risk for a bounded, structured-output task like this one;
+  Sonnet 5 reliably finishes well inside it. A one-line change to revisit
+  if the Vercel plan changes or quality disappoints.
+- **A new required secret, `ANTHROPIC_API_KEY`, on Vercel** - separate from
+  anything used to build this code - and a new, real, small, ongoing
+  per-report dollar cost that didn't exist before this slice.
+- **This is the new default, not a replacement.** `build_report` now runs
+  this path when *neither* `asks` nor `template` is given at all - the
+  original schema/table-driven path (explicit `asks`, or
+  `template="income_statement"`) is completely unchanged and still costs
+  nothing extra to run; this only fires when nothing else was specified,
+  which is the new default for the live API/site.
+- **Disclosed, accepted residual risk:** a text value from the source
+  (e.g. a company name) still reaches the model as data it can quote or
+  reason about, with an explicit system-prompt instruction that all such
+  values are data, never instructions - a standard, imperfect mitigation.
+  Verification catches every fabricated *number*; it cannot catch
+  manipulated *wording* smuggled in through a text field the model quotes
+  or paraphrases around.
+- **Tested entirely against a mocked Anthropic client** - this session had
+  no `ANTHROPIC_API_KEY` and no way to reach the real API, so the test
+  suite verifies the logic (a fabricated quote is rejected, fabricated math
+  is rejected even with real cited numbers, prose with a stray digit is
+  rejected) deterministically, with no cost and no network dependency. Real
+  output quality - whether Claude actually produces good, well-chosen
+  analysis in practice - can only be confirmed once a real key is set and
+  a real request is made.
+
 ## 2026-09-05 — Real production bug: /api/extract 404'd on Vercel
 
 Confirmed live, right after `ANALYSTOS_ACCESS_CODE` was finally set on the

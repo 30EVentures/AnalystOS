@@ -62,6 +62,7 @@ from reportlab.platypus import HRFlowable, Paragraph, SimpleDocTemplate, Spacer
 
 _MARKER_RE = re.compile(r"\[(\d+)\]")
 _FOOTNOTE_RE = re.compile(r"^\[(\d+)\]\s*(.*)$")
+_BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
 
 _STYLE = """
 body{font:16px/1.65 Georgia,'Times New Roman',serif;max-width:42rem;
@@ -170,8 +171,12 @@ def render_section(title, findings, currency_unit="actual"):
 
 
 def _para_html(text):
-    """Escape a body paragraph and turn ``[n]`` into a superscript link."""
+    """Escape a body paragraph, turn ``**text**`` into bold, and ``[n]`` into
+    a superscript link (used by ``render_narrated_section``'s stat lines -
+    see that function).
+    """
     esc = html.escape(text)
+    esc = _BOLD_RE.sub(lambda m: f"<strong>{m.group(1)}</strong>", esc)
     return _MARKER_RE.sub(
         lambda m: (
             f'<sup><a href="#fn{m.group(1)}" id="ref{m.group(1)}">'
@@ -190,6 +195,59 @@ def _note_html(line):
     return (
         f'<p id="fn{n}"><span class="n">{n}.</span>{rest}'
         f' <a href="#ref{n}">&#8617;</a></p>'
+    )
+
+
+def _quoted(source_hash, exact_text):
+    return f'source {source_hash} - "{exact_text}"'
+
+
+def _narrated_footnote(n, source_hash, citation):
+    if isinstance(citation, list):
+        return f"[{n}] computed from: " + "; ".join(_quoted(source_hash, c) for c in citation)
+    return f"[{n}] {_quoted(source_hash, citation)}"
+
+
+def render_narrated_section(title, source_hash, segments, currency_unit="actual"):
+    """Render verified segments from ``analystos.l2.analyze.analyze_document``
+    as a section - same overall shape ``render_section`` produces (title,
+    body paragraphs, ``---``, numbered footnotes), so ``render_html`` and
+    ``render_pdf`` need no changes to render this too.
+
+    Each segment is one of ``"quote"``, ``"computed"``, or ``"prose"`` (see
+    ``analystos.l2.analyze`` for the verified shape). A quote/computed
+    segment becomes one paragraph - a plain sentence if its ``"display"``
+    is ``"inline"``, a standalone bold stat line if ``"stat"`` - with a
+    footnote quoting the exact source text it was verified against. Prose
+    has no footnote - it never carries a citable number in the first place.
+    """
+    body = []
+    footnotes = []
+    n = 0
+    for segment in segments:
+        if segment["type"] == "prose":
+            body.append(segment["text"])
+            continue
+
+        n += 1
+        if "sentence" in segment:
+            rendered = _format_number(segment["value"], segment.get("format"), currency_unit)
+            text = segment["sentence"].replace("{value}", rendered)
+        else:
+            text = segment["text"]
+
+        if segment.get("display") == "stat" and segment.get("label"):
+            body.append(f"**{segment['label']}:** {text} [{n}]")
+        else:
+            body.append(f"{text} [{n}]")
+        footnotes.append(_narrated_footnote(n, source_hash, segment["citation"]))
+
+    return (
+        f"# {title}\n\n"
+        + "\n\n".join(body)
+        + "\n\n---\n"
+        + "\n".join(footnotes)
+        + "\n"
     )
 
 
@@ -238,8 +296,12 @@ _FOOTNOTE_STYLE = ParagraphStyle(
 
 
 def _para_pdf_markup(text):
-    """Escape a body paragraph for reportlab's markup and turn ``[n]`` into a superscript."""
+    """Escape a body paragraph for reportlab's markup, turn ``**text**`` into
+    bold and ``[n]`` into a superscript (used by ``render_narrated_section``'s
+    stat lines - see that function).
+    """
     esc = xml_escape(text)
+    esc = _BOLD_RE.sub(lambda m: f"<b>{m.group(1)}</b>", esc)
     return _MARKER_RE.sub(lambda m: f"<super>{m.group(1)}</super>", esc)
 
 

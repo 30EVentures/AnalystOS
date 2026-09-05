@@ -25,18 +25,25 @@
                         not per-user auth
     multipart/form-data:
         file            required - any of SUPPORTED_EXTENSIONS
-        schema          optional - a JSON object, e.g.
-                        {"period": "text", "revenue": "number"}; omitted,
-                        it's guessed the same way /api/extract's preview is
+        schema          optional - only meaningful together with `template`
+                        (below); a JSON object, e.g. {"period": "text",
+                        "revenue": "number"} - omitted, it's guessed the same
+                        way /api/extract's preview is
         title           optional - defaults to "Review of <filename>"
-        template         optional - defaults to "income_statement" (the only
-                        one that exists yet - see analystos.templates)
+        template         optional - omitted entirely (the default), the new
+                        narrated analysis runs: the document's real text is
+                        read and analyzed by a model whose every numeric
+                        claim is independently verified against the source
+                        (analystos.l2.analyze - see specs/slice-26/spec.md).
+                        Given explicitly as "income_statement" (the only
+                        named template that exists), the original schema/
+                        table-driven path runs instead, unchanged.
         currency_unit   optional - "actual" (default) / "thousands" / "millions"
                         - see analystos.l4.export for why this matters
-        pdf_confirmed   required for a .pdf source - "true" once a person has
-                        seen /api/extract's preview of it; see
-                        analystos.pipeline for the confirm-before-cite gate
-                        this satisfies
+        pdf_confirmed   only meaningful with an explicit `template` and a
+                        .pdf source - "true" once a person has seen
+                        /api/extract's preview of it; see analystos.pipeline
+                        for the confirm-before-cite gate this satisfies
 
 Nothing from a request is written to persistent storage. The upload is saved
 to a private temp directory for the life of the request only, and that
@@ -163,7 +170,11 @@ def analyze():
             return jsonify(error="'schema' form field must be a JSON object"), 400
 
     title = request.form.get("title") or f"Review of {upload.filename}"
-    template = request.form.get("template", "income_statement")
+    # Omitted entirely -> the new narrated-analysis default (build_report
+    # runs analystos.l2.analyze on the document's real text). Given
+    # explicitly (still just "income_statement" - the only one that
+    # exists) -> the original schema/table-driven path, unchanged.
+    template = request.form.get("template") or None
     currency_unit = request.form.get("currency_unit", "actual")
     pdf_confirmed = request.form.get("pdf_confirmed", "").strip().lower() in (
         "1", "true", "yes", "on",

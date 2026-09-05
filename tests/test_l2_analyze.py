@@ -175,6 +175,27 @@ class AnalyzeDocumentTest(unittest.TestCase):
             analyze_document(DOCUMENT, TITLE, client=client)
         self.assertIn("temporarily unavailable", str(cm.exception))
 
+    def test_an_anthropic_api_error_is_logged_server_side(self):
+        # The client-facing message is deliberately generic - a bad key, no
+        # billing, a rate limit, and an outage all read identically to the
+        # caller. That's only diagnosable at all if the real exception is
+        # still visible somewhere (Vercel's function logs), so this asserts
+        # it's actually printed, not just swallowed into the ValueError.
+        import io
+        from contextlib import redirect_stderr
+
+        request = httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
+
+        def _raise(**kwargs):
+            raise anthropic.APIConnectionError(request=request)
+
+        client = SimpleNamespace(messages=SimpleNamespace(create=_raise))
+        captured = io.StringIO()
+        with redirect_stderr(captured):
+            with self.assertRaises(ValueError):
+                analyze_document(DOCUMENT, TITLE, client=client)
+        self.assertIn("APIConnectionError", captured.getvalue())
+
 
 if __name__ == "__main__":
     unittest.main()

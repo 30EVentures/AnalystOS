@@ -32,6 +32,7 @@ found, never the one the model typed. See ``specs/slice-26/spec.md``.
 
 import math
 import re
+import sys
 
 import anthropic
 
@@ -263,8 +264,12 @@ def analyze_document(document_text, title, client=None):
             messages=[{"role": "user", "content": f'Title: "{title}"\n\n{document_text}'}],
         )
     except anthropic.APIError as exc:
-        # Never echo the raw exception - it can carry account/request detail
-        # that shouldn't reach a client response.
+        # Never echo the raw exception in the response - it can carry
+        # account/request detail that shouldn't reach a client. It's still
+        # genuinely useful for diagnosing a real failure (bad key, no
+        # billing, rate limit, model access, an Anthropic-side outage all
+        # look identical to the caller otherwise), so log it server-side.
+        print(f"[analystos.l2.analyze] Anthropic API call failed: {exc!r}", file=sys.stderr)
         raise ValueError(
             "analysis is temporarily unavailable - please try again shortly"
         ) from exc

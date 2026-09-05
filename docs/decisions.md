@@ -2,6 +2,31 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-05 — Real production bug: /api/extract 404'd on Vercel
+
+Confirmed live, right after `ANALYSTOS_ACCESS_CODE` was finally set on the
+Vercel project (the one open item from Slice 22): `/api/extract` (Slice 25)
+returned Vercel's own 404 page ("The page could not be found"), never
+reaching our code at all - while every local test for it passed.
+
+Root cause: exactly the file-based routing model researched and recorded
+here for Slice 20 - one `.py` file in `api/` maps to one route matching
+*its own path* (`api/analyze.py` -> `/api/analyze`), regardless of what
+routes a file's Flask app defines internally. `/api/extract` was added to
+the same shared app inside `api/analyze.py` instead of its own file, so
+Vercel had no file to map that path to. Flask's test client bypasses this
+entirely - it calls the app object directly - so nothing in the test suite
+could have caught it; this was exactly the "only confirmable once deployed"
+residual risk Slice 20's own entry already flagged, now realized for real.
+
+Fix: `api/extract.py`, a one-line file that just re-exports the same shared
+`app` object from `api/analyze.py`. Gives Vercel a matching file for
+`/api/extract` while keeping exactly one implementation of every route -
+two file-based doors into the identical app, not a second app or duplicated
+logic. A regression test (`tests/test_api_vercel_routing.py`) checks both
+files resolve to the identical app object with both routes registered, so
+this can't silently regress if a third route gets added the same way.
+
 ## 2026-09-04 — Universal upload: auto-detected schema, PDF's constraint
 generalized instead of special-cased (Slice 25)
 

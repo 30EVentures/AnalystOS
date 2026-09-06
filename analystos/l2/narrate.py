@@ -16,16 +16,18 @@ Slice 26 already verified.
 Every paragraph is validated before any of this is trusted: every
 placeholder must reference a real, citable fact, and every digit outside
 a placeholder is treated as an unverified number (the same rule
-``analyze_document``'s ``_verify_prose`` already applies) and rejects the
-whole narrative. There is no partial acceptance and no retry - a rejected
-narrative raises ``ValueError``, and the caller (``analystos.pipeline``)
-falls back to Slice 26's plain per-segment rendering. See
-``specs/slice-27/spec.md``.
+``analyze_document``'s ``_verify_prose`` already applies, calendar
+references carved out the same way - see ``_CALENDAR_RE`` in
+``analystos.l2.analyze``) and rejects the whole narrative. There is no
+partial acceptance and no retry - a rejected narrative raises
+``ValueError``, and the caller (``analystos.pipeline``) falls back to
+Slice 26's plain per-segment rendering. See ``specs/slice-27/spec.md``.
 """
 
 import re
+import sys
 
-from analystos.l2.analyze import _DIGIT_RE, _create_message, _resolve_client
+from analystos.l2.analyze import _CALENDAR_RE, _DIGIT_RE, _create_message, _resolve_client
 from analystos.l4.export import display_value
 
 _MODEL = "claude-sonnet-5"
@@ -52,7 +54,9 @@ cite - write your own sentence about it with no digits in it at all.
 
 You do not have to use every fact - use your judgment about what's \
 genuinely worth the reader's attention. Never write a digit that isn't \
-inside a {{N}} placeholder.
+inside a {{N}} placeholder - except a quarter/half/year reference (e.g. \
+"Q4 2026" or "heading into 2027"), which needs no citation and is fine \
+anywhere.
 """
 
 _TOOL = {
@@ -93,17 +97,21 @@ def _build_manifest(segments):
 
 
 def _validate_paragraph(text, segments):
-    """A paragraph is trustworthy only if every {{N}} points to a real,
-    citable fact and no digit appears anywhere outside a placeholder.
+    """``None`` if the paragraph is trustworthy - every {{N}} points to a
+    real, citable fact and no digit appears outside a placeholder -
+    otherwise a short human-readable reason it isn't, so a rejection can
+    be logged with something more useful than just "it failed."
     """
     for match in _PLACEHOLDER_RE.finditer(text):
         index = int(match.group(1))
-        if index < 0 or index >= len(segments) or segments[index]["type"] == "prose":
-            return False
-    stripped = _PLACEHOLDER_RE.sub("", text)
+        if index < 0 or index >= len(segments):
+            return f"references fact {index}, which doesn't exist"
+        if segments[index]["type"] == "prose":
+            return f"references fact {index}, which isn't citable (a prose segment)"
+    stripped = _CALENDAR_RE.sub("", _PLACEHOLDER_RE.sub("", text))
     if _DIGIT_RE.search(stripped):
-        return False
-    return True
+        return "has a digit outside any {{N}} placeholder"
+    return None
 
 
 def write_narrative(segments, title, client=None):
@@ -143,7 +151,18 @@ def write_narrative(segments, title, client=None):
         raise ValueError("model returned no paragraphs")
 
     for paragraph in paragraphs:
-        if not _validate_paragraph(paragraph.get("text", ""), segments):
+        text = paragraph.get("text", "")
+        reason = _validate_paragraph(text, segments)
+        if reason is not None:
+            # Never echo the paragraph's own text in the response, but log
+            # it server-side - "the narrative failed" alone isn't
+            # diagnosable, and this exact gap was found live (a rejection
+            # with no clue why until the actual Anthropic responses were
+            # compared against what the code did with them).
+            print(
+                f"[analystos.l2.narrate] narrative rejected - paragraph {reason}: {text!r}",
+                file=sys.stderr,
+            )
             raise ValueError(
                 "narrative referenced an unverifiable fact or a stray "
                 "number - falling back to the plain rendering"

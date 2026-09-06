@@ -118,6 +118,30 @@ any real, paid live call.
    active) using only mocked clients - no real `ANTHROPIC_API_KEY` or
    network access required to run clean.
 
+## Verified beyond the test suite
+
+The first real live test (a richer multi-section document, real
+`ANTHROPIC_API_KEY`) still rendered Slice 26's fallback despite both
+Anthropic calls succeeding (`200 OK` per Vercel's logs), and surfaced two
+real findings - not in this slice's own new code, but in the safety net
+this slice depends on:
+
+- **A genuine verification gap in `analyze.py`, pre-dating this slice.**
+  A citable claim's `exact_text` was checked for really appearing in the
+  document, but the numeric `value` paired with it never was - letting a
+  model represent subtraction (not one of the five supported operations)
+  by silently negating an operand inside a `sum`. Landed on the true
+  number both times it happened live; nothing structural stopped a false
+  one. Fixed - see `docs/decisions.md`, 2026-09-06 ("Closed a real
+  verification gap...").
+- **The digit-ban rule (Slice 26's own, inherited by this slice) rejected
+  almost any real connective prose**, since ordinary writing constantly
+  mentions a quarter or year. `write_narrative` had no logging on this
+  rejection path either, so it was invisible until reproduced manually.
+  Fixed with a calendar-reference carve-out plus logging - see
+  `docs/decisions.md`, 2026-09-06 ("Calendar references don't need a
+  citation"). Live re-test with these fixes is the next step.
+
 ## Not in this slice
 
 - **Choosing the output shape** (one-pager, slide deck, memo). Next on

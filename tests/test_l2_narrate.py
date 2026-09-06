@@ -69,6 +69,13 @@ class WriteNarrativeTest(unittest.TestCase):
         out = write_narrative(SEGMENTS, TITLE, client=_fake_client(paragraphs))
         self.assertEqual(out, paragraphs)
 
+    def test_a_calendar_reference_outside_a_placeholder_is_allowed(self):
+        # Found live, 2026-09-06: the same real-writing-mentions-dates
+        # problem as analyze.py's own prose rule - see docs/decisions.md.
+        paragraphs = [{"text": "Revenue was {{0}}, and momentum should carry into Q4 2026."}]
+        out = write_narrative(SEGMENTS, TITLE, client=_fake_client(paragraphs))
+        self.assertEqual(out, paragraphs)
+
     def test_no_citable_facts_at_all_raises_before_calling_the_model(self):
         only_prose = [{"type": "prose", "text": "Nothing to report."}]
         with self.assertRaises(ValueError):

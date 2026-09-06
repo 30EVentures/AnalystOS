@@ -92,6 +92,7 @@ then build the frontend controls last. Full plan in `docs/decisions.md`.
   one paragraph per fact in extraction order); it can only reference a
   fact by placeholder, never state a number, and any failure falls back
   to Slice 26's plain rendering rather than losing the report  ✓ done
+  (PR #39) - not yet live-tested with a real API key
 
 ## R1 — trusted on one desk (Oct–Dec 2026)
 

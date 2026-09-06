@@ -140,7 +140,26 @@ this slice depends on:
   rejection path either, so it was invisible until reproduced manually.
   Fixed with a calendar-reference carve-out plus logging - see
   `docs/decisions.md`, 2026-09-06 ("Calendar references don't need a
-  citation"). Live re-test with these fixes is the next step.
+  citation").
+
+A follow-up commit carrying these two fixes was itself reported "pushed"
+without confirming its PR was still open - it landed after that PR had
+already merged and never reached `main` at all. Recovered via
+`git cherry-pick` onto a fresh branch, this time verified through
+GitHub's own file-diff API rather than assumed. See `docs/decisions.md`,
+2026-09-06 ("A follow-up commit landed after its PR had already merged").
+
+Separately, before any of the above had actually succeeded live even
+once, the underlying writing style itself was called out as insufficient
+regardless of bug fixes: one paragraph per fact, in extraction order, is
+a fact sheet, not analysis. `_SYSTEM_PROMPT` was rewritten around real
+executive/analyst-writing patterns (the Minto Pyramid Principle, SCQA,
+equity-research practice) rather than a generic "sound smart" instruction
+- see `docs/decisions.md`, 2026-09-06 ("Rewrote the narrative prompt...").
+A mechanically-real mock (hand-written paragraphs run through the actual
+validation and rendering code, not typed-up prose) confirmed the shape
+works before spending anything on a live test of the new prompt. That
+live test is the next step.
 
 ## Not in this slice
 

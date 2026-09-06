@@ -2,6 +2,60 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-06 — Rewrote the narrative prompt against real executive-writing patterns
+
+Every live test so far (even before any of them succeeded end to end)
+carried the same underlying flaw: `write_narrative`'s prompt asked for
+"structure however best serves an executive reader" - vague enough that
+one fact per paragraph, in extraction order with a bolded label, trivially
+satisfies it. That's a fact sheet, not analysis, and it was never going to
+change on its own no matter how many bug fixes landed. Explicit ask: fix
+this *before* spending more on a live test, not after, since a working
+bug fix paired with a still-flat writing style would waste the test on a
+known-insufficient output shape.
+
+Researched how real executive/analyst writing is actually structured
+rather than defaulting to a generic "sound smart" instruction:
+
+- The **Minto Pyramid Principle** (Barbara Minto, McKinsey) - lead with
+  the single governing answer, then MECE-grouped support ordered by
+  importance. "You think from the bottom up, but you present from the top
+  down" - the standard taught at McKinsey/BCG/Bain.
+- **SCQA** (Situation-Complication-Question-Answer), the same Minto
+  framework applied to how an opening frames "why this matters" before
+  the supporting detail.
+- **Equity research practice**: "numbers by themselves do not usually
+  convince anybody of anything" - reports connect figures to a story,
+  usually built around two or three things that actually matter, with
+  qualitative context explaining *why* a number is moving, not just that
+  it is.
+
+Rewrote `_SYSTEM_PROMPT` in `analystos/l2/narrate.py` around these:
+open with a 2-3 sentence bottom-line takeaway; 3-5 substantive paragraphs
+each built around one analytical point (not one number) with facts woven
+in as evidence; explicitly call out tension/anomalies/comparisons rather
+than flat restatement; a closing risk/outlook note. Explicit anti-pattern
+named directly in the prompt: "never produce a paragraph that is just
+'Label: sentence with one number in it,' repeated fact after fact."
+
+The verification contract is completely unchanged - still `{{N}}`
+placeholders only, still the same `_validate_paragraph` checks, still no
+schema change (kept to the same single required `text` property, given
+Slice 26's `400 Schema is too complex` history). This is purely a change
+to what the model is asked to do with already-verified facts, never to
+how those facts are checked.
+
+Before spending on a live test, produced a mechanically-real mock (not
+just typed-up prose): hand-wrote paragraphs in the new style using the
+already-verified Solstice facts from Test #2/#3, ran them through the
+actual `_validate_paragraph` and `render_narrative_section` code (not a
+model call), and confirmed the shape renders correctly. Also surfaced a
+real, expected side effect of the earlier verification-gap fix: a fake
+"operating income" figure (previously only reachable via the negated-
+operand exploit) is gone for good, since subtraction still isn't one of
+the five supported operations - the mock instead uses a legitimate `sum`
+of cost of revenue + opex (both real, correctly-signed quoted operands).
+
 ## 2026-09-06 — A follow-up commit landed after its PR had already merged
 
 Test #3's continued fallback-shaped output looked like the value-matching

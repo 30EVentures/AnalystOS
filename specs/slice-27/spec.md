@@ -158,8 +158,22 @@ equity-research practice) rather than a generic "sound smart" instruction
 - see `docs/decisions.md`, 2026-09-06 ("Rewrote the narrative prompt...").
 A mechanically-real mock (hand-written paragraphs run through the actual
 validation and rendering code, not typed-up prose) confirmed the shape
-works before spending anything on a live test of the new prompt. That
-live test is the next step.
+works before spending anything on a live test of the new prompt.
+
+That first structural pass was still judged too abstract to mechanically
+prevent a flat fact-list. A second round grounded the prompt in five
+specific disciplines traced to four real, fully-read reference pieces
+(equity research, a research digest, legal-process coverage, a
+market-reaction story) rather than more stylistic guessing - stacked
+benchmarking, named mechanisms instead of category words, strict past/
+future sequencing, dated legal-process narration, and trigger+reaction
+pairing - each applied only where the source actually supports it. See
+`docs/decisions.md`, 2026-09-06 ("Five mechanical writing disciplines...").
+The mock was rebuilt against this too, honestly: the Solstice source has
+no legal or market-reaction content, so two of the five disciplines
+aren't exercised by any mock built from it - only a live test on a
+document that actually contains that material can confirm those two
+work. That live test is the next step.
 
 ## Not in this slice
 

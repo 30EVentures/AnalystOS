@@ -305,6 +305,44 @@ class PipelineTest(unittest.TestCase):
         )
         self.assertIn("Revenue was $18.4M.", out)
 
+    def test_the_narrative_pass_actually_runs_when_it_succeeds(self):  # slice 27
+        # test_neither_asks_nor_template_runs_the_narrated_default and
+        # test_narrated_default_always_uses_actual_currency_scale both use a
+        # client that always returns the write_report response, so
+        # write_narrative gets a "segments" reply instead of "paragraphs" and
+        # correctly falls back - proving the fallback works, not that the
+        # narrative pass itself ever runs. This client tells the two calls
+        # apart by which tool was requested, so both stages actually fire.
+        job = self.tmp / "narrative-success-job"
+        job.mkdir()
+        (job / "data.csv").write_text("period,revenue\nFY2024,18400000\n", encoding="utf-8")
+
+        report_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
+            "segments": [{
+                "type": "quote", "display": "inline", "label": "Revenue",
+                "exact_text": "18400000", "has_value": True, "value": 18400000.0,
+                "sentence": "Revenue was {value}.", "format": "usd",
+            }],
+        })])
+        narrative_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
+            "paragraphs": [{"text": "The headline figure this quarter was {{0}}."}],
+        })])
+
+        def _create(**kwargs):
+            if kwargs["tool_choice"]["name"] == "write_narrative":
+                return narrative_response
+            return report_response
+
+        fake_client = SimpleNamespace(messages=SimpleNamespace(create=_create))
+
+        out = build_report(
+            job / "data.csv", title="X", evidence_dir=self.tmp / "ev", llm_client=fake_client,
+        )
+        self.assertIn("The headline figure this quarter was $18.4M", out)
+        # the plain per-segment sentence - proof this is the narrative
+        # pass's own wording, not a silent fallback to Slice 26's rendering
+        self.assertNotIn("Revenue was $18.4M", out)
+
     def test_both_asks_and_template_still_raises(self):  # unchanged guard
         job = self.tmp / "both-still-bad-job"
         job.mkdir()

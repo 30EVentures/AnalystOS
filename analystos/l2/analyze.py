@@ -270,6 +270,50 @@ def _verify_segment(seg, normalized_document):
     return None
 
 
+def _resolve_client(client):
+    """Return ``client`` unchanged, or build a real ``anthropic.Anthropic()``
+    and fail clean (not with a raw crash) on a missing key.
+
+    A missing/empty ``ANTHROPIC_API_KEY`` doesn't raise ``anthropic.APIError``
+    - the SDK can't even build an authenticated request, so it raises a
+    plain ``TypeError`` from inside ``messages.create()`` instead, which
+    ``_create_message``'s ``except`` clause never sees. Catch the real
+    cause here, before that call, so a misconfigured deployment still
+    fails clean. Tests patch ``anthropic.Anthropic`` itself with a bare
+    stand-in that has no ``api_key`` attribute at all - ``getattr``'s
+    default leaves those alone. Shared by ``analyze_document`` and
+    ``analystos.l2.narrate.write_narrative`` - two real call sites now,
+    so this must not drift between them.
+    """
+    if client is not None:
+        return client
+    client = anthropic.Anthropic()
+    if getattr(client, "api_key", "present") is None:
+        raise ValueError(
+            "analysis is temporarily unavailable - please try again shortly"
+        )
+    return client
+
+
+def _create_message(client, **kwargs):
+    """Call ``client.messages.create(**kwargs)``, converting any
+    ``anthropic.APIError`` into the same clean ``ValueError`` every caller
+    already expects - never the raw exception, which can carry account/
+    request detail that shouldn't reach a client response. Still genuinely
+    useful for diagnosing a real failure (bad key, no billing, rate limit,
+    model access, an Anthropic-side outage all look identical to the
+    caller otherwise), so it's logged server-side first. Shared by
+    ``analyze_document`` and ``analystos.l2.narrate.write_narrative``.
+    """
+    try:
+        return client.messages.create(**kwargs)
+    except anthropic.APIError as exc:
+        print(f"[analystos.l2] Anthropic API call failed: {exc!r}", file=sys.stderr)
+        raise ValueError(
+            "analysis is temporarily unavailable - please try again shortly"
+        ) from exc
+
+
 def analyze_document(document_text, title, client=None):
     """Analyze ``document_text`` with Claude; return a list of *verified*
     segments (see module docstring for the three kinds).
@@ -283,40 +327,18 @@ def analyze_document(document_text, title, client=None):
     clean, honest response; letting an ``anthropic.APIError`` through
     unconverted would instead surface as a raw, unhandled server error.
     """
-    if client is None:
-        client = anthropic.Anthropic()
-        # A missing/empty ANTHROPIC_API_KEY doesn't raise anthropic.APIError -
-        # the SDK can't even build an authenticated request, so it raises a
-        # plain TypeError from inside messages.create() instead, which the
-        # except clause below never sees. Catch the real cause here, before
-        # that call, so a misconfigured deployment still fails clean. Tests
-        # patch anthropic.Anthropic itself with a bare stand-in that has no
-        # api_key attribute at all - getattr's default leaves those alone.
-        if getattr(client, "api_key", "present") is None:
-            raise ValueError(
-                "analysis is temporarily unavailable - please try again shortly"
-            )
+    client = _resolve_client(client)
     normalized_document = _normalize(document_text)
 
-    try:
-        response = client.messages.create(
-            model=_MODEL,
-            max_tokens=4096,
-            system=_SYSTEM_PROMPT,
-            tools=[_TOOL],
-            tool_choice={"type": "tool", "name": "write_report"},
-            messages=[{"role": "user", "content": f'Title: "{title}"\n\n{document_text}'}],
-        )
-    except anthropic.APIError as exc:
-        # Never echo the raw exception in the response - it can carry
-        # account/request detail that shouldn't reach a client. It's still
-        # genuinely useful for diagnosing a real failure (bad key, no
-        # billing, rate limit, model access, an Anthropic-side outage all
-        # look identical to the caller otherwise), so log it server-side.
-        print(f"[analystos.l2.analyze] Anthropic API call failed: {exc!r}", file=sys.stderr)
-        raise ValueError(
-            "analysis is temporarily unavailable - please try again shortly"
-        ) from exc
+    response = _create_message(
+        client,
+        model=_MODEL,
+        max_tokens=4096,
+        system=_SYSTEM_PROMPT,
+        tools=[_TOOL],
+        tool_choice={"type": "tool", "name": "write_report"},
+        messages=[{"role": "user", "content": f'Title: "{title}"\n\n{document_text}'}],
+    )
 
     tool_use = next((b for b in response.content if b.type == "tool_use"), None)
     if tool_use is None:

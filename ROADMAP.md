@@ -81,6 +81,18 @@ both recorded in full in `docs/decisions.md`, 2026-09-05.
 **→ Any of the five supported formats, any shape of data, now produces a
 real, cited report - the original "income statement only" limit is gone.**
 
+### Toward Fortune 10 exec-quality reports
+
+Backend-first plan agreed 2026-09-06: raise writing quality, let the user
+choose the output shape, add a feedback/revision loop, harden for scale,
+then build the frontend controls last. Full plan in `docs/decisions.md`.
+
+- Slice 27 — a second, narrower model call decides how to write about
+  Slice 26's already-verified facts (real structure/grouping instead of
+  one paragraph per fact in extraction order); it can only reference a
+  fact by placeholder, never state a number, and any failure falls back
+  to Slice 26's plain rendering rather than losing the report  ✓ done
+
 ## R1 — trusted on one desk (Oct–Dec 2026)
 
 Attestation v1 (answers the seven AAO questions); weekly test cohort ~15;

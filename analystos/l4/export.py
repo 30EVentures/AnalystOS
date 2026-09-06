@@ -63,6 +63,7 @@ from reportlab.platypus import HRFlowable, Paragraph, SimpleDocTemplate, Spacer
 _MARKER_RE = re.compile(r"\[(\d+)\]")
 _FOOTNOTE_RE = re.compile(r"^\[(\d+)\]\s*(.*)$")
 _BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
+_NARRATIVE_PLACEHOLDER_RE = re.compile(r"\{\{(\d+)\}\}")
 
 _STYLE = """
 body{font:16px/1.65 Georgia,'Times New Roman',serif;max-width:42rem;
@@ -98,11 +99,16 @@ def _compact_usd(raw_dollars):
     return f"${raw_dollars:,.2f}"
 
 
-def _format_number(value, spec, currency_unit="actual"):
+def format_number(value, spec, currency_unit="actual"):
     """Render ``value`` per ``spec`` (see module docstring); ``None`` = unchanged.
 
     Falls back to ``str(value)`` for a non-numeric answer even if a format was
     requested, so a text finding with a stray "format" key never crashes.
+    Public (not ``_``-prefixed) because ``analystos.l2.narrate`` also needs
+    it - a fact's displayed value must be computed exactly the same way
+    whether it ends up in Slice 26's plain rendering or Slice 27's
+    narrative, so there is exactly one implementation of "how a value
+    gets formatted," not two that could drift apart.
     """
     if not spec:
         return str(value)
@@ -157,7 +163,7 @@ def render_section(title, findings, currency_unit="actual"):
             raise ValueError(
                 f"finding {n}: text has no {{answer}} placeholder: {text!r}"
             )
-        rendered = _format_number(finding["answer"], finding.get("format"), currency_unit)
+        rendered = format_number(finding["answer"], finding.get("format"), currency_unit)
         body.append(text.replace("{answer}", rendered) + f" [{n}]")
         footnotes.append(_footnote(n, finding["citation"]))
 
@@ -208,6 +214,20 @@ def _narrated_footnote(n, source_hash, citation):
     return f"[{n}] {_quoted(source_hash, citation)}"
 
 
+def display_value(segment, currency_unit="actual"):
+    """The final string a verified segment's value renders as - a
+    formatted number for a quote/computed segment that has one, else its
+    plain (qualitative) quoted text. Shared by ``render_narrated_section``
+    below and ``render_narrative_section``/``analystos.l2.narrate`` (which
+    builds the manifest a narrative pass is shown) - a fact's displayed
+    value must be identical wherever it appears, not two implementations
+    that could quietly drift apart.
+    """
+    if "value" in segment:
+        return format_number(segment["value"], segment.get("format"), currency_unit)
+    return segment["text"]
+
+
 def render_narrated_section(title, source_hash, segments, currency_unit="actual"):
     """Render verified segments from ``analystos.l2.analyze.analyze_document``
     as a section - same overall shape ``render_section`` produces (title,
@@ -230,8 +250,8 @@ def render_narrated_section(title, source_hash, segments, currency_unit="actual"
             continue
 
         n += 1
-        if "sentence" in segment:
-            rendered = _format_number(segment["value"], segment.get("format"), currency_unit)
+        if "value" in segment:
+            rendered = display_value(segment, currency_unit)
             text = segment["sentence"].replace("{value}", rendered)
         else:
             text = segment["text"]
@@ -241,6 +261,43 @@ def render_narrated_section(title, source_hash, segments, currency_unit="actual"
         else:
             body.append(f"{text} [{n}]")
         footnotes.append(_narrated_footnote(n, source_hash, segment["citation"]))
+
+    return (
+        f"# {title}\n\n"
+        + "\n\n".join(body)
+        + "\n\n---\n"
+        + "\n".join(footnotes)
+        + "\n"
+    )
+
+
+def render_narrative_section(title, source_hash, segments, paragraphs, currency_unit="actual"):
+    """Render ``analystos.l2.narrate.write_narrative``'s paragraphs as a
+    section - same shape every other renderer here produces, so
+    ``render_html``/``render_pdf`` need no changes.
+
+    ``segments`` are Slice 26's already-verified facts (unchanged); each
+    ``paragraph["text"]`` may contain ``{{N}}`` placeholders referencing
+    one by index - ``write_narrative`` has already checked every ``N`` is
+    in range and points at a citable (non-``prose``) segment, so this
+    function trusts that and just substitutes. A fact referenced more than
+    once keeps the same footnote number every time (assigned by first
+    appearance, not by segment order) - real citations, not one per use.
+    """
+    footnote_number = {}
+    footnotes = []
+
+    def _substitute(match):
+        index = int(match.group(1))
+        if index not in footnote_number:
+            footnote_number[index] = len(footnotes) + 1
+            footnotes.append(
+                _narrated_footnote(footnote_number[index], source_hash, segments[index]["citation"])
+            )
+        rendered = display_value(segments[index], currency_unit)
+        return f"{rendered} [{footnote_number[index]}]"
+
+    body = [_NARRATIVE_PLACEHOLDER_RE.sub(_substitute, paragraph["text"]) for paragraph in paragraphs]
 
     return (
         f"# {title}\n\n"

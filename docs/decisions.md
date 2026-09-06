@@ -2,6 +2,84 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-06 — Backend-first roadmap toward Fortune 10 exec-quality reports
+
+Slice 26 proved the core loop works on a real live document, but its
+output is a fact list, not writing - one paragraph per verified fact, in
+extraction order, with no real structure. Discussed the end goal directly:
+any document, any size, any format, a report worthy of a Fortune 10
+executive, the user choosing the output shape (one-pager/slide deck/memo)
+and giving feedback on a generated report to have it improve. Agreed
+backend work comes before frontend polish, in this order:
+
+1. Split verification from writing so writing quality can be pushed hard
+   without ever reopening the door to a fabricated number (Slice 27,
+   below).
+2. Write down a concrete rubric for "Fortune 10 exec-worthy," not vibes.
+3. Handle documents too large for one model call (chunk, verify per
+   chunk, synthesize once over the combined verified facts).
+4. Harden extraction for messier real-world files.
+5. Add an output-shape selector on the backend (one-pager/memo/slide
+   deck), API-first, before any UI exists to choose it.
+6. Add the feedback/revision loop - re-run the writing pass with a
+   person's critique, but always re-verify before showing anything.
+7. Move off "one HTTP request does everything" once chunking/feedback
+   both need multi-step state.
+8. Build a real eval set graded against the rubric from step 2.
+9. Iterate against that eval set - the same live-testing discipline as
+   every slice so far, systematized instead of one document at a time.
+10. Frontend controls for shape choice and feedback, last.
+
+## 2026-09-06 — Split verification from writing (Slice 27)
+
+Step 1 of the roadmap above. `analystos/l2/analyze.py`'s extraction and
+verification logic is completely untouched by this slice - it's the
+safety net every later step still depends on, so it stays frozen while
+writing quality gets pushed on separately.
+
+Added `analystos/l2/narrate.py`: a second, narrower model call
+(`write_narrative`) that takes only the already-verified `segments` from
+`analyze_document` - never the raw document - and returns an ordered list
+of paragraphs. A paragraph is free prose that may reference a citable
+fact via a `{{N}}` placeholder (`N` = that fact's index); it can group
+several facts into one sentence, add a transition, or skip a fact
+entirely - real structural choices Slice 26's one-paragraph-per-fact
+rendering couldn't make. It cannot write a number itself: every
+placeholder is substituted afterward, in `analystos/l4/export.py`'s new
+`render_narrative_section`, with the exact value Slice 26 already
+verified - a fact referenced twice reuses one footnote number, by first
+appearance. A stray digit outside a placeholder, or a placeholder
+pointing at an out-of-range index or a `prose` segment (nothing to cite),
+rejects the whole narrative.
+
+Two design choices worth recording:
+
+- **Fail to the known-good path, not to an error.** `pipeline.build_report`
+  tries `write_narrative` + `render_narrative_section`; any `ValueError`
+  (bad model output, a validation failure, an `anthropic.APIError`) falls
+  back to Slice 26's `render_narrated_section` unchanged. A worse-structured
+  report is an acceptable cost of a quality experiment; losing the report
+  entirely is not.
+- **`{{N}}` parsed from the text itself, no separate `refs` field.** A
+  redundant field that could disagree with the text it's describing is a
+  bug waiting to happen; parsing keeps one source of truth. Also kept the
+  tool schema to exactly one property (`paragraphs: [{text}]`, fully
+  required) - deliberately, after Slice 26's schema already produced a
+  real `400 Schema is too complex` once (see 2026-09-05).
+
+Refactored `analyze_document`'s inline client-resolution and error-
+handling into shared `_resolve_client`/`_create_message` helpers in
+`analyze.py`, since there are now two real call sites (`analyze_document`
+and `write_narrative`) that must not reimplement or drift from the same
+missing-key check and `APIError`→clean-`ValueError` conversion. Also
+renamed `analystos.l4.export._format_number` to `format_number` and
+factored a new `display_value` helper there, both now genuinely shared
+across L2 and L4 rather than L4-private.
+
+Doubles the per-report Anthropic cost (a second real model call) - not
+deployed or live-tested with a real API key yet; built and tested
+entirely against mocked clients per the standing rule on real spend.
+
 ## 2026-09-05 — The narrated path always uses "actual" currency scale
 
 Found on the first successful real report: every dollar figure came back

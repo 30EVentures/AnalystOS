@@ -208,7 +208,11 @@ def _quoted(source_hash, exact_text):
     return f'source {source_hash} - "{exact_text}"'
 
 
-def _narrated_footnote(n, source_hash, citation):
+def narrated_footnote(n, source_hash, citation):
+    """Public (not ``_``-prefixed) because ``analystos.l4.rich_export``
+    also needs it - the same "one implementation, not two that could
+    drift" reasoning as ``format_number``/``display_value`` above.
+    """
     if isinstance(citation, list):
         return f"[{n}] computed from: " + "; ".join(_quoted(source_hash, c) for c in citation)
     return f"[{n}] {_quoted(source_hash, citation)}"
@@ -260,7 +264,7 @@ def render_narrated_section(title, source_hash, segments, currency_unit="actual"
             body.append(f"**{segment['label']}:** {text} [{n}]")
         else:
             body.append(f"{text} [{n}]")
-        footnotes.append(_narrated_footnote(n, source_hash, segment["citation"]))
+        footnotes.append(narrated_footnote(n, source_hash, segment["citation"]))
 
     return (
         f"# {title}\n\n"
@@ -292,7 +296,7 @@ def render_narrative_section(title, source_hash, segments, paragraphs, currency_
         if index not in footnote_number:
             footnote_number[index] = len(footnotes) + 1
             footnotes.append(
-                _narrated_footnote(footnote_number[index], source_hash, segments[index]["citation"])
+                narrated_footnote(footnote_number[index], source_hash, segments[index]["citation"])
             )
         rendered = display_value(segments[index], currency_unit)
         return f"{rendered} [{footnote_number[index]}]"

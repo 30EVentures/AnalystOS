@@ -38,12 +38,20 @@ whatever shape it actually is (``analystos.l1.document_text``, not forced
 into a table), analyzed by a model that can only feature a number it can
 prove is real (``analystos.l2.analyze`` - every quote checked against the
 actual source text, every computed value independently recomputed, never
-the model's own arithmetic taken on faith), and rendered the same way any
-other section is (``analystos.l4.export.render_narrated_section``). See
-``specs/slice-26/spec.md``. This doesn't apply to a ``.pdf`` source's
-existing table-extraction gate above - reading a PDF's plain text (what
-this path does) has none of the column-boundary-inference risk table
-extraction does, so no confirmation step is needed here.
+the model's own arithmetic taken on faith). See ``specs/slice-26/spec.md``.
+This doesn't apply to a ``.pdf`` source's existing table-extraction gate
+above - reading a PDF's plain text (what this path does) has none of the
+column-boundary-inference risk table extraction does, so no confirmation
+step is needed here.
+
+A second, narrower model call (``analystos.l2.narrate.write_narrative``)
+then decides how to write about those already-verified facts - real
+structure and grouping instead of one paragraph per fact in extraction
+order - but it can only reference a fact by placeholder, never state a
+number itself. If that call fails for any reason, the report falls back
+to the plain per-segment rendering (``render_narrated_section``) that
+Slice 26 already produces - a worse-structured report, never a lost one.
+See ``specs/slice-27/spec.md``.
 """
 
 import json
@@ -56,7 +64,14 @@ from analystos.l1.detect import extract_any
 from analystos.l1.document_text import extract_document_text
 from analystos.l2.analyze import analyze_document
 from analystos.l2.answer import answer_growth, answer_lookup, answer_ratio
-from analystos.l4.export import render_html, render_narrated_section, render_pdf, render_section
+from analystos.l2.narrate import write_narrative
+from analystos.l4.export import (
+    render_html,
+    render_narrated_section,
+    render_narrative_section,
+    render_pdf,
+    render_section,
+)
 from analystos.templates import build_asks
 
 
@@ -122,8 +137,9 @@ def build_report(
     passed through to the L1 extractor for format-specific choices
     (``sheet``, ``table_index``, ``slide_index``, ``page``) and also
     carries ``pdf_confirmed`` for the PDF confirm-before-cite gate.
-    ``llm_client`` is passed through to ``analyze_document`` - tests supply
-    a mock there; production leaves it unset and a real client is built.
+    ``llm_client`` is passed through to both ``analyze_document`` and
+    ``write_narrative`` - tests supply a mock there; production leaves it
+    unset and a real client is built per call.
     """
     if asks is not None and template is not None:
         raise ValueError('exactly one of "asks" or "template" is required')
@@ -141,7 +157,18 @@ def build_report(
         # header says "figures in thousands," never of a quoted number
         # copied verbatim from prose (it's already the real, actual value).
         # Applying it here would silently inflate every dollar figure.
-        return render_narrated_section(title, source_hash, segments, "actual")  # L4
+        try:
+            # A second, narrower call decides how to write about the
+            # already-verified facts above - real structure instead of one
+            # paragraph per fact in extraction order (Slice 27). It cannot
+            # state a number itself; any failure here (a bad reference, a
+            # stray digit, an API error) falls back to the plain per-segment
+            # rendering below rather than losing the report over a writing-
+            # quality improvement. See specs/slice-27/spec.md.
+            paragraphs = write_narrative(segments, title, client=llm_client)  # L2 (narrative)
+            return render_narrative_section(title, source_hash, segments, paragraphs, "actual")  # L4
+        except ValueError:
+            return render_narrated_section(title, source_hash, segments, "actual")  # L4
 
     schema, rows = extract_any(source_path, schema, extract_options)        # L1 (table)
 

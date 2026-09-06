@@ -6,7 +6,13 @@ import unittest
 
 import pdfplumber
 
-from analystos.l4.export import render_html, render_narrated_section, render_pdf, render_section
+from analystos.l4.export import (
+    render_html,
+    render_narrated_section,
+    render_narrative_section,
+    render_pdf,
+    render_section,
+)
 
 
 class RenderSectionTest(unittest.TestCase):
@@ -273,6 +279,66 @@ class RenderSectionTest(unittest.TestCase):
             text = "\n".join(p.extract_text() or "" for p in pdf.pages)
         self.assertIn("Headcount: 40 people", text)
         self.assertNotIn("**", text)
+
+
+    # --- render_narrative_section (slice 27) ---
+
+    def test_render_narrative_section_substitutes_placeholders(self):  # Done when #6
+        segments = [
+            {"type": "quote", "value": 10000000.0, "format": "usd", "citation": "$10,000,000"},
+            {"type": "quote", "value": 8000000.0, "format": "usd", "citation": "$8,000,000"},
+        ]
+        paragraphs = [{"text": "Revenue was {{0}}, up from {{1}}."}]
+        out = render_narrative_section("Q4 Review", self.src, segments, paragraphs)
+        self.assertIn("Revenue was $10.0M [1], up from $8.0M [2].", out)
+        self.assertIn(f'[1] source {self.src} - "$10,000,000"', out)
+        self.assertIn(f'[2] source {self.src} - "$8,000,000"', out)
+
+    def test_a_fact_referenced_twice_reuses_one_footnote_number(self):  # Done when #4
+        segments = [
+            {"type": "quote", "value": 10000000.0, "format": "usd", "citation": "$10,000,000"},
+        ]
+        paragraphs = [
+            {"text": "Revenue was {{0}}."},
+            {"text": "That same {{0}} figure led the quarter."},
+        ]
+        out = render_narrative_section("Q4 Review", self.src, segments, paragraphs)
+        self.assertIn("Revenue was $10.0M [1].", out)
+        self.assertIn("That same $10.0M [1] figure led the quarter.", out)
+        self.assertEqual(out.count(f'source {self.src} - "$10,000,000"'), 1)  # one footnote, not two
+
+    def test_a_fact_never_referenced_is_simply_absent(self):  # Done when #5
+        segments = [
+            {"type": "quote", "value": 10000000.0, "format": "usd", "citation": "$10,000,000"},
+            {"type": "quote", "value": 999.0, "format": "usd", "citation": "$999"},  # unused
+        ]
+        paragraphs = [{"text": "Revenue was {{0}}."}]
+        out = render_narrative_section("Q4 Review", self.src, segments, paragraphs)
+        self.assertIn("$10.0M", out)
+        self.assertNotIn("$999", out)
+        self.assertNotIn("[2]", out)
+
+    def test_a_qualitative_reference_uses_the_quoted_text(self):
+        segments = [{"type": "quote", "text": "40 people", "citation": "40 people"}]
+        paragraphs = [{"text": "Headcount reached {{0}}."}]
+        out = render_narrative_section("Q4 Review", self.src, segments, paragraphs)
+        self.assertIn("Headcount reached 40 people [1].", out)
+
+    def test_render_narrative_section_is_readable_by_render_html_and_render_pdf(self):  # Done when #6
+        segments = [{"type": "quote", "value": 4200000.0, "format": "usd", "citation": "4,200,000"}]
+        paragraphs = [{"text": "Revenue was {{0}} this year."}]
+        section = render_narrative_section("Narrated", self.src, segments, paragraphs)
+
+        page = render_html(section)
+        self.assertIn("<h1>Narrated</h1>", page)
+        self.assertIn("Revenue was $4.2M", page)  # the [1] marker lands right after the value
+        self.assertIn("this year.", page)
+
+        pdf_bytes = render_pdf(section)
+        with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+            text = "\n".join(p.extract_text() or "" for p in pdf.pages)
+        self.assertIn("Revenue was $4.2M", text)
+        self.assertIn("this year.", text)
 
 
 if __name__ == "__main__":

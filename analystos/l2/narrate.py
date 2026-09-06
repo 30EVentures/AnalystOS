@@ -61,17 +61,9 @@ BCG, and equity research desks all use):
 2. Follow with 3-5 substantive paragraphs, each built around ONE \
    analytical point - never one number. Weave facts into that point as \
    evidence: a number is a building block for a sentence, never the whole \
-   sentence. Group related figures together (a metric and what drove it, \
-   a figure and the period/segment it compares against, two numbers in \
-   tension with each other) instead of stating them as separate, isolated \
-   lines.
-3. Say what's notable, not just what's true. Call out where a number is \
-   surprising, where two facts are in tension (growth alongside rising \
-   cost; a metric moving opposite to what the rest of the picture would \
-   suggest), or where a comparison changes how a figure should be read. \
-   Flat, neutral restatement of a number with no interpretation - "X was \
-   {{N}}." and nothing else - is exactly what NOT to do.
-4. Close with a brief forward-looking or risk note if the source material \
+   sentence. Group related figures together instead of stating them as \
+   separate, isolated lines.
+3. Close with a brief forward-looking or risk note if the source material \
    supports one.
 
 You do not have to use every fact below - use your judgment about which \
@@ -80,6 +72,48 @@ one of your points is better left out than forced in as a standalone \
 line. Never produce a paragraph that is just "Label: sentence with one \
 number in it," repeated fact after fact - that shape is exactly what \
 you're being asked to move away from.
+
+Within that structure, five specific disciplines separate real analysis \
+from a fact sheet - apply every one that the source material supports:
+
+- **Benchmark every number, and stack the comparison when the source \
+  supports more than one.** A figure alone proves nothing - state it \
+  against a prior period, a peer, a segment, an index, or a stated \
+  target/guidance figure from the source. When more than one comparison \
+  is available and each tells a different part of the story (e.g. the \
+  multi-period trend AND the single-period move both matter), use more \
+  than one rather than picking whichever looks cleanest.
+- **Name the specific mechanism behind any tension, never a category \
+  word.** When a result is mixed - a gain offset by a drag, growth \
+  alongside compression, a win with a caveat - state the concrete, \
+  specific driver behind each side exactly as the source describes it \
+  (a named segment, a named cause, a named product line). "Headwinds," \
+  "challenges," "pressures," and similar category words standing in for \
+  an unstated cause are not acceptable substitutes for what the source \
+  actually says.
+- **Sequence past from future; never blend them in one sentence.** Fully \
+  explain what already happened - with its own comparisons and named \
+  mechanisms - before turning to what's expected, forecast, guided, or \
+  pending. Keep these as distinct, separately sequenced parts of the \
+  narrative, not interleaved.
+- **For legal/regulatory content, narrate it as a dated, unfolding \
+  process, not a static label.** Name the specific relief, remedy, or \
+  claim actually at stake - never a generic "legal risk." State any dates \
+  the source gives as a concrete timeline, and give the specific next \
+  procedural step where the source provides one, rather than a vague \
+  "pending further developments."
+- **State a triggering event and its reaction together, in the same \
+  breath.** When the source ties a market/financial reaction to a \
+  specific cause, state the magnitude and the specific cause together - \
+  don't separate them and make the reader infer the connection. When the \
+  source includes a party's own stated defense or justification, \
+  represent it faithfully rather than asserting your own verdict; let \
+  the surrounding facts create whatever tension exists.
+
+Not every document will have material for all five - a plain internal \
+memo may have no legal content or market reaction to narrate, and that's \
+fine. Apply each discipline where the source actually supports it; don't \
+force one that doesn't fit.
 
 To use a "[citable]" fact's value in a sentence, write {{N}} (its number \
 below) exactly where the value belongs - never write the number itself, \

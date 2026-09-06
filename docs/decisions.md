@@ -2,6 +2,56 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-06 — Five mechanical writing disciplines, grounded in four real reference pieces
+
+The prior prompt rewrite (Pyramid Principle/SCQA) fixed structure but was
+still too abstract to mechanically prevent a flat fact-list - "say what's
+notable" doesn't tell a model *how*. Given four real, fully-read reference
+pieces (a McKesson equity-research note, a Zacks research digest, a
+Courthouse News DOJ/Google appeal story, and CNBC's UnitedHealth DOJ
+investigation coverage) and asked to extract the actual mechanical
+patterns that separate them from a fact sheet - not another round of
+stylistic guessing.
+
+Five disciplines, each traced to a specific thing the reference pieces do
+and now written into `_SYSTEM_PROMPT` in `analystos/l2/narrate.py`:
+
+1. **Benchmark every number, stacking comparisons when the source
+   supports more than one** - the McKesson piece never reports a return
+   alone; it layers one-year vs. S&P 500, then YTD-only, then a
+   sector ETF, because each comparison told a different part of the
+   story.
+2. **Name the specific mechanism behind any tension, never a category
+   word** - McKesson names actual drivers (oncology, GLP-1 demand vs. a
+   named primary-care mix shift), never "headwinds."
+3. **Sequence past from future; never blend them in one sentence** - both
+   financial pieces fully resolve current performance before turning to
+   forward-looking material (ratings, targets, catalysts) as a distinct,
+   later block.
+4. **Legal/regulatory content narrated as a dated, unfolding process** -
+   the Courthouse News piece names the specific remedy being appealed and
+   gives a concrete filing date, never a generic "legal risk" label.
+5. **State a triggering event and its reaction together** - the
+   UnitedHealth coverage states the stock-drop magnitude and its specific
+   cause in the same breath, and represents the company's own stated
+   defense faithfully rather than asserting a verdict.
+
+Explicitly scoped as conditional: not every document has legal or
+market-reaction content, and the prompt says so - apply each discipline
+only where the source actually supports it, never force one that
+doesn't fit. The verification contract is untouched (same `{{N}}`
+mechanism, same `_validate_paragraph`, same schema).
+
+Rebuilt the mechanically-real mock (hand-written paragraphs through the
+actual `_validate_paragraph`/`render_narrative_section` code) against the
+new prompt, and was honest about its limits: the Solstice source has no
+legal or market-reaction content, so disciplines 4 and 5 aren't
+exercised by this mock at all - only a live test on a document that
+actually contains that kind of material can confirm those two work.
+Also deliberately did *not* invent a mechanism for a cost-growth figure
+the source doesn't explain, rather than force discipline 2 where it
+isn't supported - flagged in the mock's own text instead.
+
 ## 2026-09-06 — Rewrote the narrative prompt against real executive-writing patterns
 
 Every live test so far (even before any of them succeeded end to end)

@@ -92,7 +92,17 @@ then build the frontend controls last. Full plan in `docs/decisions.md`.
   one paragraph per fact in extraction order); it can only reference a
   fact by placeholder, never state a number, and any failure falls back
   to Slice 26's plain rendering rather than losing the report  ✓ done
-  (PR #39) - not yet live-tested with a real API key
+  (PR #39) - live-tested repeatedly (Tests #2/#3); found and fixed a real
+  verification gap and a false-positive digit-ban rule along the way
+  (PRs #40, #41, #42) - a real narrative-pass success is still unconfirmed
+- Slice 28 — rich report rendering: real inline-SVG charts, section-by-
+  section structure with an executive summary, and a visually distinct
+  "outlook" block that can't be mistaken for a verified fact. Builds only
+  the rendering side (`analystos/l4/charts.py`, `rich_export.py`),
+  proven against a hand-authored mock run through the real render code -
+  deliberately does not yet wire a model into deciding chart placement/
+  section structure, which is its own follow-up  ✓ done (PR #43) - not
+  yet live-tested (no L2 stage produces this shape yet)
 
 ## R1 — trusted on one desk (Oct–Dec 2026)
 

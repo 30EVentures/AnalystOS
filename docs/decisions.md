@@ -2,6 +2,68 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-06 — Rich rendering: charts, real section structure, a distinct outlook block (Slice 28)
+
+Slice 27 fixed how the words read; this fixes what the report looks
+like. Explicit bar: a Fortune 10 executive should see something their
+own strategy/IR team would produce - charts where data supports them, a
+real executive-summary-first section structure, forward-looking
+"outlook" content visually impossible to mistake for a verified fact.
+
+**Scope drawn deliberately narrow, and stated up front:** this slice
+builds the *rendering capability* - new `analystos/l4/charts.py` and
+`analystos/l4/rich_export.py` - proven by hand-authoring the structured
+input a future L2 stage would produce and running it through the real
+render code, not by writing throwaway HTML. It does not build that L2
+stage (a model actually deciding section structure/chart placement/
+outlook content from a real document) - that's a new prompt, schema, and
+tool-use design in its own right, and it needs its own live test before
+it's trusted, same as every other model-facing change today. Drawing
+this line let the rendering side get reviewed and merged on its own
+strength, independent of a not-yet-built model-decision layer.
+
+**Charting approach**: checked `requirements.txt` first, per the
+instruction to use what's already available before reaching for
+something new. Nothing exists yet. Chose plain inline SVG (zero new
+dependency - a browser renders it natively with no JavaScript) over
+`matplotlib`, which would add real weight to Vercel's serverless
+functions for something a few hundred lines of string-built markup
+already does. `reportlab` (already a dependency) has
+`reportlab.graphics.charts` for a PDF equivalent - explicitly deferred,
+not part of this round's ask (an HTML draft specifically).
+
+**A chart data point inherits Slice 26's verification by construction,
+not a new check.** A chart spec's `fact_index` can only point into
+`segments`, which is already 100% verified by the time anything reaches
+L4 - exactly how `{{N}}` already works in prose. `_resolve_chart` does
+its own defensive bounds/type check (in range, quantitative, not
+`prose`) because no L2 stage produces or validates chart specs yet - the
+same structural check `_validate_paragraph` already does for text
+placeholders, just not inherited from anywhere since this is new. A bad
+point is dropped; a chart left with fewer than two points is dropped
+entirely rather than rendered as something misleading.
+
+**A real bug caught by the new test suite, not by review**: the first
+draft inserted real `<sup><a>` HTML during placeholder substitution, then
+ran the whole paragraph through `html.escape()` afterward - double-
+escaping the markup into literal `&lt;sup&gt;` text. Fixed by matching
+the existing codebase's own pattern (`export.py`'s `_para_html`): escape
+first, then convert plain `[n]` markers into real HTML - two passes, not
+one, so nothing inserted mid-pipeline gets re-escaped downstream.
+
+Verified with a hand-authored mock (a clearly-labeled DRAFT/TEMPLATE
+earnings report for a fictional company, not a real client's data), run
+through the real `render_rich_report` - 4 embedded charts, a shared
+footnote sequence across the executive summary/4 sections/outlook, cross-
+section synthesis (margin compression and segment-mix shift connected
+explicitly as one story, not two). Honestly scoped: this fictional
+source has no legal/regulatory content and no market-reaction event
+either, so two of Slice 27's five writing disciplines still aren't
+exercised by any mock built so far - even a *real* earnings report
+wouldn't naturally contain those, since a company's own report doesn't
+cover its own stock's reaction to itself. Proving those two needs a
+source that's actually news coverage, not a financial report.
+
 ## 2026-09-06 — Five mechanical writing disciplines, grounded in four real reference pieces
 
 The prior prompt rewrite (Pyramid Principle/SCQA) fixed structure but was

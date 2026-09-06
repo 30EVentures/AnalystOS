@@ -2,6 +2,37 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-06 — A follow-up commit landed after its PR had already merged
+
+Test #3's continued fallback-shaped output looked like the value-matching
+and calendar fixes below hadn't worked. They hadn't been *deployed at
+all*: they were pushed as a second commit to the `slice-27-narrative-pass`
+branch after PR #39 (which only covered the branch's first commit) had
+already been merged - `git log`/`git branch --contains` confirmed the
+merge commit only covers up through the "Add PR #39 reference" commit,
+and the fix commit existed only on the now-orphaned branch, never on
+`main`. Reported it as "pushed to PR #39" without re-checking the PR was
+still open at that moment - it wasn't. The "190" exploit's absence in
+Test #3 was the model choosing different phrasing that run, unrelated to
+any fix actually running. Recovered by cherry-picking that commit's real
+changes onto a fresh branch off current `main`, rather than assuming a
+push reached wherever it was aimed - and by actually diffing the merge
+commit against the fix commit to confirm, not just asking for another
+retest and guessing again from the result.
+
+## 2026-09-06 — write_narrative's remaining failure paths were unlogged
+
+A precaution taken alongside the recovery above, before any of this had
+actually reached a live test: the per-paragraph validation-rejection path
+had logging (added earlier today), but `write_narrative`'s other two
+failure points - the model's response having no `tool_use` block at all,
+and the model returning an empty `paragraphs` list - did not. Either
+could produce a silent fallback with zero log evidence, exactly like the
+gap that motivated adding logging in the first place. Added logging to
+both remaining raise points, plus a success line (`narrative accepted: N
+paragraphs`) so a clean run is also visible, not just inferred from the
+absence of a rejection - the next live check is conclusive either way.
+
 ## 2026-09-06 — Closed a real verification gap found on the first Slice 27 live test
 
 The first live test of Slice 27 (two real Anthropic calls, both `200 OK`

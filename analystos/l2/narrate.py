@@ -144,10 +144,12 @@ def write_narrative(segments, title, client=None):
 
     tool_use = next((b for b in response.content if b.type == "tool_use"), None)
     if tool_use is None:
+        print("[analystos.l2.narrate] response had no tool_use block", file=sys.stderr)
         raise ValueError("model did not return a narrative")
 
     paragraphs = tool_use.input.get("paragraphs", [])
     if not paragraphs:
+        print("[analystos.l2.narrate] model returned an empty paragraphs list", file=sys.stderr)
         raise ValueError("model returned no paragraphs")
 
     for paragraph in paragraphs:
@@ -168,4 +170,5 @@ def write_narrative(segments, title, client=None):
                 "number - falling back to the plain rendering"
             )
 
+    print(f"[analystos.l2.narrate] narrative accepted: {len(paragraphs)} paragraphs", file=sys.stderr)
     return paragraphs

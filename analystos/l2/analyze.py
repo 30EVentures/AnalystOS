@@ -11,18 +11,24 @@ returns is one of:
 - a **quote**: a claim backed by ``exact_text`` the model asserts appears
   verbatim in the source. Verified here by an actual substring check
   against the real document text - not "the model says so." A quote that
-  doesn't check out is dropped, never shown.
+  doesn't check out is dropped, never shown. When the quote carries a
+  numeric ``value``, that value must itself match the number ``exact_text``
+  actually spells out (``_value_matches_text``) - a real substring alone
+  only proves the *text* is real, not that the *number* paired with it is
+  (see ``docs/decisions.md``, 2026-09-06, for the live case this closed).
 - a **computed** value (a sum, a ratio, a growth rate, a share of total):
   the model gives the raw ``operands`` (each with its own ``exact_text``,
-  same substring check) and the ``operation`` and its own claimed
-  ``result`` - and this code independently *recomputes* that operation
-  over the verified operand values and checks it matches. A citation only
-  proves a quote is real; it says nothing about arithmetic done on top of
-  it, so this is a second, independent check specifically for anything
-  derived rather than directly quoted.
+  same substring-and-value check as a quote) and the ``operation`` and its
+  own claimed ``result`` - and this code independently *recomputes* that
+  operation over the verified operand values and checks it matches. A
+  citation only proves a quote is real; it says nothing about arithmetic
+  done on top of it, so this is a second, independent check specifically
+  for anything derived rather than directly quoted.
 - **prose**: connective text with no numeric claim at all - and none
   allowed: any stray digit found in it is treated as an unverified number
-  and the whole segment is dropped.
+  and the whole segment is dropped, except a calendar reference (a
+  quarter, half, or fiscal/calendar year - "Q4 2026" isn't a claim that
+  needs a source quote the way a dollar figure does; see ``_CALENDAR_RE``).
 
 A model-authored sentence still supplies the *wording* around a value via a
 `{value}` placeholder - never the value itself. The number that actually
@@ -51,6 +57,14 @@ import anthropic
 _MODEL = "claude-sonnet-5"
 _PLACEHOLDER_RE = re.compile(r"\{value\}")
 _DIGIT_RE = re.compile(r"\d")
+# Calendar references (a quarter, a half, a fiscal/calendar year) aren't a
+# citable claim - "Q4 2026" needs no source quote the way a dollar figure
+# does. Stripped before _DIGIT_RE runs on connective prose, so ordinary
+# writing that mentions a quarter or year doesn't get treated as an
+# unverified number - found live, 2026-09-06 (see docs/decisions.md):
+# without this, real prose almost always contains a year or quarter and
+# the whole segment/narrative gets rejected over nothing worth verifying.
+_CALENDAR_RE = re.compile(r"\bQ[1-4]\b|\bH[12]\b|\bFY['’]?\d{2,4}\b|\b(?:19|20)\d{2}\b", re.IGNORECASE)
 _OPERATIONS = ("sum", "average", "ratio", "growth_percent", "percent_of_total")
 
 _SYSTEM_PROMPT = """\
@@ -91,7 +105,8 @@ ignore them:
 - "format": "usd", "percent", "number", or "text" for how to render \
   "value"/the computed result. "text" if not applicable.
 - "text": for "prose", the connective text itself - no digits at all \
-  (write "a small number of" not a figure you can't cite). "" otherwise.
+  (write "a small number of" not a figure you can't cite), except a \
+  quarter/half/year reference (e.g. "Q4 2026") - that's fine. "" otherwise.
 - "operation": for "computed", one of "sum", "average", "ratio", \
   "growth_percent", "percent_of_total". "none" for "quote"/"prose".
 - "operands": for "computed", the raw numbers behind the calculation, \
@@ -178,6 +193,54 @@ def _really_in_document(exact_text, normalized_document):
     return _normalize(exact_text) in normalized_document
 
 
+_NUMBER_TOKEN_RE = re.compile(
+    r"(\(?-?)\$?\s*(\d[\d,]*\.?\d*|\.\d+)\s*"
+    r"(thousand|million|billion|bn|mm|k|m|b)?(?![a-zA-Z])",
+    re.IGNORECASE,
+)
+_SCALE_WORDS = {
+    "k": 1_000, "thousand": 1_000,
+    "m": 1_000_000, "mm": 1_000_000, "million": 1_000_000,
+    "b": 1_000_000_000, "bn": 1_000_000_000, "billion": 1_000_000_000,
+}
+
+
+def _parse_number(text):
+    """Best-effort parse of the first real number ``text`` contains -
+    strips ``$``/commas/``%``, honors a trailing scale word (``K``/``M``/
+    ``B``, ``thousand``/``million``/``billion``) and an accounting-style
+    negative (a leading ``-`` or an opening ``(``). Returns ``None`` if no
+    number is found. Never guesses a value from surrounding words - only
+    the number ``text`` itself actually spells out.
+    """
+    match = _NUMBER_TOKEN_RE.search(text)
+    if not match:
+        return None
+    sign_part, digits, scale = match.groups()
+    value = float(digits.replace(",", ""))
+    if scale:
+        value *= _SCALE_WORDS[scale.lower()]
+    if "-" in sign_part or "(" in sign_part:
+        value = -value
+    return value
+
+
+def _value_matches_text(value, exact_text):
+    """Does ``exact_text`` actually spell out ``value``? A real substring
+    match on ``exact_text`` alone proves the *text* is real - it says
+    nothing about whether the *number* paired with it is. Without this,
+    a model can cite a real quote and pair it with an arbitrary value
+    (found live: a "net additions" claim computed as sum([1240, -1050])
+    - "1,050" really is in the document, but the model silently negated
+    it, smuggling a subtraction past the five supported operations, none
+    of which is subtraction). See ``docs/decisions.md``, 2026-09-06.
+    """
+    if value is None:
+        return False
+    parsed = _parse_number(exact_text)
+    return parsed is not None and _close_enough(parsed, value)
+
+
 def _recompute(operation, values, total_value=None):
     if operation == "sum":
         return sum(values)
@@ -209,6 +272,8 @@ def _verify_quote(seg, normalized_document):
     if not seg.get("has_value"):
         return {"type": "quote", "display": seg.get("display", "inline"),
                 "label": seg.get("label"), "text": exact_text, "citation": exact_text}
+    if not _value_matches_text(seg.get("value"), exact_text):
+        return None
     sentence = seg.get("sentence", "")
     if len(_PLACEHOLDER_RE.findall(sentence)) != 1:
         return None
@@ -231,11 +296,15 @@ def _verify_computed(seg, normalized_document):
     for op in operands:
         if not _really_in_document(op.get("exact_text", ""), normalized_document):
             return None
+        if not _value_matches_text(op.get("value"), op["exact_text"]):
+            return None
     total_value = seg.get("total_value")
     if operation == "percent_of_total":
         if not seg.get("has_total") or not _really_in_document(
             seg.get("total_exact_text", ""), normalized_document
         ):
+            return None
+        if not _value_matches_text(total_value, seg["total_exact_text"]):
             return None
     values = [op["value"] for op in operands]
     recomputed = _recompute(operation, values, total_value)
@@ -254,7 +323,7 @@ def _verify_computed(seg, normalized_document):
 
 def _verify_prose(seg):
     text = seg.get("text", "")
-    if not text.strip() or _DIGIT_RE.search(text):
+    if not text.strip() or _DIGIT_RE.search(_CALENDAR_RE.sub("", text)):
         return None
     return {"type": "prose", "text": text}
 

@@ -41,6 +41,85 @@ class AnalyzeDocumentTest(unittest.TestCase):
         self.assertEqual(out[0]["value"], 10000000.0)
         self.assertEqual(out[0]["citation"], "$10,000,000")
 
+    def test_a_quote_value_that_does_not_match_its_own_exact_text_is_rejected(self):
+        # Found live, 2026-09-06: a real substring match on exact_text
+        # alone proves the *text* is real - it says nothing about whether
+        # the paired *value* is. "$10,000,000" really is in DOCUMENT, but
+        # claiming its value is 500.0 (or anything else) must still fail.
+        segments = [{
+            "type": "quote", "display": "inline", "label": "Revenue",
+            "exact_text": "$10,000,000", "has_value": True, "value": 500.0,
+            "sentence": "Q4 revenue was {value}.", "format": "usd",
+        }]
+        with self.assertRaises(ValueError):
+            analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
+
+    def test_a_computed_operand_with_a_silently_negated_value_is_rejected(self):
+        # Found live, 2026-09-06: subtraction isn't one of the five
+        # supported operations, so a model computing "net additions"
+        # (1,240 - 1,050 = 190) faked it with operation "sum" and a
+        # silently negated second operand (exact_text "1,050" paired with
+        # value -1050.0) - the text is real, the paired number isn't what
+        # it says. Landed on the true answer this time; the point is nothing
+        # stops this same trick from landing on a false one.
+        document = (
+            'The company ended the quarter with 1,240 customers, up from '
+            '1,050 at the start of the quarter.'
+        )
+        segments = [{
+            "type": "computed", "display": "inline", "label": "Net additions",
+            "operation": "sum",
+            "operands": [
+                {"exact_text": "1,240", "value": 1240.0},
+                {"exact_text": "1,050", "value": -1050.0},  # real text, faked value
+            ],
+            "has_total": False, "total_exact_text": "", "total_value": 0,
+            "result": 190.0,
+            "sentence": "Net customer additions were {value}.",
+            "format": "number",
+        }]
+        with self.assertRaises(ValueError):
+            analyze_document(document, "Q3 Review", client=_fake_client(segments))
+
+    def test_percent_of_total_value_that_does_not_match_its_exact_text_is_rejected(self):
+        segments = [{
+            "type": "computed", "display": "inline", "label": "Share",
+            "operation": "percent_of_total",
+            "operands": [{"exact_text": "$8,000,000", "value": 8000000.0}],
+            "has_total": True, "total_exact_text": "$10,000,000", "total_value": 1.0,
+            "result": 800000000.0,
+            "sentence": "Q3 revenue was {value} of Q4's.",
+            "format": "percent",
+        }]
+        with self.assertRaises(ValueError):
+            analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
+
+    def test_a_quote_value_matching_an_abbreviated_million_figure_is_accepted(self):
+        # A real document can spell a figure out as "$1.2 million" rather
+        # than "$1,200,000" - the scale word must be honored, not treated
+        # as a mismatch just because the digits alone don't match.
+        document = "Q3 revenue was $1.2 million, the strongest quarter yet."
+        segments = [{
+            "type": "quote", "display": "inline", "label": "Revenue",
+            "exact_text": "$1.2 million", "has_value": True, "value": 1200000.0,
+            "sentence": "Revenue was {value}.", "format": "usd",
+        }]
+        out = analyze_document(document, "Q3 Review", client=_fake_client(segments))
+        self.assertEqual(out[0]["value"], 1200000.0)
+
+    def test_a_number_followed_by_a_word_starting_with_m_is_not_misread_as_millions(self):
+        # Regression: the scale-word check must not fire just because the
+        # next word happens to start with the same letter as "million" -
+        # "142 members" is 142, not 142,000,000.
+        document = "The club had 142 members at the end of the quarter."
+        segments = [{
+            "type": "quote", "display": "inline", "label": "Members",
+            "exact_text": "142 members", "has_value": True, "value": 142.0,
+            "sentence": "Membership reached {value}.", "format": "number",
+        }]
+        out = analyze_document(document, "Q3 Review", client=_fake_client(segments))
+        self.assertEqual(out[0]["value"], 142.0)
+
     def test_a_fabricated_quote_not_in_the_document_is_rejected(self):  # Done when #3
         segments = [{
             "type": "quote", "display": "inline", "label": "Revenue",
@@ -142,6 +221,15 @@ class AnalyzeDocumentTest(unittest.TestCase):
         segments = [{"type": "prose", "text": "Growth was roughly 45% this quarter."}]
         with self.assertRaises(ValueError):
             analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
+
+    def test_prose_with_a_calendar_reference_is_kept(self):
+        # Found live, 2026-09-06: a real analyst's connective prose almost
+        # always mentions a quarter or year - "heading into Q4 2026" isn't
+        # a claim that needs a source quote the way a dollar figure does,
+        # and banning it made ordinary writing fail near-universally.
+        segments = [{"type": "prose", "text": "Momentum should continue into Q4 2026."}]
+        out = analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
+        self.assertEqual(out[0]["text"], "Momentum should continue into Q4 2026.")
 
     def test_prose_with_no_numbers_is_kept(self):
         segments = [

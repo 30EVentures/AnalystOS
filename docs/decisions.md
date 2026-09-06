@@ -2,6 +2,88 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-06 — A follow-up commit landed after its PR had already merged
+
+Test #3's continued fallback-shaped output looked like the value-matching
+and calendar fixes below hadn't worked. They hadn't been *deployed at
+all*: they were pushed as a second commit to the `slice-27-narrative-pass`
+branch after PR #39 (which only covered the branch's first commit) had
+already been merged - `git log`/`git branch --contains` confirmed the
+merge commit only covers up through the "Add PR #39 reference" commit,
+and the fix commit existed only on the now-orphaned branch, never on
+`main`. Reported it as "pushed to PR #39" without re-checking the PR was
+still open at that moment - it wasn't. The "190" exploit's absence in
+Test #3 was the model choosing different phrasing that run, unrelated to
+any fix actually running. Recovered by cherry-picking that commit's real
+changes onto a fresh branch off current `main`, rather than assuming a
+push reached wherever it was aimed - and by actually diffing the merge
+commit against the fix commit to confirm, not just asking for another
+retest and guessing again from the result.
+
+## 2026-09-06 — write_narrative's remaining failure paths were unlogged
+
+A precaution taken alongside the recovery above, before any of this had
+actually reached a live test: the per-paragraph validation-rejection path
+had logging (added earlier today), but `write_narrative`'s other two
+failure points - the model's response having no `tool_use` block at all,
+and the model returning an empty `paragraphs` list - did not. Either
+could produce a silent fallback with zero log evidence, exactly like the
+gap that motivated adding logging in the first place. Added logging to
+both remaining raise points, plus a success line (`narrative accepted: N
+paragraphs`) so a clean run is also visible, not just inferred from the
+absence of a rejection - the next live check is conclusive either way.
+
+## 2026-09-06 — Closed a real verification gap found on the first Slice 27 live test
+
+The first live test of Slice 27 (two real Anthropic calls, both `200 OK`
+per Vercel's logs) still rendered Slice 26's plain fallback, and the
+output contained "Net customer additions were 190" - correct
+arithmetically (1,240 − 1,050 = 190), but subtraction isn't one of the
+five operations `_recompute` supports (`sum`/`average`/`ratio`/
+`growth_percent`/`percent_of_total`). The only way to land on exactly 190
+is `sum([1240, -1050])` - the model quoted the real substring `"1,050"`
+but paired it with `value: -1050.0`. `_verify_computed` only checked that
+`"1,050"` really appears in the document; it never checked that the
+*number* paired with it (`-1050` vs `1050`) is what the text actually
+says. Same root cause explained a `$7.6M` operating-income figure computed
+via a three-way signed `sum` faking `revenue − cogs − opex`. Both landed
+on the *true* number this time - the finding is that nothing stops the
+same mechanism from landing on a false one, which is the entire premise
+this project is built to prevent.
+
+Fixed in `analystos/l2/analyze.py`: `_parse_number`/`_value_matches_text`
+parse the actual number a piece of quoted text spells out (handling `$`,
+commas, `%`, accounting-parens negatives, and `K`/`M`/`B`/`thousand`/
+`million`/`billion` scale words, with a lookahead so "142 members" isn't
+misread as 142 million) and reject a quote or computed operand whose
+claimed `value` doesn't match. Applied to `_verify_quote`, every operand
+in `_verify_computed`, and `percent_of_total`'s `total_value`. New tests
+reproduce the exact live exploit (confirmed they fail without the fix,
+pass with it) plus the abbreviated-figure and false-positive-word cases
+the stricter parsing has to get right to avoid new false rejections.
+
+## 2026-09-06 — Calendar references don't need a citation
+
+Also found on that same live test, from the Vercel log's two `200 OK`
+Anthropic calls: the narrative pass got a real, successful model response
+and my own validation code rejected it anyway - `write_narrative` had no
+logging on that path, only on an `anthropic.APIError`, so this was
+invisible until reproduced manually. Root cause: `_verify_prose` (Slice
+26) and `write_narrative`'s paragraph check (Slice 27) both ban any digit
+outside a citation - but ordinary analyst writing constantly mentions a
+quarter or year ("heading into Q4 2026"), so the ban was rejecting almost
+any real connective prose, not just genuine unverified figures.
+
+Added `_CALENDAR_RE` in `analyze.py` (quarters, halves, `FY`-prefixed
+years, bare `19xx`/`20xx` years) and strip it before the digit check in
+both `_verify_prose` and `narrate._validate_paragraph`, so a calendar
+reference is allowed while an actual number still isn't - it was never a
+claim that needed a source quote in the first place. Also added logging
+to `write_narrative`'s own validation-rejection path (previously silent),
+matching the logging `analyze_document` already had for API failures -
+this exact gap is why the live failure had to be reproduced manually
+instead of read straight from the logs.
+
 ## 2026-09-06 — Backend-first roadmap toward Fortune 10 exec-quality reports
 
 Slice 26 proved the core loop works on a real live document, but its

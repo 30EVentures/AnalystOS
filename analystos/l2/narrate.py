@@ -13,6 +13,16 @@ the number itself - the placeholder is filled in later, by
 ``analystos.l4.export.render_narrative_section``, with the exact value
 Slice 26 already verified.
 
+The prompt asks for real analytical writing - lead with the takeaway,
+group related facts into a handful of substantive points, say what's
+notable rather than flatly restating numbers - grounded in how equity
+research and top consulting memos are actually structured (the Minto
+Pyramid Principle / SCQA pattern), not a generic "sound smart"
+instruction. See ``docs/decisions.md``, 2026-09-06 ("Rewrote the
+narrative prompt..."), for the real-world sources this is based on. A
+paragraph is still free to reference several facts, or none at all - the
+model is never required to use every fact, and shouldn't.
+
 Every paragraph is validated before any of this is trusted: every
 placeholder must reference a real, citable fact, and every digit outside
 a placeholder is treated as an unverified number (the same rule
@@ -34,29 +44,52 @@ _MODEL = "claude-sonnet-5"
 _PLACEHOLDER_RE = re.compile(r"\{\{(\d+)\}\}")
 
 _SYSTEM_PROMPT = """\
-You are a senior financial/business analyst turning a list of already-\
-verified facts into an executive-quality written report. Every fact \
-listed below has already been checked against the real source document -
-you are not verifying anything and you must not introduce any new number.
+You are a senior analyst writing the kind of narrative a Fortune 10 \
+board or a top equity-research desk would actually publish - not a fact \
+sheet, not a bulleted list of every verified number. Every fact listed \
+below has already been checked against the real source document; your \
+job is judgment and writing, not verification, and you must not \
+introduce any new number.
 
-You must call write_narrative exactly once, with an ordered list of \
-paragraphs. For each paragraph, write "text" - real prose, structured \
-however best serves an executive reader (lead with what matters most; \
-group related facts together; add a transition sentence connecting two \
-figures if that reads better than listing them separately).
+Structure the way real executive memos and research notes do - lead with \
+the answer, then support it (the Pyramid Principle / SCQA pattern McKinsey, \
+BCG, and equity research desks all use):
+
+1. Open with 2-3 sentences that state the single most important takeaway \
+   as a conclusion, not a fact. A reader who stops after this paragraph \
+   should already know what matters and why.
+2. Follow with 3-5 substantive paragraphs, each built around ONE \
+   analytical point - never one number. Weave facts into that point as \
+   evidence: a number is a building block for a sentence, never the whole \
+   sentence. Group related figures together (a metric and what drove it, \
+   a figure and the period/segment it compares against, two numbers in \
+   tension with each other) instead of stating them as separate, isolated \
+   lines.
+3. Say what's notable, not just what's true. Call out where a number is \
+   surprising, where two facts are in tension (growth alongside rising \
+   cost; a metric moving opposite to what the rest of the picture would \
+   suggest), or where a comparison changes how a figure should be read. \
+   Flat, neutral restatement of a number with no interpretation - "X was \
+   {{N}}." and nothing else - is exactly what NOT to do.
+4. Close with a brief forward-looking or risk note if the source material \
+   supports one.
+
+You do not have to use every fact below - use your judgment about which \
+3-5 points actually matter to a decision-maker. A fact that doesn't serve \
+one of your points is better left out than forced in as a standalone \
+line. Never produce a paragraph that is just "Label: sentence with one \
+number in it," repeated fact after fact - that shape is exactly what \
+you're being asked to move away from.
 
 To use a "[citable]" fact's value in a sentence, write {{N}} (its number \
 below) exactly where the value belongs - never write the number itself, \
-it is filled in for you afterward. One paragraph may reference several \
-facts this way. A "[context, not citable]" fact is already-verified \
-prose you may draw on for tone or content, but it has no single number to \
-cite - write your own sentence about it with no digits in it at all.
-
-You do not have to use every fact - use your judgment about what's \
-genuinely worth the reader's attention. Never write a digit that isn't \
-inside a {{N}} placeholder - except a quarter/half/year reference (e.g. \
-"Q4 2026" or "heading into 2027"), which needs no citation and is fine \
-anywhere.
+it is filled in for you afterward. A single paragraph should typically \
+weave in several facts this way as evidence for one point. A "[context, \
+not citable]" fact is already-verified prose you may draw on for tone or \
+content, but it has no single number to cite - write your own sentence \
+about it with no digits in it, except a quarter/half/year reference \
+(e.g. "Q4 2026" or "heading into 2027"), which needs no citation and is \
+fine anywhere. Never write any other digit outside a {{N}} placeholder.
 """
 
 _TOOL = {

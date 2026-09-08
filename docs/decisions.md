@@ -2,6 +2,52 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-08 — Dated events as a verified, structured fact (Slice 32)
+
+The system was rigorous with numbers and weak with events - an
+acquisition or a regulatory step could be mentioned as a plain quote, but
+nothing captured *when*, *where it stands*, and *what's next*, so the
+report said "an acquisition closed during the quarter." This adds an
+`event` segment type to `analyze_document` - the last piece of the
+diagnosis's Mechanism 4.
+
+- **`event` is a fourth segment type** (`quote` / `computed` / `event` /
+  `prose`), carrying no numeric value. Its four parts - `what` / `date` /
+  `status` / `next_step` - sit in a nested `event` object on the tool
+  schema, every field required (Slice 26 all-required rule; nesting was
+  never the problem, optionality was - Slice 30's nested chart schema
+  already proves it).
+- **The model copies, never composes.** `what` must be a verbatim
+  substring and is required; `date` / `status` / `next_step` are each
+  either `""` or a verbatim substring. `_verify_event` drops the whole
+  event if `what` isn't real, or if any *supplied* part isn't - a
+  half-verified timeline is worse than none.
+- **The model never types an event's date into prose either.** The
+  narrator references an event with `{{N}}` like any citable fact; L4's
+  new `event_line` composes the verified parts into a timeline string
+  (`what (date) — status — next: next_step`, omitting absent parts). Every
+  digit on an event line is a verified substring. This extends the "model
+  never writes a number" guarantee to "model never writes a date." Slice
+  27's calendar carve-out still lets the model write "into 2027" as
+  connective prose; the *event's own* dates come through the verified
+  channel.
+- **Slice 31's `horizon` marker applies** - a `projected` event (a
+  planned/expected one) renders its line with the `(projected)` /
+  `PROJECTED` marker unchanged. Charts are untouched: an event has no
+  `value`, so `_resolve_chart` already excludes it.
+- `coverage_summary` gains an `events` count.
+- `rich_export.py` needed **no change** - `_substitute` already routes
+  through `display_value`, which now knows `event`.
+- 280 tests, mocked client only. Hand-authored end-to-end run: two events
+  (one reported, one projected) verified, the reported one rendered as a
+  full dated timeline, the projected one with `— next: …` and the Slice
+  31 marker, `coverage_summary` reporting `events: 2`. Real-model
+  behaviour is the still-owed live Vercel smoke test.
+- **Not in this slice:** numeric reasoning about a deal (size, %
+  accretion) stays a `quote`/`computed`; multi-event chronology ordering;
+  and the long-standing carve-outs (mix-vs-rate bridge, share-of-total
+  shift, peer benchmarks, a real `.pdf` of the rich layout).
+
 ## 2026-09-08 — Horizon made visible in the rendered report (Slice 31)
 
 Slice 29 tags every fact `reported` / `guidance` / `projected`; Slice 30

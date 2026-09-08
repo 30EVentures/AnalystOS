@@ -167,12 +167,15 @@ part of a section - never asserted as a historical result.
 To use a "[citable]" fact's value, write {{N}} (its number in the \
 manifest) exactly where the value belongs - never write the number \
 itself, it is filled in for you afterward. A single paragraph typically \
-weaves in several facts this way as evidence for one point. A "[context, \
-not citable]" fact is already-verified prose you may draw on for tone or \
-content, but it has no number to cite - write your own sentence about it \
-with no digits, except a quarter/half/year reference (e.g. "Q4 2026" or \
-"heading into 2027"), which is fine anywhere. Never write any other digit \
-outside a {{N}} placeholder.
+weaves in several facts this way as evidence for one point. An "[event]" \
+fact already carries its date, status, and next step - reference it with \
+{{N}} and write the sentence around it (it renders as a dated timeline); \
+do not retype the date yourself. A "[context, not citable]" fact is \
+already-verified prose you may draw on for tone or content, but it has no \
+number to cite - write your own sentence about it with no digits, except \
+a quarter/half/year reference (e.g. "Q4 2026" or "heading into 2027"), \
+which is fine anywhere. Never write any other digit outside a {{N}} \
+placeholder.
 """
 
 _PARAGRAPH_SCHEMA = {
@@ -249,6 +252,14 @@ def _build_manifest(segments):
         tag = "" if horizon == "reported" else f" [{horizon}]"
         if segment["type"] == "prose":
             lines.append(f'Fact {i} [context, not citable]{tag}: "{segment["text"]}"')
+        elif segment["type"] == "event":
+            # Show the whole structure so the model narrates it as a
+            # timeline and references it with {{i}}, not by retyping a date.
+            parts = [f'what="{segment["what"]}"']
+            for key in ("date", "status", "next_step"):
+                if segment.get(key):
+                    parts.append(f'{key}="{segment[key]}"')
+            lines.append(f"Fact {i} [event]{tag}: " + ", ".join(parts))
         else:
             label = segment.get("label") or "Fact"
             lines.append(

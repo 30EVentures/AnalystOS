@@ -218,15 +218,35 @@ def narrated_footnote(n, source_hash, citation):
     return f"[{n}] {_quoted(source_hash, citation)}"
 
 
+def event_line(segment):
+    """Compose a verified ``event`` segment's parts into one timeline
+    string - ``what`` always, then ``(date)``, ``status``, and
+    ``next: next_step`` only where the source actually supplied them
+    (Slice 32). Every digit here is a verified substring; the model never
+    typed it. One implementation, shared by every renderer.
+    """
+    line = segment["what"]
+    if segment.get("date"):
+        line += f" ({segment['date']})"
+    if segment.get("status"):
+        line += f" — {segment['status']}"
+    if segment.get("next_step"):
+        line += f" — next: {segment['next_step']}"
+    return line
+
+
 def display_value(segment, currency_unit="actual"):
     """The final string a verified segment's value renders as - a
-    formatted number for a quote/computed segment that has one, else its
+    formatted number for a quote/computed segment that has one, an
+    event's composed timeline line for an ``event`` segment, else its
     plain (qualitative) quoted text. Shared by ``render_narrated_section``
     below and ``render_narrative_section``/``analystos.l2.narrate`` (which
     builds the manifest a narrative pass is shown) - a fact's displayed
     value must be identical wherever it appears, not two implementations
     that could quietly drift apart.
     """
+    if segment["type"] == "event":
+        return event_line(segment)
     if "value" in segment:
         return format_number(segment["value"], segment.get("format"), currency_unit)
     return segment["text"]
@@ -238,12 +258,14 @@ def render_narrated_section(title, source_hash, segments, currency_unit="actual"
     body paragraphs, ``---``, numbered footnotes), so ``render_html`` and
     ``render_pdf`` need no changes to render this too.
 
-    Each segment is one of ``"quote"``, ``"computed"``, or ``"prose"`` (see
-    ``analystos.l2.analyze`` for the verified shape). A quote/computed
-    segment becomes one paragraph - a plain sentence if its ``"display"``
-    is ``"inline"``, a standalone bold stat line if ``"stat"`` - with a
-    footnote quoting the exact source text it was verified against. Prose
-    has no footnote - it never carries a citable number in the first place.
+    Each segment is one of ``"quote"``, ``"computed"``, ``"event"``, or
+    ``"prose"`` (see ``analystos.l2.analyze`` for the verified shape). A
+    quote/computed/event segment becomes one paragraph - a plain sentence
+    if its ``"display"`` is ``"inline"``, a standalone bold stat line if
+    ``"stat"`` - with a footnote quoting the exact source text it was
+    verified against; an ``event`` renders its composed timeline line
+    (``event_line``). Prose has no footnote - it never carries a citable
+    number in the first place.
     """
     body = []
     footnotes = []
@@ -258,7 +280,9 @@ def render_narrated_section(title, source_hash, segments, currency_unit="actual"
             rendered = display_value(segment, currency_unit)
             text = segment["sentence"].replace("{value}", rendered)
         else:
-            text = segment["text"]
+            # a qualitative quote (its quoted text) or an event (its
+            # composed timeline line) - display_value handles both.
+            text = display_value(segment, currency_unit)
 
         # A forward-looking figure is marked inline so this plain fallback
         # can't mislead any more than the rich path can (Slice 31). Plain

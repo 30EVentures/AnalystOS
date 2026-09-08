@@ -233,5 +233,51 @@ class HorizonMarkerTest(unittest.TestCase):
         self.assertNotIn("⟧", out)
 
 
+class EventInRichReportTest(unittest.TestCase):
+    """Slice 32: an event referenced by {{N}} renders its composed
+    timeline line, shares one footnote across uses, and (when projected)
+    carries the Slice 31 marker.
+    """
+
+    SEGMENTS = [
+        {"type": "quote", "horizon": "reported", "value": 3_800_000_000.0,
+         "format": "usd", "citation": "$3.80 billion"},                      # 0
+        {"type": "event", "horizon": "reported",
+         "what": "acquired Halyard Analytics", "date": "May 2026",
+         "status": "integrating", "next_step": "accretive in 2027",
+         "citation": "acquired Halyard Analytics"},                          # 1
+        {"type": "event", "horizon": "projected",
+         "what": "plans to divest the legacy unit", "date": "", "status": "",
+         "next_step": "", "citation": "plans to divest the legacy unit"},    # 2
+    ]
+
+    def _report(self):
+        return {
+            "title": "Deal review",
+            "executive_summary": [{"text": "Revenue was {{0}}; the company {{1}}."}],
+            "sections": [{
+                "heading": "The deal",
+                "paragraphs": [{"text": "In context: the company {{1}}, and separately {{2}}."}],
+                "chart": None,
+            }],
+            "outlook": [{"text": "The next milestone is tied to {{1}}."}],
+        }
+
+    def test_event_substitutes_the_composed_timeline_line(self):  # Done when #4
+        out = render_rich_report(self._report(), self.SEGMENTS, SRC)
+        self.assertIn(
+            "acquired Halyard Analytics (May 2026) — integrating — next: accretive in 2027",
+            out,
+        )
+
+    def test_an_event_referenced_three_times_shares_one_footnote(self):  # Done when #4
+        out = render_rich_report(self._report(), self.SEGMENTS, SRC)
+        self.assertEqual(out.count('<p id="fn2">'), 1)
+
+    def test_a_projected_event_carries_the_horizon_tag(self):  # Done when #4
+        out = render_rich_report(self._report(), self.SEGMENTS, SRC)
+        self.assertIn('<span class="horizon-tag">projected</span>', out)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -124,7 +124,9 @@ ignore them:
 
 - "type": "quote" (a claim backed by an exact substring from the \
   document), "computed" (a total/average/ratio/growth rate/share of total \
-  calculated from figures in the document), or "prose" (connective \
+  calculated from figures in the document), "event" (a dated thing that \
+  happened or is planned - a deal, an approval, a launch, a leadership \
+  change, a financing, a litigation step), or "prose" (connective \
   analysis with no citable number at all).
 - "display": "stat" for a headline figure that's clearest as a standalone \
   number with a short label, "inline" for something that reads better as \
@@ -174,9 +176,20 @@ ignore them:
   "percent_of_total" with has_total true. "" / 0 otherwise.
 - "result": for "computed", your computed result (checked against \
   independently). 0 otherwise.
+- "event": for "event", an object {what, date, status, next_step}. Every \
+  part is a verbatim substring copied from the document - never composed, \
+  never a date you half-remember. "what" names the event and is required. \
+  "date" is when it happened or is expected ("" if the document gives \
+  none). "status" is where it stands now ("" if none). "next_step" is the \
+  concrete next move the document states ("" if none). For any non-"event" \
+  segment, fill every part with "". A "what" that isn't a real substring, \
+  or any non-empty part that isn't, drops the whole event - a \
+  half-verified timeline is not shown.
 
-If you cannot find a real number to support a claim, leave the claim out \
-rather than estimate one.
+When the document describes a dated event, capture it as an "event" \
+segment (not a plain "quote"), so the report can narrate it as a \
+timeline. If you cannot find a real number to support a claim, leave the \
+claim out rather than estimate one.
 """
 
 _TOOL = {
@@ -191,7 +204,7 @@ _TOOL = {
                 "items": {
                     "type": "object",
                     "properties": {
-                        "type": {"type": "string", "enum": ["quote", "computed", "prose"]},
+                        "type": {"type": "string", "enum": ["quote", "computed", "event", "prose"]},
                         "horizon": {"type": "string", "enum": list(_HORIZONS)},
                         "display": {"type": "string", "enum": ["inline", "stat"]},
                         "label": {"type": "string"},
@@ -218,16 +231,29 @@ _TOOL = {
                         "total_exact_text": {"type": "string"},
                         "total_value": {"type": "number"},
                         "result": {"type": "number"},
+                        "event": {
+                            "type": "object",
+                            "properties": {
+                                "what": {"type": "string"},
+                                "date": {"type": "string"},
+                                "status": {"type": "string"},
+                                "next_step": {"type": "string"},
+                            },
+                            "required": ["what", "date", "status", "next_step"],
+                            "additionalProperties": False,
+                        },
                     },
                     # Every property is required - see the module docstring's
                     # note on why: a schema with only "type" required (the
                     # rest genuinely optional) is what produced a real
-                    # "Schema is too complex" 400 from a live call.
+                    # "Schema is too complex" 400 from a live call. The
+                    # nested "event" object is all-required for the same
+                    # reason; nesting was never the problem, optionality was.
                     "required": [
                         "type", "horizon", "display", "label", "sentence", "format",
                         "exact_text", "has_value", "value", "text",
                         "operation", "operands", "has_total",
-                        "total_exact_text", "total_value", "result",
+                        "total_exact_text", "total_value", "result", "event",
                     ],
                     "additionalProperties": False,
                 },
@@ -405,12 +431,40 @@ def _verify_prose(seg):
     return {"type": "prose", "horizon": _horizon(seg), "text": text}
 
 
+def _verify_event(seg, normalized_document):
+    """An ``event`` carries a timeline, not a number: ``what`` / ``date`` /
+    ``status`` / ``next_step``, every one a verbatim substring of the
+    source. ``what`` is required; each *supplied* (non-empty) other part
+    must check out too, or the whole event is dropped - a half-verified
+    timeline is worse than none. The model never writes an event's dates
+    into prose; L4's ``event_line`` composes the verified parts, so every
+    digit on an event line traces to the source.
+    """
+    event = seg.get("event") or {}
+    what = (event.get("what") or "").strip()
+    if not _really_in_document(what, normalized_document):
+        return None
+    parts = {}
+    for key in ("date", "status", "next_step"):
+        piece = (event.get(key) or "").strip()
+        if piece and not _really_in_document(piece, normalized_document):
+            return None
+        parts[key] = piece
+    return {
+        "type": "event", "horizon": _horizon(seg),
+        "what": what, "date": parts["date"], "status": parts["status"],
+        "next_step": parts["next_step"], "citation": what,
+    }
+
+
 def _verify_segment(seg, normalized_document):
     kind = seg.get("type")
     if kind == "quote":
         return _verify_quote(seg, normalized_document)
     if kind == "computed":
         return _verify_computed(seg, normalized_document)
+    if kind == "event":
+        return _verify_event(seg, normalized_document)
     if kind == "prose":
         return _verify_prose(seg)
     return None
@@ -509,11 +563,14 @@ def coverage_summary(segments):
     narrator uses this to decide whether to flag a thin document out loud
     rather than pretend a lone figure is analysis; the test suite asserts
     on it. Returns ``{"reported_figures": n, "comparisons": m,
-    "horizons": {...}}`` where ``comparisons`` counts the ``_COMPARISON_OPS``
-    (a figure set against another figure), not aggregates like ``sum``.
+    "events": k, "horizons": {...}}`` where ``comparisons`` counts the
+    ``_COMPARISON_OPS`` (a figure set against another figure), not
+    aggregates like ``sum``, and ``events`` counts verified ``event``
+    segments.
     """
     reported_figures = 0
     comparisons = 0
+    events = 0
     horizons = {h: 0 for h in _HORIZONS}
     for seg in segments:
         horizons[_horizon(seg)] = horizons.get(_horizon(seg), 0) + 1
@@ -521,8 +578,11 @@ def coverage_summary(segments):
             reported_figures += 1
         elif seg["type"] == "computed" and seg.get("operation") in _COMPARISON_OPS:
             comparisons += 1
+        elif seg["type"] == "event":
+            events += 1
     return {
         "reported_figures": reported_figures,
         "comparisons": comparisons,
+        "events": events,
         "horizons": horizons,
     }

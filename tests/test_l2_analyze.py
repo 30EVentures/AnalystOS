@@ -489,5 +489,63 @@ class CoverageContractTest(unittest.TestCase):
         self.assertEqual(cov["horizons"]["reported"], 6)
 
 
+class EventSegmentTest(unittest.TestCase):
+    """Slice 32: a dated event is a verified structured fact - every part
+    a real substring of the source, or the whole event is dropped.
+    """
+
+    DOC = (
+        "On May 14, 2026, Northwind completed its acquisition of Halyard "
+        "Analytics. Integration is underway, with one-time costs peaking "
+        "this quarter. Management expects the deal to be accretive to "
+        "earnings by the first half of 2027."
+    )
+
+    def _event(self, **over):
+        ev = {
+            "what": "completed its acquisition of Halyard Analytics",
+            "date": "May 14, 2026",
+            "status": "Integration is underway",
+            "next_step": "accretive to earnings by the first half of 2027",
+        }
+        ev.update(over)
+        return {"type": "event", "event": ev}
+
+    def test_a_fully_real_event_is_verified_and_kept(self):  # Done when #1
+        out = analyze_document(self.DOC, TITLE, client=_fake_client([self._event()]))
+        self.assertEqual(len(out), 1)
+        self.assertEqual(out[0]["type"], "event")
+        self.assertEqual(out[0]["what"], "completed its acquisition of Halyard Analytics")
+        self.assertEqual(out[0]["date"], "May 14, 2026")
+        self.assertEqual(out[0]["next_step"], "accretive to earnings by the first half of 2027")
+        self.assertEqual(out[0]["citation"], out[0]["what"])
+
+    def test_an_event_whose_what_is_not_in_the_source_is_dropped(self):  # Done when #1
+        bad = self._event(what="acquired a mystery competitor")
+        with self.assertRaises(ValueError):
+            analyze_document(self.DOC, TITLE, client=_fake_client([bad]))
+
+    def test_an_event_with_a_fabricated_next_step_is_dropped_whole(self):  # Done when #1
+        # what/date/status are all real, but the next step is invented ->
+        # a half-verified timeline is not shown.
+        bad = self._event(next_step="a spin-off planned for 2025")
+        with self.assertRaises(ValueError):
+            analyze_document(self.DOC, TITLE, client=_fake_client([bad]))
+
+    def test_an_event_with_only_what_is_kept(self):  # Done when #2
+        ev = self._event(date="", status="", next_step="")
+        out = analyze_document(self.DOC, TITLE, client=_fake_client([ev]))
+        self.assertEqual(out[0]["date"], "")
+        self.assertEqual(out[0]["what"], "completed its acquisition of Halyard Analytics")
+
+    def test_coverage_summary_reports_events(self):  # Done when #5
+        quote = {
+            "type": "quote", "display": "inline", "label": "x",
+            "exact_text": "Halyard Analytics", "has_value": False,
+        }
+        out = analyze_document(self.DOC, TITLE, client=_fake_client([self._event(), quote]))
+        self.assertEqual(coverage_summary(out)["events"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()

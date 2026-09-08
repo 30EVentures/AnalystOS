@@ -354,6 +354,53 @@ class PipelineTest(unittest.TestCase):
         # pass's own wording, not a silent fallback to Slice 26's rendering
         self.assertNotIn("Revenue was $18.4M", out)
 
+    def test_an_event_flows_through_to_the_rendered_report(self):  # slice 32
+        job = self.tmp / "event-job"
+        job.mkdir()
+        sentence = (
+            "Acme completed its acquisition of Halyard on May 14 2026; "
+            "integration is underway; the deal is expected to be accretive in 2027"
+        )
+        (job / "memo.csv").write_text(f"note\n{sentence}\n", encoding="utf-8")
+
+        report_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
+            "segments": [{
+                "type": "event", "horizon": "reported",
+                "event": {
+                    "what": "completed its acquisition of Halyard",
+                    "date": "May 14 2026",
+                    "status": "integration is underway",
+                    "next_step": "expected to be accretive in 2027",
+                },
+            }],
+        })])
+        narrative_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
+            "executive_summary": [{"text": "The quarter's headline was the deal: Acme {{0}}."}],
+            "sections": [{
+                "heading": "The deal",
+                "paragraphs": [{"text": "For context, Acme {{0}}."}],
+                "has_chart": False,
+                "chart": {"type": "bar", "title": "", "format": "number", "series": []},
+            }],
+            "outlook": [],
+        })])
+
+        def _create(**kwargs):
+            if kwargs["tool_choice"]["name"] == "write_narrative":
+                return narrative_response
+            return report_response
+
+        fake_client = SimpleNamespace(messages=SimpleNamespace(create=_create))
+        out = build_report(
+            job / "memo.csv", title="Acme deal", evidence_dir=self.tmp / "ev",
+            llm_client=fake_client,
+        )
+        self.assertIn(
+            "completed its acquisition of Halyard (May 14 2026) — "
+            "integration is underway — next: expected to be accretive in 2027",
+            out,
+        )
+
     def test_both_asks_and_template_still_raises(self):  # unchanged guard
         job = self.tmp / "both-still-bad-job"
         job.mkdir()

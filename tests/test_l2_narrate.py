@@ -165,6 +165,19 @@ class WriteNarrativeStructureTest(unittest.TestCase):
         out = write_narrative(SEGMENTS, TITLE, client=_fake_client(ok))
         self.assertEqual(len(out["outlook"]), 1)
 
+    def test_an_event_fact_can_be_referenced_like_any_citable_fact(self):  # slice 32
+        segs = SEGMENTS + [{
+            "type": "event", "horizon": "reported", "what": "acquired Halyard",
+            "date": "May 2026", "status": "integrating", "next_step": "accretive in 2027",
+            "citation": "acquired Halyard",
+        }]
+        rep = _report(sections=[{
+            "heading": "The deal", "paragraphs": [{"text": "The company {{5}} this year."}],
+            "has_chart": False, "chart": _empty_chart(),
+        }])
+        out = write_narrative(segs, TITLE, client=_fake_client(rep))
+        self.assertEqual(out["sections"][0]["paragraphs"][0]["text"], "The company {{5}} this year.")
+
 
 class WriteNarrativeFailurePathsTest(unittest.TestCase):
     def test_no_citable_facts_at_all_raises_before_calling_the_model(self):

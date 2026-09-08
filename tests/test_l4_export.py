@@ -280,6 +280,41 @@ class RenderSectionTest(unittest.TestCase):
         self.assertIn("Headcount: 40 people", text)
         self.assertNotIn("**", text)
 
+    def test_event_line_composes_present_parts_and_omits_absent(self):  # slice 32
+        from analystos.l4.export import event_line
+
+        full = {"type": "event", "what": "acquired Halyard", "date": "May 2026",
+                "status": "integrating", "next_step": "accretive in 2027"}
+        self.assertEqual(
+            event_line(full),
+            "acquired Halyard (May 2026) — integrating — next: accretive in 2027",
+        )
+        bare = {"type": "event", "what": "acquired Halyard", "date": "", "status": "", "next_step": ""}
+        self.assertEqual(event_line(bare), "acquired Halyard")
+
+    def test_render_narrated_section_renders_an_event_with_a_footnote(self):  # slice 32
+        segments = [{
+            "type": "event", "horizon": "reported", "display": "inline",
+            "what": "acquired Halyard", "date": "May 2026", "status": "integrating",
+            "next_step": "accretive in 2027", "citation": "acquired Halyard",
+        }]
+        out = render_narrated_section("Deal", self.src, segments)
+        self.assertIn(
+            "acquired Halyard (May 2026) — integrating — next: accretive in 2027 [1]", out
+        )
+        self.assertIn(f'[1] source {self.src} - "acquired Halyard"', out)
+        self.assertIn("acquired Halyard", render_html(out))
+        self.assertTrue(render_pdf(out).startswith(b"%PDF"))
+
+    def test_a_projected_event_carries_the_slice_31_marker(self):  # slice 31 + 32
+        segments = [{
+            "type": "event", "horizon": "projected", "display": "inline",
+            "what": "plans to acquire Halyard", "date": "", "status": "", "next_step": "",
+            "citation": "plans to acquire Halyard",
+        }]
+        out = render_narrated_section("Deal", self.src, segments)
+        self.assertIn("plans to acquire Halyard (projected) [1]", out)
+
     def test_narrated_section_marks_a_forward_looking_figure_inline(self):  # slice 31
         segments = [
             {"type": "quote", "horizon": "reported", "display": "inline", "label": "Revenue",

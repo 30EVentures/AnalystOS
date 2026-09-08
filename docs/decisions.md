@@ -2,6 +2,70 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-08 — Structured narrator, wired end to end (Slice 30)
+
+Slice 28 built `analystos/l4/rich_export.py` (executive summary, sections,
+per-section charts, a distinct outlook block) and wired it to nothing.
+Slice 29 made `analyze_document` guarantee the comparison set and tag each
+fact's `horizon`. This slice closes the loop: `write_narrative` returns
+the structured report shape and `pipeline.build_report`'s default path
+renders it through `render_rich_report`. From here, the default output of
+AnalystOS is the rich report, for any document, verification contract
+untouched.
+
+- **`write_narrative` returns a `report` dict, not a `paragraphs` list** —
+  `executive_summary`, `sections` (each with an optional `chart`),
+  `outlook` — exactly what `render_rich_report` consumes. It validates,
+  then normalizes (`has_chart` folded away, `chart` → `None` when false or
+  invalid, empty `outlook` → `None`).
+- **Schema stays all-required, zero optional properties** — the exact
+  pattern that fixed Slice 26's `400 Schema is too complex`. "Not
+  applicable" is the `has_chart` boolean plus placeholder values, never an
+  absent key. Nesting (report → section → chart → series) is fine; it was
+  *optional*-property combinatorics that broke the grammar compiler, and
+  there are none.
+- **A malformed chart is the one non-fatal case.** Every paragraph
+  failure (bad `{{N}}`, stray digit) and every structural failure (empty
+  summary/sections, a section with no heading or body) raises → the
+  pipeline falls back to Slice 26's plain rendering, no partial
+  acceptance. A bad chart is just dropped (`chart` → `None`), matching
+  `rich_export._resolve_chart`'s existing "a bad chart is left out, the
+  report is never lost" rule — that check stays as defence in depth,
+  `write_narrative` now also runs it up front.
+- **Prompt extends the five disciplines, doesn't replace them.**
+  Discipline 4 broadened from "legal/regulatory content" to *any* dated or
+  sequential event (a deal, a launch, a leadership change, a financing) —
+  the user's ask was explicitly wider than the reference pieces that
+  seeded the original wording. Discipline 5 got a worked example of
+  co-stating trigger and consequence in one sentence. New structural
+  instruction (exec summary / 3-5 sections / outlook), chart guidance
+  (only 2+ cited facts, only when the shape carries information), and a
+  `horizon` instruction (forward-looking facts belong in the outlook —
+  Slice 31 *enforces* it). `coverage_summary` from Slice 29 is passed into
+  the prompt so a genuinely thin document is described as thin rather than
+  dressed up.
+- **`build_report`'s default path now returns a full HTML document**,
+  where the table/`template` path still returns section markdown.
+  Contained by two small guards, no contract rewrite: `render_html` is
+  idempotent on an already-complete document (so `api/analyze.py` needs no
+  change — the live frontend only reads `data.html` anyway), and
+  `pipeline.main()` writes `section.html` directly for an HTML section and
+  skips the `.md`/`.pdf` writes for it. A real `.pdf` of the
+  sectioned/charted layout (extending Slice 24's `reportlab` renderer) is
+  its own follow-up.
+- **`render_narrative_section`** (the flat narrative renderer) stays in
+  `export.py` for its own tests but leaves the pipeline path — rich or the
+  Slice 26 plain fallback, nothing in between.
+- Tested against a mocked client only. A hand-authored structured response
+  for the Slice 29 multi-period mock document, run through the real
+  `write_narrative` + `render_rich_report`, produced the target shape:
+  executive summary, sections, a line chart drawn only from cited
+  quarterly facts, a distinct outlook, one shared 8-footnote sequence,
+  guidance and implied-remaining figures rendered from verified `computed`
+  segments. Whether a *real* model produces this well from a real
+  document is the post-merge Vercel smoke test, flagged before any paid
+  call.
+
 ## 2026-09-08 — L2 extraction contract: guarantee the comparisons, tag the horizon (Slice 29)
 
 `analystos/l2/narrate.py`'s prompt already instructs all five

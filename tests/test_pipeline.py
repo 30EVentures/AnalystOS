@@ -305,14 +305,16 @@ class PipelineTest(unittest.TestCase):
         )
         self.assertIn("Revenue was $18.4M.", out)
 
-    def test_the_narrative_pass_actually_runs_when_it_succeeds(self):  # slice 27
+    def test_the_narrative_pass_actually_runs_when_it_succeeds(self):  # slice 27 + 30
         # test_neither_asks_nor_template_runs_the_narrated_default and
         # test_narrated_default_always_uses_actual_currency_scale both use a
         # client that always returns the write_report response, so
-        # write_narrative gets a "segments" reply instead of "paragraphs" and
-        # correctly falls back - proving the fallback works, not that the
-        # narrative pass itself ever runs. This client tells the two calls
-        # apart by which tool was requested, so both stages actually fire.
+        # write_narrative gets a "segments" reply instead of the structured
+        # report and correctly falls back - proving the fallback works, not
+        # that the narrative pass itself ever runs. This client tells the
+        # two calls apart by which tool was requested, so both stages fire,
+        # and the output is the rich HTML document (Slice 30), not the
+        # flat per-segment fallback.
         job = self.tmp / "narrative-success-job"
         job.mkdir()
         (job / "data.csv").write_text("period,revenue\nFY2024,18400000\n", encoding="utf-8")
@@ -325,7 +327,14 @@ class PipelineTest(unittest.TestCase):
             }],
         })])
         narrative_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
-            "paragraphs": [{"text": "The headline figure this quarter was {{0}}."}],
+            "executive_summary": [{"text": "The headline figure this quarter was {{0}}."}],
+            "sections": [{
+                "heading": "Revenue",
+                "paragraphs": [{"text": "That figure, {{0}}, set the tone for the quarter."}],
+                "has_chart": False,
+                "chart": {"type": "bar", "title": "", "format": "number", "series": []},
+            }],
+            "outlook": [],
         })])
 
         def _create(**kwargs):
@@ -338,6 +347,8 @@ class PipelineTest(unittest.TestCase):
         out = build_report(
             job / "data.csv", title="X", evidence_dir=self.tmp / "ev", llm_client=fake_client,
         )
+        self.assertTrue(out.lstrip().lower().startswith("<!doctype html"))  # rich path
+        self.assertIn("<h2>Revenue</h2>", out)
         self.assertIn("The headline figure this quarter was $18.4M", out)
         # the plain per-segment sentence - proof this is the narrative
         # pass's own wording, not a silent fallback to Slice 26's rendering

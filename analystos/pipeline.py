@@ -68,10 +68,10 @@ from analystos.l2.narrate import write_narrative
 from analystos.l4.export import (
     render_html,
     render_narrated_section,
-    render_narrative_section,
     render_pdf,
     render_section,
 )
+from analystos.l4.rich_export import render_rich_report
 from analystos.templates import build_asks
 
 
@@ -158,17 +158,19 @@ def build_report(
         # copied verbatim from prose (it's already the real, actual value).
         # Applying it here would silently inflate every dollar figure.
         try:
-            # A second, narrower call decides how to write about the
-            # already-verified facts above - real structure instead of one
-            # paragraph per fact in extraction order (Slice 27). It cannot
+            # A second, narrower call decides how to *structure and write*
+            # the report about the already-verified facts above - an
+            # executive summary, sections, charts drawn only from cited
+            # facts, a distinct outlook block (Slice 27 + 30). It cannot
             # state a number itself; any failure here (a bad reference, a
-            # stray digit, an API error) falls back to the plain per-segment
-            # rendering below rather than losing the report over a writing-
-            # quality improvement. See specs/slice-27/spec.md.
-            paragraphs = write_narrative(segments, title, client=llm_client)  # L2 (narrative)
-            return render_narrative_section(title, source_hash, segments, paragraphs, "actual")  # L4
+            # stray digit, a malformed structure, an API error) falls back
+            # to the plain per-segment rendering below rather than losing
+            # the report over a writing-quality improvement. See
+            # specs/slice-27/spec.md and specs/slice-30/spec.md.
+            report = write_narrative(segments, title, client=llm_client)  # L2 (structure + writing)
+            return render_rich_report(report, segments, source_hash, "actual")  # L4 (rich HTML)
         except ValueError:
-            return render_narrated_section(title, source_hash, segments, "actual")  # L4
+            return render_narrated_section(title, source_hash, segments, "actual")  # L4 (plain fallback)
 
     schema, rows = extract_any(source_path, schema, extract_options)        # L1 (table)
 
@@ -225,14 +227,25 @@ def main(argv=None):
         return 2
     job_dir = Path(argv[0])
     section = run_job(job_dir)
-    md_path = job_dir / "section.md"
     html_path = job_dir / "section.html"
-    pdf_path = job_dir / "section.pdf"
-    md_path.write_text(section, encoding="utf-8")
-    html_path.write_text(render_html(section), encoding="utf-8")
-    pdf_path.write_bytes(render_pdf(section))
-    print(section)
-    print(f"\n(written to {md_path}, {html_path}, and {pdf_path})", file=sys.stderr)
+
+    # The narrated default path returns a finished HTML document
+    # (analystos.l4.rich_export); the schema/table path returns section
+    # markdown that render_html / render_pdf turn into a page. A real .pdf
+    # of the sectioned/charted layout is its own follow-up (Slice 24's
+    # reportlab renderer extended) - see specs/slice-30/spec.md.
+    if section.lstrip().lower().startswith("<!doctype html"):
+        html_path.write_text(section, encoding="utf-8")
+        print(f"(written to {html_path})", file=sys.stderr)
+    else:
+        md_path = job_dir / "section.md"
+        pdf_path = job_dir / "section.pdf"
+        md_path.write_text(section, encoding="utf-8")
+        html_path.write_text(render_html(section), encoding="utf-8")
+        pdf_path.write_bytes(render_pdf(section))
+        print(section)
+        print(f"\n(written to {md_path}, {html_path}, and {pdf_path})", file=sys.stderr)
+
     # Open the page for the person running it; never during tests (no terminal).
     if sys.platform == "darwin" and sys.stdout.isatty():
         subprocess.run(["open", str(html_path)], check=False)

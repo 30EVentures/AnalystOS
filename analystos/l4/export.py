@@ -335,7 +335,17 @@ def _parse_section(section_md):
 
 
 def render_html(section_md):
-    """Render a section produced by ``render_section`` as a standalone HTML page."""
+    """Render a section produced by ``render_section`` as a standalone HTML page.
+
+    Idempotent on a finished page: since Slice 30 the narrated default path
+    returns a complete HTML document (``analystos.l4.rich_export``), and
+    ``api/analyze.py`` / ``pipeline.main`` still call this on whatever
+    ``build_report`` returned. Given something that is already a full
+    document, return it untouched rather than wrapping ``<!doctype html>``
+    in another ``<!doctype html>``.
+    """
+    if section_md.lstrip().lower().startswith("<!doctype html"):
+        return section_md
     title, paragraphs, notes = _parse_section(section_md)
 
     esc_title = html.escape(title)

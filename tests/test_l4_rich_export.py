@@ -171,5 +171,67 @@ class RenderRichReportTest(unittest.TestCase):
         self.assertNotIn("**", out)
 
 
+class HorizonMarkerTest(unittest.TestCase):
+    """Slice 31: a guidance/projected fact is visibly marked wherever it
+    is used - executive summary, section, or outlook - so it can't be
+    read as a verified historical result.
+    """
+
+    SEGMENTS = [
+        {"type": "quote", "horizon": "reported", "value": 3_800_000_000.0,
+         "format": "usd", "citation": "$3.80 billion"},                      # 0
+        {"type": "quote", "horizon": "guidance", "value": 15_000_000_000.0,
+         "format": "usd", "citation": "$15.00 billion"},                     # 1
+        {"type": "computed", "horizon": "projected", "value": 4_450_000_000.0,
+         "format": "usd", "citation": ["$15.00 billion", "$3.80 billion"]},  # 2
+    ]
+
+    def _report(self, **over):
+        base = {
+            "title": "Acme — revenue review",
+            "executive_summary": [{"text": "Q3 revenue was {{0}}; the full-year guide is {{1}}."}],
+            "sections": [{
+                "heading": "Revenue",
+                "paragraphs": [{"text": "Against {{0}} in Q3, the guide of {{1}} is a step up."}],
+                "chart": None,
+            }],
+            "outlook": [{"text": "The guide of {{1}} leaves {{2}} for the rest of the year."}],
+        }
+        base.update(over)
+        return base
+
+    def test_a_guidance_fact_is_marked_in_the_executive_summary(self):  # Done when #1
+        out = render_rich_report(self._report(), self.SEGMENTS, SRC)
+        summary = out.split('class="exec-summary"')[1].split("</div>")[0]
+        self.assertIn('<span class="horizon-tag">guidance</span>', summary)
+
+    def test_a_guidance_fact_is_marked_inside_a_section(self):  # Done when #1
+        out = render_rich_report(self._report(), self.SEGMENTS, SRC)
+        section = out.split('class="report-section"')[1].split("</section>")[0]
+        self.assertIn('<span class="horizon-tag">guidance</span>', section)
+
+    def test_guidance_and_projected_are_both_marked_in_the_outlook(self):  # Done when #1
+        out = render_rich_report(self._report(), self.SEGMENTS, SRC)
+        outlook = out.split('class="outlook"')[1].split("</div>")[0]
+        self.assertIn('<span class="horizon-tag">guidance</span>', outlook)
+        self.assertIn('<span class="horizon-tag">projected</span>', outlook)
+
+    def test_a_reported_fact_is_not_marked(self):  # Done when #2
+        out = render_rich_report(self._report(), self.SEGMENTS, SRC)
+        # $3.8B (fact 0, reported) goes straight to its footnote link, no tag
+        self.assertIn("$3.8B <sup>", out)
+        self.assertNotIn('$3.8B <span class="horizon-tag"', out)
+
+    def test_segments_with_no_horizon_key_are_never_marked(self):  # Done when #2
+        out = render_rich_report(_report(), SEGMENTS, SRC)  # module fixtures, no horizon
+        # the CSS rule is always present; a rendered span is what must not be
+        self.assertNotIn('<span class="horizon-tag">', out)
+
+    def test_the_sentinel_never_leaks_as_literal_text(self):  # Done when #3
+        out = render_rich_report(self._report(), self.SEGMENTS, SRC)
+        self.assertNotIn("⟦", out)
+        self.assertNotIn("⟧", out)
+
+
 if __name__ == "__main__":
     unittest.main()

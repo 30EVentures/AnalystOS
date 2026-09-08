@@ -260,6 +260,14 @@ def render_narrated_section(title, source_hash, segments, currency_unit="actual"
         else:
             text = segment["text"]
 
+        # A forward-looking figure is marked inline so this plain fallback
+        # can't mislead any more than the rich path can (Slice 31). Plain
+        # text - no markup - so it flows through render_html/render_pdf
+        # untouched.
+        horizon = segment.get("horizon", "reported")
+        if horizon in ("guidance", "projected"):
+            text = f"{text} ({horizon})"
+
         if segment.get("display") == "stat" and segment.get("label"):
             body.append(f"**{segment['label']}:** {text} [{n}]")
         else:

@@ -2,6 +2,47 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-08 — Horizon made visible in the rendered report (Slice 31)
+
+Slice 29 tags every fact `reported` / `guidance` / `projected`; Slice 30
+surfaces that to the narrator and asks it to keep forward material in the
+outlook. This slice makes it *enforced in the output*: a `guidance` or
+`projected` figure is visibly marked wherever it appears - executive
+summary, any section, the outlook - so it can't be read as a verified
+historical result regardless of where the model put it.
+
+- **Mark, don't police.** A hard "reject a guidance fact used outside the
+  outlook" rule was rejected: the Slice 30 prompt legitimately allows a
+  forward fact in a clearly-forward-marked part of a section, so a hard
+  rule would cause needless fallbacks. Marking at the point of
+  substitution is strictly safer - the fact is always flagged, the report
+  is never lost, and there is no model call in the slice at all.
+- **Two-pass, matching the existing pattern.** `rich_export._substitute`
+  runs before `html.escape` (Slice 28's double-escape bug), so it emits a
+  plain-text sentinel `⟦guidance⟧` / `⟦projected⟧` (U+27E6/27E7 - never in
+  financial prose, pass through `html.escape` untouched) and `_para_html`
+  converts it to `<span class="horizon-tag">` in the same escape-then-
+  convert pass that already handles `[n]`.
+- **The plain fallback marks it too.** `render_narrated_section` appends a
+  literal ` (guidance)` / ` (projected)` - plain text, flows through
+  `render_html` / `render_pdf` untouched. The degraded path must not
+  mislead any more than the rich one.
+- **`horizon` absent → no marker.** Purely additive; every pre-existing
+  test segment (no `horizon` key) renders unchanged.
+- Verified beyond the suite: the Slice 30 hand-authored end-to-end run,
+  re-checked - `$15.0B` (guidance) and `$4.5B` (the implied-remaining
+  `difference`, also guidance) carry the marker in both the executive
+  summary and the outlook; the reported quarterly figures do not; the
+  sentinel never leaks as literal text.
+- **Dated-event structure is explicitly NOT here.** `date` / `what` /
+  `status` / `next_step` as a quote-verified segment shape in
+  `analyze.py`, so an acquisition or regulatory step can be narrated as a
+  real timeline, is the other half of the diagnosis's Mechanism 4. It is
+  a genuine `analyze.py` + `narrate.py` change and gets its own slice
+  (proposed Slice 32) - not part of the pre-approved 29-31 run. Slice 30
+  already broadened discipline 4 in the prompt; until 32, events are
+  narrated from `quote` / `prose` segments.
+
 ## 2026-09-08 — Structured narrator, wired end to end (Slice 30)
 
 Slice 28 built `analystos/l4/rich_export.py` (executive summary, sections,

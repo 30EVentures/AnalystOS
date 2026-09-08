@@ -44,6 +44,12 @@ from analystos.l4.charts import bar_chart_svg, donut_chart_svg, line_chart_svg
 from analystos.l4.export import _BOLD_RE, _FOOTNOTE_RE, _MARKER_RE, display_value, narrated_footnote
 
 _PLACEHOLDER_RE = re.compile(r"\{\{(\d+)\}\}")
+# A plain-text sentinel emitted by _substitute (before html.escape) and
+# turned into a real <span> by _para_html (after it) - the same escape-
+# then-convert two-pass the [n] markers use. U+27E6/27E7 never occur in
+# financial prose and pass through html.escape untouched.
+_HORIZON_TAG_RE = re.compile("⟦(guidance|projected)⟧")
+_FORWARD_HORIZONS = ("guidance", "projected")
 
 _CHART_RENDERERS = {"bar": bar_chart_svg, "line": line_chart_svg, "donut": donut_chart_svg}
 
@@ -95,7 +101,12 @@ hr{border:0;border-top:1px solid var(--hairline);margin:3rem 0 1.4rem}
 .footnotes .n{color:var(--ink);font-weight:600;margin-right:.35em}
 .footnotes a{color:var(--signal);text-decoration:none;margin-left:.35em}
 
-@media print{body{background:#fff}.exec-summary,.outlook,.chart-card{break-inside:avoid}}
+.horizon-tag{font-family:var(--font-mono);font-size:.62rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--amber);
+  vertical-align:.15em;margin-left:.25em;white-space:nowrap}
+
+@media print{body{background:#fff}.exec-summary,.outlook,.chart-card{break-inside:avoid}
+  .horizon-tag{color:#7A4A12}}
 """
 
 
@@ -118,7 +129,9 @@ def _substitute(text, segments, source_hash, currency_unit, footnote_number, foo
             footnotes.append(narrated_footnote(footnote_number[index], source_hash, citation))
         n = footnote_number[index]
         rendered = display_value(segments[index], currency_unit)
-        return f"{rendered} [{n}]"
+        horizon = segments[index].get("horizon", "reported")
+        tag = f" ⟦{horizon}⟧" if horizon in _FORWARD_HORIZONS else ""
+        return f"{rendered}{tag} [{n}]"
 
     return _PLACEHOLDER_RE.sub(_sub, text)
 
@@ -132,6 +145,9 @@ def _para_html(text, footnotes):
     """
     esc = html.escape(text)
     esc = _BOLD_RE.sub(lambda m: f"<strong>{m.group(1)}</strong>", esc)
+    esc = _HORIZON_TAG_RE.sub(
+        lambda m: f'<span class="horizon-tag">{m.group(1)}</span>', esc
+    )
 
     def _marker(match):
         n = match.group(1)

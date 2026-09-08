@@ -280,6 +280,28 @@ class RenderSectionTest(unittest.TestCase):
         self.assertIn("Headcount: 40 people", text)
         self.assertNotIn("**", text)
 
+    def test_narrated_section_marks_a_forward_looking_figure_inline(self):  # slice 31
+        segments = [
+            {"type": "quote", "horizon": "reported", "display": "inline", "label": "Revenue",
+             "sentence": "Q3 revenue was {value}.", "value": 3800000000.0, "format": "usd",
+             "citation": "$3.80 billion"},
+            {"type": "quote", "horizon": "guidance", "display": "inline", "label": "FY guide",
+             "sentence": "Full-year revenue is guided to {value}.", "value": 15000000000.0,
+             "format": "usd", "citation": "$15.00 billion"},
+            {"type": "computed", "horizon": "projected", "display": "inline", "label": "Implied",
+             "sentence": "That leaves {value} for the rest of the year.", "value": 4450000000.0,
+             "format": "usd", "citation": ["$15.00 billion", "$3.80 billion"]},
+        ]
+        out = render_narrated_section("Acme", self.src, segments)
+        self.assertIn("Q3 revenue was $3.8B. [1]", out)              # reported: unmarked
+        self.assertIn("guided to $15.0B. (guidance) [2]", out)        # guidance: marked
+        self.assertIn("for the rest of the year. (projected) [3]", out)
+        # still renders cleanly through both downstream renderers
+        page = render_html(out)
+        self.assertIn("(guidance)", page)
+        pdf_bytes = render_pdf(out)
+        self.assertTrue(pdf_bytes.startswith(b"%PDF"))
+
 
     # --- render_narrative_section (slice 27) ---
 

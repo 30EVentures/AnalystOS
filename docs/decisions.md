@@ -2,6 +2,65 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-08 — L2 extraction contract: guarantee the comparisons, tag the horizon (Slice 29)
+
+`analystos/l2/narrate.py`'s prompt already instructs all five
+executive-writing disciplines (benchmark, name the mechanism, sequence
+past from future, narrate events, co-state cause and effect). The gap the
+`mock_rich_report_v3.html` diagnosis surfaced
+(`docs/rich-report-diagnosis.md`) is upstream of the writing: the
+narrator can only write from what `analyze_document` extracted, and that
+stage returned "the important facts" with benchmarking left to the
+model's per-run discretion. No prompt on the narrator conjures a
+comparison that was never computed. This slice is `analyze.py` only.
+
+- **`difference` is now a supported operation.** Subtraction was excluded
+  through Slice 26 because a model could smuggle a sign flip (the
+  `sum([1240, -1050])` "net additions" case). That hole was closed
+  separately by `_value_matches_text`, which checks each operand's value
+  against the number its own `exact_text` spells out, sign included. With
+  that check in place `operands[0] - sum(rest)` is safe — and it is the
+  operation an absolute period-over-period change, a margin move in
+  points, and "stated target minus the actuals so far" all need, none of
+  which the five prior operations could express. A dedicated test retries
+  the old sign-flip exploit under `difference` and confirms it still
+  fails.
+- **Every segment carries a `horizon`:** `reported` (default),
+  `guidance`, or `projected`, verified by the same substring + value-match
+  checks as any quote. Nothing in L4 consumes it yet — Slice 31 wires the
+  outlook block from it and enforces "no projected figure unmarked in a
+  history section." Produced now so that wiring has something to read.
+- **The prompt's "what to report" section is now a completeness
+  contract:** for every figure featured, surface *every* comparison the
+  source's own numbers support (prior value + `growth_percent` +
+  `difference`; each period of a 3-plus-period trend as its own quote;
+  `percent_of_total` of a stated total; target-vs-actuals where a target
+  is stated). The honesty rule is unchanged and explicit: if the source
+  doesn't contain a comparison, leave the figure without one — never
+  invent one. The bar is on which *citable* comparisons must be computed
+  when available, not on inventing them.
+- **Return type stays `list[segment]`.** The spec floated returning a
+  dict with a coverage summary; threading that through `pipeline.py` and
+  ~20 tests was more churn than value for a signal that's derivable from
+  the segments. Instead `coverage_summary(segments)` is a module helper —
+  comparison count, reported-figure count, horizon breakdown — for the
+  Slice 30 narrator to flag a thin document, and for tests. Verified
+  segments also now carry `operation` (previously dropped after
+  verification) so the helper, and later the narrator, can tell a
+  comparison from an aggregate.
+- **Schema stays all-required.** `horizon` is one more required enum on an
+  object whose every property is already required — no optional-property
+  combinatorics, so no repeat of the `400 Schema is too complex` failure
+  (that was caused by *optional* properties).
+- **Peer / sector / index benchmarks remain out of scope.** The system
+  sees one document; the verification guarantee forbids a comparison it
+  can't cite. A boundary, not a bug — revisit only if a second (peer)
+  source is supplied.
+- Tested against a mocked client only (no `ANTHROPIC_API_KEY` in the
+  build env). Whether a *real* model produces the full comparison set
+  from a real document, unprompted per run, is the post-merge Vercel
+  smoke test in the agreed proof plan — flagged before any paid call.
+
 ## 2026-09-06 — Rich rendering: charts, real section structure, a distinct outlook block (Slice 28)
 
 Slice 27 fixed how the words read; this fixes what the report looks

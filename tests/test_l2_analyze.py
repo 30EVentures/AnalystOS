@@ -10,7 +10,7 @@ from types import SimpleNamespace
 import anthropic
 import httpx2
 
-from analystos.l2.analyze import analyze_document
+from analystos.l2.analyze import analyze_document, coverage_summary
 
 DOCUMENT = (
     'Q4 revenue was $10,000,000, up from $8,000,000 in Q3. '
@@ -315,6 +315,178 @@ class AnalyzeDocumentTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 analyze_document(DOCUMENT, TITLE, client=client)
         self.assertIn("APIConnectionError", captured.getvalue())
+
+
+class DifferenceOperationTest(unittest.TestCase):
+    """Slice 29: subtraction is a supported operation now - safe only
+    because every operand's value is still checked against the number its
+    own exact_text spells out, sign included.
+    """
+
+    DOC = "Q4 revenue was $4,200,000, up from $3,950,000 in Q3 2026."
+
+    def _seg(self, **over):
+        base = {
+            "type": "computed", "display": "inline", "label": "QoQ change",
+            "operation": "difference",
+            "operands": [
+                {"exact_text": "$4,200,000", "value": 4200000.0},
+                {"exact_text": "$3,950,000", "value": 3950000.0},
+            ],
+            "has_total": False, "total_exact_text": "", "total_value": 0,
+            "result": 250000.0,
+            "sentence": "Revenue rose by {value} quarter over quarter.",
+            "format": "usd",
+        }
+        base.update(over)
+        return base
+
+    def test_correct_difference_is_recomputed_and_kept(self):  # Done when #1
+        out = analyze_document(self.DOC, TITLE, client=_fake_client([self._seg()]))
+        self.assertEqual(len(out), 1)
+        self.assertEqual(out[0]["value"], 250000.0)
+        self.assertEqual(out[0]["operation"], "difference")
+
+    def test_difference_with_a_wrong_result_is_dropped(self):  # Done when #1
+        with self.assertRaises(ValueError):
+            analyze_document(self.DOC, TITLE, client=_fake_client([self._seg(result=999999.0)]))
+
+    def test_difference_with_a_sign_flipped_operand_is_dropped(self):  # Done when #1
+        # The pre-Slice-29 exploit, retried under the new operation:
+        # "$3,950,000" really is in the document, but passing it as a
+        # negative value (making a - b silently a + b) must still fail the
+        # per-operand value check.
+        seg = self._seg(
+            operands=[
+                {"exact_text": "$4,200,000", "value": 4200000.0},
+                {"exact_text": "$3,950,000", "value": -3950000.0},
+            ],
+            result=8150000.0,
+        )
+        with self.assertRaises(ValueError):
+            analyze_document(self.DOC, TITLE, client=_fake_client([seg]))
+
+    def test_difference_with_only_one_operand_is_dropped(self):  # Done when #1
+        seg = self._seg(
+            operands=[{"exact_text": "$4,200,000", "value": 4200000.0}],
+            result=4200000.0,
+        )
+        with self.assertRaises(ValueError):
+            analyze_document(self.DOC, TITLE, client=_fake_client([seg]))
+
+
+class HorizonFieldTest(unittest.TestCase):
+    """Slice 29: every verified segment carries a horizon; a guidance
+    figure is verified exactly like any other quote.
+    """
+
+    def test_a_guidance_quote_is_verified_and_keeps_its_horizon(self):  # Done when #2
+        document = "Management guided full-year 2027 revenue to $50,000,000."
+        segments = [{
+            "type": "quote", "horizon": "guidance", "display": "stat",
+            "label": "FY2027 guidance", "exact_text": "$50,000,000",
+            "has_value": True, "value": 50000000.0,
+            "sentence": "Full-year revenue is guided to {value}.", "format": "usd",
+        }]
+        out = analyze_document(document, TITLE, client=_fake_client(segments))
+        self.assertEqual(out[0]["value"], 50000000.0)
+        self.assertEqual(out[0]["horizon"], "guidance")
+
+    def test_a_segment_with_no_horizon_defaults_to_reported(self):  # Done when #2
+        segments = [{
+            "type": "quote", "display": "inline", "label": "Revenue",
+            "exact_text": "$10,000,000", "has_value": True, "value": 10000000.0,
+            "sentence": "Q4 revenue was {value}.", "format": "usd",
+        }]
+        out = analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
+        self.assertEqual(out[0]["horizon"], "reported")
+
+    def test_an_unrecognised_horizon_falls_back_to_reported(self):  # Done when #2
+        segments = [{
+            "type": "quote", "horizon": "wishful", "display": "inline",
+            "label": "Revenue", "exact_text": "$10,000,000",
+            "has_value": True, "value": 10000000.0,
+            "sentence": "Q4 revenue was {value}.", "format": "usd",
+        }]
+        out = analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
+        self.assertEqual(out[0]["horizon"], "reported")
+
+    def test_prose_carries_a_horizon_too(self):
+        segments = [{"type": "prose", "horizon": "projected",
+                     "text": "Momentum should continue into 2027."}]
+        out = analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
+        self.assertEqual(out[0]["horizon"], "projected")
+
+
+class CoverageContractTest(unittest.TestCase):
+    """Slice 29: given a realistic multi-period response, the full
+    comparison set survives verification and coverage_summary reports it.
+    """
+
+    DOC = (
+        "Acme 2026 results. Q1 revenue was $3.20 billion. Q2 revenue was "
+        "$3.55 billion. Q3 revenue was $3.80 billion, up from Q2. Data "
+        "Services was $1.14 billion of the Q3 total. Full-year revenue is "
+        "guided to $15.00 billion."
+    )
+
+    SEGMENTS = [
+        {"type": "quote", "display": "inline", "label": "Q3 revenue",
+         "exact_text": "$3.80 billion", "has_value": True, "value": 3.8e9,
+         "sentence": "Q3 revenue was {value}.", "format": "usd"},
+        {"type": "quote", "display": "inline", "label": "Q2 revenue",
+         "exact_text": "$3.55 billion", "has_value": True, "value": 3.55e9,
+         "sentence": "Q2 revenue was {value}.", "format": "usd"},
+        {"type": "quote", "display": "inline", "label": "Q1 revenue",
+         "exact_text": "$3.20 billion", "has_value": True, "value": 3.2e9,
+         "sentence": "Q1 revenue was {value}.", "format": "usd"},
+        {"type": "computed", "display": "inline", "label": "QoQ growth",
+         "operation": "growth_percent",
+         "operands": [{"exact_text": "$3.55 billion", "value": 3.55e9},
+                      {"exact_text": "$3.80 billion", "value": 3.8e9}],
+         "has_total": False, "total_exact_text": "", "total_value": 0,
+         "result": 7.04, "sentence": "Revenue grew {value} from Q2 to Q3.",
+         "format": "percent"},
+        {"type": "computed", "display": "inline", "label": "QoQ change",
+         "operation": "difference",
+         "operands": [{"exact_text": "$3.80 billion", "value": 3.8e9},
+                      {"exact_text": "$3.55 billion", "value": 3.55e9}],
+         "has_total": False, "total_exact_text": "", "total_value": 0,
+         "result": 250000000.0, "sentence": "Revenue rose {value} from Q2 to Q3.",
+         "format": "usd"},
+        {"type": "computed", "display": "inline", "label": "Data Services share",
+         "operation": "percent_of_total",
+         "operands": [{"exact_text": "$1.14 billion", "value": 1.14e9}],
+         "has_total": True, "total_exact_text": "$3.80 billion", "total_value": 3.8e9,
+         "result": 30.0, "sentence": "Data Services was {value} of Q3 revenue.",
+         "format": "percent"},
+        {"type": "quote", "horizon": "guidance", "display": "stat",
+         "label": "FY guidance", "exact_text": "$15.00 billion",
+         "has_value": True, "value": 15e9,
+         "sentence": "Full-year revenue is guided to {value}.", "format": "usd"},
+        {"type": "computed", "horizon": "guidance", "display": "inline",
+         "label": "Implied H2 remaining", "operation": "difference",
+         "operands": [{"exact_text": "$15.00 billion", "value": 15e9},
+                      {"exact_text": "$3.20 billion", "value": 3.2e9},
+                      {"exact_text": "$3.55 billion", "value": 3.55e9},
+                      {"exact_text": "$3.80 billion", "value": 3.8e9}],
+         "has_total": False, "total_exact_text": "", "total_value": 0,
+         "result": 4450000000.0,
+         "sentence": "That leaves {value} to reach the full-year guide.",
+         "format": "usd"},
+    ]
+
+    def test_the_full_comparison_set_survives_verification(self):  # Done when #3
+        out = analyze_document(self.DOC, TITLE, client=_fake_client(self.SEGMENTS))
+        self.assertEqual(len(out), 8)  # nothing dropped
+
+    def test_coverage_summary_counts_comparisons_and_horizons(self):  # Done when #4
+        out = analyze_document(self.DOC, TITLE, client=_fake_client(self.SEGMENTS))
+        cov = coverage_summary(out)
+        self.assertEqual(cov["comparisons"], 4)      # growth, difference, pct_of_total, difference
+        self.assertEqual(cov["reported_figures"], 3)  # the three quoted quarters
+        self.assertEqual(cov["horizons"]["guidance"], 2)
+        self.assertEqual(cov["horizons"]["reported"], 6)
 
 
 if __name__ == "__main__":

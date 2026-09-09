@@ -28,13 +28,13 @@ DOCUMENT = (
 TITLE = "Q4 Review"
 
 
-def _fake_client(segments):
+def _fake_client(segments, stop_reason="tool_use"):
     """A minimal stand-in for anthropic.Anthropic() - just enough surface
     for analyze_document to call .messages.create(...) and read back a
     tool_use block shaped like the real SDK's response.
     """
     tool_use_block = SimpleNamespace(type="tool_use", input={"segments": segments})
-    response = SimpleNamespace(content=[tool_use_block])
+    response = SimpleNamespace(content=[tool_use_block], stop_reason=stop_reason)
     return SimpleNamespace(messages=SimpleNamespace(create=lambda **kwargs: response))
 
 
@@ -669,6 +669,27 @@ class RealFilingTablesTest(unittest.TestCase):
         }]
         out = analyze_document(doc, TITLE, client=_fake_client(segs))
         self.assertEqual(out[0]["value"], 498_000_000.0)
+
+    def test_a_truncated_response_is_logged_loudly(self):  # Slice 34
+        # a dense filing that overran max_tokens: valid segments still
+        # verify, but the truncation must be visible in the logs
+        good = {
+            "type": "quote", "display": "inline", "label": "Revenue",
+            "exact_text": "1,842.0", "has_value": True, "value": 1_842_000_000.0,
+            "sentence": "Revenue was {value}.", "format": "usd",
+        }
+        buf = io.StringIO()
+        with redirect_stderr(buf):
+            analyze_document(self.DOC, TITLE, client=_fake_client([good], stop_reason="max_tokens"))
+        self.assertIn("hit max_tokens", buf.getvalue())
+
+    def test_a_truncation_that_leaves_nothing_verifiable_says_so(self):  # Slice 34
+        bad = {"type": "quote", "display": "inline", "label": "x",
+               "exact_text": "not in the document at all", "has_value": False}
+        buf = io.StringIO()
+        with redirect_stderr(buf), self.assertRaises(ValueError):
+            analyze_document(self.DOC, TITLE, client=_fake_client([bad], stop_reason="max_tokens"))
+        self.assertIn("TRUNCATED", buf.getvalue())
 
 
 if __name__ == "__main__":

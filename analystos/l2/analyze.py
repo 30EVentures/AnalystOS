@@ -705,9 +705,16 @@ def analyze_document(document_text, title, client=None):
 
     tool_use = next((b for b in response.content if b.type == "tool_use"), None)
     if tool_use is None:
+        kinds = [getattr(b, "type", "?") for b in getattr(response, "content", [])]
+        print(
+            f"[analystos.l2.analyze] no tool_use block. stop_reason="
+            f"{getattr(response, 'stop_reason', '?')!r}, content blocks={kinds}",
+            file=sys.stderr,
+        )
         raise ValueError("model did not return a report")
 
-    raw_segments = tool_use.input.get("segments", [])
+    tool_input = tool_use.input if isinstance(tool_use.input, dict) else {}
+    raw_segments = tool_input.get("segments") or []
     verified = []
     reasons = []
     for seg in raw_segments:
@@ -718,16 +725,22 @@ def analyze_document(document_text, title, client=None):
             reasons.append(reason)
 
     if not verified:
-        # Log why every segment was dropped - to Vercel's function logs, not
-        # the client response. A bare "nothing survived" was undiagnosable
-        # (found live 2026-09-09 on a real earnings release); this is the
-        # same server-side-logging fix Slice 27 made for the narrative pass.
-        detail = "; ".join(reasons[:8]) if reasons else "the model returned no segments"
+        # Everything about the failure, to Vercel's function logs only (never
+        # the client response) - a bare "nothing survived" was undiagnosable
+        # across three fix attempts, live, 2026-09-09. This dump names the
+        # cause on the very next failed request: doc size, detected scale,
+        # truncation, how many segments the model sent, the first few it
+        # sent (type + the text it tried to cite), and why each was dropped.
+        head = [
+            f"{(s.get('type') or '?')}:{(s.get('exact_text') or s.get('text') or (s.get('event') or {}).get('what') or '')[:80]!r}"
+            for s in raw_segments[:5]
+        ]
         print(
-            f"[analystos.l2.analyze] no verifiable content: {len(raw_segments)} "
-            f"segment(s) returned, 0 verified"
-            f"{' (RESPONSE WAS TRUNCATED at max_tokens)' if truncated else ''}. "
-            f"Reasons: {detail}",
+            f"[analystos.l2.analyze] NO VERIFIABLE CONTENT. "
+            f"doc={len(document_text)} chars, scale={doc_scale}, "
+            f"truncated={truncated}, segments_returned={len(raw_segments)}. "
+            f"first: {head}. "
+            f"drop reasons: {reasons[:10] if reasons else 'model returned no segments'}",
             file=sys.stderr,
         )
         raise ValueError("no verifiable content survived - nothing the model said could be confirmed against the real document")

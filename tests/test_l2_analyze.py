@@ -4,13 +4,22 @@ real API call, no cost, no network dependency, so this suite runs clean
 with no ANTHROPIC_API_KEY at all.
 """
 
+import io
 import unittest
+from contextlib import redirect_stderr
 from types import SimpleNamespace
 
 import anthropic
 import httpx2
 
-from analystos.l2.analyze import analyze_document, coverage_summary
+from analystos.l2.analyze import (
+    _detect_scale,
+    _match_key,
+    _really_in_document,
+    _value_matches_text,
+    analyze_document,
+    coverage_summary,
+)
 
 DOCUMENT = (
     'Q4 revenue was $10,000,000, up from $8,000,000 in Q3. '
@@ -545,6 +554,121 @@ class EventSegmentTest(unittest.TestCase):
         }
         out = analyze_document(self.DOC, TITLE, client=_fake_client([self._event(), quote]))
         self.assertEqual(coverage_summary(out)["events"], 1)
+
+
+class RealFilingTablesTest(unittest.TestCase):
+    """Slice 33: a table-heavy filing that states its unit once. Meridian
+    (all prose, every figure spelled out "$498.0 million") hid these; a
+    real condensed income statement broke verification to zero live.
+    """
+
+    # An L1-style extraction of a condensed statement: a scale line, then
+    # a pipe-delimited table, the way analystos.l1.document_text renders it.
+    DOC = (
+        "Calderon Grid Technologies — Third Quarter 2026 Results\n"
+        "In millions of U.S. dollars, except per share amounts.\n"
+        "Table 1:\n"
+        " | Q3 2026 | Q2 2026 | Q3 2025\n"
+        "Revenue | 1,842.0 | 1,788.0 | 1,715.0\n"
+        "Operating income | 110.0 | 150.0 | 149.1\n"
+        "Diluted earnings per share | 0.22 | 0.34 | 0.35\n"
+    )
+
+    def test_detect_scale_reads_the_unit_declaration(self):
+        self.assertEqual(_detect_scale(self.DOC), 1_000_000)
+        self.assertEqual(_detect_scale("Amounts in thousands. Revenue 4,200."), 1_000)
+        self.assertEqual(_detect_scale("figures in millions of US dollars"), 1_000_000)
+        self.assertEqual(_detect_scale("Q4 revenue was $498.0 million."), 1)  # prose, no unit line
+
+    def test_match_key_folds_typography_not_digits(self):
+        self.assertIn("revenue 1842.0", _match_key("Revenue | 1,842.0 | 1,788.0"))
+        self.assertTrue(_really_in_document("$1,842.0", _match_key(self.DOC)))
+        self.assertTrue(_really_in_document("Revenue 1842.0", _match_key(self.DOC)))
+        # a model that re-appends the header's unit word still locates the cell
+        self.assertTrue(_really_in_document("1,842.0 million", _match_key(self.DOC)))
+        # a number that isn't in the document still cannot match
+        self.assertFalse(_really_in_document("9,999.0", _match_key(self.DOC)))
+
+    def test_a_bare_cell_number_locates_but_a_mislabelled_pair_does_not(self):
+        mk = _match_key(self.DOC)
+        # the prompt tells the model to cite a non-leading cell by the
+        # number alone - that always locates
+        self.assertTrue(_really_in_document("1,715.0", mk))
+        self.assertTrue(_really_in_document("0.35", mk))
+        # row-label + distant cell is refused rather than risk accepting a
+        # mislabelled number - a false "verified" is never acceptable
+        self.assertFalse(_really_in_document("Operating income 1,715.0", mk))
+
+    def test_value_matches_text_accepts_the_declared_scale(self):
+        # the model gave the actual magnitude for a "1,842.0" cell in millions
+        self.assertEqual(_value_matches_text(1_842_000_000.0, "1,842.0", 1_000_000), 1_842_000_000.0)
+        # the model left it unscaled - still matches (stored as-is), not dropped
+        self.assertEqual(_value_matches_text(1_842.0, "1,842.0", 1_000_000), 1_842.0)
+        # a fabricated magnitude matches neither scale
+        self.assertIsNone(_value_matches_text(9_999_000_000.0, "1,842.0", 1_000_000))
+        # sign flip still rejected (Slice 29 guard holds)
+        self.assertIsNone(_value_matches_text(-1_050.0, "1,050", 1_000_000))
+
+    def test_a_scaled_table_quote_verifies_and_is_stored_at_real_size(self):
+        segs = [{
+            "type": "quote", "display": "stat", "label": "Q3 revenue",
+            "exact_text": "Revenue 1,842.0", "has_value": True, "value": 1_842_000_000.0,
+            "sentence": "Third-quarter revenue was {value}.", "format": "usd",
+        }]
+        out = analyze_document(self.DOC, TITLE, client=_fake_client(segs))
+        self.assertEqual(out[0]["value"], 1_842_000_000.0)
+
+    def test_a_quote_that_re_adds_the_dollar_sign_and_unit_still_verifies(self):
+        segs = [{
+            "type": "quote", "display": "inline", "label": "Q3 revenue",
+            "exact_text": "$1,842.0 million", "has_value": True, "value": 1_842_000_000.0,
+            "sentence": "Revenue reached {value}.", "format": "usd",
+        }]
+        out = analyze_document(self.DOC, TITLE, client=_fake_client(segs))
+        self.assertEqual(out[0]["value"], 1_842_000_000.0)
+
+    def test_growth_on_scaled_table_operands_verifies_even_if_left_unscaled(self):
+        # bare-cell citations (what the prompt now tells the model to use
+        # for a non-leading table column), left at the table's printed
+        # scale - the growth % is scale-invariant, and both operands are
+        # canonicalised to real size before the recompute either way.
+        segs = [{
+            "type": "computed", "display": "inline", "label": "Revenue growth",
+            "operation": "growth_percent",
+            "operands": [
+                {"exact_text": "1,715.0", "value": 1_715.0},
+                {"exact_text": "1,842.0", "value": 1_842.0},
+            ],
+            "has_total": False, "total_exact_text": "", "total_value": 0,
+            "result": 7.4,
+            "sentence": "Revenue grew {value} year over year.", "format": "percent",
+        }]
+        out = analyze_document(self.DOC, TITLE, client=_fake_client(segs))
+        self.assertAlmostEqual(out[0]["value"], (1842 - 1715) / 1715 * 100, places=1)
+
+    def test_total_verification_failure_is_logged_with_reasons(self):
+        segs = [
+            {"type": "quote", "display": "inline", "label": "x",
+             "exact_text": "Revenue of $9,999.9 billion", "has_value": True,
+             "value": 9_999_900_000_000.0, "sentence": "It was {value}.", "format": "usd"},
+            {"type": "prose", "text": "Growth was roughly 45% this quarter."},
+        ]
+        buf = io.StringIO()
+        with redirect_stderr(buf), self.assertRaises(ValueError):
+            analyze_document(self.DOC, TITLE, client=_fake_client(segs))
+        logged = buf.getvalue()
+        self.assertIn("0 verified", logged)
+        self.assertIn("not found in document", logged)
+
+    def test_prose_only_meridian_style_document_is_unaffected(self):
+        doc = "Third-quarter revenue was $498.0 million, up 9.5% from the prior quarter."
+        segs = [{
+            "type": "quote", "display": "inline", "label": "Revenue",
+            "exact_text": "$498.0 million", "has_value": True, "value": 498_000_000.0,
+            "sentence": "Revenue was {value}.", "format": "usd",
+        }]
+        out = analyze_document(doc, TITLE, client=_fake_client(segs))
+        self.assertEqual(out[0]["value"], 498_000_000.0)
 
 
 if __name__ == "__main__":

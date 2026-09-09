@@ -9,13 +9,22 @@ model is never allowed to just state a number, though. Every segment it
 returns is one of:
 
 - a **quote**: a claim backed by ``exact_text`` the model asserts appears
-  verbatim in the source. Verified here by an actual substring check
-  against the real document text - not "the model says so." A quote that
-  doesn't check out is dropped, never shown. When the quote carries a
-  numeric ``value``, that value must itself match the number ``exact_text``
-  actually spells out (``_value_matches_text``) - a real substring alone
-  only proves the *text* is real, not that the *number* paired with it is
-  (see ``docs/decisions.md``, 2026-09-06, for the live case this closed).
+  in the source. Verified here by a substring check against the real
+  document text - not "the model says so." The check folds away how a
+  number is *typeset* (a table's ``1,842.0`` vs prose's ``$1,842.0
+  million`` vs a guidance row's ``$1,880M``) but never a digit sequence
+  the source doesn't contain (``_match_key`` / ``_really_in_document``) -
+  a byte-exact check verified a whole real earnings release to zero,
+  because a model reasons about a figure rather than character-copying it
+  (found live 2026-09-09, Slice 33). A quote that doesn't check out is
+  dropped, never shown. When the quote carries a numeric ``value``, that
+  value must match the number ``exact_text`` spells out, at face value or
+  at the document's declared scale (``_detect_scale`` /
+  ``_value_matches_text``: "In millions of U.S. dollars" makes a cell
+  printed ``1,842.0`` mean 1,842,000,000) - a real substring alone only
+  proves the *text* is real, not that the *number* paired with it is
+  (see ``docs/decisions.md``, 2026-09-06 and Slice 33, for the live cases
+  this closed).
 - a **computed** value (a sum, a ratio, a growth rate, a share of total,
   a difference): the model gives the raw ``operands`` (each with its own
   ``exact_text``, same substring-and-value check as a quote) and the
@@ -133,13 +142,23 @@ ignore them:
   a sentence with surrounding context - choose whichever serves the \
   reader. Use "inline" for "prose" (ignored there).
 - "label": a short heading for the figure. "" if not applicable.
-- "exact_text": for "quote", the exact substring copied verbatim from the \
-  document - not paraphrased, not reformatted. "" for "computed"/"prose".
+- "exact_text": for "quote", text copied straight from the document - the \
+  figure plus enough neighbouring words to locate it. Copy it as printed. \
+  This document's tables are rendered as "Label | value | value | value" \
+  rows; quote a cell as its row label followed by the number ("Diluted \
+  earnings per share 0.22") or the number alone ("1,842.0"). Do NOT \
+  abbreviate the label, add a "$", or add a scale word ("million") the \
+  cell itself does not show. "" for "computed"/"prose".
 - "has_value": true only for a "quote" whose exact_text is itself a \
   number you want rendered as a value (see "value"); false for a \
   qualitative quote (a name, a short phrase) or any non-"quote" segment.
-- "value": the number for a "quote" with has_value true. 0 otherwise - \
-  never write an estimated number here just to fill the field.
+- "value": for a "quote" with has_value true, the ACTUAL numeric \
+  magnitude the figure represents. If the document declares its amounts \
+  are in thousands or millions (check the table headers and any "in \
+  millions of U.S. dollars" line), scale accordingly: a table headed "in \
+  millions" showing "1,842.0" has value 1842000000. Percentages, \
+  per-share amounts and share counts are never scaled this way. 0 for a \
+  non-value segment - never write an estimated number to fill the field.
 - "sentence": for "quote" with has_value true, and for "computed", a \
   one-sentence template with exactly one {value} placeholder where the \
   number goes - never write the number itself, it's filled in for you. \
@@ -167,8 +186,9 @@ ignore them:
   (e.g. the gap between full-year guidance and the actuals so far is \
   "guidance").
 - "operands": for "computed", the raw numbers behind the calculation, \
-  each with its own exact_text (copied verbatim from the document) and \
-  value. [] otherwise.
+  each with its own exact_text (copied from the document, same table \
+  rules as above) and value (the ACTUAL magnitude, scaled the same way as \
+  above). [] otherwise.
 - "has_total": true only for a "computed" "percent_of_total" whose \
   total_exact_text/total_value are a real, quoted total from the \
   document. false otherwise.
@@ -265,14 +285,60 @@ _TOOL = {
 }
 
 
-def _normalize(text):
-    return " ".join(text.split())
+# --- tolerant matching -----------------------------------------------------
+# A real filing typesets the same figure many ways: "1,842.0" in a table,
+# "$1,842.0 million" in prose, "$1,880M" in a guidance row. The model reasons
+# about the number rather than character-copying it, so a byte-exact
+# substring check drops almost everything a table-heavy document produces
+# (found live 2026-09-09: a whole earnings release verified to zero). The
+# checks below forgive *typography* - never a digit sequence that isn't in
+# the source, which stays intact and in order.
+
+_THOUSANDS_SEP_RE = re.compile(r"(?<=\d),(?=\d{3}(?:\D|$))")
+_TRAILING_SCALE_RE = re.compile(
+    r"\s*(?:thousand|million|billion|bn|mm|k|m|b)\s*$", re.IGNORECASE
+)
 
 
-def _really_in_document(exact_text, normalized_document):
+def _match_key(text):
+    """Fold away how a number or table cell is typeset: lowercase, unify
+    dashes, drop ``$`` and the ``|`` our own table rendering inserts, strip
+    thousands separators from digit groups, collapse whitespace.
+    """
+    t = text.lower().replace("–", "-").replace("—", "-").replace("−", "-")
+    t = t.replace("$", " ").replace("|", " ")
+    t = _THOUSANDS_SEP_RE.sub("", t)
+    return " ".join(t.split())
+
+
+def _really_in_document(exact_text, match_document):
+    """True if ``exact_text`` locates real text in ``match_document`` (which
+    is already ``_match_key``-folded). Two tiers, both incapable of passing
+    a digit sequence the source doesn't contain:
+
+    1. the folded text is a substring;
+    2. it is a substring with one trailing scale word removed - a model
+       reading a scaled table often re-appends the unit the header declared
+       ("1,842.0" -> "$1,842.0 million"), and stripping a word it added
+       cannot fabricate a match.
+
+    A model that prepends a row label to a *non-leading* table cell
+    ("Diluted earnings per share 0.35", where our pipe-flattened text has
+    "... per share 0.22 0.34 0.35") still fails here - deliberately: tying
+    a label to a distant number by proximity risks accepting a *mislabelled*
+    one, and a false "verified" is the one outcome this must never produce.
+    The prompt tells the model to cite such a cell by the number alone; a
+    miss is logged with the exact reason.
+    """
     if not exact_text or not exact_text.strip():
         return False
-    return _normalize(exact_text) in normalized_document
+    key = _match_key(exact_text)
+    if not key:
+        return False
+    if key in match_document:
+        return True
+    stripped = _TRAILING_SCALE_RE.sub("", key).strip()
+    return bool(stripped) and stripped != key and stripped in match_document
 
 
 _NUMBER_TOKEN_RE = re.compile(
@@ -307,20 +373,56 @@ def _parse_number(text):
     return value
 
 
-def _value_matches_text(value, exact_text):
-    """Does ``exact_text`` actually spell out ``value``? A real substring
-    match on ``exact_text`` alone proves the *text* is real - it says
-    nothing about whether the *number* paired with it is. Without this,
-    a model can cite a real quote and pair it with an arbitrary value
-    (found live: a "net additions" claim computed as sum([1240, -1050])
-    - "1,050" really is in the document, but the model silently negated
-    it, smuggling a subtraction past the five supported operations, none
-    of which is subtraction). See ``docs/decisions.md``, 2026-09-06.
+_SCALE_DECLARATION_RE = re.compile(
+    r"\bin\s+(thousands|millions|billions)\b"
+    r"|\b(thousands|millions|billions)\s+of\s+(?:u\.?\s?s\.?\s+)?dollars\b",
+    re.IGNORECASE,
+)
+_DECLARED_SCALE = {"thousands": 1_000, "millions": 1_000_000, "billions": 1_000_000_000}
+_SCALE_NAME = {1_000: "thousands", 1_000_000: "millions", 1_000_000_000: "billions"}
+
+
+def _detect_scale(document_text):
+    """Financial tables state their unit once ("In millions of U.S.
+    dollars") and then print "1,842.0" to mean 1,842,000,000. Return that
+    multiplier - 1 when the document declares none (a plain memo, or prose
+    that spells every figure out). When several are declared, the largest
+    wins: the primary statements carry the biggest unit, an exception like
+    "share data in thousands" is the minority.
+    """
+    found = {
+        _DECLARED_SCALE[(m.group(1) or m.group(2)).lower()]
+        for m in _SCALE_DECLARATION_RE.finditer(document_text)
+    }
+    return max(found) if found else 1
+
+
+def _value_matches_text(value, exact_text, doc_scale=1):
+    """The canonical numeric value ``exact_text`` supports for ``value``,
+    or ``None`` if it supports none.
+
+    A real substring match on ``exact_text`` proves the *text* is real; it
+    says nothing about whether the *number* paired with it is. Without this
+    a model can cite a real quote and pair an arbitrary value with it
+    (found live: "net additions" as sum([1240, -1050]) - "1,050" is really
+    in the document, silently negated). ``exact_text`` may carry its own
+    scale word ("$1.2 million" -> 1_200_000) or be bare as a scaled table
+    prints it ("1,842.0", document declared "in millions" -> 1.842e9).
+    ``value`` matches the parsed number as-is *or* that number times the
+    document's declared scale; the matched magnitude is returned, so a
+    figure the model left unscaled is still stored - and rendered - at its
+    real size. Sign is preserved, so the Slice-29 sign-flip guard holds
+    (-1050 never matches 1050).
     """
     if value is None:
-        return False
+        return None
     parsed = _parse_number(exact_text)
-    return parsed is not None and _close_enough(parsed, value)
+    if parsed is None:
+        return None
+    for candidate in (parsed, parsed * doc_scale):
+        if _close_enough(candidate, value):
+            return candidate
+    return None
 
 
 def _recompute(operation, values, total_value=None):
@@ -365,54 +467,73 @@ def _horizon(seg):
     return h if h in _HORIZONS else "reported"
 
 
-def _verify_quote(seg, normalized_document):
+def _verify_quote(seg, match_document, doc_scale):
     exact_text = seg.get("exact_text", "")
-    if not _really_in_document(exact_text, normalized_document):
-        return None
+    if not _really_in_document(exact_text, match_document):
+        return None, f"quote exact_text not found in document: {exact_text!r}"
     if not seg.get("has_value"):
-        return {"type": "quote", "horizon": _horizon(seg),
-                "display": seg.get("display", "inline"),
-                "label": seg.get("label"), "text": exact_text, "citation": exact_text}
-    if not _value_matches_text(seg.get("value"), exact_text):
-        return None
+        return {
+            "type": "quote", "horizon": _horizon(seg),
+            "display": seg.get("display", "inline"),
+            "label": seg.get("label"), "text": exact_text, "citation": exact_text,
+        }, None
+    canonical = _value_matches_text(seg.get("value"), exact_text, doc_scale)
+    if canonical is None:
+        return None, (
+            f"quote value {seg.get('value')!r} does not match the number in "
+            f"exact_text {exact_text!r}"
+        )
     sentence = seg.get("sentence", "")
     if len(_PLACEHOLDER_RE.findall(sentence)) != 1:
-        return None
+        return None, f"quote sentence needs exactly one {{value}} placeholder: {sentence!r}"
     return {
         "type": "quote", "horizon": _horizon(seg),
         "display": seg.get("display", "inline"),
         "label": seg.get("label"), "sentence": sentence,
-        "value": seg["value"], "format": seg.get("format", "number"),
+        "value": canonical, "format": seg.get("format", "number"),
         "citation": exact_text,
-    }
+    }, None
 
 
-def _verify_computed(seg, normalized_document):
+def _verify_computed(seg, match_document, doc_scale):
     operation = seg.get("operation")
     operands = seg.get("operands") or []
     sentence = seg.get("sentence", "")
     if operation not in _OPERATIONS or not operands:
-        return None
+        return None, f"computed segment has no operands or a bad operation: {operation!r}"
     if len(_PLACEHOLDER_RE.findall(sentence)) != 1:
-        return None
+        return None, f"computed sentence needs exactly one {{value}} placeholder: {sentence!r}"
+    values = []
     for op in operands:
-        if not _really_in_document(op.get("exact_text", ""), normalized_document):
-            return None
-        if not _value_matches_text(op.get("value"), op["exact_text"]):
-            return None
-    total_value = seg.get("total_value")
+        op_text = op.get("exact_text", "")
+        if not _really_in_document(op_text, match_document):
+            return None, f"computed operand not found in document: {op_text!r}"
+        canonical = _value_matches_text(op.get("value"), op_text, doc_scale)
+        if canonical is None:
+            return None, (
+                f"computed operand value {op.get('value')!r} does not match "
+                f"exact_text {op_text!r}"
+            )
+        values.append(canonical)
+    total_canonical = None
     if operation == "percent_of_total":
-        if not seg.get("has_total") or not _really_in_document(
-            seg.get("total_exact_text", ""), normalized_document
-        ):
-            return None
-        if not _value_matches_text(total_value, seg["total_exact_text"]):
-            return None
-    values = [op["value"] for op in operands]
-    recomputed = _recompute(operation, values, total_value)
+        if not seg.get("has_total"):
+            return None, "percent_of_total has has_total false - no real quoted total"
+        total_text = seg.get("total_exact_text", "")
+        if not _really_in_document(total_text, match_document):
+            return None, f"percent_of_total total not found in document: {total_text!r}"
+        total_canonical = _value_matches_text(
+            seg.get("total_value"), total_text, doc_scale
+        )
+        if total_canonical is None:
+            return None, f"percent_of_total total value does not match {total_text!r}"
+    recomputed = _recompute(operation, values, total_canonical)
     if recomputed is None or not _close_enough(recomputed, seg.get("result", float("nan"))):
-        return None
-    citations = [op["exact_text"] for op in operands]
+        return None, (
+            f"recomputed {operation} = {recomputed!r} does not match the model's "
+            f"result {seg.get('result')!r}"
+        )
+    citations = [op.get("exact_text", "") for op in operands]
     if operation == "percent_of_total":
         citations.append(seg["total_exact_text"])
     return {
@@ -421,53 +542,60 @@ def _verify_computed(seg, normalized_document):
         "label": seg.get("label"), "sentence": sentence,
         "value": recomputed, "format": seg.get("format", "number"),
         "citation": citations,
-    }
+    }, None
 
 
 def _verify_prose(seg):
     text = seg.get("text", "")
-    if not text.strip() or _DIGIT_RE.search(_CALENDAR_RE.sub("", text)):
-        return None
-    return {"type": "prose", "horizon": _horizon(seg), "text": text}
+    if not text.strip():
+        return None, "prose segment is empty"
+    if _DIGIT_RE.search(_CALENDAR_RE.sub("", text)):
+        return None, f"prose has a digit outside a calendar reference: {text!r}"
+    return {"type": "prose", "horizon": _horizon(seg), "text": text}, None
 
 
-def _verify_event(seg, normalized_document):
+def _verify_event(seg, match_document):
     """An ``event`` carries a timeline, not a number: ``what`` / ``date`` /
-    ``status`` / ``next_step``, every one a verbatim substring of the
-    source. ``what`` is required; each *supplied* (non-empty) other part
-    must check out too, or the whole event is dropped - a half-verified
-    timeline is worse than none. The model never writes an event's dates
-    into prose; L4's ``event_line`` composes the verified parts, so every
-    digit on an event line traces to the source.
+    ``status`` / ``next_step``, every one a substring of the source. ``what``
+    is required; each *supplied* (non-empty) other part must check out too,
+    or the whole event is dropped - a half-verified timeline is worse than
+    none. The model never writes an event's dates into prose; L4's
+    ``event_line`` composes the verified parts, so every digit on an event
+    line traces to the source.
     """
     event = seg.get("event") or {}
     what = (event.get("what") or "").strip()
-    if not _really_in_document(what, normalized_document):
-        return None
+    if not _really_in_document(what, match_document):
+        return None, f"event 'what' not found in document: {what!r}"
     parts = {}
     for key in ("date", "status", "next_step"):
         piece = (event.get(key) or "").strip()
-        if piece and not _really_in_document(piece, normalized_document):
-            return None
+        if piece and not _really_in_document(piece, match_document):
+            return None, f"event {key!r} not found in document: {piece!r}"
         parts[key] = piece
     return {
         "type": "event", "horizon": _horizon(seg),
         "what": what, "date": parts["date"], "status": parts["status"],
         "next_step": parts["next_step"], "citation": what,
-    }
+    }, None
 
 
-def _verify_segment(seg, normalized_document):
+def _verify_segment(seg, match_document, doc_scale):
+    """Return ``(verified_segment, None)`` or ``(None, reason)`` - the reason
+    is logged server-side when nothing survives, so a total verification
+    failure is diagnosable instead of just "it failed" (the same gap
+    Slice 27 closed for the narrative pass).
+    """
     kind = seg.get("type")
     if kind == "quote":
-        return _verify_quote(seg, normalized_document)
+        return _verify_quote(seg, match_document, doc_scale)
     if kind == "computed":
-        return _verify_computed(seg, normalized_document)
+        return _verify_computed(seg, match_document, doc_scale)
     if kind == "event":
-        return _verify_event(seg, normalized_document)
+        return _verify_event(seg, match_document)
     if kind == "prose":
         return _verify_prose(seg)
-    return None
+    return None, f"unknown segment type: {kind!r}"
 
 
 def _resolve_client(client):
@@ -528,7 +656,17 @@ def analyze_document(document_text, title, client=None):
     unconverted would instead surface as a raw, unhandled server error.
     """
     client = _resolve_client(client)
-    normalized_document = _normalize(document_text)
+    match_document = _match_key(document_text)
+    doc_scale = _detect_scale(document_text)
+
+    scale_note = ""
+    if doc_scale != 1:
+        scale_note = (
+            f'\n\n(This document states amounts in {_SCALE_NAME[doc_scale]}. In '
+            f'every "value" and every operand "value", give the ACTUAL magnitude '
+            f'- a figure printed as "1,842.0" here is {int(1842.0 * doc_scale)}. '
+            f"Percentages, per-share amounts and share counts are not scaled.)"
+        )
 
     response = _create_message(
         client,
@@ -537,7 +675,9 @@ def analyze_document(document_text, title, client=None):
         system=_SYSTEM_PROMPT,
         tools=[_TOOL],
         tool_choice={"type": "tool", "name": "write_report"},
-        messages=[{"role": "user", "content": f'Title: "{title}"\n\n{document_text}'}],
+        messages=[
+            {"role": "user", "content": f'Title: "{title}"\n\n{document_text}{scale_note}'}
+        ],
     )
 
     tool_use = next((b for b in response.content if b.type == "tool_use"), None)
@@ -545,12 +685,34 @@ def analyze_document(document_text, title, client=None):
         raise ValueError("model did not return a report")
 
     raw_segments = tool_use.input.get("segments", [])
-    verified = [
-        v for v in (_verify_segment(seg, normalized_document) for seg in raw_segments)
-        if v is not None
-    ]
+    verified = []
+    reasons = []
+    for seg in raw_segments:
+        result, reason = _verify_segment(seg, match_document, doc_scale)
+        if result is not None:
+            verified.append(result)
+        elif reason:
+            reasons.append(reason)
+
     if not verified:
+        # Log why every segment was dropped - to Vercel's function logs, not
+        # the client response. A bare "nothing survived" was undiagnosable
+        # (found live 2026-09-09 on a real earnings release); this is the
+        # same server-side-logging fix Slice 27 made for the narrative pass.
+        detail = "; ".join(reasons[:8]) if reasons else "the model returned no segments"
+        print(
+            f"[analystos.l2.analyze] no verifiable content: {len(raw_segments)} "
+            f"segment(s) returned, 0 verified. Reasons: {detail}",
+            file=sys.stderr,
+        )
         raise ValueError("no verifiable content survived - nothing the model said could be confirmed against the real document")
+
+    if reasons:
+        print(
+            f"[analystos.l2.analyze] {len(verified)} verified, {len(reasons)} "
+            f"dropped: {'; '.join(reasons[:5])}",
+            file=sys.stderr,
+        )
     return verified
 
 

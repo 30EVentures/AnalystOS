@@ -2,6 +2,50 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-09 — Verification that survives a real filing's tables and scale (Slice 33)
+
+A realistic fictional earnings release, uploaded to the live site,
+returned **"no verifiable content survived"** — every segment the model
+returned was dropped. `analyze_document`'s checks were tuned to Meridian
+(five prose paragraphs, every figure spelled out "$498.0 million"); a real
+condensed income statement is a pipe-delimited table headed "In millions
+of U.S. dollars", and against that the checks reject everything.
+
+- **Byte-exact substring citation was the wrong bar.** A model reasons
+  about a figure and re-expresses it — `1,842.0` in the table becomes
+  `$1,842.0 million` / `$1,842` / `1842.0` — and an exact `in` check drops
+  each. Fixed with `_match_key` (folds case, dashes, `$`, the `|` our L1
+  rendering inserts, and thousands separators — never the digits) plus a
+  trailing-scale-word fallback in `_really_in_document`. A model that
+  prepends a row label to a *non-leading* cell still fails, on purpose:
+  tying a label to a distant number by proximity risks accepting a
+  *mislabelled* one, and a false "verified" is the one thing this must
+  never do.
+- **No notion of a table's declared scale.** `_detect_scale` reads "in
+  millions" / "in thousands" once; `_value_matches_text` now accepts the
+  model's `value` at face value *or* times the declared scale, and returns
+  whichever matched (canonical value) — so a figure the model scaled to
+  its real magnitude verifies and is stored/rendered correctly, and one
+  left unscaled still verifies (no regression). Sign preserved, so the
+  Slice 29 sign-flip guard holds. The user message also states the
+  detected scale and that per-share amounts, percentages and share counts
+  are not scaled.
+- **The failure logged nothing about *why*** — the same "no clue why"
+  hole Slice 27 closed for the narrative pass. `_verify_*` now return
+  `(segment, None)` or `(None, reason)`; a total failure logs the first
+  several reasons to stderr (Vercel logs), never the client response.
+- Verified beyond the suite: the real L1 extraction of the document that
+  failed live, fed a hand-authored model response mimicking real
+  table-citation behaviour — 8 of 10 segments verified (was 0), dollar
+  cells stored at real magnitude, per-share values untouched, a
+  fabricated figure and wrong arithmetic dropped with logged reasons.
+  Meridian and every prior fixture unaffected (a document declaring no
+  unit has `doc_scale == 1` and the new checks collapse to the old ones).
+- Not fixed here, its own slice: column-aware L1 extraction (keep a cell
+  tied to its row label / column header) so a "RowLabel Cell" citation of
+  any column verifies. This slice makes that citation fail *safely and
+  visibly*, not silently.
+
 ## 2026-09-08 — Dated events as a verified, structured fact (Slice 32)
 
 The system was rigorous with numbers and weak with events - an

@@ -2,6 +2,34 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-09 — The output-token ceiling on a dense document (Slice 34)
+
+Slice 33 fixed how verification matches; the realistic earnings release
+still returned "no verifiable content survived" once deployed. The tell:
+that request ran **1m38s** on Vercel - a single Sonnet call on an
+8.5k-char document should take 20-40s. 98s is the signature of hitting
+the output ceiling. `max_tokens` was 4096; a dense filing (four tables)
+makes the model emit 20+ segments in the verbose all-required schema, it
+overruns 4096, and the tool call is truncated mid-JSON - the segment
+list comes back short or with a half-written last entry, and little or
+nothing verifies. Meridian (5 paragraphs, ~7 segments) never came close.
+
+- **`_MAX_TOKENS` 4096 -> 8192** in `analyze_document` and
+  `write_narrative` (a rich report over a dense document can also
+  outgrow 4096). Direct fix.
+- **`stop_reason == "max_tokens"` is now logged** to stderr, and the
+  "no verifiable content" log flags `(RESPONSE WAS TRUNCATED at
+  max_tokens)` - the failure that had no fingerprint now has an obvious
+  one.
+- **Prompt caps output at 20 segments** and says not to transcribe
+  tables - prefer a computed comparison or a prose point tying figures
+  together. Keeps the response in budget and makes a better report.
+- **Schema shape left alone.** Slimming the all-required per-segment
+  schema (the reason each segment is verbose) risks re-triggering
+  Slice 26's "400 Schema is too complex"; the token bump plus the cap
+  solve it without that risk. Revisit only if 8192 + a 20-cap still
+  truncates.
+
 ## 2026-09-09 — Verification that survives a real filing's tables and scale (Slice 33)
 
 A realistic fictional earnings release, uploaded to the live site,

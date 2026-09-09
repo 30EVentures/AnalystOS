@@ -70,6 +70,7 @@ from analystos.l2.analyze import (
 from analystos.l4.export import display_value
 
 _MODEL = "claude-sonnet-5"
+_MAX_TOKENS = 8192  # a rich report over a dense document can outgrow 4096 - see analyze.py
 _PLACEHOLDER_RE = re.compile(r"\{\{(\d+)\}\}")
 _CHART_TYPES = ("bar", "line", "donut")
 _CHART_FORMATS = ("usd", "percent", "number")
@@ -381,12 +382,19 @@ def write_narrative(segments, title, client=None):
     response = _create_message(
         client,
         model=_MODEL,
-        max_tokens=4096,
+        max_tokens=_MAX_TOKENS,
         system=_SYSTEM_PROMPT,
         tools=[_TOOL],
         tool_choice={"type": "tool", "name": "write_narrative"},
         messages=[{"role": "user", "content": user_content}],
     )
+
+    if getattr(response, "stop_reason", None) == "max_tokens":
+        print(
+            f"[analystos.l2.narrate] response hit max_tokens ({_MAX_TOKENS}) - "
+            "the narrative was truncated",
+            file=sys.stderr,
+        )
 
     tool_use = next((b for b in response.content if b.type == "tool_use"), None)
     if tool_use is None:

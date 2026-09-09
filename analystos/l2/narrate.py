@@ -324,25 +324,68 @@ def _validate_chart(chart, segments):
     }
 
 
-def _reject(where, detail):
-    """Log a rejection server-side (never echo model text to a client
-    response) and raise the caller's fallback signal. The exact "no clue
-    why it failed" gap this closes was found live - see the module
-    docstring history.
-    """
-    print(f"[analystos.l2.narrate] narrative rejected - {where}: {detail}", file=sys.stderr)
-    raise ValueError(
-        "narrative referenced an unverifiable fact or was malformed - "
-        "falling back to the plain rendering"
-    )
-
-
-def _check_paragraphs(paragraphs, segments, where):
+def _first_paragraph_problem(paragraphs, segments, where):
+    """The first reason a paragraph in this group isn't trustworthy, or
+    ``None`` if they all are."""
     for paragraph in paragraphs:
         text = paragraph.get("text", "")
         reason = _validate_paragraph(text, segments)
         if reason is not None:
-            _reject(f"{where} paragraph", f"{reason}: {text!r}")
+            return f"{where} paragraph {reason}: {text!r}"
+    return None
+
+
+def _assemble_report(tool_use, segments, title):
+    """Validate one ``write_narrative`` tool response into a render-ready
+    report dict. Returns ``(report, None)`` or ``(None, reason)`` and never
+    raises - so the caller can retry once with the reason before falling
+    back. A malformed chart is dropped (``chart`` -> ``None``), never a
+    reason to reject the whole report.
+    """
+    if tool_use is None:
+        return None, "response had no tool_use block"
+    report = tool_use.input if isinstance(tool_use.input, dict) else {}
+    executive_summary = report.get("executive_summary") or []
+    raw_sections = report.get("sections") or []
+    outlook = report.get("outlook") or []
+
+    if not executive_summary:
+        return None, "empty executive_summary"
+    if not raw_sections:
+        return None, "no sections"
+
+    problem = _first_paragraph_problem(executive_summary, segments, "executive-summary")
+    if problem:
+        return None, problem
+
+    sections = []
+    for i, section in enumerate(raw_sections):
+        heading = (section.get("heading") or "").strip()
+        paragraphs = section.get("paragraphs") or []
+        if not heading or not paragraphs:
+            return None, f"section {i} has no heading or no paragraphs"
+        problem = _first_paragraph_problem(paragraphs, segments, f"section {i}")
+        if problem:
+            return None, problem
+        chart = _validate_chart(section.get("chart"), segments) if section.get("has_chart") else None
+        sections.append(
+            {
+                "heading": heading,
+                "paragraphs": [{"text": p["text"]} for p in paragraphs],
+                "chart": chart,
+            }
+        )
+
+    problem = _first_paragraph_problem(outlook, segments, "outlook")
+    if problem:
+        return None, problem
+
+    return {
+        "title": title,
+        "executive_summary": [{"text": p["text"]} for p in executive_summary],
+        "sections": sections,
+        "outlook": [{"text": p["text"]} for p in outlook] or None,
+    }, None
 
 
 def write_narrative(segments, title, client=None):
@@ -379,69 +422,57 @@ def write_narrative(segments, title, client=None):
             "plainly rather than presenting a lone figure as if it were benchmarked."
         )
 
-    response = _create_message(
-        client,
-        model=_MODEL,
-        max_tokens=_MAX_TOKENS,
-        system=_SYSTEM_PROMPT,
-        tools=[_TOOL],
-        tool_choice={"type": "tool", "name": "write_narrative"},
-        messages=[{"role": "user", "content": user_content}],
-    )
+    def _call(extra=""):
+        response = _create_message(
+            client,
+            model=_MODEL,
+            max_tokens=_MAX_TOKENS,
+            system=_SYSTEM_PROMPT,
+            tools=[_TOOL],
+            tool_choice={"type": "tool", "name": "write_narrative"},
+            messages=[{"role": "user", "content": user_content + extra}],
+        )
+        if getattr(response, "stop_reason", None) == "max_tokens":
+            print(
+                f"[analystos.l2.narrate] response hit max_tokens ({_MAX_TOKENS}) - "
+                "the narrative was truncated",
+                file=sys.stderr,
+            )
+        return next(
+            (b for b in getattr(response, "content", [])
+             if getattr(b, "type", None) == "tool_use"),
+            None,
+        )
 
-    if getattr(response, "stop_reason", None) == "max_tokens":
+    report, reason = _assemble_report(_call(), segments, title)
+    if report is None:
+        # One retry with the concrete reason - the common failure is a
+        # stray digit the model typed instead of a {{N}} placeholder, and
+        # a nudge fixes it far more often than a fresh call. Falling back
+        # to the plain rendering over a fixable writing slip is what made
+        # real reports look "grade 1" (found live 2026-09-09).
         print(
-            f"[analystos.l2.narrate] response hit max_tokens ({_MAX_TOKENS}) - "
-            "the narrative was truncated",
+            f"[analystos.l2.narrate] narrative rejected ({reason}) - retrying once",
             file=sys.stderr,
         )
-
-    tool_use = next((b for b in response.content if b.type == "tool_use"), None)
-    if tool_use is None:
-        print("[analystos.l2.narrate] response had no tool_use block", file=sys.stderr)
-        raise ValueError("model did not return a narrative")
-
-    report = tool_use.input or {}
-    executive_summary = report.get("executive_summary") or []
-    raw_sections = report.get("sections") or []
-    outlook = report.get("outlook") or []
-
-    if not executive_summary:
-        _reject("structure", "empty executive_summary")
-    if not raw_sections:
-        _reject("structure", "no sections")
-
-    _check_paragraphs(executive_summary, segments, "executive-summary")
-
-    sections = []
-    for i, section in enumerate(raw_sections):
-        heading = (section.get("heading") or "").strip()
-        paragraphs = section.get("paragraphs") or []
-        if not heading or not paragraphs:
-            _reject(f"section {i}", "no heading or no paragraphs")
-        _check_paragraphs(paragraphs, segments, f"section {i}")
-        chart = None
-        if section.get("has_chart"):
-            chart = _validate_chart(section.get("chart"), segments)
-        sections.append(
-            {
-                "heading": heading,
-                "paragraphs": [{"text": p["text"]} for p in paragraphs],
-                "chart": chart,
-            }
+        report, reason = _assemble_report(
+            _call(
+                f"\n\nYour previous narrative was rejected: {reason}. Fix exactly "
+                "that. Every number must be a {{N}} placeholder - never write a "
+                'digit outside one (a quarter or year like "Q4 2026" is fine). '
+                "Return an executive_summary plus 3-5 sections, each with a "
+                "heading and at least one paragraph."
+            ),
+            segments,
+            title,
         )
-
-    _check_paragraphs(outlook, segments, "outlook")
+    if report is None:
+        raise ValueError(f"narrative rejected after one retry: {reason}")
 
     print(
-        f"[analystos.l2.narrate] narrative accepted: {len(sections)} sections, "
-        f"{sum(1 for s in sections if s['chart'])} chart(s), "
-        f"outlook={'yes' if outlook else 'no'}",
+        f"[analystos.l2.narrate] narrative accepted: {len(report['sections'])} "
+        f"sections, {sum(1 for s in report['sections'] if s['chart'])} chart(s), "
+        f"outlook={'yes' if report['outlook'] else 'no'}",
         file=sys.stderr,
     )
-    return {
-        "title": title,
-        "executive_summary": [{"text": p["text"]} for p in executive_summary],
-        "sections": sections,
-        "outlook": [{"text": p["text"]} for p in outlook] or None,
-    }
+    return report

@@ -38,6 +38,23 @@ def _fake_client(segments, stop_reason="tool_use"):
     return SimpleNamespace(messages=SimpleNamespace(create=lambda **kwargs: response))
 
 
+def _sequenced_client(*rounds):
+    """A client whose successive .messages.create(...) calls return
+    successive (segments, stop_reason) rounds - so a retry gets a
+    different answer than the first call. ``calls`` counts invocations.
+    """
+    state = {"i": 0, "calls": 0}
+
+    def _create(**kwargs):
+        state["calls"] += 1
+        segs, stop = rounds[min(state["i"], len(rounds) - 1)]
+        state["i"] += 1
+        block = SimpleNamespace(type="tool_use", input={"segments": segs})
+        return SimpleNamespace(content=[block], stop_reason=stop)
+
+    return SimpleNamespace(messages=SimpleNamespace(create=_create), _state=state)
+
+
 class AnalyzeDocumentTest(unittest.TestCase):
     def test_a_real_quote_is_verified_and_kept(self):  # Done when #2
         segments = [{
@@ -692,6 +709,30 @@ class RealFilingTablesTest(unittest.TestCase):
         logged = buf.getvalue()
         self.assertIn("truncated=True", logged)
         self.assertIn("hit max_tokens", logged)
+
+    def test_an_empty_first_response_is_retried_once_and_can_recover(self):  # Slice 34
+        good = {"type": "quote", "display": "stat", "label": "Q3 revenue",
+                "exact_text": "1,842.0", "has_value": True, "value": 1_842_000_000.0,
+                "sentence": "Revenue was {value}.", "format": "usd"}
+        client = _sequenced_client(([], "tool_use"), ([good], "tool_use"))
+        buf = io.StringIO()
+        with redirect_stderr(buf):
+            out = analyze_document(self.DOC, TITLE, client=client)
+        self.assertEqual(len(out), 1)
+        self.assertEqual(client._state["calls"], 2)  # retried
+        self.assertIn("retrying once", buf.getvalue())
+
+    def test_two_empty_responses_in_a_row_still_raise(self):  # Slice 34
+        client = _sequenced_client(([], "tool_use"), ([], "tool_use"))
+        with redirect_stderr(io.StringIO()), self.assertRaises(ValueError):
+            analyze_document(self.DOC, TITLE, client=client)
+        self.assertEqual(client._state["calls"], 2)  # one retry, then it stops
+
+    def test_an_empty_but_truncated_response_is_not_retried(self):  # Slice 34
+        client = _sequenced_client(([], "max_tokens"), ([], "tool_use"))
+        with redirect_stderr(io.StringIO()), self.assertRaises(ValueError):
+            analyze_document(self.DOC, TITLE, client=client)
+        self.assertEqual(client._state["calls"], 1)  # truncated-empty: no retry
 
 
 if __name__ == "__main__":

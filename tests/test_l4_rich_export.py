@@ -54,9 +54,9 @@ class RenderRichReportTest(unittest.TestCase):
     def test_outlook_is_visually_distinct_from_verified_sections(self):  # Done when #4
         out = render_rich_report(_report(), SEGMENTS, SRC)
         outlook_start = out.index('class="outlook"')
-        section_start = out.index('class="report-section"')
+        section_start = out.index("<section>")
         self.assertNotEqual(outlook_start, section_start)
-        self.assertIn("Interpretation, not a verified fact", out)
+        self.assertIn("interpretation, not verified fact", out.lower())
 
     def test_citation_marker_carries_a_hover_title(self):  # Done when #5
         out = render_rich_report(_report(), SEGMENTS, SRC)
@@ -207,7 +207,7 @@ class HorizonMarkerTest(unittest.TestCase):
 
     def test_a_guidance_fact_is_marked_inside_a_section(self):  # Done when #1
         out = render_rich_report(self._report(), self.SEGMENTS, SRC)
-        section = out.split('class="report-section"')[1].split("</section>")[0]
+        section = out.split('<section>')[1].split('</section>')[0]
         self.assertIn('<span class="horizon-tag">guidance</span>', section)
 
     def test_guidance_and_projected_are_both_marked_in_the_outlook(self):  # Done when #1
@@ -219,7 +219,7 @@ class HorizonMarkerTest(unittest.TestCase):
     def test_a_reported_fact_is_not_marked(self):  # Done when #2
         out = render_rich_report(self._report(), self.SEGMENTS, SRC)
         # $3.8B (fact 0, reported) goes straight to its footnote link, no tag
-        self.assertIn("$3.8B <sup>", out)
+        self.assertIn('$3.8B <sup class="cite"', out)
         self.assertNotIn('$3.8B <span class="horizon-tag"', out)
 
     def test_segments_with_no_horizon_key_are_never_marked(self):  # Done when #2
@@ -277,6 +277,84 @@ class EventInRichReportTest(unittest.TestCase):
     def test_a_projected_event_carries_the_horizon_tag(self):  # Done when #4
         out = render_rich_report(self._report(), self.SEGMENTS, SRC)
         self.assertIn('<span class="horizon-tag">projected</span>', out)
+
+
+class V4StructureTest(unittest.TestCase):  # Slice 36
+    SEG = [
+        {"type": "quote", "horizon": "reported", "value": 498_000_000.0, "format": "usd",
+         "citation": "$498.0 million"},                                                  # 0
+        {"type": "computed", "horizon": "reported", "operation": "growth_percent",
+         "value": -12.5, "format": "percent", "operands": [22_400_000.0, 19_600_000.0],
+         "total": None, "citation": ["$22.4 million", "$19.6 million"]},                 # 1
+        {"type": "quote", "horizon": "reported", "value": 88_000_000.0, "format": "usd",
+         "citation": "$88.0 million"},                                                   # 2 bridge start
+        {"type": "computed", "horizon": "reported", "operation": "difference",
+         "value": 20_000_000.0, "format": "usd",
+         "operands": [142_000_000.0, 88_000_000.0, 34_000_000.0], "total": None,
+         "citation": ["$142.0M", "$88.0M", "$34.0M"]},                                   # 3 component
+        {"type": "quote", "horizon": "reported", "value": 34_000_000.0, "format": "usd",
+         "citation": "$34.0 million"},                                                   # 4 component
+        {"type": "quote", "horizon": "reported", "value": 142_000_000.0, "format": "usd",
+         "citation": "$142.0 million"},                                                  # 5 bridge end
+        {"type": "event", "horizon": "reported", "what": "acquired Halyard",
+         "date": "May 14, 2026", "status": "", "next_step": "",
+         "milestones": [{"date": "May 14, 2026", "detail": "closed at $340M"},
+                        {"date": "1H 2027", "detail": "expected accretive"}],
+         "citation": "acquired Halyard"},                                                # 6 event
+    ]
+
+    def _report(self, **over):
+        base = {
+            "title": "Acme Q3",
+            "kpis": [{"label": "Revenue", "value_fact": 0, "delta_fact": 1}],
+            "executive_summary": [{"text": "Revenue was {{0}}."}],
+            "executive_insight": "Read together, {{0}} and {{1}} tell one story.",
+            "sections": [{
+                "heading": "Segments",
+                "paragraphs": [{"text": "It grew via {{6}} to {{5}}."}],
+                "chart": {"type": "waterfall", "title": "Bridge", "format": "usd",
+                          "series": [{"label": "start", "fact_index": 2},
+                                     {"label": "organic", "fact_index": 3},
+                                     {"label": "halyard", "fact_index": 4},
+                                     {"label": "end", "fact_index": 5}]},
+            }],
+            "disclosure_gaps": [{"text": "EPS is not disclosed."}],
+            "outlook": [{"text": "Guidance was reiterated."}],
+            "outlook_interpretation": "That reiteration is itself a signal.",
+        }
+        base.update(over)
+        return base
+
+    def test_all_eight_v4_elements_render(self):
+        out = render_rich_report(self._report(), self.SEG, SRC)
+        self.assertIn('class="kpi-strip"', out)                    # 1 KPI strip
+        self.assertIn('<sup class="cite">&#10003;', out)           # 1 quote tag
+        self.assertIn('<sup class="cite calc">&#8721;', out)       # 1 computed tag
+        self.assertIn('class="analysis-block"', out)               # 2 boxed insight
+        self.assertIn(">Analysis<", out)
+        self.assertIn('<figure class="chart-card"', out)           # 3 chart (waterfall)
+        self.assertIn('class="gap-note"', out)                     # 4 disclosure gap
+        self.assertIn("Disclosure gap:", out)
+        self.assertIn('class="timeline"', out)                     # 5 dated timeline
+        self.assertIn('tl-date">May 14, 2026', out)
+        self.assertIn('class="outlook"', out)                      # 6 outlook, distinct
+        self.assertIn('class="interp">Interpretation:', out)
+        self.assertIn("($19.6M − $22.4M) / $22.4M", out)  # 7 footnote shows the actual arithmetic
+        self.assertIn("IBM Plex Serif", out)                       # 8 typography system
+
+    def test_a_waterfall_that_does_not_tie_out_is_dropped(self):
+        bad = self._report()
+        bad["sections"][0]["chart"]["series"][1]["fact_index"] = 0  # $498M component breaks the bridge
+        out = render_rich_report(bad, self.SEG, SRC)
+        self.assertNotIn("<svg", out)
+
+    def test_a_bad_kpi_reference_is_skipped_not_fatal(self):
+        r = self._report(kpis=[{"label": "Bad", "value_fact": 99, "delta_fact": -1},
+                               {"label": "Revenue", "value_fact": 0, "delta_fact": -1}])
+        out = render_rich_report(r, self.SEG, SRC)
+        self.assertIn('class="kpi-strip"', out)
+        self.assertIn(">Revenue<", out)
+        self.assertNotIn(">Bad<", out)
 
 
 if __name__ == "__main__":

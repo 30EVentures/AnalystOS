@@ -40,73 +40,124 @@ line is drawn where it is.
 import html
 import re
 
-from analystos.l4.charts import bar_chart_svg, donut_chart_svg, line_chart_svg
-from analystos.l4.export import _BOLD_RE, _FOOTNOTE_RE, _MARKER_RE, display_value, narrated_footnote
+from analystos.l4.charts import (
+    bar_chart_svg,
+    donut_chart_svg,
+    line_chart_svg,
+    waterfall_chart_svg,
+)
+from analystos.l4.export import (
+    _BOLD_RE,
+    _FOOTNOTE_RE,
+    _MARKER_RE,
+    display_value,
+    format_number,
+    narrated_footnote,
+)
 
 _PLACEHOLDER_RE = re.compile(r"\{\{(\d+)\}\}")
-# A plain-text sentinel emitted by _substitute (before html.escape) and
-# turned into a real <span> by _para_html (after it) - the same escape-
-# then-convert two-pass the [n] markers use. U+27E6/27E7 never occur in
+# Plain-text sentinels emitted by _substitute (before html.escape) and
+# turned into real markup by _para_html (after it) - the same escape-then-
+# convert two-pass the [n] markers use. U+27E6/27E7 never occur in
 # financial prose and pass through html.escape untouched.
-_HORIZON_TAG_RE = re.compile("⟦(guidance|projected)⟧")
+#   guidance/projected -> a forward-looking marker
+#   q / c              -> the source tag: quote (verified) / computed
+_TAG_RE = re.compile("⟦(guidance|projected|q|c)⟧")
 _FORWARD_HORIZONS = ("guidance", "projected")
 
-_CHART_RENDERERS = {"bar": bar_chart_svg, "line": line_chart_svg, "donut": donut_chart_svg}
+_CHART_RENDERERS = {
+    "bar": bar_chart_svg,
+    "line": line_chart_svg,
+    "donut": donut_chart_svg,
+    "waterfall": waterfall_chart_svg,
+}
 
 _STYLE = """
 :root{
-  --paper:#F3F4F7; --surface:#FBFBFD; --raised:#FFFFFF;
-  --ink:#10151F; --graphite:#565E6B; --faint:#8A93A1;
-  --hairline:#D9DCE3; --hairline-strong:#C3C8D2;
-  --institutional:#1B3A6B; --signal:#2F5CE0;
-  --amber:#A9631A; --amber-bg:#FBF3EA;
-  --font-display:"Newsreader",Georgia,"Times New Roman",serif;
+  --ink:#14171C; --ink-soft:#4A4E57; --paper:#FCFCFA; --panel:#F5F3EE;
+  --rule:#DBD7CC; --verified:#1F4B47; --verified-bg:#EAF1EF;
+  --computed:#2E4570; --computed-bg:#EAEEF6;
+  --interp:#8A6A2A; --interp-bg:#F7EFDD;
+  --neg:#8C3F32; --pos:#1F4B47;
+  --font-display:"IBM Plex Serif",Georgia,"Times New Roman",serif;
   --font-sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
   --font-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-sans);
-  font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
-.wrap{max-width:44rem;margin:0 auto;padding:3rem 1.5rem 5rem}
-.eyebrow{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--faint);margin:0 0 .6rem}
-h1{font-family:var(--font-display);font-weight:500;font-size:2rem;line-height:1.2;
-  margin:0 0 1.6rem;text-wrap:balance}
-h2{font-family:var(--font-display);font-weight:500;font-size:1.35rem;line-height:1.3;
-  margin:0 0 .9rem;color:var(--institutional)}
-p{margin:0 0 1rem}
-sup{line-height:0}
-sup a{text-decoration:none;color:var(--signal);font-size:.72em;padding:0 .1em;cursor:help}
+  font-size:15px;line-height:1.6;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+.wrap{max-width:55rem;margin:0 auto;padding:0 28px 100px}
+header.masthead{padding:38px 0 20px;border-bottom:2px solid var(--ink);
+  display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+header.masthead h1{font-family:var(--font-display);font-weight:600;font-size:1.8rem;
+  margin:0 0 6px;letter-spacing:-0.01em}
+header.masthead .sub{color:var(--ink-soft);font-size:.9rem}
+header.masthead .meta{text-align:right;font-size:.8rem;color:var(--ink-soft);line-height:1.5}
+p{margin:0 0 .8rem;max-width:74ch}
 
-.exec-summary{background:var(--raised);border:1px solid var(--hairline);border-left:4px solid var(--signal);
-  border-radius:8px;padding:1.5rem 1.7rem;margin-bottom:2.4rem}
-.exec-summary .eyebrow{color:var(--signal)}
+.kpi-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0;
+  margin:28px 0 6px;border-top:1px solid var(--ink)}
+.kpi{padding:14px 12px 6px;border-right:1px solid var(--rule)}
+.kpi:last-child{border-right:none}
+.kpi .label{font-size:.72rem;color:var(--ink-soft);margin-bottom:6px}
+.kpi .value{font-family:var(--font-display);font-size:1.4rem;font-weight:600}
+.kpi .delta{font-size:.8rem;margin-top:3px}
+.kpi .delta.pos{color:var(--pos)} .kpi .delta.neg{color:var(--neg)}
+.legend{display:flex;gap:20px;flex-wrap:wrap;font-size:.75rem;color:var(--ink-soft);margin:10px 0 0}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.legend .dot.v{background:var(--verified)} .legend .dot.c{background:var(--computed)}
+.legend .dot.i{background:var(--interp)}
 
-section.report-section{margin-bottom:2.6rem}
-section.report-section .chart-card{background:var(--raised);border:1px solid var(--hairline);
-  border-radius:10px;padding:1.2rem 1.3rem 1rem;margin:1.2rem 0 1.4rem}
-section.report-section .chart-card svg{width:100%;height:auto;display:block}
+section{margin-top:40px}
+h2{font-family:var(--font-display);font-weight:600;font-size:1.2rem;
+  padding-bottom:8px;border-bottom:1px solid var(--rule);margin:0 0 14px}
 
-.outlook{background:var(--amber-bg);border:1px solid color-mix(in srgb,var(--amber) 35%,var(--hairline));
-  border-left:4px solid var(--amber);border-radius:8px;padding:1.5rem 1.7rem;margin-top:2.6rem}
-.outlook .eyebrow{color:var(--amber)}
-.outlook .caption{font-family:var(--font-mono);font-size:.78rem;color:var(--graphite);
-  margin:-.3rem 0 1.1rem}
+.cite{font-size:.66rem;vertical-align:super;font-weight:600;padding:1px 4px;
+  border-radius:3px;margin-left:1px;background:var(--verified-bg);color:var(--verified)}
+.cite.calc{background:var(--computed-bg);color:var(--computed)}
+.horizon-tag{font-family:var(--font-mono);font-size:.6rem;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--interp);
+  vertical-align:.15em;margin-left:.2em;white-space:nowrap}
 
-hr{border:0;border-top:1px solid var(--hairline);margin:3rem 0 1.4rem}
-.footnotes{font-family:var(--font-mono);font-size:.78rem;line-height:1.6;color:var(--graphite)}
-.footnotes .heading{font-family:var(--font-sans);font-size:.75rem;font-weight:600;
-  letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:.8rem}
-.footnotes p{margin:.4rem 0}
-.footnotes .n{color:var(--ink);font-weight:600;margin-right:.35em}
-.footnotes a{color:var(--signal);text-decoration:none;margin-left:.35em}
+.exec-summary{background:var(--panel);border:1px solid var(--rule);border-radius:4px;
+  padding:22px 24px;margin-top:24px}
+.exec-summary h2{border:none;padding:0;margin-bottom:12px}
+.analysis-block{background:var(--interp-bg);border-left:3px solid var(--interp);
+  padding:14px 16px;margin:16px 0;border-radius:0 3px 3px 0}
+.analysis-block .tag{font-size:.68rem;font-weight:700;color:var(--interp);
+  text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;display:block}
+.analysis-block p{margin-bottom:0}
 
-.horizon-tag{font-family:var(--font-mono);font-size:.62rem;font-weight:600;
-  letter-spacing:.08em;text-transform:uppercase;color:var(--amber);
-  vertical-align:.15em;margin-left:.25em;white-space:nowrap}
+.chart-card{margin:18px 0 6px}
+.chart-card svg{width:100%;height:auto;display:block}
+.chart-card figcaption{font-size:.78rem;color:var(--ink-soft);margin-top:4px}
 
-@media print{body{background:#fff}.exec-summary,.outlook,.chart-card{break-inside:avoid}
-  .horizon-tag{color:#7A4A12}}
+.gap-note{font-size:.85rem;color:var(--ink-soft);background:var(--panel);
+  border:1px dashed #C7C2B4;padding:10px 14px;border-radius:3px;margin:14px 0}
+.gap-note b{color:var(--ink)}
+
+.timeline{border-left:2px solid var(--rule);padding-left:18px;margin:14px 0}
+.tl-item{position:relative;margin-bottom:14px;font-size:.9rem}
+.tl-item::before{content:'';position:absolute;left:-23px;top:5px;width:9px;height:9px;
+  border-radius:50%;background:var(--verified)}
+.tl-date{font-size:.78rem;color:var(--ink-soft);font-weight:600;display:block}
+
+.outlook{background:var(--interp-bg);border:1px solid #D8C384;border-radius:4px;
+  padding:20px 24px;margin-top:36px}
+.outlook h2{border:none;padding:0;color:var(--interp);margin-bottom:10px}
+.outlook .interp{color:var(--interp);font-weight:600;font-style:italic}
+
+footer.footnotes{margin-top:52px;padding-top:16px;border-top:1px solid var(--ink);
+  font-size:.78rem;color:var(--ink-soft);font-family:var(--font-mono)}
+footer.footnotes .heading{font-family:var(--font-sans);font-weight:600;font-size:.72rem;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px}
+footer.footnotes p{margin:.35rem 0;max-width:none}
+footer.footnotes .n{color:var(--ink);font-weight:600;margin-right:.35em}
+footer.footnotes a{color:var(--computed);text-decoration:none;margin-left:.35em}
+
+@media print{body{background:#fff}
+  .exec-summary,.outlook,.chart-card,.analysis-block,.gap-note{break-inside:avoid}}
 """
 
 
@@ -123,15 +174,19 @@ def _substitute(text, segments, source_hash, currency_unit, footnote_number, foo
     """
     def _sub(match):
         index = int(match.group(1))
+        segment = segments[index]
         if index not in footnote_number:
             footnote_number[index] = len(footnotes) + 1
-            citation = segments[index]["citation"]
-            footnotes.append(narrated_footnote(footnote_number[index], source_hash, citation))
+            footnotes.append(
+                _rich_footnote(footnote_number[index], source_hash, segment, currency_unit)
+            )
         n = footnote_number[index]
-        rendered = display_value(segments[index], currency_unit)
-        horizon = segments[index].get("horizon", "reported")
-        tag = f" ⟦{horizon}⟧" if horizon in _FORWARD_HORIZONS else ""
-        return f"{rendered}{tag} [{n}]"
+        rendered = display_value(segment, currency_unit)
+        horizon = segment.get("horizon", "reported")
+        h_tag = f" ⟦{horizon}⟧" if horizon in _FORWARD_HORIZONS else ""
+        # ✓ for a direct source quote, ∑ for an independently computed value.
+        src_tag = " ⟦c⟧" if segment.get("type") == "computed" else " ⟦q⟧"
+        return f"{rendered}{h_tag}{src_tag} [{n}]"
 
     return _PLACEHOLDER_RE.sub(_sub, text)
 
@@ -145,9 +200,16 @@ def _para_html(text, footnotes):
     """
     esc = html.escape(text)
     esc = _BOLD_RE.sub(lambda m: f"<strong>{m.group(1)}</strong>", esc)
-    esc = _HORIZON_TAG_RE.sub(
-        lambda m: f'<span class="horizon-tag">{m.group(1)}</span>', esc
-    )
+
+    def _tag(match):
+        kind = match.group(1)
+        if kind == "q":
+            return '<sup class="cite" title="Direct quote from source">&#10003;</sup>'
+        if kind == "c":
+            return '<sup class="cite calc" title="Independently computed &amp; verified">&#8721;</sup>'
+        return f'<span class="horizon-tag">{kind}</span>'
+
+    esc = _TAG_RE.sub(_tag, esc)
 
     def _marker(match):
         n = match.group(1)
@@ -163,6 +225,108 @@ def _paragraphs_html(paragraphs, segments, source_hash, currency_unit, footnote_
         f"<p>{_para_html(_substitute(p['text'], segments, source_hash, currency_unit, footnote_number, footnotes), footnotes)}</p>"
         for p in paragraphs
     )
+
+
+def _fmt(value, spec, currency_unit):
+    return html.escape(format_number(value, spec or "number", currency_unit))
+
+
+def _operand_fmt(value, currency_unit):
+    return _fmt(value, "usd" if abs(value) >= 1000 else "number", currency_unit)
+
+
+def _arithmetic(segment, currency_unit):
+    """The visible math for a computed segment - "$142.0M - $88.0M - $34.0M
+    = $20.0M" - built from the canonical operand values Slice 35 carries.
+    Returns "" if the shape isn't one we can spell out."""
+    op = segment.get("operation")
+    ops = segment.get("operands") or []
+    result = _fmt(segment.get("value", 0), segment.get("format"), currency_unit)
+    o = [_operand_fmt(v, currency_unit) for v in ops]
+    if op == "difference" and len(o) >= 2:
+        return f"{o[0]} − {' − '.join(o[1:])} = {result}"
+    if op == "sum" and o:
+        return f"{' + '.join(o)} = {result}"
+    if op == "average" and o:
+        return f"mean of {', '.join(o)} = {result}"
+    if op == "growth_percent" and len(o) == 2:
+        return f"({o[1]} − {o[0]}) / {o[0]} = {result}"
+    if op == "ratio" and len(o) == 2:
+        return f"{o[0]} / {o[1]} = {result}"
+    if op == "percent_of_total" and len(o) == 1 and segment.get("total") is not None:
+        return f"{o[0]} / {_operand_fmt(segment['total'], currency_unit)} = {result}"
+    return ""
+
+
+def _rich_footnote(n, source_hash, segment, currency_unit):
+    """Like ``narrated_footnote`` but, for a computed segment, shows the
+    arithmetic itself - the reader sees the math, not just a citation."""
+    if segment.get("type") == "computed":
+        expr = _arithmetic(segment, currency_unit)
+        if expr:
+            return f"[{n}] {expr}, verified by recomputation. Source {source_hash}."
+    return narrated_footnote(n, source_hash, segment["citation"])
+
+
+_LEGEND = (
+    '<div class="legend">'
+    '<span><i class="dot v"></i>Direct quote from source</span>'
+    '<span><i class="dot c"></i>Independently computed &amp; verified</span>'
+    '<span><i class="dot i"></i>Analytical interpretation (not a verified fact)</span>'
+    "</div>"
+)
+
+
+def _kpi_strip_html(kpis, segments, currency_unit):
+    if not kpis:
+        return ""
+    cells = []
+    for k in kpis:
+        vi = k.get("value_fact", -1)
+        if not isinstance(vi, int) or not (0 <= vi < len(segments)):
+            continue  # defence in depth; write_narrative already filtered
+        seg = segments[vi]
+        if seg.get("value") is None:
+            continue
+        vtag = ('<sup class="cite calc">&#8721;</sup>' if seg.get("type") == "computed"
+                else '<sup class="cite">&#10003;</sup>')
+        delta = ""
+        di = k.get("delta_fact", -1)
+        if di is not None and di >= 0:
+            dseg = segments[di]
+            cls = "pos" if (dseg.get("value") or 0) >= 0 else "neg"
+            delta = (f'<div class="delta {cls}">{html.escape(display_value(dseg, currency_unit))}'
+                     '<sup class="cite calc">&#8721;</sup></div>')
+        cells.append(
+            f'<div class="kpi"><div class="label">{html.escape(k.get("label") or "")}</div>'
+            f'<div class="value">{html.escape(display_value(seg, currency_unit))}{vtag}</div>'
+            f"{delta}</div>"
+        )
+    return f'<div class="kpi-strip">{"".join(cells)}</div>{_LEGEND}'
+
+
+def _as_text(value):
+    """``executive_insight`` / ``outlook_interpretation`` arrive from
+    ``write_narrative`` as a plain string (or None); tolerate a
+    ``{"text": ...}`` dict too, in case a caller passes the raw shape."""
+    if isinstance(value, dict):
+        value = value.get("text")
+    return (value or "").strip()
+
+
+def _timeline_html(segment):
+    rows = []
+    if segment.get("date") and segment.get("what"):
+        rows.append((segment["date"], segment["what"]))
+    for m in segment.get("milestones") or []:
+        rows.append((m["date"], m["detail"]))
+    if len(rows) < 2:
+        return ""
+    items = "".join(
+        f'<div class="tl-item"><span class="tl-date">{html.escape(d)}</span>{html.escape(t)}</div>'
+        for d, t in rows
+    )
+    return f'<div class="timeline">{items}</div>'
 
 
 def _resolve_chart(chart, segments):
@@ -200,55 +364,86 @@ def _chart_html(chart, segments, currency_unit):
     renderer = _CHART_RENDERERS.get(chart.get("type"))
     if renderer is None:
         return ""
+    if chart.get("type") == "waterfall":
+        # defence in depth: only draw a bridge that actually bridges
+        if len(values) < 3 or abs(
+            values[0] + sum(values[1:-1]) - values[-1]
+        ) > 0.01 * max(abs(values[-1]), 1.0):
+            return ""
     svg = renderer(chart.get("title", ""), labels, values, chart.get("format", "number"), currency_unit)
-    return f'<div class="chart-card">{svg}</div>'
+    tag = ("&#8721; Computed &amp; verified" if chart.get("type") == "waterfall"
+           else "&#10003; Direct quote")
+    return f'<figure class="chart-card">{svg}<figcaption><span class="cite">{tag}</span></figcaption></figure>'
 
 
 def render_rich_report(report, segments, source_hash, currency_unit="actual"):
-    """Render ``report`` (see module docstring for its shape) as a
-    standalone HTML page: an executive summary, section-by-section body
-    with optional embedded charts, and a visually distinct outlook block.
-    Returns a full ``<!doctype html>`` string.
+    """Render ``report`` as a standalone HTML page in the v4 structure: a
+    masthead, a KPI strip (each metric tagged direct-quote or computed), an
+    executive summary with one boxed cross-section insight, section-by-
+    section body with charts, disclosure-gap callouts, and a visually
+    distinct outlook block with its interpretation set apart. Every figure
+    still traces to a verified segment. Returns a full ``<!doctype html>``.
     """
-    footnote_number = {}
-    footnotes = []
+    fn_num, footnotes = {}, []
 
-    exec_html = _paragraphs_html(
-        report.get("executive_summary", []), segments, source_hash, currency_unit,
-        footnote_number, footnotes,
-    )
+    def paras(items):
+        return _paragraphs_html(items, segments, source_hash, currency_unit, fn_num, footnotes)
+
+    kpi_html = _kpi_strip_html(report.get("kpis"), segments, currency_unit)
+
+    exec_body = paras(report.get("executive_summary", []))
+    insight = _as_text(report.get("executive_insight"))
+    if insight:
+        exec_body += (
+            '<div class="analysis-block"><span class="tag">Analysis</span>'
+            f"<p>{_para_html(_substitute(insight, segments, source_hash, currency_unit, fn_num, footnotes), footnotes)}</p></div>"
+        )
 
     sections_html = []
     for section in report.get("sections", []):
-        body = _paragraphs_html(
-            section.get("paragraphs", []), segments, source_hash, currency_unit,
-            footnote_number, footnotes,
-        )
-        chart_html = ""
+        body = paras(section.get("paragraphs", []))
+        extra = ""
         if section.get("chart"):
-            chart_html = _chart_html(section["chart"], segments, currency_unit)
+            extra += _chart_html(section["chart"], segments, currency_unit)
+        referenced = {
+            int(m)
+            for p in section.get("paragraphs", [])
+            for m in _PLACEHOLDER_RE.findall(p.get("text", ""))
+        }
+        for i in sorted(referenced):
+            if 0 <= i < len(segments) and segments[i].get("type") == "event":
+                extra += _timeline_html(segments[i])
         sections_html.append(
-            f'<section class="report-section"><h2>{html.escape(section["heading"])}</h2>'
-            f"{body}{chart_html}</section>"
+            f'<section><h2>{html.escape(section["heading"])}</h2>{body}{extra}</section>'
         )
+
+    gaps = report.get("disclosure_gaps") or []
+    gaps_html = ""
+    if gaps:
+        gaps_html = "<section><h2>What the source does not disclose</h2>" + "".join(
+            f'<div class="gap-note"><b>Disclosure gap:</b> '
+            f'{_para_html(_substitute(g["text"], segments, source_hash, currency_unit, fn_num, footnotes), footnotes)}</div>'
+            for g in gaps
+        ) + "</section>"
 
     outlook_html = ""
     outlook_paragraphs = report.get("outlook")
-    if outlook_paragraphs:
-        body = _paragraphs_html(
-            outlook_paragraphs, segments, source_hash, currency_unit,
-            footnote_number, footnotes,
-        )
+    interp = _as_text(report.get("outlook_interpretation"))
+    if outlook_paragraphs or interp:
+        body = paras(outlook_paragraphs or [])
+        if interp:
+            body += (
+                '<p class="interp">Interpretation: '
+                f'{_para_html(_substitute(interp, segments, source_hash, currency_unit, fn_num, footnotes), footnotes)}</p>'
+            )
         outlook_html = (
-            '<div class="outlook"><p class="eyebrow">Outlook</p>'
-            '<p class="caption">Interpretation, not a verified fact - '
-            "reasoning about what the figures above imply, not a new citable claim.</p>"
+            '<div class="outlook"><h2>Outlook — interpretation, not verified fact</h2>'
             f"{body}</div>"
         )
 
     notes_html = "\n".join(
-        f'<p id="fn{i + 1}"><span class="n">{i + 1}.</span>{html.escape(_FOOTNOTE_RE.match(note).group(2))}'
-        f' <a href="#ref{i + 1}">&#8617;</a></p>'
+        f'<p id="fn{i + 1}"><span class="n">{i + 1}.</span>'
+        f'{html.escape(_FOOTNOTE_RE.match(note).group(2))} <a href="#ref{i + 1}">&#8617;</a></p>'
         for i, note in enumerate(footnotes)
     )
 
@@ -260,16 +455,22 @@ def render_rich_report(report, segments, source_hash, currency_unit="actual"):
         f"<title>{esc_title}</title>\n"
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
-        '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:'
-        'ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:'
-        "wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap\">\n"
+        '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:'
+        "ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:"
+        'wght@400;500;600;700&display=swap">\n'
         f"<style>{_STYLE}</style>\n</head>\n<body>\n"
         '<div class="wrap">\n'
-        f'<p class="eyebrow">Executive report</p>\n<h1>{esc_title}</h1>\n'
-        f'<div class="exec-summary"><p class="eyebrow">Executive summary</p>{exec_html}</div>\n'
+        '<header class="masthead"><div>'
+        f"<h1>{esc_title}</h1>"
+        '<div class="sub">Independent analysis · Prepared by AnalystOS</div></div>'
+        '<div class="meta">Source: uploaded document<br>'
+        "Every figure verified &#10003; or computed &#8721;</div></header>\n"
+        + kpi_html
+        + f'\n<section class="exec-summary"><h2>Executive summary</h2>{exec_body}</section>\n'
         + "\n".join(sections_html)
+        + gaps_html
         + outlook_html
-        + '\n<hr><div class="footnotes"><p class="heading">Sources</p>\n'
+        + '\n<footer class="footnotes"><p class="heading">Sources &amp; calculations</p>\n'
         + notes_html
-        + "\n</div>\n</div>\n</body>\n</html>\n"
+        + "\n</footer>\n</div>\n</body>\n</html>\n"
     )

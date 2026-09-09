@@ -20,10 +20,19 @@ from analystos.l4.export import format_number
 
 _WIDTH = 560
 _HEIGHT = 320
-_PALETTE = ("#2F5CE0", "#1B3A6B", "#57C79E", "#D79A5C", "#8A93A1", "#A94442")
-_AXIS_COLOR = "#C3C8D2"
-_TEXT_COLOR = "#10151F"
-_LABEL_COLOR = "#565E6B"
+# One semantic system, shared with rich_export's _STYLE (Slice 36): teal is
+# a verified/current figure, slate a computed one, sand a prior-period
+# comparison, brick a decline. The old rotating 6-colour palette carried no
+# meaning across charts; this does.
+_VERIFIED = "#1F4B47"   # teal - current / verified
+_COMPUTED = "#2E4570"   # slate - independently computed
+_PRIOR = "#C9C4B4"      # sand - prior period, for a side-by-side comparison
+_NEG = "#8C3F32"        # brick - a decrease / adverse move
+_ADD = "#5C8A72"        # muted green - an additive bridge component
+_PALETTE = (_VERIFIED, _PRIOR, _COMPUTED, _ADD, _NEG)
+_AXIS_COLOR = "#DBD7CC"
+_TEXT_COLOR = "#14171C"
+_LABEL_COLOR = "#4A4E57"
 
 
 def _esc(text):
@@ -124,6 +133,70 @@ def line_chart_svg(title, x_labels, values, value_format="usd", currency_unit="a
         + f'y2="{baseline_y}" stroke="{_AXIS_COLOR}" stroke-width="1"/>'
         + f'<polyline points="{polyline}" fill="none" stroke="{_PALETTE[0]}" stroke-width="2.5"/>'
         + "".join(dots)
+        + "</svg>"
+    )
+
+
+def waterfall_chart_svg(title, labels, values, value_format="usd", currency_unit="actual"):
+    """A bridge / waterfall: ``values[0]`` is a start level, ``values[1:-1]``
+    are signed components that add up to the move, ``values[-1]`` is the end
+    level. Callers (``rich_export._resolve_chart``) must have already
+    confirmed ``values[0] + sum(values[1:-1]) ≈ values[-1]`` - this only
+    draws it. Start and end are full bars from the baseline; each component
+    floats from the running total, green up / brick down.
+    """
+    n = len(values)
+    pad_left, pad_right, pad_top, pad_bottom = 50, 30, 50, 60
+    plot_w = _WIDTH - pad_left - pad_right
+    plot_h = _HEIGHT - pad_top - pad_bottom
+    baseline_y = pad_top + plot_h
+    top = max([values[0], values[-1]] + [
+        values[0] + sum(values[1:i + 1]) for i in range(1, n - 1)
+    ]) or 1
+
+    slot = plot_w / n
+    bar_w = slot * 0.5
+    parts = []
+    running = 0.0
+    for i, (label, val) in enumerate(zip(labels, values)):
+        x = pad_left + i * slot + (slot - bar_w) / 2
+        if i == 0 or i == n - 1:
+            level = val
+            y0, y1 = baseline_y, baseline_y - (level / top) * plot_h
+            color = _VERIFIED
+            running = level
+        else:
+            start_level, end_level = running, running + val
+            running = end_level
+            y0 = baseline_y - (start_level / top) * plot_h
+            y1 = baseline_y - (end_level / top) * plot_h
+            color = _ADD if val >= 0 else _NEG
+        y_top, y_bot = min(y0, y1), max(y0, y1)
+        shown = val if (0 < i < n - 1) else val
+        sign = "+" if (0 < i < n - 1 and val >= 0) else ""
+        parts.append(
+            f'<rect x="{x:.1f}" y="{y_top:.1f}" width="{bar_w:.1f}" '
+            f'height="{max(y_bot - y_top, 1):.1f}" fill="{color}" rx="2"/>'
+            f'<text x="{x + bar_w / 2:.1f}" y="{y_top - 7:.1f}" text-anchor="middle" '
+            f'font-size="12" font-weight="600" fill="{_TEXT_COLOR}">'
+            f'{sign}{_value_label(abs(shown) if sign else shown, value_format, currency_unit)}</text>'
+            f'<text x="{x + bar_w / 2:.1f}" y="{baseline_y + 20:.1f}" text-anchor="middle" '
+            f'font-size="11" fill="{_LABEL_COLOR}">{_esc(label)}</text>'
+        )
+        if 0 < i < n - 1:
+            parts.append(
+                f'<line x1="{x - (slot - bar_w) / 2:.1f}" y1="{y1:.1f}" '
+                f'x2="{x + bar_w + (slot - bar_w) / 2:.1f}" y2="{y1:.1f}" '
+                f'stroke="{_AXIS_COLOR}" stroke-dasharray="3,3"/>'
+            )
+
+    return (
+        _svg_open(title)
+        + f'<text x="{pad_left}" y="24" font-size="15" font-weight="600" '
+        + f'fill="{_TEXT_COLOR}">{_esc(title)}</text>'
+        + f'<line x1="{pad_left}" y1="{baseline_y}" x2="{_WIDTH - pad_right}" '
+        + f'y2="{baseline_y}" stroke="{_TEXT_COLOR}" stroke-width="1"/>'
+        + "".join(parts)
         + "</svg>"
     )
 

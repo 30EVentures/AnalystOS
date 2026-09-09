@@ -774,6 +774,66 @@ class RealFilingTablesTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             analyze_document(self.DOC, TITLE, client=_fake_client(segs))
 
+    def test_a_computed_segment_carries_its_arithmetic(self):  # Slice 35
+        segs = [{
+            "type": "computed", "display": "inline", "label": "YoY change",
+            "operation": "difference",
+            "operands": [
+                {"exact_text": "1,842.0", "value": 1_842_000_000.0},
+                {"exact_text": "1,715.0", "value": 1_715_000_000.0},
+            ],
+            "has_total": False, "total_exact_text": "", "total_value": 0,
+            "result": 127_000_000.0,
+            "sentence": "Revenue rose {value} year over year.", "format": "usd",
+        }]
+        out = analyze_document(self.DOC, TITLE, client=_fake_client(segs))
+        self.assertEqual(out[0]["operation"], "difference")
+        self.assertEqual(out[0]["operands"], [1_842_000_000.0, 1_715_000_000.0])
+        self.assertIsNone(out[0]["total"])
+
+
+class EventMilestonesTest(unittest.TestCase):  # Slice 35
+    DOC = (
+        "On May 14, 2026, Meridian completed its acquisition of Halyard Analytics. "
+        "Integration costs of approximately $11.0 million were the expected peak in "
+        "the third quarter of 2026. Costs are projected to fall to approximately "
+        "$5.0 million in the fourth quarter of 2026. The acquisition is expected to "
+        "become accretive to earnings per share in the first half of 2027."
+    )
+
+    def _event(self, milestones):
+        return {
+            "type": "event", "display": "inline", "label": "Halyard acquisition",
+            "event": {
+                "what": "completed its acquisition of Halyard Analytics",
+                "date": "On May 14, 2026", "status": "", "next_step": "",
+                "milestones": milestones,
+            },
+        }
+
+    def test_verified_milestones_are_kept_in_order(self):
+        segs = [self._event([
+            {"date": "On May 14, 2026", "detail": "completed its acquisition of Halyard Analytics"},
+            {"date": "the fourth quarter of 2026", "detail": "projected to fall to approximately $5.0 million"},
+            {"date": "the first half of 2027", "detail": "expected to become accretive to earnings per share"},
+        ])]
+        out = analyze_document(self.DOC, "Halyard", client=_fake_client(segs))
+        self.assertEqual(len(out[0]["milestones"]), 3)
+        self.assertEqual(out[0]["milestones"][0]["date"], "On May 14, 2026")
+
+    def test_a_milestone_that_isnt_in_the_document_is_dropped_but_the_event_survives(self):
+        segs = [self._event([
+            {"date": "On May 14, 2026", "detail": "completed its acquisition of Halyard Analytics"},
+            {"date": "the fourth quarter of 2026", "detail": "will double the segment's revenue"},  # invented
+        ])]
+        out = analyze_document(self.DOC, "Halyard", client=_fake_client(segs))
+        self.assertEqual(len(out[0]["milestones"]), 1)  # bad row dropped, event kept
+
+    def test_no_milestones_is_fine(self):
+        segs = [self._event([])]
+        out = analyze_document(self.DOC, "Halyard", client=_fake_client(segs))
+        self.assertEqual(out[0]["milestones"], [])
+
 
 if __name__ == "__main__":
     unittest.main()

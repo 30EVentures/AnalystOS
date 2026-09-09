@@ -165,6 +165,18 @@ class WriteNarrativeStructureTest(unittest.TestCase):
         out = write_narrative(SEGMENTS, TITLE, client=_fake_client(ok))
         self.assertEqual(len(out["outlook"]), 1)
 
+    def test_a_dated_day_of_month_does_not_reject_the_narrative(self):  # Slice 34
+        # "as of September 30, 2026" was rejecting whole narratives live -
+        # the "30" read as a stray digit and the report fell back to flat.
+        ok = _report(sections=[{
+            "heading": "Liquidity",
+            "paragraphs": [{"text": "Cash fell to {{0}} as of September 30, 2026, "
+                            "against {{1}} at December 31, 2025."}],
+            "has_chart": False, "chart": _empty_chart(),
+        }])
+        out = write_narrative(SEGMENTS, TITLE, client=_fake_client(ok))
+        self.assertEqual(out["sections"][0]["heading"], "Liquidity")
+
     def test_an_event_fact_can_be_referenced_like_any_citable_fact(self):  # slice 32
         segs = SEGMENTS + [{
             "type": "event", "horizon": "reported", "what": "acquired Halyard",

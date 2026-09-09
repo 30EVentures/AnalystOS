@@ -734,6 +734,46 @@ class RealFilingTablesTest(unittest.TestCase):
             analyze_document(self.DOC, TITLE, client=client)
         self.assertEqual(client._state["calls"], 1)  # truncated-empty: no retry
 
+    def test_a_whole_table_row_citation_matches_any_of_its_cells(self):  # Slice 34
+        # the model cited the whole row for one cell - the year-ago column.
+        # Its value must check against ALL numbers in the text, not just
+        # the first, or every period-over-period comparison is dropped.
+        segs = [{
+            "type": "quote", "display": "inline", "label": "Prior-year revenue",
+            "exact_text": "Revenue | 1,842.0 | 1,788.0 | 1,715.0",
+            "has_value": True, "value": 1_715_000_000.0,
+            "sentence": "A year ago revenue was {value}.", "format": "usd",
+        }]
+        out = analyze_document(self.DOC, TITLE, client=_fake_client(segs))
+        self.assertEqual(out[0]["value"], 1_715_000_000.0)
+
+    def test_growth_from_two_whole_row_citations_recomputes_correctly(self):  # Slice 34
+        segs = [{
+            "type": "computed", "display": "inline", "label": "Revenue growth YoY",
+            "operation": "growth_percent",
+            "operands": [
+                {"exact_text": "Revenue | 1,842.0 | 1,788.0 | 1,715.0", "value": 1_715_000_000.0},
+                {"exact_text": "Revenue | 1,842.0 | 1,788.0 | 1,715.0", "value": 1_842_000_000.0},
+            ],
+            "has_total": False, "total_exact_text": "", "total_value": 0,
+            "result": 7.4,
+            "sentence": "Revenue grew {value} year over year.", "format": "percent",
+        }]
+        out = analyze_document(self.DOC, TITLE, client=_fake_client(segs))
+        self.assertAlmostEqual(out[0]["value"], (1842 - 1715) / 1715 * 100, places=1)
+
+    def test_a_dated_day_of_month_in_prose_is_not_a_stray_digit(self):  # Slice 34
+        segs = [{"type": "prose",
+                 "text": "The segment was reclassified as held for sale as of "
+                         "September 30, 2026, effective the following quarter."}]
+        out = analyze_document(self.DOC, TITLE, client=_fake_client(segs))
+        self.assertEqual(out[0]["type"], "prose")
+
+    def test_a_bare_number_in_prose_is_still_a_stray_digit(self):  # Slice 34 - guard intact
+        segs = [{"type": "prose", "text": "Cash fell by 40 million over the period."}]
+        with self.assertRaises(ValueError):
+            analyze_document(self.DOC, TITLE, client=_fake_client(segs))
+
 
 if __name__ == "__main__":
     unittest.main()

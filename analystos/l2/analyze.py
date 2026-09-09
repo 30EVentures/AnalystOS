@@ -85,14 +85,28 @@ _MODEL = "claude-sonnet-5"
 _MAX_TOKENS = 8192
 _PLACEHOLDER_RE = re.compile(r"\{value\}")
 _DIGIT_RE = re.compile(r"\d")
-# Calendar references (a quarter, a half, a fiscal/calendar year) aren't a
+# Calendar references (a quarter, a half, a fiscal/calendar year, a dated
+# day like "September 30, 2026", an ordinal like "the 14th") aren't a
 # citable claim - "Q4 2026" needs no source quote the way a dollar figure
 # does. Stripped before _DIGIT_RE runs on connective prose, so ordinary
-# writing that mentions a quarter or year doesn't get treated as an
-# unverified number - found live, 2026-09-06 (see docs/decisions.md):
-# without this, real prose almost always contains a year or quarter and
-# the whole segment/narrative gets rejected over nothing worth verifying.
-_CALENDAR_RE = re.compile(r"\bQ[1-4]\b|\bH[12]\b|\bFY['’]?\d{2,4}\b|\b(?:19|20)\d{2}\b", re.IGNORECASE)
+# writing that mentions a date doesn't get treated as an unverified number
+# - found live 2026-09-06 (year/quarter) and 2026-09-09 (a day-of-month in
+# "as of September 30, 2026" was rejecting whole narratives). Without this,
+# real prose almost always contains a date and the segment/narrative gets
+# thrown out over nothing worth verifying.
+_MONTH_RE = (
+    r"(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?"
+    r"|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)"
+)
+_CALENDAR_RE = re.compile(
+    r"\bQ[1-4]\b"
+    r"|\bH[12]\b"
+    r"|\bFY['’]?\d{2,4}\b"
+    r"|\b(?:19|20)\d{2}\b"                                  # a year
+    r"|\b" + _MONTH_RE + r"\s+\d{1,2}(?:st|nd|rd|th)?\b"    # "September 30", "Sep 3rd"
+    r"|\b\d{1,2}(?:st|nd|rd|th)\b",                          # "the 14th"
+    re.IGNORECASE,
+)
 _OPERATIONS = ("sum", "average", "ratio", "growth_percent", "percent_of_total", "difference")
 # The operations that are a *comparison* (a figure set against another
 # figure), as opposed to an aggregate. coverage_summary counts these to
@@ -369,24 +383,31 @@ _SCALE_WORDS = {
 }
 
 
-def _parse_number(text):
-    """Best-effort parse of the first real number ``text`` contains -
-    strips ``$``/commas/``%``, honors a trailing scale word (``K``/``M``/
-    ``B``, ``thousand``/``million``/``billion``) and an accounting-style
-    negative (a leading ``-`` or an opening ``(``). Returns ``None`` if no
-    number is found. Never guesses a value from surrounding words - only
-    the number ``text`` itself actually spells out.
+def _parse_numbers(text):
+    """Every real number ``text`` spells out, in order - not just the first.
+    Each is stripped of ``$``/commas, given its trailing scale word
+    (``K``/``M``/``B``, ``thousand``/``million``/``billion``) and its
+    accounting-style sign (a leading ``-`` or an opening ``(``). A model
+    that cites a whole multi-column table row ("Revenue | 1,842.0 | 1,788.0
+    | 1,715.0") means one specific cell; its value is checked against all
+    of them, never invented - only the digits the text itself contains.
     """
-    match = _NUMBER_TOKEN_RE.search(text)
-    if not match:
-        return None
-    sign_part, digits, scale = match.groups()
-    value = float(digits.replace(",", ""))
-    if scale:
-        value *= _SCALE_WORDS[scale.lower()]
-    if "-" in sign_part or "(" in sign_part:
-        value = -value
-    return value
+    out = []
+    for match in _NUMBER_TOKEN_RE.finditer(text):
+        sign_part, digits, scale = match.groups()
+        value = float(digits.replace(",", ""))
+        if scale:
+            value *= _SCALE_WORDS[scale.lower()]
+        if "-" in sign_part or "(" in sign_part:
+            value = -value
+        out.append(value)
+    return out
+
+
+def _parse_number(text):
+    """The first real number ``text`` contains, or ``None``."""
+    nums = _parse_numbers(text)
+    return nums[0] if nums else None
 
 
 _SCALE_DECLARATION_RE = re.compile(
@@ -424,20 +445,19 @@ def _value_matches_text(value, exact_text, doc_scale=1):
     in the document, silently negated). ``exact_text`` may carry its own
     scale word ("$1.2 million" -> 1_200_000) or be bare as a scaled table
     prints it ("1,842.0", document declared "in millions" -> 1.842e9).
-    ``value`` matches the parsed number as-is *or* that number times the
-    document's declared scale; the matched magnitude is returned, so a
-    figure the model left unscaled is still stored - and rendered - at its
-    real size. Sign is preserved, so the Slice-29 sign-flip guard holds
-    (-1050 never matches 1050).
+    ``value`` matches *any* number the text spells out (a model often cites
+    a whole table row for one cell), as-is *or* times the document's
+    declared scale; the matched magnitude is returned, so a figure the
+    model left unscaled is still stored - and rendered - at its real size.
+    Sign is preserved, so the Slice-29 sign-flip guard holds (-1050 never
+    matches 1050).
     """
     if value is None:
         return None
-    parsed = _parse_number(exact_text)
-    if parsed is None:
-        return None
-    for candidate in (parsed, parsed * doc_scale):
-        if _close_enough(candidate, value):
-            return candidate
+    for parsed in _parse_numbers(exact_text):
+        for candidate in (parsed, parsed * doc_scale):
+            if _close_enough(candidate, value):
+                return candidate
     return None
 
 

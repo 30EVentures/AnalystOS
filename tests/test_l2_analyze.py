@@ -657,7 +657,7 @@ class RealFilingTablesTest(unittest.TestCase):
         with redirect_stderr(buf), self.assertRaises(ValueError):
             analyze_document(self.DOC, TITLE, client=_fake_client(segs))
         logged = buf.getvalue()
-        self.assertIn("0 verified", logged)
+        self.assertIn("NO VERIFIABLE CONTENT", logged)
         self.assertIn("not found in document", logged)
 
     def test_prose_only_meridian_style_document_is_unaffected(self):
@@ -689,7 +689,9 @@ class RealFilingTablesTest(unittest.TestCase):
         buf = io.StringIO()
         with redirect_stderr(buf), self.assertRaises(ValueError):
             analyze_document(self.DOC, TITLE, client=_fake_client([bad], stop_reason="max_tokens"))
-        self.assertIn("TRUNCATED", buf.getvalue())
+        logged = buf.getvalue()
+        self.assertIn("truncated=True", logged)
+        self.assertIn("hit max_tokens", logged)
 
 
 if __name__ == "__main__":

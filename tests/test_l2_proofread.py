@@ -10,13 +10,15 @@ notices a given language problem is unverifiable without the API, the same
 caveat as every other model-facing test in this codebase.
 """
 
+import contextlib
+import io
 import unittest
 from types import SimpleNamespace
 
 import anthropic
 import httpx2
 
-from analystos.l2.proofread import _report_text, proofread_report
+from analystos.l2.proofread import _TOOL, _report_text, proofread_report
 
 REPORT = {
     "executive_summary": [{"text": "Revenue reached {{0}}."}],
@@ -31,10 +33,52 @@ REPORT = {
 }
 
 
-def _fake_client(passed, issues=None):
-    tool_use = SimpleNamespace(type="tool_use", input={"passed": passed, "issues": issues or []})
+def _fake_client(passed, issues=None, **rubric):
+    tool_use = SimpleNamespace(
+        type="tool_use", input={"passed": passed, "issues": issues or [], **rubric}
+    )
     response = SimpleNamespace(content=[tool_use])
     return SimpleNamespace(messages=SimpleNamespace(create=lambda **kwargs: response))
+
+
+class RubricSchemaTest(unittest.TestCase):  # Slice 49
+    """The tool schema itself carries the three new structured fields
+    (has_filler, has_synthesized_insight, disclosure_gaps_clear) - so a
+    specific criterion's outcome is directly inspectable, not inferred by
+    string-matching "problem" text."""
+
+    def test_the_tool_schema_requires_all_three_new_fields(self):
+        props = _TOOL["input_schema"]["properties"]
+        for field in ("has_filler", "has_synthesized_insight", "disclosure_gaps_clear"):
+            self.assertIn(field, props)
+            self.assertEqual(props[field]["type"], "boolean")
+        for field in ("has_filler", "has_synthesized_insight", "disclosure_gaps_clear"):
+            self.assertIn(field, _TOOL["input_schema"]["required"])
+
+    def test_the_rubric_fields_are_logged_for_auditability(self):
+        client = _fake_client(
+            True, [], has_filler=False, has_synthesized_insight=True, disclosure_gaps_clear=True,
+        )
+        buf = io.StringIO()
+        with contextlib.redirect_stderr(buf):
+            proofread_report(REPORT, client=client)
+        logged = buf.getvalue()
+        self.assertIn("has_filler=False", logged)
+        self.assertIn("has_synthesized_insight=True", logged)
+        self.assertIn("disclosure_gaps_clear=True", logged)
+
+    def test_passed_stays_the_single_source_of_truth_not_gated_on_the_rubric_fields(self):
+        # a model response that says passed=True with no issues, but also
+        # flags has_filler=True, must still ship - the three fields are
+        # for auditability, never a second, competing pass/fail signal
+        # (an inconsistency like this would itself indicate a confused
+        # response worth logging, not a reason to override "passed").
+        client = _fake_client(
+            True, [], has_filler=True, has_synthesized_insight=False, disclosure_gaps_clear=False,
+        )
+        ok, issues = proofread_report(REPORT, client=client)
+        self.assertTrue(ok)
+        self.assertEqual(issues, [])
 
 
 class ReportTextExtractionTest(unittest.TestCase):

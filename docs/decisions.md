@@ -2,6 +2,48 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-11 — Gate 2's full prose-quality rubric (Slice 49)
+
+Gate 2 (`analystos.l2.proofread`) previously judged language mechanics
+only - spelling, grammar, duplication, leftover artifacts. Raised its
+bar to three further criteria (no filler, genuine cross-section
+synthesis clearly labeled, plain-language disclosure gaps), each
+grounded in a worked example in the system prompt the same way every
+other rule in this codebase's prompts already is - a bare adjective
+("check for filler") produces inconsistent model judgment; a concrete
+good/bad example doesn't.
+
+One check moved out of the LLM's hands entirely: whether
+`executive_insight`/`outlook_interpretation` cites at least two distinct
+`{{N}}` facts is mechanically verifiable, so it's now a deterministic
+Gate-1-style check in `analystos.l2.narrate` (`_synthesis_problem`),
+not asked of the model at all - this codebase's established preference
+wherever a rule can be checked in code instead of only judged. Gate 2
+still separately judges whether an insight that *does* cite two facts
+actually connects them into a real judgment (a mechanical count can't
+tell "margin fell and guidance held, together suggesting X" from
+"margin fell. guidance held." - both cite two facts) - the two checks
+catch different failure modes of the same instruction, deliberately not
+redundant.
+
+`_TOOL`'s schema gained `has_filler`/`has_synthesized_insight`/
+`disclosure_gaps_clear` (booleans) so a specific criterion's outcome is
+directly inspectable rather than inferred by string-matching `problem`
+text. These are logged for auditability only - `passed` stays the
+single, sole signal for whether a report ships, deliberately never
+combined with the new booleans into a second, competing pass/fail path;
+a test proves this holds even when the two would disagree (a mocked
+`passed=True` response with `has_filler=True` still ships).
+
+Live-tested (not offline-simulated) per the task's own before/after
+requirement: same underlying facts run through a real `proofread_report`
+call twice. The "before" version - a generic-sentiment filler sentence,
+two facts stated side by side with no connecting judgment, and a vague
+disclosure gap - failed with exactly those three reasons, verbatim from
+the model. The "after" version, same facts rewritten to state a specific
+gap and read the two facts together into one judgment, passed cleanly.
+Full transcript in `specs/slice-49/spec.md`'s "Built" section.
+
 ## 2026-09-11 — a real server-side PDF for the rich report (Slice 48)
 
 The rich (v4) report had no server-generated PDF, only the browser's own

@@ -638,6 +638,26 @@ def _redundant_unit_problem(text):
     return None
 
 
+def _synthesis_problem(text):
+    """``executive_insight``/``outlook_interpretation`` are meant to read
+    two or more facts *together* into a judgment neither states alone (see
+    the "executive_insight"/"outlook_interpretation" rules in
+    ``_SYSTEM_PROMPT``) - a paragraph citing only one distinct ``{{N}}``
+    (or none at all) is a restatement, not synthesis, whatever the prose
+    around it claims. This is fully checkable without any model judgment
+    - a deterministic Gate-1-style gate, not a Gate 2 (proofread) call -
+    the same way a digit-outside-placeholder violation already is
+    (Slice 49).
+    """
+    indices = {int(m.group(1)) for m in _PLACEHOLDER_RE.finditer(text)}
+    if len(indices) < 2:
+        return (
+            f"cites only {len(indices)} distinct fact{'s' if len(indices) != 1 else ''} - "
+            "synthesis requires reading at least two facts together, not restating one"
+        )
+    return None
+
+
 def _validate_paragraph(text, segments):
     """``None`` if the paragraph is trustworthy - every {{N}} points to a
     real, citable fact, no digit appears outside a placeholder, no
@@ -771,7 +791,7 @@ def _locate_problem(report, segments):
     if isinstance(insight_obj, dict):
         insight = (insight_obj.get("text") or "").strip()
         if insight:
-            reason = _validate_paragraph(insight, segments)
+            reason = _validate_paragraph(insight, segments) or _synthesis_problem(insight)
             if reason:
                 get, set_text = _leaf(insight_obj)
                 return get, set_text, f"executive_insight {reason}"
@@ -780,7 +800,7 @@ def _locate_problem(report, segments):
     if isinstance(interp_obj, dict):
         interp = (interp_obj.get("text") or "").strip()
         if interp:
-            reason = _validate_paragraph(interp, segments)
+            reason = _validate_paragraph(interp, segments) or _synthesis_problem(interp)
             if reason:
                 get, set_text = _leaf(interp_obj)
                 return get, set_text, f"outlook_interpretation {reason}"

@@ -57,6 +57,24 @@ def _raw_rows(path, page=None, table_index=0):
     return headers, numbered
 
 
+def all_tables(path):
+    """Every table across the whole document, in page order, as
+    ``[(headers, numbered_raw_rows), ...]`` - each extracted through the
+    exact same ``_raw_rows`` the schema-driven path above already uses.
+    A table with no rows is skipped, not fatal to the rest. See
+    specs/slice-44/spec.md.
+    """
+    with pdfplumber.open(path) as pdf:
+        total = sum(len(p.extract_tables()) for p in pdf.pages)
+    tables = []
+    for i in range(total):
+        try:
+            tables.append(_raw_rows(path, table_index=i))
+        except ValueError:
+            continue
+    return tables
+
+
 def extract_table_pdf(path, schema, page=None, table_index=0):
     """Read one table from the PDF at ``path``; return its rows as typed dicts.
 

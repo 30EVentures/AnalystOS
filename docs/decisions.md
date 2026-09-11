@@ -2,6 +2,46 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-11 — one real table-parsing standard + real footnote detection (Slice 44)
+
+Foundation work for GAAP/non-GAAP detection, which needs real typed table
+structure and real footnoted adjustments to reason about - neither existed
+on the narrated-default path before this. `document_text.py` maintained
+its own separate, weaker table flattening (raw cell text joined directly)
+instead of the real, type-aware `_raw_rows` every format module already
+had for the schema-driven path. Unified: every `_text_from_*` function now
+calls that same `_raw_rows` directly. Proved genuine, not just asserted -
+stashed this slice's changes, reran the five unification tests, watched
+all five fail (each for "the real parsing function was never called"),
+restored the fix, watched them pass.
+
+One real bug this fixes, not just a refactor: Excel stores a percentage-
+formatted cell as its fraction (`0.571` for what displays as "57.1%").
+The schema-driven path already rescaled this correctly; the old narrated-
+path flattening showed the raw fraction verbatim - a person reading the
+narrated text would see a number 100x too small. Fixed by construction,
+not a special case, once both paths go through the same function.
+
+Footnote detection: built real, structural marker-to-content linking for
+`.docx` only. Word's OOXML format has a genuine structural relationship
+(a footnote reference element with an `id`, linked to real content in a
+separate `footnotes.xml` part) - the same kind of unambiguous link a
+table's real cell/row structure has. Checked every other supported format
+against the same bar before building anything, not after: PDF has no
+reliable structural footnote concept through `pdfplumber` (or through most
+real-world PDFs, which aren't tagged) - only a font-size/position
+heuristic is possible, and that's guesswork, not structural detection, so
+it's deliberately not built as part of this. PPTX has no footnote
+mechanism at all. XLSX's closest analog (cell comments) is a different
+relationship entirely (attached to a cell, not a marker in running body
+text). CSV is flat data with no markup. `python-docx` itself exposes no
+public API for footnotes, so the reader parses `word/document.xml` and
+`word/footnotes.xml` directly - and the test fixture needed a real
+footnote built by hand (`lxml`-level XML injection into a python-docx
+document plus a hand-assembled `footnotes.xml`/relationship/content-type),
+since neither a committed fixture nor `python-docx`'s API could produce
+one.
+
 ## 2026-09-11 — evidence encryption at rest + a retention window (Slice 43)
 
 `evidence/` has held plain, unencrypted copies of every uploaded source

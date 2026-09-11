@@ -46,6 +46,26 @@ def _raw_rows(path, table_index=0):
     return headers, numbered
 
 
+def all_tables(path):
+    """Every table in the document, in document order, as
+    ``[(headers, numbered_raw_rows), ...]`` - each extracted through the
+    exact same ``_raw_rows`` the schema-driven path above already uses,
+    not a separate re-implementation. A table with no rows is skipped
+    (matches ``_raw_rows``'s own "empty table" refusal) rather than
+    aborting the whole document. See specs/slice-44/spec.md - this is
+    what ``analystos.l1.document_text`` now calls for a .docx's tables,
+    instead of its own prior ad hoc cell-walking.
+    """
+    doc = Document(path)
+    tables = []
+    for i in range(len(doc.tables)):
+        try:
+            tables.append(_raw_rows(path, table_index=i))
+        except ValueError:
+            continue
+    return tables
+
+
 def extract_table_docx(path, schema, table_index=0):
     """Read table ``table_index`` from the .docx at ``path``; return its rows
     as a list of typed dicts.

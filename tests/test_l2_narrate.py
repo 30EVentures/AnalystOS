@@ -13,6 +13,7 @@ import httpx2
 from analystos.l2.narrate import (
     _MAX_REPAIR_ATTEMPTS,
     _MAX_RETRIES,
+    _build_manifest,
     _locate_problem,
     _redundant_unit_problem,
     _validate_paragraph,
@@ -571,6 +572,33 @@ class WriteNarrativeRepairLoopTest(unittest.TestCase):  # Slice 40
         self.assertEqual(calls["write_narrative"], 1)
         self.assertEqual(calls["fixed_paragraph"], 2)
         self.assertLessEqual(2, _MAX_REPAIR_ATTEMPTS)
+
+
+class ManifestGaapStatusTest(unittest.TestCase):  # Slice 45
+    def test_a_non_gaap_fact_is_tagged_in_the_manifest(self):
+        segs = [{
+            "type": "quote", "horizon": "reported", "gaap_status": "non_gaap",
+            "label": "Non-GAAP net income", "value": 24100000.0, "format": "usd",
+        }]
+        manifest = _build_manifest(segs)
+        self.assertIn("[non-gaap]", manifest)
+
+    def test_a_gaap_fact_carries_no_tag(self):
+        segs = [{
+            "type": "quote", "horizon": "reported", "gaap_status": "gaap",
+            "label": "GAAP net income", "value": 19600000.0, "format": "usd",
+        }]
+        manifest = _build_manifest(segs)
+        self.assertNotIn("[non-gaap]", manifest)
+        self.assertNotIn("[gaap]", manifest)  # gaap is the unmarked default, same as "reported"
+
+    def test_both_a_horizon_and_a_gaap_tag_can_appear_together(self):
+        segs = [{
+            "type": "quote", "horizon": "guidance", "gaap_status": "non_gaap",
+            "label": "FY guide (adjusted)", "value": 50000000.0, "format": "usd",
+        }]
+        manifest = _build_manifest(segs)
+        self.assertIn("[guidance, non-gaap]", manifest)
 
 
 if __name__ == "__main__":

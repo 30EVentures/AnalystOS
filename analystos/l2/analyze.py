@@ -115,6 +115,7 @@ _OPERATIONS = ("sum", "average", "ratio", "growth_percent", "percent_of_total", 
 # tell a benchmarked analysis from a flat list of figures.
 _COMPARISON_OPS = ("ratio", "growth_percent", "percent_of_total", "difference")
 _HORIZONS = ("reported", "guidance", "projected")
+_GAAP_STATUSES = ("gaap", "non_gaap", "n/a")
 
 _SYSTEM_PROMPT = """\
 You are a senior financial/business analyst producing an executive-quality \
@@ -150,6 +151,11 @@ numbers support, each as its own "computed" segment:
 - when the document states a target, a guidance range, or a plan figure \
   for that same metric, that figure and the gap to it ("difference" \
   between the target and the sum of the actuals reported so far).
+- when the document states the same metric on both a GAAP and a non-GAAP \
+  ("adjusted"/"pro forma") basis, both figures (each tagged by \
+  "gaap_status" below) and the reconciling gap between them, as its own \
+  "difference" segment - the same way any other period-over-period gap \
+  is computed.
 
 A figure featured with no comparison, when the document contains one, is \
 an incomplete analysis. If the document genuinely does not contain a \
@@ -221,6 +227,18 @@ ignore them:
   a guidance or projected figure, in which case it takes that horizon \
   (e.g. the gap between full-year guidance and the actuals so far is \
   "guidance").
+- "gaap_status": "gaap" for a figure the document presents as its \
+  standard/audited measure - including one the document doesn't qualify \
+  with "GAAP"/"non-GAAP" language at all, since an unqualified financial- \
+  statement figure is the GAAP one by convention. "non_gaap" only when \
+  the document itself labels the figure "non-GAAP," "adjusted," "pro \
+  forma," or explicitly states it excludes a named item ("excluding \
+  one-time restructuring costs") - never inferred from the number itself \
+  or from whether it looks more favorable. "n/a" for anything the \
+  distinction doesn't apply to (a headcount, a share count, a date, a \
+  percentage that isn't itself a financial-statement line item). \
+  Required on every segment, "prose" and "event" included, where it is \
+  always "n/a".
 - "operands": for "computed", the raw numbers behind the calculation, \
   each with its own exact_text (copied from the document, same table \
   rules as above) and value (the ACTUAL magnitude, scaled the same way as \
@@ -278,6 +296,7 @@ _TOOL = {
                     "properties": {
                         "type": {"type": "string", "enum": ["quote", "computed", "event", "prose"]},
                         "horizon": {"type": "string", "enum": list(_HORIZONS)},
+                        "gaap_status": {"type": "string", "enum": list(_GAAP_STATUSES)},
                         "display": {"type": "string", "enum": ["inline", "stat"]},
                         "label": {"type": "string"},
                         "sentence": {"type": "string"},
@@ -334,8 +353,8 @@ _TOOL = {
                     # nested "event" object is all-required for the same
                     # reason; nesting was never the problem, optionality was.
                     "required": [
-                        "type", "horizon", "display", "label", "sentence", "format",
-                        "exact_text", "has_value", "value", "text",
+                        "type", "horizon", "gaap_status", "display", "label", "sentence",
+                        "format", "exact_text", "has_value", "value", "text",
                         "operation", "operands", "has_total",
                         "total_exact_text", "total_value", "result", "event",
                     ],
@@ -537,13 +556,29 @@ def _horizon(seg):
     return h if h in _HORIZONS else "reported"
 
 
+def _gaap_status(seg):
+    """The segment's GAAP/non-GAAP status, defaulting to ``"n/a"`` - both
+    when the model omits it and when it sends something not in
+    ``_GAAP_STATUSES``. Unlike ``_horizon`` (whose safe default is the
+    same value most segments genuinely have), the safe default here is
+    "no distinction known" rather than "gaap" - defaulting a malformed
+    field to "gaap" would risk silently presenting an unlabelled non-GAAP
+    figure as though it were the audited one, exactly what Slice 45
+    exists to prevent. "n/a" only means the tag-required check
+    (``analystos.l2.narrate``) doesn't apply; it never asserts the figure
+    actually is a standard GAAP measure.
+    """
+    g = seg.get("gaap_status", "n/a")
+    return g if g in _GAAP_STATUSES else "n/a"
+
+
 def _verify_quote(seg, match_document, doc_scale):
     exact_text = seg.get("exact_text", "")
     if not _really_in_document(exact_text, match_document):
         return None, f"quote exact_text not found in document: {exact_text!r}"
     if not seg.get("has_value"):
         return {
-            "type": "quote", "horizon": _horizon(seg),
+            "type": "quote", "horizon": _horizon(seg), "gaap_status": _gaap_status(seg),
             "display": seg.get("display", "inline"),
             "label": seg.get("label"), "text": exact_text, "citation": exact_text,
         }, None
@@ -557,7 +592,7 @@ def _verify_quote(seg, match_document, doc_scale):
     if len(_PLACEHOLDER_RE.findall(sentence)) != 1:
         return None, f"quote sentence needs exactly one {{value}} placeholder: {sentence!r}"
     return {
-        "type": "quote", "horizon": _horizon(seg),
+        "type": "quote", "horizon": _horizon(seg), "gaap_status": _gaap_status(seg),
         "display": seg.get("display", "inline"),
         "label": seg.get("label"), "sentence": sentence,
         "value": canonical, "format": seg.get("format", "number"),
@@ -626,7 +661,8 @@ def _verify_computed(seg, match_document, doc_scale):
     if operation == "percent_of_total":
         citations.append(seg["total_exact_text"])
     return {
-        "type": "computed", "horizon": _horizon(seg), "operation": operation,
+        "type": "computed", "horizon": _horizon(seg), "gaap_status": _gaap_status(seg),
+        "operation": operation,
         "display": seg.get("display", "inline"),
         "label": seg.get("label"), "sentence": sentence,
         "value": recomputed, "format": seg.get("format", "number"),
@@ -645,7 +681,10 @@ def _verify_prose(seg):
         return None, "prose segment is empty"
     if _DIGIT_RE.search(_CALENDAR_RE.sub("", text)):
         return None, f"prose has a digit outside a calendar reference: {text!r}"
-    return {"type": "prose", "horizon": _horizon(seg), "text": text}, None
+    return {
+        "type": "prose", "horizon": _horizon(seg), "gaap_status": _gaap_status(seg),
+        "text": text,
+    }, None
 
 
 def _verify_event(seg, match_document):
@@ -681,7 +720,7 @@ def _verify_event(seg, match_document):
             continue
         milestones.append({"date": m_date, "detail": m_detail})
     return {
-        "type": "event", "horizon": _horizon(seg),
+        "type": "event", "horizon": _horizon(seg), "gaap_status": _gaap_status(seg),
         "what": what, "date": parts["date"], "status": parts["status"],
         "next_step": parts["next_step"], "milestones": milestones,
         "citation": what,

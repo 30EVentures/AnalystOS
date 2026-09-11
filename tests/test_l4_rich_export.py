@@ -233,6 +233,60 @@ class HorizonMarkerTest(unittest.TestCase):
         self.assertNotIn("⟧", out)
 
 
+class GaapStatusMarkerTest(unittest.TestCase):
+    """Slice 45: a non-GAAP fact is visibly marked wherever it's cited -
+    the same mechanism (and the same guarantee) Slice 31's horizon marker
+    already has for a forward-looking fact. The tag is attached by the
+    renderer itself from the segment's own gaap_status, not by anything
+    the model writes - it can't be silently omitted.
+    """
+
+    SEGMENTS = [
+        {"type": "quote", "horizon": "reported", "gaap_status": "gaap",
+         "value": 19_600_000.0, "format": "usd", "citation": "$19.6 million"},        # 0
+        {"type": "quote", "horizon": "reported", "gaap_status": "non_gaap",
+         "value": 24_100_000.0, "format": "usd", "citation": "$24.1 million"},        # 1
+        {"type": "computed", "horizon": "reported", "gaap_status": "n/a",
+         "operation": "difference", "value": 4_500_000.0, "format": "usd",
+         "citation": ["$24.1 million", "$19.6 million"]},                             # 2
+    ]
+
+    def _report(self, **over):
+        base = {
+            "title": "Acme — Q3 review",
+            "executive_summary": [
+                {"text": "GAAP net income was {{0}}; non-GAAP net income was {{1}}."},
+            ],
+            "sections": [{
+                "heading": "Net income",
+                "paragraphs": [{"text": "The reconciling gap was {{2}}."}],
+                "chart": None,
+            }],
+            "outlook": None,
+        }
+        base.update(over)
+        return base
+
+    def test_a_non_gaap_fact_is_marked_wherever_it_is_cited(self):
+        out = render_rich_report(self._report(), self.SEGMENTS, SRC)
+        self.assertIn('<span class="horizon-tag">non-gaap</span>', out)
+
+    def test_the_gaap_fact_next_to_it_is_not_marked(self):
+        out = render_rich_report(self._report(), self.SEGMENTS, SRC)
+        self.assertIn('$19.6M <sup class="cite"', out)
+        self.assertNotIn('$19.6M <span class="horizon-tag"', out)
+
+    def test_a_reconciling_difference_with_no_gaap_status_is_not_marked(self):
+        out = render_rich_report(self._report(), self.SEGMENTS, SRC)
+        self.assertIn('$4.5M <sup class="cite calc"', out)
+        self.assertNotIn('$4.5M <span class="horizon-tag"', out)
+
+    def test_the_sentinel_never_leaks_as_literal_text(self):
+        out = render_rich_report(self._report(), self.SEGMENTS, SRC)
+        self.assertNotIn("⟦", out)
+        self.assertNotIn("⟧", out)
+
+
 class EventInRichReportTest(unittest.TestCase):
     """Slice 32/38: an event referenced by {{N}} substitutes its short
     name inline - never the full composed timeline (Slice 38 fixed that

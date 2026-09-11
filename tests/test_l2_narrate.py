@@ -16,6 +16,7 @@ from analystos.l2.narrate import (
     _build_manifest,
     _locate_problem,
     _redundant_unit_problem,
+    _synthesis_problem,
     _validate_paragraph,
     repair_language_issues,
     write_narrative,
@@ -341,6 +342,60 @@ class RedundantUnitGateTest(unittest.TestCase):  # Slice 40
         problem = _validate_paragraph(text, segs)
         self.assertIsNotNone(problem)
         self.assertIn("million", problem)
+
+
+class SynthesisGateTest(unittest.TestCase):  # Slice 49
+    """executive_insight/outlook_interpretation must read at least two
+    distinct facts together - a single fact restated (or none at all) is
+    not synthesis, whatever the prose claims. Fully deterministic - no
+    model judgment, the same way a digit-outside-placeholder violation
+    already is."""
+
+    def test_a_single_distinct_fact_is_rejected(self):
+        problem = _synthesis_problem("Revenue of {{0}} is the single clearest signal this quarter.")
+        self.assertIsNotNone(problem)
+        self.assertIn("only 1 distinct fact", problem)
+
+    def test_the_same_fact_cited_twice_still_counts_as_one(self):
+        problem = _synthesis_problem("{{0}} matters because {{0}} is what investors watch.")
+        self.assertIsNotNone(problem)
+        self.assertIn("only 1 distinct fact", problem)
+
+    def test_no_facts_at_all_is_rejected(self):
+        problem = _synthesis_problem("This quarter tells its own story.")
+        self.assertIsNotNone(problem)
+        self.assertIn("only 0 distinct facts", problem)
+
+    def test_two_distinct_facts_read_together_passes(self):
+        self.assertIsNone(_synthesis_problem(
+            "Margin compression of {{0}} alongside reiterated guidance of {{1}} "
+            "suggests the dip is temporary."
+        ))
+
+    def test_three_distinct_facts_also_passes(self):
+        self.assertIsNone(_synthesis_problem(
+            "{{0}}, {{1}}, and {{2}} together point the same direction."
+        ))
+
+    def test_wired_into_locate_problem_for_executive_insight(self):
+        report = _report(executive_insight={"text": "Revenue of {{0}} is the single clearest signal."})
+        get, set_text, reason = _locate_problem(report, SEGMENTS)
+        self.assertIn("executive_insight", reason)
+        self.assertIn("only 1 distinct fact", reason)
+        set_text("Revenue of {{0}}, against {{1}} a year earlier, is the clearest signal.")
+        self.assertIsNone(_locate_problem(report, SEGMENTS))
+
+    def test_wired_into_locate_problem_for_outlook_interpretation(self):
+        report = _report(outlook_interpretation={"text": "Guidance of {{4}} speaks for itself."})
+        _get, _set_text, reason = _locate_problem(report, SEGMENTS)
+        self.assertIn("outlook_interpretation", reason)
+        self.assertIn("only 1 distinct fact", reason)
+
+    def test_an_absent_executive_insight_is_not_a_synthesis_failure(self):
+        # {"text": ""} (the model's own "nothing to say" signal) must not
+        # be treated as a one-fact restatement - it's simply absent.
+        report = _report(executive_insight={"text": ""})
+        self.assertIsNone(_locate_problem(report, SEGMENTS))
 
 
 class LocateProblemTest(unittest.TestCase):  # Slice 40

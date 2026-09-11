@@ -2,6 +2,40 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-11 — legal boilerplate exclusion, not a keyword blocklist (Slice 46)
+
+A forward-looking-statements/safe-harbor disclaimer is dense with words
+("forward-looking," "risk," "future") that also appear constantly in
+ordinary, substantive business prose - a single-keyword filter would
+either miss real disclaimers phrased slightly differently or wrongly
+strip legitimate content that happens to use one of those words once.
+Built `analystos/l1/boilerplate.py` around two structurally different
+signals instead: a canonical section heading (this genre's heading
+phrasing is a genuine, standardized legal-drafting convention, not
+something that varies freely) OR a *density* of specific statutory
+phrase patterns (citing the actual securities-law sections, the "actual
+results...differ materially" formulation, "undertake no obligation to
+update") - several must co-occur before content-only detection fires.
+Verified directly: a document using "forward-looking" or "risk" once in
+an ordinary sentence is left untouched; a real disclaimer, headed or not,
+is fully removed.
+
+Wired into `analystos.pipeline.build_report` between
+`extract_document_text` and `analyze_document` - the narrated-default
+path only. The old schema/template path never reads prose at all, so
+there is nothing for this to act on there.
+
+Also closed a proof gap in Slice 45 (GAAP/non-GAAP): that slice's own
+tests used hand-typed prose fixtures, never a real table. Built
+`tests/test_l1_l2_gaap_table_integration.py` - a genuine `.docx`
+reconciliation table, run through the real unified extraction path
+(spied to confirm `extract_docx._raw_rows` actually parsed it), proving
+both figures verify against the real table text and are linked by a
+verified reconciling gap, with a fabricated third figure correctly
+failing verification. No production code changed for this part - Slice
+45's mechanism was already correct; this proved it against the harder,
+realistic case instead of only the fixture that was convenient to type.
+
 ## 2026-09-11 — detect and label GAAP vs. non-GAAP figures (Slice 45)
 
 SEC Reg G requires a filer to label a non-GAAP figure as such wherever it

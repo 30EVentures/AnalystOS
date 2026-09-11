@@ -74,6 +74,7 @@ from analystos.l4.export import (
     render_section,
 )
 from analystos.l4.rich_export import render_rich_report
+from analystos.l4.rich_pdf import render_rich_pdf
 from analystos.templates import build_asks
 
 # A Gate 2 repair is a small, targeted call per flagged issue, not a full
@@ -132,6 +133,7 @@ def build_report(
     evidence_dir=None,
     extract_options=None,
     llm_client=None,
+    want_pdf=False,
 ):
     """Run L0 -> L1 -> L2 -> L4 for one source file; return the section text.
 
@@ -147,6 +149,13 @@ def build_report(
     ``llm_client`` is passed through to both ``analyze_document`` and
     ``write_narrative`` - tests supply a mock there; production leaves it
     unset and a real client is built per call.
+
+    ``want_pdf=True`` is opt-in (Slice 48): the default single-string
+    return contract is unchanged for every existing caller. Asking for a
+    PDF makes this return a ``(section_text, pdf_bytes)`` pair instead -
+    ``render_rich_pdf`` for the rich (v4) report, ``render_pdf`` (the
+    existing flat renderer) for the plain-fallback or schema/template
+    path - so one call produces both without re-running the pipeline.
     """
     if asks is not None and template is not None:
         raise ValueError('exactly one of "asks" or "template" is required')
@@ -212,10 +221,16 @@ def build_report(
                         file=sys.stderr,
                     )
                 raise ValueError(f"Gate 2 (language quality) did not pass after repair ({len(issues)} issue(s))")
-            return render_rich_report(report, segments, source_hash, "actual")  # L4 (rich HTML)
+            html = render_rich_report(report, segments, source_hash, "actual")  # L4 (rich HTML)
+            if want_pdf:
+                return html, render_rich_pdf(report, segments, source_hash, "actual")
+            return html
         except ValueError as exc:
             print(f"[analystos.pipeline] rich report fell back to plain rendering: {exc}", file=sys.stderr)
-            return render_narrated_section(title, source_hash, segments, "actual")  # L4 (plain fallback)
+            plain = render_narrated_section(title, source_hash, segments, "actual")  # L4 (plain fallback)
+            if want_pdf:
+                return plain, render_pdf(plain)
+            return plain
 
     schema, rows = extract_any(source_path, schema, extract_options)        # L1 (table)
 
@@ -239,16 +254,20 @@ def build_report(
         result = _run_ask(rows, source_hash, ask)                          # L2
         findings.append({"text": ask["text"], "format": ask.get("format"), **result})
 
-    return render_section(title, findings, currency_unit)                   # L4
+    section = render_section(title, findings, currency_unit)                # L4
+    if want_pdf:
+        return section, render_pdf(section)
+    return section
 
 
-def run_job(job_dir, evidence_dir=None):
+def run_job(job_dir, evidence_dir=None, want_pdf=False):
     """Run the job in ``job_dir`` (reads job.json); return the section text.
 
     ``build_report`` raises only if job.json has *both* "asks" and
     "template" - having neither now runs the new document-analysis default
     (see ``build_report``'s docstring). "schema" and "title" are optional
-    in job.json too.
+    in job.json too. ``want_pdf`` is passed straight through - see
+    ``build_report``'s docstring.
     """
     job_dir = Path(job_dir)
     job = json.loads((job_dir / "job.json").read_text(encoding="utf-8"))
@@ -262,6 +281,7 @@ def run_job(job_dir, evidence_dir=None):
         currency_unit=job.get("currency_unit", "actual"),
         evidence_dir=evidence_dir,
         extract_options=job,
+        want_pdf=want_pdf,
     )
 
 
@@ -271,23 +291,24 @@ def main(argv=None):
         print("usage: python3 -m analystos <job-dir>", file=sys.stderr)
         return 2
     job_dir = Path(argv[0])
-    section = run_job(job_dir)
+    section, pdf_bytes = run_job(job_dir, want_pdf=True)
     html_path = job_dir / "section.html"
+    pdf_path = job_dir / "section.pdf"
 
     # The narrated default path returns a finished HTML document
     # (analystos.l4.rich_export); the schema/table path returns section
-    # markdown that render_html / render_pdf turn into a page. A real .pdf
-    # of the sectioned/charted layout is its own follow-up (Slice 24's
-    # reportlab renderer extended) - see specs/slice-30/spec.md.
+    # markdown that render_html turns into a page. Either way, want_pdf=True
+    # above already produced the matching PDF (render_rich_pdf for the rich
+    # report, render_pdf for the flat one) - see specs/slice-48/spec.md.
     if section.lstrip().lower().startswith("<!doctype html"):
         html_path.write_text(section, encoding="utf-8")
-        print(f"(written to {html_path})", file=sys.stderr)
+        pdf_path.write_bytes(pdf_bytes)
+        print(f"(written to {html_path} and {pdf_path})", file=sys.stderr)
     else:
         md_path = job_dir / "section.md"
-        pdf_path = job_dir / "section.pdf"
         md_path.write_text(section, encoding="utf-8")
         html_path.write_text(render_html(section), encoding="utf-8")
-        pdf_path.write_bytes(render_pdf(section))
+        pdf_path.write_bytes(pdf_bytes)
         print(section)
         print(f"\n(written to {md_path}, {html_path}, and {pdf_path})", file=sys.stderr)
 

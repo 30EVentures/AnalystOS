@@ -360,6 +360,59 @@ class PipelineTest(unittest.TestCase):
         # pass's own wording, not a silent fallback to Slice 26's rendering
         self.assertNotIn("Revenue was $18.4M", out)
 
+    def test_want_pdf_returns_a_real_rich_pdf_alongside_the_html(self):  # slice 48
+        # want_pdf is opt-in - every other test above calls build_report
+        # without it and still gets a bare string back (the untouched
+        # default contract). This proves the *second* shape: asking for a
+        # PDF returns (html, pdf_bytes), and pdf_bytes is a genuine,
+        # independently-generated rich PDF (render_rich_pdf), not the flat
+        # renderer's output and not a duplicate pipeline run.
+        job = self.tmp / "want-pdf-job"
+        job.mkdir()
+        (job / "data.csv").write_text("period,revenue\nFY2024,18400000\n", encoding="utf-8")
+
+        report_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
+            "segments": [{
+                "type": "quote", "display": "inline", "label": "Revenue",
+                "exact_text": "18400000", "has_value": True, "value": 18400000.0,
+                "sentence": "Revenue was {value}.", "format": "usd",
+            }],
+        })])
+        narrative_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
+            "executive_summary": [{"text": "The headline figure this quarter was {{0}}."}],
+            "sections": [{
+                "heading": "Revenue",
+                "paragraphs": [{"text": "That figure, {{0}}, set the tone for the quarter."}],
+                "has_chart": False,
+                "chart": {"type": "bar", "title": "", "format": "number", "series": []},
+            }],
+            "outlook": [],
+        })])
+        proofread_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
+            "passed": True, "issues": [],
+        })])
+
+        def _create(**kwargs):
+            name = kwargs["tool_choice"]["name"]
+            if name == "write_narrative":
+                return narrative_response
+            if name == "report_issues":
+                return proofread_response
+            return report_response
+
+        fake_client = SimpleNamespace(messages=SimpleNamespace(create=_create))
+
+        out = build_report(
+            job / "data.csv", title="X", evidence_dir=self.tmp / "ev", llm_client=fake_client,
+            want_pdf=True,
+        )
+        html, pdf_bytes = out
+        self.assertTrue(html.lstrip().lower().startswith("<!doctype html"))
+        self.assertTrue(pdf_bytes.startswith(b"%PDF-"))
+        with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+            text = "\n".join(page.extract_text() or "" for page in pdf.pages)
+        self.assertIn("$18.4M", text)
+
     def test_a_gate2_failure_is_repaired_not_immediately_fallen_back(self):  # slice 40
         # Found live 2026-09-11: a report can pass Gate 1 (every number
         # correctly cited) and still fail Gate 2 on pure wording - before

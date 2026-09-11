@@ -39,6 +39,8 @@ from pptx import Presentation
 
 from analystos.l1 import extract, extract_docx, extract_pdf, extract_pptx, extract_xlsx
 from analystos.l1.footnotes import extract_footnotes_docx
+from analystos.l1.image_facts import extract_image_transcripts, render_image_blocks
+from analystos.l1.pdf_columns import extract_page_text
 
 SUPPORTED_EXTENSIONS = (".csv", ".docx", ".pdf", ".pptx", ".xlsx")
 
@@ -61,7 +63,7 @@ def _render_table(headers, numbered_rows):
     return "\n".join(lines)
 
 
-def _text_from_csv(path):
+def _text_from_csv(path, client=None):
     headers, rows = extract._raw_rows(path)
     return _render_table(headers, rows)
 
@@ -74,7 +76,7 @@ def _sheet_names(path):
         wb.close()
 
 
-def _text_from_xlsx(path):
+def _text_from_xlsx(path, client=None):
     chunks = []
     for name in _sheet_names(path):
         try:
@@ -85,7 +87,7 @@ def _text_from_xlsx(path):
     return "\n\n".join(chunks)
 
 
-def _text_from_docx(path):
+def _text_from_docx(path, client=None):
     doc = Document(path)
     chunks = []
     paragraphs = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
@@ -109,7 +111,7 @@ def _text_from_docx(path):
     return "\n\n".join(chunks)
 
 
-def _text_from_pptx(path):
+def _text_from_pptx(path, client=None):
     prs = Presentation(path)
     chunks = []
     table_i = 0  # a global index across the whole deck - matches how
@@ -131,14 +133,14 @@ def _text_from_pptx(path):
     return "\n\n".join(chunks)
 
 
-def _text_from_pdf(path):
+def _text_from_pdf(path, client=None):
     chunks = []
     table_i = 0  # a global index across the whole document - matches how
     # extract_pdf._raw_rows numbers tables without a page filter
     with pdfplumber.open(path) as pdf:
         for page_i, page in enumerate(pdf.pages, start=1):
             lines = [f"Page {page_i}:"]
-            text = page.extract_text()
+            text = extract_page_text(page)  # column-aware - see analystos.l1.pdf_columns
             if text:
                 lines.append(text.strip())
             for _ in page.extract_tables():
@@ -150,6 +152,13 @@ def _text_from_pdf(path):
                 table_i += 1
             if len(lines) > 1:
                 chunks.append("\n".join(lines))
+
+    # Embedded images (charts, scanned exhibits) transcribed via a real
+    # vision call - a no-op, no-cost, no-client-required return of []
+    # when the document has no embedded images at all. See
+    # analystos.l1.image_facts.
+    chunks.extend(render_image_blocks(extract_image_transcripts(path, client=client)))
+
     return "\n\n".join(chunks)
 
 
@@ -162,7 +171,7 @@ _EXTRACTORS = {
 }
 
 
-def extract_document_text(path):
+def extract_document_text(path, client=None):
     """Return the real text content of the document at ``path``.
 
     Dispatches by extension - one of ``SUPPORTED_EXTENSIONS`` - to a
@@ -172,6 +181,12 @@ def extract_document_text(path):
     ``analystos.l1.detect.extract_any`` uses (see the module docstring),
     never a separately re-implemented flattener. Raises ``ValueError`` for
     an unsupported extension or a document with no readable text at all.
+
+    ``client`` is only ever used by the PDF path, to transcribe embedded
+    images (``analystos.l1.image_facts``) - every other format ignores it.
+    Defaults to ``None`` (a real client is resolved only if the document
+    actually has an embedded image to transcribe; a plain PDF never
+    touches it at all).
     """
     suffix = path.suffix.lower()
     if suffix not in _EXTRACTORS:
@@ -179,7 +194,7 @@ def extract_document_text(path):
             f"unsupported source file type {suffix!r}; "
             f"expected one of {sorted(SUPPORTED_EXTENSIONS)}"
         )
-    text = _EXTRACTORS[suffix](path).strip()
+    text = _EXTRACTORS[suffix](path, client=client).strip()
     if not text:
         raise ValueError("document has no readable text")
     return text

@@ -63,6 +63,7 @@ from analystos.l0.store import store
 from analystos.l1.detect import extract_any
 from analystos.l1.boilerplate import strip_forward_looking_boilerplate
 from analystos.l1.document_text import extract_document_text
+from analystos.l1.image_facts import tag_image_sourced_segments
 from analystos.l2.analyze import analyze_document
 from analystos.l2.answer import answer_growth, answer_lookup, answer_ratio
 from analystos.l2.narrate import repair_language_issues, write_narrative
@@ -166,9 +167,10 @@ def build_report(
     source_hash = store(source_path, evidence_dir)                          # L0
 
     if asks is None and template is None:
-        document_text = extract_document_text(source_path)                  # L1 (text)
+        document_text = extract_document_text(source_path, client=llm_client)  # L1 (text)
         document_text = strip_forward_looking_boilerplate(document_text)    # L1 (legal boilerplate out)
         segments = analyze_document(document_text, title, client=llm_client)  # L2 (verified)
+        segments = tag_image_sourced_segments(segments, document_text)       # L1 (image provenance)
         # currency_unit ("thousands"/"millions") means "the source data is
         # pre-scaled by this factor" - true of a CSV/Excel table whose
         # header says "figures in thousands," never of a quoted number

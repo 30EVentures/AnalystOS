@@ -2,6 +2,55 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-11 — evidence encryption at rest + a retention window (Slice 43)
+
+`evidence/` has held plain, unencrypted copies of every uploaded source
+since Slice 2, kept indefinitely. Both gaps closed together: `store` now
+writes `Fernet(key).encrypt(...)` to disk instead of raw bytes, and
+`purge_expired_evidence` deletes anything past a configurable retention
+window. `hash_of` deliberately still hashes the *plaintext*, before
+encryption - Fernet's fresh random nonce means the same source would file
+under a different address every time otherwise, breaking the whole
+"same bytes -> same name" point of a content-addressed store.
+
+Added `cryptography` as a direct, pinned dependency
+(`requirements.txt`) - it was already present transitively (via `anthropic`
+and/or `flask`'s dependency tree), so this makes an existing implicit
+dependency explicit rather than adding real new surface. `Fernet`
+specifically: the standard, well-audited choice in this library for
+"encrypt a blob with one symmetric key," no need to hand-roll AES modes or
+authentication.
+
+Key source: `ANALYSTOS_EVIDENCE_KEY` if set - a real per-deployment secret,
+the same pattern as `ANALYSTOS_ACCESS_CODE` (Slice 22). If unset, a stable,
+repo-known fallback derived from a fixed local constant, so the store is
+never plaintext-by-default in a dev environment - but this fallback is
+explicitly *not* a secret (anyone with this source can derive it) and must
+never be relied on where real data matters. This differs from Slice 22's
+access code, which fails *closed* (500) when unconfigured - encryption
+fails *soft* to a known-weak default instead, because the alternative
+(refusing to store anything without a real key configured) would silently
+break every existing caller and test that has never needed to think about
+this. Documented, not hidden - anyone auditing this file sees exactly
+where the weaker default is.
+
+Retention: `ANALYSTOS_EVIDENCE_RETENTION_DAYS` unset means no expiry
+enforced - the same opt-in pattern Slices 41/42 already use for their own
+ceilings, not a surprise auto-deletion policy. Deletion, not archiving, for
+simplicity (the task's own framing allowed either). `store()` runs the
+cleanup pass itself on every call (best-effort - never lets a cleanup
+problem break the store it's riding along with), so retention is actually
+enforced over time with no external cron job needed, while
+`purge_expired_evidence` stays independently callable for a script or a
+test.
+
+Not migrated: any evidence already on disk from before this change, stored
+under the old plaintext format. `evidence/` is git-ignored dev/test data at
+this stage, and `retrieve()` (the only thing that would ever try to
+decrypt an old file) isn't currently called anywhere in the live pipeline -
+confirmed by inspection, not assumption - so this has no live-behavior
+impact today.
+
 ## 2026-09-11 — an in-code spend hard-stop, second layer over the account cap (Slice 42)
 
 The only spend safety net before this was external to the repo entirely: a

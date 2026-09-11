@@ -45,10 +45,17 @@ class StoreTest(unittest.TestCase):
         second = store(self.source, self.evidence)
         self.assertNotEqual(first, second)
 
-    def test_stored_bytes_match_the_original(self):  # Done when #5
+    def test_stored_bytes_are_encrypted_not_plaintext(self):  # Slice 43 - Done when #1
+        # Slice 2's original version of this test asserted the opposite -
+        # that the on-disk bytes matched the plaintext exactly. Slice 43
+        # (evidence encryption at rest) makes that assertion wrong by
+        # design; the round trip through retrieve() (below) is what now
+        # proves correctness, not raw on-disk equality.
         digest = store(self.source, self.evidence)
         stored = (self.evidence / digest).read_bytes()
-        self.assertEqual(stored, self.source.read_bytes())
+        original = self.source.read_bytes()
+        self.assertNotEqual(stored, original)
+        self.assertNotIn(original, stored)  # not just reordered - not present at all
 
     def test_hash_is_really_sha256_of_the_contents(self):  # sanity check
         digest = store(self.source, self.evidence)

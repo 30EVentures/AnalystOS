@@ -59,6 +59,24 @@ def _raw_rows(path, slide_index=None, table_index=0):
     return headers, numbered
 
 
+def all_tables(path):
+    """Every table across the whole deck, in slide order, as
+    ``[(headers, numbered_raw_rows), ...]`` - each extracted through the
+    exact same ``_raw_rows`` the schema-driven path above already uses.
+    A table with no rows is skipped, not fatal to the rest. See
+    specs/slice-44/spec.md.
+    """
+    prs = Presentation(path)
+    total = sum(len(_tables_on(slide)) for slide in prs.slides)
+    tables = []
+    for i in range(total):
+        try:
+            tables.append(_raw_rows(path, table_index=i))
+        except ValueError:
+            continue
+    return tables
+
+
 def extract_table_pptx(path, schema, slide_index=None, table_index=0):
     """Read one table from the deck at ``path``; return its rows as typed dicts.
 

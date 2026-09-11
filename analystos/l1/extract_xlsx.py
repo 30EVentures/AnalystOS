@@ -66,6 +66,31 @@ def _raw_rows(path, sheet=None):
     return headers, numbered
 
 
+def all_tables(path):
+    """Every worksheet in the workbook, each treated as its own table, as
+    ``[(headers, numbered_raw_rows), ...]`` in sheet order - each
+    extracted through the exact same ``_raw_rows`` the schema-driven path
+    above already uses (including its percentage-format rescaling, so
+    every caller of this function sees the same real value a
+    percentage-formatted cell displays, not the raw stored fraction). An
+    empty sheet is skipped, not fatal to the rest. See
+    specs/slice-44/spec.md.
+    """
+    wb = load_workbook(path, read_only=True)
+    try:
+        names = list(wb.sheetnames)
+    finally:
+        wb.close()
+
+    tables = []
+    for name in names:
+        try:
+            tables.append(_raw_rows(path, sheet=name))
+        except ValueError:
+            continue
+    return tables
+
+
 def extract_table_xlsx(path, schema, sheet=None):
     """Read the sheet at ``path``; return its rows as a list of typed dicts.
 

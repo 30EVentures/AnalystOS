@@ -10,11 +10,24 @@ which of the five supported extensions it is. This is what makes "upload
 anything, read it exactly as it is" real: one function, one text-in
 contract, dispatched internally by extension.
 
-Tables aren't ignored - they're rendered as plain, readable pipe-delimited
-text alongside everything else, so a spreadsheet's numbers are still in the
-returned text; they just aren't parsed into typed cells the way
-``analystos.l1.detect.extract_any`` does for the schema-driven path. See
-``specs/slice-26/spec.md``.
+Tables are rendered as plain, readable pipe-delimited text alongside
+everything else, so a spreadsheet's numbers are still in the returned
+text - but every table now goes through the exact same real,
+type-aware table-parsing functions (``_raw_rows``, in each
+``analystos.l1.extract*`` module) that ``analystos.l1.detect.extract_any``
+already uses for the schema-driven path, not a separate, weaker
+re-implementation that just joins raw cell text. This is one real
+difference, not just a refactor: an Excel cell formatted as a percentage
+stores its *fraction* (``0.571`` for what a person sees as "57.1%"), and
+the old, separate flattening here showed that raw fraction verbatim -
+``_raw_rows``'s percentage rescaling means this path now shows the same
+human-correct "57.1" the schema path already did. See
+specs/slice-44/spec.md.
+
+DOCX footnotes are included too, each linked to the real body text it
+sits near (``analystos.l1.footnotes.extract_footnotes_docx``) - see that
+module for exactly which formats have a genuine structural footnote
+concept to detect at all.
 """
 
 import csv
@@ -24,6 +37,9 @@ from docx import Document
 from openpyxl import load_workbook
 from pptx import Presentation
 
+from analystos.l1 import extract, extract_docx, extract_pdf, extract_pptx, extract_xlsx
+from analystos.l1.footnotes import extract_footnotes_docx
+
 SUPPORTED_EXTENSIONS = (".csv", ".docx", ".pdf", ".pptx", ".xlsx")
 
 
@@ -31,27 +47,42 @@ def _row_to_line(cells):
     return " | ".join((c or "").strip() for c in cells)
 
 
+def _render_table(headers, numbered_rows):
+    """One already-extracted table - ``(headers, numbered_rows)``, the
+    exact shape ``_raw_rows`` returns - rendered as readable pipe-delimited
+    text: the header row, then each data row in the same column order.
+    The one place every format's table becomes text, so the rendering
+    itself can't drift between formats the way five separate ad hoc
+    flatteners could.
+    """
+    lines = [_row_to_line(headers)]
+    for _row_num, raw in numbered_rows:
+        lines.append(_row_to_line(raw.get(h, "") for h in headers))
+    return "\n".join(lines)
+
+
 def _text_from_csv(path):
-    with open(path, newline="", encoding="utf-8-sig") as f:
-        rows = list(csv.reader(f))
-    return "\n".join(_row_to_line(row) for row in rows if any((c or "").strip() for c in row))
+    headers, rows = extract._raw_rows(path)
+    return _render_table(headers, rows)
+
+
+def _sheet_names(path):
+    wb = load_workbook(path, read_only=True)
+    try:
+        return list(wb.sheetnames)
+    finally:
+        wb.close()
 
 
 def _text_from_xlsx(path):
-    wb = load_workbook(path, read_only=True, data_only=True)
-    try:
-        chunks = []
-        for ws in wb.worksheets:
-            lines = [f"Sheet: {ws.title}"]
-            for row in ws.iter_rows():
-                values = [str(c.value) if c.value is not None else "" for c in row]
-                if any(v.strip() for v in values):
-                    lines.append(_row_to_line(values))
-            if len(lines) > 1:
-                chunks.append("\n".join(lines))
-        return "\n\n".join(chunks)
-    finally:
-        wb.close()
+    chunks = []
+    for name in _sheet_names(path):
+        try:
+            headers, rows = extract_xlsx._raw_rows(path, sheet=name)
+        except ValueError:
+            continue  # an empty sheet - skip it, not fatal to the rest
+        chunks.append(f"Sheet: {name}\n" + _render_table(headers, rows))
+    return "\n\n".join(chunks)
 
 
 def _text_from_docx(path):
@@ -60,25 +91,41 @@ def _text_from_docx(path):
     paragraphs = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
     if paragraphs:
         chunks.append("\n".join(paragraphs))
-    for i, table in enumerate(doc.tables):
-        lines = [f"Table {i + 1}:"]
-        for row in table.rows:
-            lines.append(_row_to_line(c.text for c in row.cells))
+
+    for i in range(len(doc.tables)):
+        try:
+            headers, rows = extract_docx._raw_rows(path, table_index=i)
+        except ValueError:
+            continue  # an empty table - skip it, not fatal to the rest
+        chunks.append(f"Table {i + 1}:\n" + _render_table(headers, rows))
+
+    footnotes = extract_footnotes_docx(path)
+    if footnotes:
+        lines = ["Footnotes:"]
+        for fn in footnotes:
+            lines.append(f'[{fn["id"]}] (near: "{fn["marker_context"]}") {fn["footnote_text"]}')
         chunks.append("\n".join(lines))
+
     return "\n\n".join(chunks)
 
 
 def _text_from_pptx(path):
     prs = Presentation(path)
     chunks = []
+    table_i = 0  # a global index across the whole deck - matches how
+    # extract_pptx._raw_rows numbers tables without a slide_index
     for slide_i, slide in enumerate(prs.slides, start=1):
         lines = [f"Slide {slide_i}:"]
         for shape in slide.shapes:
             if shape.has_text_frame and shape.text_frame.text.strip():
                 lines.append(shape.text_frame.text.strip())
             elif shape.has_table:
-                for row in shape.table.rows:
-                    lines.append(_row_to_line(c.text for c in row.cells))
+                try:
+                    headers, rows = extract_pptx._raw_rows(path, table_index=table_i)
+                    lines.append(_render_table(headers, rows))
+                except ValueError:
+                    pass  # an empty table - skip it, not fatal to the rest
+                table_i += 1
         if len(lines) > 1:
             chunks.append("\n".join(lines))
     return "\n\n".join(chunks)
@@ -86,14 +133,21 @@ def _text_from_pptx(path):
 
 def _text_from_pdf(path):
     chunks = []
+    table_i = 0  # a global index across the whole document - matches how
+    # extract_pdf._raw_rows numbers tables without a page filter
     with pdfplumber.open(path) as pdf:
         for page_i, page in enumerate(pdf.pages, start=1):
             lines = [f"Page {page_i}:"]
             text = page.extract_text()
             if text:
                 lines.append(text.strip())
-            for table in page.extract_tables():
-                lines.append("\n".join(_row_to_line(row) for row in table))
+            for _ in page.extract_tables():
+                try:
+                    headers, rows = extract_pdf._raw_rows(path, table_index=table_i)
+                    lines.append(_render_table(headers, rows))
+                except ValueError:
+                    pass  # an empty table - skip it, not fatal to the rest
+                table_i += 1
             if len(lines) > 1:
                 chunks.append("\n".join(lines))
     return "\n\n".join(chunks)
@@ -113,9 +167,11 @@ def extract_document_text(path):
 
     Dispatches by extension - one of ``SUPPORTED_EXTENSIONS`` - to a
     format-specific reader, but every reader returns the same thing: plain
-    text, paragraphs and rendered tables both included, nothing parsed into
-    typed cells. Raises ``ValueError`` for an unsupported extension or a
-    document with no readable text at all.
+    text, paragraphs and rendered tables both included, every table
+    parsed through the same real, type-aware logic
+    ``analystos.l1.detect.extract_any`` uses (see the module docstring),
+    never a separately re-implemented flattener. Raises ``ValueError`` for
+    an unsupported extension or a document with no readable text at all.
     """
     suffix = path.suffix.lower()
     if suffix not in _EXTRACTORS:

@@ -27,6 +27,16 @@ def _raw_rows(path):
     return headers, numbered
 
 
+def all_tables(path):
+    """Every table in the source, as ``[(headers, numbered_raw_rows), ...]``
+    - a CSV file is one table, always, so this is just ``[_raw_rows(path)]``.
+    Exists so every format exposes the same "give me every real table"
+    entry point (``analystos.l1.document_text`` uses this instead of its
+    own separate parsing) - see specs/slice-44/spec.md.
+    """
+    return [_raw_rows(path)]
+
+
 def extract_table(path, schema):
     """Read the CSV at ``path``; return its rows as a list of typed dicts.
 

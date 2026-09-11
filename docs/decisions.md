@@ -2,6 +2,53 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-11 — code, not the model, decides chart type (Slice 47, Task 2)
+
+The writer model previously declared `chart.type` directly; `_chart_html`
+now derives it itself from the resolved, verified `(labels, values)` and
+ignores whatever the model put in that field. A start -> components ->
+end bridge (the exact tie-out property the existing waterfall check
+already required) is a waterfall; three or more period-labelled points
+are a line; anything else is a bar.
+
+This changed one existing test's expected behavior, on purpose:
+`test_a_waterfall_that_does_not_tie_out_is_dropped` previously asserted
+that breaking a declared waterfall's bridge made the whole chart vanish.
+Under auto-detection, that data is simply never classified as a
+waterfall in the first place - it renders as an honest bar comparison of
+the same real numbers instead. No chart lost, and no misleading bridge
+shown either - arguably safer than the old behavior, not a regression.
+Added a new, separate test proving the existing tie-out check is still a
+genuinely independent safety layer: mocked the detector to force
+"waterfall" onto purpose-broken bridge data, confirmed the untouched
+check still refused to render it.
+
+Donut ("parts of a stated whole") is not auto-detected - deliberately
+out of scope, not silently dropped. Nothing available to the detector (a
+plain resolved value list, no associated "total") reliably distinguishes
+that shape from an ordinary categorical comparison without a new signal;
+falls back to bar, a safe default, until that signal is designed.
+
+## 2026-09-11 — "remainder": organic-vs-inorganic as a real operation (Slice 47, Task 1)
+
+The Meridian Data Services bridge (total growth, minus Halyard's stated
+contribution, equals organic growth) was previously only ever produced
+ad hoc through the model's own `"difference"` usage. Added `"remainder"`
+as its own named operation - identical arithmetic to `"difference"`
+(operands[0] minus the sum of the rest), but kept separate so this
+specific "total change minus a named, disclosed component" pattern is
+recognizable downstream rather than just another generic magnitude.
+Verified the same way every operation is: independently recomputed from
+already-checked operand values, dropped if the claimed result doesn't
+match - proven directly, not asserted (a wrong claimed remainder, and an
+operand not actually in the source, both correctly fail).
+
+Given the same cautious treatment `"difference"` already has in the
+direction-word gate: nothing verifies operand[0] genuinely is "the
+total" rather than just the first number listed, so its sign is exactly
+as unreliable, and a directional word next to a `remainder` fact is
+refused the same way.
+
 ## 2026-09-11 — legal boilerplate exclusion, not a keyword blocklist (Slice 46)
 
 A forward-looking-statements/safe-harbor disclaimer is dense with words

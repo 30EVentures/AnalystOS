@@ -109,11 +109,13 @@ _CALENDAR_RE = re.compile(
     r"|\b\d{1,2}(?:st|nd|rd|th)\b",                          # "the 14th"
     re.IGNORECASE,
 )
-_OPERATIONS = ("sum", "average", "ratio", "growth_percent", "percent_of_total", "difference")
+_OPERATIONS = (
+    "sum", "average", "ratio", "growth_percent", "percent_of_total", "difference", "remainder",
+)
 # The operations that are a *comparison* (a figure set against another
 # figure), as opposed to an aggregate. coverage_summary counts these to
 # tell a benchmarked analysis from a flat list of figures.
-_COMPARISON_OPS = ("ratio", "growth_percent", "percent_of_total", "difference")
+_COMPARISON_OPS = ("ratio", "growth_percent", "percent_of_total", "difference", "remainder")
 _HORIZONS = ("reported", "guidance", "projected")
 _GAAP_STATUSES = ("gaap", "non_gaap", "n/a")
 
@@ -156,6 +158,17 @@ numbers support, each as its own "computed" segment:
   "gaap_status" below) and the reconciling gap between them, as its own \
   "difference" segment - the same way any other period-over-period gap \
   is computed.
+- when the document states a TOTAL change for a metric AND separately \
+  names one or more specific components' own disclosed contribution to \
+  that change (e.g., "total Data Services revenue grew $43.0 million, of \
+  which the Halyard acquisition contributed $34.0 million"), compute \
+  what's left over - the "remainder" operation, operands[0] the total \
+  change, the rest each named component's contribution. This is the \
+  organic-vs-inorganic split: the remainder is what the business did \
+  without the named component's effect. Only when the document actually \
+  discloses both the total change and a specific component's own stated \
+  contribution - never estimate a component's share, and never compute a \
+  remainder from a total alone.
 
 A figure featured with no comparison, when the document contains one, is \
 an incomplete analysis. If the document genuinely does not contain a \
@@ -207,14 +220,24 @@ ignore them:
   (write "a small number of" not a figure you can't cite), except a \
   quarter/half/year reference (e.g. "Q4 2026") - that's fine. "" otherwise.
 - "operation": for "computed", one of "sum", "average", "ratio", \
-  "growth_percent", "percent_of_total", "difference". "growth_percent" is \
-  (operands[1] - operands[0]) / operands[0] * 100 - operands[0] is the \
-  EARLIER period, operands[1] the LATER one, in that order, so the sign \
-  is a real increase (positive) or decrease (negative); reversing the \
-  order flips the sign. "difference" is operands[0] minus the sum of the \
-  rest (a - b, or a target minus each actual reported so far) - use it \
-  for an absolute period-over-period change, a margin move stated in \
-  points, or a stated target minus the actuals to date. "none" for \
+  "growth_percent", "percent_of_total", "difference", "remainder". \
+  "growth_percent" is (operands[1] - operands[0]) / operands[0] * 100 - \
+  operands[0] is the EARLIER period, operands[1] the LATER one, in that \
+  order, so the sign is a real increase (positive) or decrease \
+  (negative); reversing the order flips the sign. "difference" is \
+  operands[0] minus the sum of the rest (a - b, or a target minus each \
+  actual reported so far) - use it for an absolute period-over-period \
+  change, a margin move stated in points, or a stated target minus the \
+  actuals to date. "remainder" is the same arithmetic (operands[0] minus \
+  the sum of the rest) but for a specific pattern: a stated TOTAL change \
+  minus one or more specific, NAMED components' disclosed contribution \
+  to it - operands[0] is the total change, the rest are each named \
+  component's own stated contribution - leaving what the total doesn't \
+  explain (often called "organic" when the named component is an \
+  acquisition or divestiture, but the same pattern applies to any "total \
+  change, of which a named part was X" disclosure). Use "remainder" \
+  specifically for this named-component-vs-total pattern; use plain \
+  "difference" for every other kind of subtraction. "none" for \
   "quote"/"prose".
 - "horizon": "reported" for a stated actual or historical figure - the \
   default; use it unless the document clearly frames the number as \
@@ -540,6 +563,20 @@ def _recompute(operation, values, total_value=None):
         if len(values) != 1 or not total_value:
             return None
         return values[0] / total_value * 100
+    if operation == "remainder":
+        # A total change minus one or more named, disclosed components'
+        # contribution to it - the leftover attributable to everything
+        # else, often called "organic" when the named component is an
+        # acquisition (the Meridian Data Services bridge this generalizes
+        # - see specs/slice-47/spec.md), but the same computation applies
+        # to any "total change, of which a named part was X" pattern.
+        # Same formula as "difference" (operands[0] minus the sum of the
+        # rest), kept as its own named operation rather than reusing
+        # "difference" outright so downstream narration/labelling can
+        # recognize this specific pattern instead of a generic magnitude.
+        if len(values) < 2:
+            return None
+        return values[0] - sum(values[1:])
     return None
 
 

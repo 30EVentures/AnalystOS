@@ -171,6 +171,45 @@ class AnalyzeDocumentTest(unittest.TestCase):
         self.assertEqual(len(out), 1)
         self.assertAlmostEqual(out[0]["value"], 25.0)
 
+    def test_growth_percent_with_operands_listed_current_then_prior_still_verifies(self):
+        # Slice 39, found live 2026-09-11: the model listed operands as
+        # [current, prior] instead of the [prior, current] the recompute
+        # expects, on every growth_percent attempt in a real run - correct
+        # math, reversed order. Both operands are still independently
+        # verified real numbers, so accepting whichever order matches the
+        # model's own claimed result stays inside the guarantee.
+        segments = [{
+            "type": "computed", "display": "inline", "label": "Growth",
+            "operation": "growth_percent",
+            "operands": [
+                {"exact_text": "$10,000,000", "value": 10000000.0},  # current, listed first
+                {"exact_text": "$8,000,000", "value": 8000000.0},    # prior, listed second
+            ],
+            "result": 25.0,  # correct: (10M - 8M) / 8M = 25%
+            "sentence": "Revenue grew {value} quarter over quarter.",
+            "format": "percent",
+        }]
+        out = analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
+        self.assertEqual(len(out), 1)
+        self.assertAlmostEqual(out[0]["value"], 25.0)
+
+    def test_a_genuinely_wrong_growth_percent_result_is_still_rejected(self):
+        # neither ordering of these two real operands produces 90% - the
+        # reversed-order allowance never becomes "accept anything"
+        segments = [{
+            "type": "computed", "display": "inline", "label": "Growth",
+            "operation": "growth_percent",
+            "operands": [
+                {"exact_text": "$8,000,000", "value": 8000000.0},
+                {"exact_text": "$10,000,000", "value": 10000000.0},
+            ],
+            "result": 90.0,
+            "sentence": "Revenue grew {value} quarter over quarter.",
+            "format": "percent",
+        }]
+        with self.assertRaises(ValueError):
+            analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
+
     def test_fabricated_math_is_rejected_even_with_real_cited_numbers(self):  # Done when #3, the core guarantee
         segments = [{
             "type": "computed", "display": "inline", "label": "Growth",

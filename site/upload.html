@@ -103,7 +103,8 @@ textarea{min-height:6rem;resize:vertical;line-height:1.5}
 #preview-note{font-family:var(--font-mono);font-size:.74rem;color:var(--faint);margin-top:.5rem}
 
 #result{margin-top:2.2rem}
-#result h2{font-size:1.15rem;margin-bottom:.9rem}
+.result-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:.9rem}
+.result-head h2{font-size:1.15rem;margin:0}
 #report-frame{width:100%;min-height:70vh;border:1px solid var(--hairline);border-radius:12px;background:#fff}
 
 [hidden]{display:none!important}
@@ -199,7 +200,10 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
     </form>
 
     <div id="result" hidden>
-      <h2>Report</h2>
+      <div class="result-head">
+        <h2>Report</h2>
+        <button type="button" class="btn small" id="download-pdf-btn">Download PDF ▸</button>
+      </div>
       <iframe id="report-frame" title="Generated report"></iframe>
     </div>
   </div>
@@ -221,7 +225,18 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
   var errorEl = document.getElementById('error');
   var resultEl = document.getElementById('result');
   var frame = document.getElementById('report-frame');
+  var downloadPdfBtn = document.getElementById('download-pdf-btn');
   var accessCodeInput = document.getElementById('access-code');
+
+  // The report itself already renders a "Download PDF" button
+  // (analystos.l4.rich_export), so this just re-triggers the same native
+  // browser print dialog on the iframe's content - one real page, printed
+  // pixel-for-pixel (real fonts, real inline SVG charts), no second
+  // renderer to keep in sync with the HTML.
+  downloadPdfBtn.addEventListener('click', function () {
+    frame.contentWindow.focus();
+    frame.contentWindow.print();
+  });
 
   var fileInput = document.getElementById('file');
   var tabularToggle = document.getElementById('tabular-toggle');

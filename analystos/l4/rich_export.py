@@ -83,10 +83,15 @@ _STYLE = """
   --font-sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
   --font-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
 }
-*{box-sizing:border-box}
+*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-sans);
   font-size:15px;line-height:1.6;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
 .wrap{max-width:55rem;margin:0 auto;padding:0 28px 100px}
+.pdf-btn{position:fixed;top:20px;right:24px;z-index:10;font-family:var(--font-sans);
+  font-size:.82rem;font-weight:600;color:var(--paper);background:var(--ink);
+  border:none;border-radius:5px;padding:9px 16px;cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.pdf-btn:hover{background:var(--verified)}
 header.masthead{padding:38px 0 20px;border-bottom:2px solid var(--ink);
   display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
 header.masthead h1{font-family:var(--font-display);font-weight:600;font-size:1.8rem;
@@ -156,8 +161,12 @@ footer.footnotes p{margin:.35rem 0;max-width:none}
 footer.footnotes .n{color:var(--ink);font-weight:600;margin-right:.35em}
 footer.footnotes a{color:var(--computed);text-decoration:none;margin-left:.35em}
 
-@media print{body{background:#fff}
-  .exec-summary,.outlook,.chart-card,.analysis-block,.gap-note{break-inside:avoid}}
+@media print{
+  body{background:#fff}
+  .pdf-btn{display:none}
+  .exec-summary,.outlook,.chart-card,.analysis-block,.gap-note,
+  .kpi-strip,.tl-item,section{break-inside:avoid}
+}
 """
 
 
@@ -459,6 +468,13 @@ def render_rich_report(report, segments, source_hash, currency_unit="actual"):
         "ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:"
         'wght@400;500;600;700&display=swap">\n'
         f"<style>{_STYLE}</style>\n</head>\n<body>\n"
+        # Native browser print, not a generated file - the browser already
+        # renders this page pixel-for-pixel (real fonts, real inline SVG
+        # charts), so "print to PDF" reproduces it exactly with no second
+        # renderer to keep in sync. class="no-print" (via the .pdf-btn rule
+        # in @media print) removes the button itself from the output.
+        '<button class="pdf-btn" onclick="window.print()" aria-label="Download this report as a PDF">'
+        "Download PDF</button>\n"
         '<div class="wrap">\n'
         '<header class="masthead"><div>'
         f"<h1>{esc_title}</h1>"

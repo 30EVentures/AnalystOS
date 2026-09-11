@@ -356,6 +356,29 @@ class V4StructureTest(unittest.TestCase):  # Slice 36
         self.assertIn(">Revenue<", out)
         self.assertNotIn(">Bad<", out)
 
+    def test_every_report_has_a_download_pdf_button_that_prints_the_page(self):  # Slice 37
+        # Real browser print, not a generated file - the page already
+        # renders pixel-for-pixel (real fonts, real inline SVG charts), so
+        # printing it *is* the PDF, with no second renderer to drift from
+        # the HTML. Works identically for a CLI-written section.html and
+        # the live site's iframe.
+        out = render_rich_report(self._report(), self.SEG, SRC)
+        self.assertIn('<button class="pdf-btn" onclick="window.print()"', out)
+        self.assertIn("Download PDF</button>", out)
+
+    def test_the_pdf_button_and_only_it_is_hidden_when_printing(self):  # Slice 37
+        out = render_rich_report(self._report(), self.SEG, SRC)
+        style = out.split("<style>")[1].split("</style>")[0]
+        media_print = style.split("@media print{")[1]
+        self.assertIn(".pdf-btn{display:none}", media_print)
+
+    def test_colored_boxes_are_forced_to_print_their_background(self):  # Slice 37
+        # Chrome/Safari drop background colors on print by default - without
+        # this the analysis-block/gap-note/outlook boxes print as plain
+        # white, losing the verified-vs-interpretation visual system.
+        out = render_rich_report(self._report(), self.SEG, SRC)
+        self.assertIn("print-color-adjust:exact", out)
+
 
 if __name__ == "__main__":
     unittest.main()

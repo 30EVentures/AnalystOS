@@ -2,6 +2,46 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-11 — multi-column PDF reading order + image-derived facts (Slice 50)
+
+Two audit-flagged gaps: PDF text extraction read pages in `pdfplumber`'s
+default order, which - confirmed by direct experiment - interleaves a
+genuine two-column layout line by line rather than reading one column
+fully before the next; and an embedded image/chart was completely
+invisible to the system, no OCR, no vision call, anywhere.
+
+**Column detection** (`analystos/l1/pdf_columns.py`) works from words'
+own bounding boxes: the largest empty horizontal gap on the page,
+requiring it span a real minimum fraction of the page width and split a
+real minimum number of words on each side, is treated as a column
+gutter. No such gap -> falls back to the exact pre-Slice-50 behavior, so
+every existing single-column document (the overwhelming majority) is
+provably unaffected - tested directly against the same fixtures used
+before this slice.
+
+**Image-derived facts** (`analystos/l1/image_facts.py`): `tesseract`
+isn't installed on this machine and a system-level binary is a bigger
+ask than any dependency this repo has taken on - vision via the
+existing `anthropic` client needed nothing new. The model's only job is
+a literal, verbatim transcription (never "extract the revenue figure")
+- that transcript is then treated as ordinary document text and flows
+through `analyze_document` *completely unmodified*: a fact "from" an
+image is verified exactly as rigorously as any other quote, an exact
+substring of something real, here a transcript instead of digitally-
+extracted text. The one honest, disclosed gap - a transcript is a model
+output, not a byte-exact extraction - is why every such segment gets a
+new, purely additive `source: "image"` tag, applied *after*
+verification, never folded into or weakening it.
+
+A document with zero embedded images never resolves an Anthropic
+client at all, proven directly (with the API key cleared) - a plain
+PDF costs nothing extra and needs no key just because this code now
+sits on the extraction path.
+
+`Pillow` is now pinned explicitly in `requirements.txt` (it was already
+an implicit transitive dependency of `pdfplumber`/`reportlab`; this
+slice's tests import it directly to build embedded-image fixtures).
+
 ## 2026-09-11 — Gate 2's full prose-quality rubric (Slice 49)
 
 Gate 2 (`analystos.l2.proofread`) previously judged language mechanics

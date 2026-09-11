@@ -2,6 +2,54 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-11 — a real server-side PDF for the rich report (Slice 48)
+
+The rich (v4) report had no server-generated PDF, only the browser's own
+`window.print()`; the flat report's `render_pdf` (Slice 24) only knows
+the flat title/paragraphs/footnotes shape and has no concept of a KPI
+grid, a chart, or a boxed interpretation block. Added
+`analystos/l4/rich_pdf.py` (`render_rich_pdf`), a parallel PDF renderer
+built on `reportlab` (already pinned - no new dependency) that consumes
+the exact same `(report, segments, source_hash, currency_unit)` inputs
+as `render_rich_report`, so nothing is re-derived or re-parsed from the
+HTML.
+
+Two real choices, made up front rather than discovered mid-build:
+
+- **Bundled real IBM Plex font files** (OFL-licensed, redistributable)
+  rather than `reportlab`'s base-14 fonts. "Matching visual fidelity"
+  was the task's own stated goal; a Helvetica/Times stand-in would not
+  meet it. Six TTFs (Sans/Serif/Mono x Regular/SemiBold) live in
+  `analystos/l4/fonts/`, registered at import time.
+- **Charts are redrawn, not reused.** `reportlab` has no SVG renderer,
+  so the existing inline-SVG chart strings (`analystos.l4.charts`)
+  can't be reused directly. A parallel PDF-native drawer
+  (`reportlab.graphics.shapes`) mirrors the same layout logic, but both
+  renderers call the *same* `_detect_chart_type` (Slice 47) on the same
+  resolved `(labels, values)` - so HTML and PDF can never disagree on
+  what shape a chart is, only how it's drawn. The waterfall tie-out
+  safety check (Slice 47) is reimplemented independently on the PDF
+  path too, and proven independent the same way: forcing the detector
+  to lie and confirming the chart still gets refused.
+- **Pipeline integration is opt-in, not a contract change.**
+  `build_report` gained `want_pdf=False`; every existing caller and
+  test still gets a bare string back unchanged. Passing
+  `want_pdf=True` runs the pipeline exactly once and returns
+  `(text, pdf_bytes)` for every path (rich, plain-fallback, and the
+  schema/template path alike). Considered instead making
+  `build_report` always return a pair, or wiring PDF generation only
+  into `main()`/`api/analyze.py` with pipeline logic duplicated there -
+  both were more disruptive for no real benefit. `main()` now always
+  passes `want_pdf=True`, so the CLI writes a real `section.pdf` next
+  to `section.html` for the rich path too, closing a gap where only the
+  flat path ever got one.
+
+Pagination (`reportlab.platypus.KeepTogether` around every chart and
+boxed block) is proven, not assumed: a test builds a report dense
+enough to force a real page break near a chart and confirms via
+`pdfplumber`'s own rect-per-page reading that the chart's bars are
+wholly on one page, never split.
+
 ## 2026-09-11 — code, not the model, decides chart type (Slice 47, Task 2)
 
 The writer model previously declared `chart.type` directly; `_chart_html`

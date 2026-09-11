@@ -2,6 +2,42 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-11 — a deliberate, real-money live-test suite (Slice 51)
+
+The 458 tests in `tests/` are entirely mocked - valuable and permanently
+free, but structurally blind to anything only a genuine model response
+can surface (found directly this session: a report that looked correct
+against every mock but produced an uncitable number live). Added
+`live_tests/` - outside `tests/` on purpose, so it is never collected by
+`unittest discover -s tests` and never runs without being explicitly
+invoked - a small, fixed set of 4 structurally different documents (the
+schema/template path, the narrated path over plain prose, over Slice
+50's column-aware extraction, and over Slice 50's image-fact
+extraction), run against a real, non-mocked `anthropic.Anthropic()`
+client.
+
+Cost tracking is real, not a proxy: `CostTrackingClient` wraps the real
+client so every actual `response.usage` becomes a real dollar figure via
+a price table sourced from Anthropic's own published pricing
+(`claude.com/pricing`, checked 2026-09-11 - $2/MTok in, $10/MTok out for
+Sonnet 5), logged per call and per document. A **$1.00 hard ceiling**
+(your call - conservative against an expected real cost of a few cents
+to a few tens of cents for the whole run) is checked before every
+dispatch; once reached, every further call is refused before it's ever
+sent, and the run stops rather than continuing to spend. One honest,
+disclosed limit: a call's cost isn't known until its response completes,
+so the ceiling can only be checked against *completed* calls - total
+spend can overshoot by at most one call's own bounded cost, never
+unbounded, and this is stated plainly in `live_tests/README.md` rather
+than glossed over.
+
+The runner's own logic (price table, cost accumulation, the ceiling
+correctly refusing and never dispatching the call that would exceed it)
+is proven by 7 ordinary mocked tests in `tests/` - this codebase's usual
+discipline of proving logic before it ever touches a real key - fully
+separate from the live run itself, which is the actual, human-triggered
+proof this slice exists to produce.
+
 ## 2026-09-11 — multi-column PDF reading order + image-derived facts (Slice 50)
 
 Two audit-flagged gaps: PDF text extraction read pages in `pdfplumber`'s

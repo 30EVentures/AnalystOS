@@ -62,7 +62,7 @@ _PLACEHOLDER_RE = re.compile(r"\{\{(\d+)\}\}")
 # financial prose and pass through html.escape untouched.
 #   guidance/projected -> a forward-looking marker
 #   q / c              -> the source tag: quote (verified) / computed
-_TAG_RE = re.compile("⟦(guidance|projected|q|c)⟧")
+_TAG_RE = re.compile("⟦(guidance|projected|non-gaap|q|c)⟧")
 _FORWARD_HORIZONS = ("guidance", "projected")
 
 _CHART_RENDERERS = {
@@ -200,9 +200,13 @@ def _substitute(text, segments, source_hash, currency_unit, footnote_number, foo
         rendered = segment["what"] if segment.get("type") == "event" else display_value(segment, currency_unit)
         horizon = segment.get("horizon", "reported")
         h_tag = f" ⟦{horizon}⟧" if horizon in _FORWARD_HORIZONS else ""
+        # A non-GAAP figure carries its own visible tag the same way a
+        # forward-looking one does - never let an adjusted figure read as
+        # though it were the audited measure. See specs/slice-45/spec.md.
+        g_tag = " ⟦non-gaap⟧" if segment.get("gaap_status") == "non_gaap" else ""
         # ✓ for a direct source quote, ∑ for an independently computed value.
         src_tag = " ⟦c⟧" if segment.get("type") == "computed" else " ⟦q⟧"
-        return f"{rendered}{h_tag}{src_tag} [{n}]"
+        return f"{rendered}{h_tag}{g_tag}{src_tag} [{n}]"
 
     return _PLACEHOLDER_RE.sub(_sub, text)
 

@@ -243,6 +243,20 @@ support (fewer quarters, or a plain "declined across recent periods" \
 with no specific count). This is checked the same way directional words \
 are, and a shortfall gets the whole narrative rejected.
 
+GAAP vs. non-GAAP: a fact's manifest entry says which it is. When the \
+manifest has only one of the two for a metric, cite it plainly - most \
+figures never have this distinction at all. When it has *both* - the \
+standard/audited figure and management's own "adjusted"/"non-GAAP"/"pro \
+forma" version - state the GAAP figure as the primary fact; you may also \
+cite the non-GAAP figure as management's own adjusted view (it renders \
+with its own visible tag automatically - you never need to write "non- \
+GAAP" yourself, citing {{N}} is enough), but never in place of the GAAP \
+figure, and never lead with the adjusted number as though it were the \
+official one. If the manifest gives you a computed reconciling gap \
+between the two, that gap - what's actually excluded from the adjusted \
+figure - is usually the more informative sentence than either number \
+alone.
+
 Charts: give a section a chart only when it plots two or more facts you \
 are already citing and the shape carries real information - a "line" for \
 one metric across three or more periods, a "bar" to compare categories \
@@ -437,7 +451,10 @@ def _build_manifest(segments):
     lines = []
     for i, segment in enumerate(segments):
         horizon = segment.get("horizon", "reported")
-        tag = "" if horizon == "reported" else f" [{horizon}]"
+        labels = [] if horizon == "reported" else [horizon]
+        if segment.get("gaap_status") == "non_gaap":
+            labels.append("non-gaap")
+        tag = f" [{', '.join(labels)}]" if labels else ""
         if segment["type"] == "prose":
             lines.append(f'Fact {i} [context, not citable]{tag}: "{segment["text"]}"')
         elif segment["type"] == "event":

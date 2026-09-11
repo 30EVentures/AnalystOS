@@ -2,6 +2,32 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-11 — detect and label GAAP vs. non-GAAP figures (Slice 45)
+
+SEC Reg G requires a filer to label a non-GAAP figure as such wherever it
+appears - a genuinely detectable signal already in the source text, not
+something to infer from a number's size or direction. Added `gaap_status`
+("gaap"/"non_gaap"/"n/a") alongside the existing `horizon` field on every
+segment, verified the same way: trusted only when the source's own
+wording states it, defaulting safely to "n/a" (not "gaap") on anything
+missing or malformed - unlike `horizon`, where the safe default
+("reported") is what most segments genuinely are, defaulting a malformed
+gaap_status to "gaap" would risk silently presenting an unlabelled
+adjusted figure as the audited one, exactly what this slice exists to
+prevent.
+
+Planned a new Gate 1 validator (a non-GAAP fact cited without its tag
+gets rejected) before building it, then found it unnecessary during
+implementation: the tag is attached by `rich_export.py`'s renderer
+straight from the segment's `gaap_status`, the identical mechanism
+`⟦guidance⟧`/`⟦projected⟧` already use - reusing `_TAG_RE`'s existing
+generic rendering branch and the already-generic `.horizon-tag` CSS
+class needed no new styling either. The model cannot omit the tag any
+more than it can omit a guidance marker; a validator would have only
+checked something already structurally guaranteed. Dropped the checker,
+kept the guarantee - a stronger property than the originally-scoped
+plan, found by building it rather than assumed going in.
+
 ## 2026-09-11 — one real table-parsing standard + real footnote detection (Slice 44)
 
 Foundation work for GAAP/non-GAAP detection, which needs real typed table

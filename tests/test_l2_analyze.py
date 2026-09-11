@@ -483,6 +483,86 @@ class HorizonFieldTest(unittest.TestCase):
         self.assertEqual(out[0]["horizon"], "projected")
 
 
+class GaapStatusFieldTest(unittest.TestCase):  # Slice 45
+    """Every verified segment carries a gaap_status; a non-GAAP figure is
+    verified exactly like any other quote, just tagged."""
+
+    def test_a_non_gaap_quote_is_verified_and_keeps_its_status(self):
+        document = "Non-GAAP net income, which excludes stock-based compensation, was $24,100,000."
+        segments = [{
+            "type": "quote", "gaap_status": "non_gaap", "display": "stat",
+            "label": "Non-GAAP net income", "exact_text": "$24,100,000",
+            "has_value": True, "value": 24100000.0,
+            "sentence": "Non-GAAP net income was {value}.", "format": "usd",
+        }]
+        out = analyze_document(document, TITLE, client=_fake_client(segments))
+        self.assertEqual(out[0]["value"], 24100000.0)
+        self.assertEqual(out[0]["gaap_status"], "non_gaap")
+
+    def test_a_segment_with_no_gaap_status_defaults_to_n_a(self):
+        segments = [{
+            "type": "quote", "display": "inline", "label": "Revenue",
+            "exact_text": "$10,000,000", "has_value": True, "value": 10000000.0,
+            "sentence": "Q4 revenue was {value}.", "format": "usd",
+        }]
+        out = analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
+        self.assertEqual(out[0]["gaap_status"], "n/a")
+
+    def test_an_unrecognised_gaap_status_falls_back_to_n_a(self):
+        # Unlike horizon (whose safe fallback is "reported" - what most
+        # segments genuinely are), a malformed gaap_status must never
+        # default to "gaap" - that would risk silently presenting an
+        # unlabelled figure as the audited one.
+        segments = [{
+            "type": "quote", "gaap_status": "kinda-gaap", "display": "inline",
+            "label": "Revenue", "exact_text": "$10,000,000",
+            "has_value": True, "value": 10000000.0,
+            "sentence": "Q4 revenue was {value}.", "format": "usd",
+        }]
+        out = analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
+        self.assertEqual(out[0]["gaap_status"], "n/a")
+
+    def test_prose_carries_a_gaap_status_too(self):
+        segments = [{"type": "prose", "gaap_status": "n/a",
+                     "text": "Momentum should continue into 2027."}]
+        out = analyze_document(DOCUMENT, TITLE, client=_fake_client(segments))
+        self.assertEqual(out[0]["gaap_status"], "n/a")
+
+    def test_a_gaap_and_non_gaap_pair_with_a_reconciling_difference(self):
+        # The realistic shape: both figures for the same metric, plus the
+        # gap between them as a normal, already-supported "difference"
+        # computation - no new verification code needed for this part,
+        # just the two figures correctly tagged.
+        document = (
+            "GAAP net income was $19,600,000. Non-GAAP net income, which "
+            "excludes $4,500,000 of one-time integration costs, was $24,100,000."
+        )
+        segments = [
+            {"type": "quote", "gaap_status": "gaap", "display": "stat",
+             "label": "GAAP net income", "exact_text": "$19,600,000",
+             "has_value": True, "value": 19600000.0,
+             "sentence": "GAAP net income was {value}.", "format": "usd"},
+            {"type": "quote", "gaap_status": "non_gaap", "display": "stat",
+             "label": "Non-GAAP net income", "exact_text": "$24,100,000",
+             "has_value": True, "value": 24100000.0,
+             "sentence": "Non-GAAP net income was {value}.", "format": "usd"},
+            {"type": "computed", "gaap_status": "n/a", "display": "inline",
+             "label": "GAAP/non-GAAP reconciling gap", "operation": "difference",
+             "operands": [{"exact_text": "$24,100,000", "value": 24100000.0},
+                          {"exact_text": "$19,600,000", "value": 19600000.0}],
+             "has_total": False, "total_exact_text": "", "total_value": 0,
+             "result": 4500000.0, "sentence": "The reconciling gap was {value}.",
+             "format": "usd"},
+        ]
+        out = analyze_document(document, TITLE, client=_fake_client(segments))
+        self.assertEqual(len(out), 3)
+        self.assertEqual(out[0]["gaap_status"], "gaap")
+        self.assertEqual(out[1]["gaap_status"], "non_gaap")
+        self.assertEqual(out[1]["value"], 24100000.0)
+        self.assertEqual(out[2]["value"], 4500000.0)  # the verified reconciling gap
+        self.assertEqual(out[2]["gaap_status"], "n/a")
+
+
 class CoverageContractTest(unittest.TestCase):
     """Slice 29: given a realistic multi-period response, the full
     comparison set survives verification and coverage_summary reports it.

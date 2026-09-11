@@ -65,6 +65,7 @@ from analystos.l1.document_text import extract_document_text
 from analystos.l2.analyze import analyze_document
 from analystos.l2.answer import answer_growth, answer_lookup, answer_ratio
 from analystos.l2.narrate import write_narrative
+from analystos.l2.proofread import proofread_report
 from analystos.l4.export import (
     render_html,
     render_narrated_section,
@@ -163,11 +164,20 @@ def build_report(
             # executive summary, sections, charts drawn only from cited
             # facts, a distinct outlook block (Slice 27 + 30). It cannot
             # state a number itself; any failure here (a bad reference, a
-            # stray digit, a malformed structure, an API error) falls back
-            # to the plain per-segment rendering below rather than losing
-            # the report over a writing-quality improvement. See
-            # specs/slice-27/spec.md and specs/slice-30/spec.md.
-            report = write_narrative(segments, title, client=llm_client)  # L2 (structure + writing)
+            # stray digit, a malformed structure, a wrong direction word,
+            # an API error) falls back to the plain per-segment rendering
+            # below rather than losing the report over a writing-quality
+            # improvement. See specs/slice-27/spec.md, slice-30, slice-38.
+            report = write_narrative(segments, title, client=llm_client)  # L2 (structure + writing) - Gate 1
+            # Gate 2, run separately and blind to the facts: language
+            # quality only (spelling, grammar, duplicated text, leftover
+            # artifacts). Both gates are mandatory - a report that fails
+            # either one is never shown; it falls back the same way a
+            # Gate 1 failure does, not a special case. See
+            # specs/slice-38/spec.md ("two mandatory quality gates").
+            passed, _issues = proofread_report(report, client=llm_client)
+            if not passed:
+                raise ValueError("Gate 2 (language quality) did not pass")
             return render_rich_report(report, segments, source_hash, "actual")  # L4 (rich HTML)
         except ValueError:
             return render_narrated_section(title, source_hash, segments, "actual")  # L4 (plain fallback)

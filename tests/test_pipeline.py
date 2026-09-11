@@ -336,10 +336,16 @@ class PipelineTest(unittest.TestCase):
             }],
             "outlook": [],
         })])
+        proofread_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
+            "passed": True, "issues": [],
+        })])
 
         def _create(**kwargs):
-            if kwargs["tool_choice"]["name"] == "write_narrative":
+            name = kwargs["tool_choice"]["name"]
+            if name == "write_narrative":
                 return narrative_response
+            if name == "report_issues":
+                return proofread_response
             return report_response
 
         fake_client = SimpleNamespace(messages=SimpleNamespace(create=_create))
@@ -384,10 +390,16 @@ class PipelineTest(unittest.TestCase):
             }],
             "outlook": [],
         })])
+        proofread_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
+            "passed": True, "issues": [],
+        })])
 
         def _create(**kwargs):
-            if kwargs["tool_choice"]["name"] == "write_narrative":
+            name = kwargs["tool_choice"]["name"]
+            if name == "write_narrative":
                 return narrative_response
+            if name == "report_issues":
+                return proofread_response
             return report_response
 
         fake_client = SimpleNamespace(messages=SimpleNamespace(create=_create))

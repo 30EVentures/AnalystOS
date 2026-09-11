@@ -199,11 +199,15 @@ ignore them:
   (write "a small number of" not a figure you can't cite), except a \
   quarter/half/year reference (e.g. "Q4 2026") - that's fine. "" otherwise.
 - "operation": for "computed", one of "sum", "average", "ratio", \
-  "growth_percent", "percent_of_total", "difference". "difference" is \
-  operands[0] minus the sum of the rest (a - b, or a target minus each \
-  actual reported so far) - use it for an absolute period-over-period \
-  change, a margin move stated in points, or a stated target minus the \
-  actuals to date. "none" for "quote"/"prose".
+  "growth_percent", "percent_of_total", "difference". "growth_percent" is \
+  (operands[1] - operands[0]) / operands[0] * 100 - operands[0] is the \
+  EARLIER period, operands[1] the LATER one, in that order, so the sign \
+  is a real increase (positive) or decrease (negative); reversing the \
+  order flips the sign. "difference" is operands[0] minus the sum of the \
+  rest (a - b, or a target minus each actual reported so far) - use it \
+  for an absolute period-over-period change, a margin move stated in \
+  points, or a stated target minus the actuals to date. "none" for \
+  "quote"/"prose".
 - "horizon": "reported" for a stated actual or historical figure - the \
   default; use it unless the document clearly frames the number as \
   forward-looking. "guidance" for a figure the document attributes to the \
@@ -581,7 +585,26 @@ def _verify_computed(seg, match_document, doc_scale):
         if total_canonical is None:
             return None, f"percent_of_total total value does not match {total_text!r}"
     recomputed = _recompute(operation, values, total_canonical)
-    if recomputed is None or not _close_enough(recomputed, seg.get("result", float("nan"))):
+    claimed = seg.get("result", float("nan"))
+    if operation == "growth_percent" and len(values) == 2 and (
+        recomputed is None or not _close_enough(recomputed, claimed)
+    ):
+        # Both operands are already independently verified real numbers;
+        # the model listing them as [current, prior] instead of the
+        # [prior, current] this recomputation expects is a benign, common
+        # mixup - found live 2026-09-11, correct math, reversed operand
+        # order, on every growth_percent attempt in one real run (making
+        # the fresh "use growth_percent for direction" rule from the same
+        # slice backfire: more attempts, same order confusion, more
+        # drops). Accepting whichever order matches the model's own
+        # claimed result stays inside the guarantee - it is still the
+        # real percent change between the same two real numbers, computed
+        # the other legitimate way - and removes the fragility instead of
+        # trusting a prompt instruction to hold on its own.
+        alt = _recompute(operation, list(reversed(values)), total_canonical)
+        if alt is not None and _close_enough(alt, claimed):
+            recomputed = alt
+    if recomputed is None or not _close_enough(recomputed, claimed):
         return None, (
             f"recomputed {operation} = {recomputed!r} does not match the model's "
             f"result {seg.get('result')!r}"

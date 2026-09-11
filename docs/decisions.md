@@ -2,6 +2,38 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-11 — growth_percent operand order made order-independent (Slice 39)
+
+Live-tested Slice 38 immediately after merge: a report that should have
+been rich fell all the way back to plain text. The log showed the real
+cause - every `growth_percent` computed segment in that run failed
+verification, e.g. `recomputed growth_percent = -8.63 does not match the
+model's result 9.45`. Checked both orderings of the same two operands by
+hand: `(498-455)/455 = 9.45` - the model's math was correct; it had just
+listed the operands as `[current, prior]` instead of the `[prior,
+current]` `_recompute` assumed. With no citable growth fact left, the
+narrator wrote a raw, uncited dollar figure instead, which tripped the
+existing digit check and took the whole report down to the flat fallback.
+
+Root cause is Slice 38 itself: the new "use growth_percent for every
+directional claim" prompt rule (replacing "difference," which has no
+reliable sign) made the model attempt `growth_percent` far more often -
+so an operand-order mixup that used to surface occasionally now hit on
+every attempt in one run. Fixing the sign-word bug amplified a different,
+pre-existing one.
+
+**Fixed at the verification layer, not the prompt** - a prompt
+clarification was added too, but a prompt instruction had already failed
+4 times in this exact run and shouldn't be trusted alone.
+`_verify_computed` now tries both operand orderings for `growth_percent`
+and accepts whichever one matches the model's own claimed result. Both
+operands are already independently verified real numbers at that point,
+so this stays entirely inside the guarantee - it is still the real
+percent change between the same two real numbers, computed the other
+legitimate way, never a third or fabricated value. `difference` is left
+order-sensitive (unchanged) since Slice 38 already bans a direction word
+next to it regardless of sign.
+
 ## 2026-09-11 — Two mandatory quality gates: correctness and language, independent (Slice 38)
 
 A real PDF from the live site (`Downloads/Test #5 to download pdf.pdf`)

@@ -70,8 +70,10 @@ longer prompt and schema. See ``docs/decisions.md``, 2026-09-05.
 """
 
 import math
+import os
 import re
 import sys
+from threading import Lock
 
 import anthropic
 
@@ -729,6 +731,58 @@ def _resolve_client(client):
     return client
 
 
+# Slice 42 - a second, in-code spend safety net alongside the existing
+# account-level Anthropic spend cap (2026-09-05 decision). That cap is
+# real but external - this repo's code can't see, configure, or test it.
+# Tracks cumulative *call count*, not dollar cost: turning token usage
+# into a real dollar figure means embedding a per-model price table that
+# goes silently stale the moment pricing changes, and call count is the
+# metric this task explicitly sanctions as the fallback when cost isn't
+# directly available. See specs/slice-42/spec.md.
+_MAX_API_CALLS_ENV_VAR = "ANALYSTOS_MAX_API_CALLS"
+_api_call_lock = Lock()
+_api_call_count = 0  # cumulative, process-lifetime
+
+
+def _spend_ceiling():
+    """The configured ceiling, or ``None`` if unset/unparseable - unset
+    means no internal ceiling (the account-level cap remains the only
+    one), not some arbitrary default forced on every deployment."""
+    raw = os.environ.get(_MAX_API_CALLS_ENV_VAR)
+    if not raw:
+        return None
+    try:
+        return int(raw)
+    except ValueError:
+        return None
+
+
+def _enforce_spend_ceiling():
+    """Raise ``ValueError`` - the same clean failure shape a real
+    ``anthropic.APIError`` already becomes - if the configured ceiling is
+    already spent. Checked before any API call is dispatched, so a call
+    that would exceed the budget never reaches Anthropic at all."""
+    ceiling = _spend_ceiling()
+    if ceiling is None:
+        return
+    with _api_call_lock:
+        if _api_call_count >= ceiling:
+            print(
+                f"[analystos.l2] internal API call budget exceeded "
+                f"({_api_call_count}/{ceiling}) - refusing before dispatch",
+                file=sys.stderr,
+            )
+            raise ValueError(
+                "analysis is temporarily unavailable - please try again shortly"
+            )
+
+
+def _record_api_call():
+    global _api_call_count
+    with _api_call_lock:
+        _api_call_count += 1
+
+
 def _create_message(client, **kwargs):
     """Call ``client.messages.create(**kwargs)``, converting any
     ``anthropic.APIError`` into the same clean ``ValueError`` every caller
@@ -737,8 +791,12 @@ def _create_message(client, **kwargs):
     useful for diagnosing a real failure (bad key, no billing, rate limit,
     model access, an Anthropic-side outage all look identical to the
     caller otherwise), so it's logged server-side first. Shared by
-    ``analyze_document`` and ``analystos.l2.narrate.write_narrative``.
+    ``analyze_document`` and ``analystos.l2.narrate.write_narrative`` - the
+    one choke point every Anthropic call in the codebase goes through,
+    which is also why the Slice 42 spend ceiling lives here.
     """
+    _enforce_spend_ceiling()
+    _record_api_call()
     try:
         return client.messages.create(**kwargs)
     except anthropic.APIError as exc:

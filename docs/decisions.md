@@ -2,6 +2,31 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-11 — an in-code spend hard-stop, second layer over the account cap (Slice 42)
+
+The only spend safety net before this was external to the repo entirely: a
+monthly cap set on the Anthropic account itself (see the 2026-09-05 entry
+below). Real, but this repo's code can't see, configure, or test it.
+Added a second layer inside `_create_message` - the one choke point every
+Anthropic call in the codebase already goes through - checked *before*
+dispatching a call, so a runaway loop hits an internal stop before (or
+even without) ever touching the account-level cap.
+
+Tracks **call count, not dollar cost**. Considered token-usage-based
+tracking (the SDK response does carry `usage.input_tokens`/
+`output_tokens`), but that means embedding a per-model price table in this
+repo that goes silently stale the moment Anthropic's pricing changes -
+exactly the kind of drift a safety net shouldn't have. Call count degrades
+safely instead: worst case the ceiling trips a bit earlier or later than a
+dollar-exact one would, never silently and never wrong-currency.
+
+`ANALYSTOS_MAX_API_CALLS` unset means **no internal ceiling** - this is a
+second layer on top of the account-level cap, not a replacement forced on
+every deployment by default. Set it, and it's enforced with the same
+clean `ValueError` a real `anthropic.APIError` already produces, so a
+caller can't tell "hit the account cap" from "hit the internal one"
+without reading server logs.
+
 ## 2026-09-11 — per-IP rate limiting on the access-code endpoints (Slice 41)
 
 Slice 22 explicitly deferred this ("an accepted, disclosed tradeoff for

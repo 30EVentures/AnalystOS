@@ -2,6 +2,29 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-11 — per-IP rate limiting on the access-code endpoints (Slice 41)
+
+Slice 22 explicitly deferred this ("an accepted, disclosed tradeoff for
+this stage, not an oversight"). Added as defense in depth, not a redesign
+of auth: the shared-code, no-accounts model is unchanged. In-memory,
+per-process fixed-window counter keyed by client IP
+(`X-Forwarded-For`'s first hop, else `request.remote_addr`), checked
+*before* the access-code comparison so a wrong-code guess still counts
+against the budget - the actual point of rate-limiting this endpoint is
+slowing down someone trying to brute-force the shared code, not just
+capping legitimate traffic. Configurable via `ANALYSTOS_RATE_LIMIT_MAX`
+(default 30) and `ANALYSTOS_RATE_LIMIT_WINDOW_SECONDS` (default 60); an
+unset or unparseable value falls back to the default rather than raising -
+a throttle must never be the reason the whole service goes down.
+
+In-memory per-process, not a shared store (Redis, etc.): correct for a
+single Vercel function instance, not guaranteed across many concurrent
+instances under real distributed load. Accepted for this stage - the same
+category of tradeoff Slice 22 already made for the access code itself
+(good enough to keep this off casual abuse, not hardened against a
+determined distributed attacker). A real shared-store limiter is future
+work if the threat model changes.
+
 ## 2026-09-11 — repair the one flagged piece, not a full regenerate (Slice 40)
 
 Live-tested Slice 39's fix twice more, back to back, and both runs still

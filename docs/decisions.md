@@ -2,6 +2,51 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-11 — Two mandatory quality gates: correctness and language, independent (Slice 38)
+
+A real PDF from the live site (`Downloads/Test #5 to download pdf.pdf`)
+had four distinct defects even though every number in it individually
+traced to a real source: a net-income decline described as "rose... up
+$2.8M"; an event's full composed timeline leaking verbatim into prose
+6+ times, "next:" artifact and all; a footnote whose displayed operand
+("$1.9B") didn't actually support its own displayed result ("$565.0M");
+and a fragile, unchecked class of "N consecutive quarters" claims. All
+four are root-caused and fixed in `analystos/l2/narrate.py` and
+`analystos/l4/{export,rich_export}.py` - see the Slice 38 commit for the
+full breakdown per bug.
+
+**Gate 1 (correctness)** is enforced inside `write_narrative`'s existing
+validation (`_validate_paragraph`), so a violation gets the same
+retry-then-fallback treatment a stray digit already did - never a special
+code path. **Gate 2 (language quality)** is a new, separate, independent
+model call (`analystos/l2/proofread.py`) that sees only the assembled
+prose - never segments, citations, or values - so it cannot be swayed by
+whether the facts are right, and can never be quietly satisfied just
+because Gate 1 already passed. Wired into `pipeline.py` to run after Gate
+1, before rendering; either gate failing takes the identical fallback
+path to the plain renderer.
+
+This is a third model call per narrated report (real added latency and
+cost, on top of `analyze_document` and `write_narrative`) - a deliberate
+trade explicitly asked for over a general-purpose grammar library, which
+is a poor fit for a Vercel serverless function (most need a JVM or a
+native binary neither of which reliably run there).
+
+Each of the four checks has a dedicated test reproducing the live defect
+and confirming the fix catches it (not just "the code changed"). The
+exact Meridian figures behind the broken PDF were also rebuilt as
+verified segments and run through the real `write_narrative` +
+`proofread_report` + `render_rich_report` end to end (mocked client) -
+both gates pass, and the corrected output was converted to a real PDF
+via headless Chrome for a direct before/after comparison. Whether a
+*real* model reliably produces content this clean, and whether Gate 2
+actually catches a real model's language slips, is the still-open,
+unverifiable-without-the-API question - same caveat as every model-facing
+change this session.
+
+Also true but out of scope here, and deferred to a follow-up per the
+request's own ordering: chart-type diversity and table formatting.
+
 ## 2026-09-09 — The output-token ceiling on a dense document (Slice 34)
 
 Slice 33 fixed how verification matches; the realistic earnings release

@@ -88,18 +88,25 @@ _FORMATS = ("number", "percent", "usd")
 _CURRENCY_UNITS = {"actual": 1, "thousands": 1_000, "millions": 1_000_000}
 
 
-def _compact_usd(raw_dollars):
-    """Render a raw dollar amount as $X.XK / $X.XM / $X.XB, else $X.XX."""
+def _compact_usd(raw_dollars, decimals=1):
+    """Render a raw dollar amount as $X.XK / $X.XM / $X.XB, else $X.XX.
+
+    ``decimals`` defaults to 1 (unchanged historical behaviour) but a caller
+    building a footnote's visible arithmetic can ask for more - $1.95B
+    compacted to 1 decimal is "$1.9B", which no longer adds up against the
+    other operands in the same expression (see ``analystos.l4.rich_export
+    ._arithmetic``, Slice 38).
+    """
     if raw_dollars >= 1_000_000_000:
-        return f"${raw_dollars / 1_000_000_000:,.1f}B"
+        return f"${raw_dollars / 1_000_000_000:,.{decimals}f}B"
     if raw_dollars >= 1_000_000:
-        return f"${raw_dollars / 1_000_000:,.1f}M"
+        return f"${raw_dollars / 1_000_000:,.{decimals}f}M"
     if raw_dollars >= 1_000:
-        return f"${raw_dollars / 1_000:,.1f}K"
+        return f"${raw_dollars / 1_000:,.{decimals}f}K"
     return f"${raw_dollars:,.2f}"
 
 
-def format_number(value, spec, currency_unit="actual"):
+def format_number(value, spec, currency_unit="actual", decimals=1):
     """Render ``value`` per ``spec`` (see module docstring); ``None`` = unchanged.
 
     Falls back to ``str(value)`` for a non-numeric answer even if a format was
@@ -108,7 +115,8 @@ def format_number(value, spec, currency_unit="actual"):
     it - a fact's displayed value must be computed exactly the same way
     whether it ends up in Slice 26's plain rendering or Slice 27's
     narrative, so there is exactly one implementation of "how a value
-    gets formatted," not two that could drift apart.
+    gets formatted," not two that could drift apart. ``decimals`` only
+    affects ``"usd"``'s compact K/M/B suffix (see ``_compact_usd``).
     """
     if not spec:
         return str(value)
@@ -130,7 +138,7 @@ def format_number(value, spec, currency_unit="actual"):
                 f"unknown currency_unit {currency_unit!r}; "
                 f"expected one of {tuple(_CURRENCY_UNITS)}"
             )
-        body = _compact_usd(n * _CURRENCY_UNITS[currency_unit])
+        body = _compact_usd(n * _CURRENCY_UNITS[currency_unit], decimals)
     else:
         raise ValueError(f"unknown format {spec!r}; expected one of {_FORMATS}")
 

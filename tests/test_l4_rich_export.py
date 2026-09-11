@@ -234,9 +234,11 @@ class HorizonMarkerTest(unittest.TestCase):
 
 
 class EventInRichReportTest(unittest.TestCase):
-    """Slice 32: an event referenced by {{N}} renders its composed
-    timeline line, shares one footnote across uses, and (when projected)
-    carries the Slice 31 marker.
+    """Slice 32/38: an event referenced by {{N}} substitutes its short
+    name inline - never the full composed timeline (Slice 38 fixed that
+    leaking verbatim into prose, duplicated, wherever the same event was
+    cited: found live 2026-09-11, "next:" and all). Still shares one
+    footnote across uses, and (when projected) carries the Slice 31 marker.
     """
 
     SEGMENTS = [
@@ -263,12 +265,12 @@ class EventInRichReportTest(unittest.TestCase):
             "outlook": [{"text": "The next milestone is tied to {{1}}."}],
         }
 
-    def test_event_substitutes_the_composed_timeline_line(self):  # Done when #4
+    def test_event_substitutes_its_short_name_inline_not_the_full_timeline(self):  # Slice 38
         out = render_rich_report(self._report(), self.SEGMENTS, SRC)
-        self.assertIn(
-            "acquired Halyard Analytics (May 2026) — integrating — next: accretive in 2027",
-            out,
-        )
+        self.assertIn("the company acquired Halyard Analytics", out)
+        # the full composed line belongs only in a dedicated .timeline
+        # widget (2+ dated rows) - never dumped inline mid-sentence
+        self.assertNotIn("(May 2026) — integrating — next:", out)
 
     def test_an_event_referenced_three_times_shares_one_footnote(self):  # Done when #4
         out = render_rich_report(self._report(), self.SEGMENTS, SRC)
@@ -378,6 +380,87 @@ class V4StructureTest(unittest.TestCase):  # Slice 36
         # white, losing the verified-vs-interpretation visual system.
         out = render_rich_report(self._report(), self.SEG, SRC)
         self.assertIn("print-color-adjust:exact", out)
+
+
+class PrecisionConsistencyGateTest(unittest.TestCase):
+    """Slice 38, Gate 1 check #3 - reproduces the live bug exactly:
+    footnote 15 showed "$1.9B - $498.0M - $455.0M - $432.0M = $565.0M",
+    which only works with the real $1,950,000,000 - "$1.9B" is that
+    number's 1-decimal display, and 1.9B - 1.385B = $515M, not $565M.
+    """
+
+    SEG = [
+        {"type": "quote", "horizon": "guidance", "value": 498_000_000.0, "format": "usd",
+         "citation": "Q3"},                                                   # 0 (unused directly)
+        {"type": "computed", "horizon": "guidance", "operation": "difference",
+         "value": 565_000_000.0, "format": "usd",
+         "operands": [1_950_000_000.0, 498_000_000.0, 455_000_000.0, 432_000_000.0],
+         "total": None, "citation": ["$1.95 billion", "$498.0M", "$455.0M", "$432.0M"]},  # 1
+    ]
+
+    def _report(self):
+        return {
+            "title": "Precision check",
+            "executive_summary": [{"text": "The remaining gap to guidance is {{1}}."}],
+            "sections": [], "outlook": None,
+        }
+
+    def test_the_footnote_shows_numbers_that_actually_foot(self):
+        out = render_rich_report(self._report(), self.SEG, SRC)
+        # the operand that needed more precision now shows it ($1.95B, not
+        # the lossy $1.9B) - every other number stays at the same precision
+        self.assertIn("$1.95B − $498.00M − $455.00M − $432.00M = $565.00M", out)
+        self.assertNotIn("$1.9B −", out)
+
+    def test_the_displayed_expression_is_arithmetically_self_consistent(self):
+        # don't just trust the fix - parse the numbers exactly as a reader
+        # would see them and confirm they really do add up
+        out = render_rich_report(self._report(), self.SEG, SRC)
+        import re as _re
+        expr = _re.search(r"\$[\d.]+B − \$[\d.]+M − \$[\d.]+M − \$[\d.]+M = \$[\d.]+M", out)
+        self.assertIsNotNone(expr)
+        nums = _re.findall(r"([\d.]+)(B|M)", expr.group(0))
+        scale = {"B": 1e9, "M": 1e6}
+        a, b, c, d, result = (float(v) * scale[u] for v, u in nums)
+        self.assertAlmostEqual(a - b - c - d, result, delta=1.0)
+
+
+class KpiDeltaSignGateTest(unittest.TestCase):
+    """Slice 38 - a KPI delta is only colored pos/neg when it's backed by
+    a growth_percent fact (the only operation with a defined sign). A
+    difference-based delta renders neutral - found live 2026-09-11: a
+    $2.8M net-income *decline* rendered green ("pos") because the
+    subtraction behind it happened to come out positive.
+    """
+
+    SEG = [
+        {"type": "quote", "horizon": "reported", "value": 19_600_000.0, "format": "usd",
+         "citation": "$19.6M"},                                                          # 0
+        {"type": "computed", "horizon": "reported", "operation": "difference",
+         "value": 2_800_000.0, "format": "usd", "operands": [22_400_000.0, 19_600_000.0],
+         "total": None, "citation": ["$22.4M", "$19.6M"]},                               # 1
+        {"type": "computed", "horizon": "reported", "operation": "growth_percent",
+         "value": -12.5, "format": "percent", "operands": [22_400_000.0, 19_600_000.0],
+         "total": None, "citation": ["$22.4M", "$19.6M"]},                               # 2
+    ]
+
+    def _report(self, delta_fact):
+        return {
+            "title": "KPI sign check",
+            "kpis": [{"label": "Net income", "value_fact": 0, "delta_fact": delta_fact}],
+            "executive_summary": [{"text": "Net income was {{0}}."}],
+            "sections": [], "outlook": None,
+        }
+
+    def test_a_difference_backed_delta_is_neutral_not_colored(self):
+        out = render_rich_report(self._report(1), self.SEG, SRC)
+        self.assertIn('class="delta neutral"', out)
+        self.assertNotIn('class="delta pos"', out)
+        self.assertNotIn('class="delta neg"', out)
+
+    def test_a_growth_percent_backed_delta_is_colored_by_its_real_sign(self):
+        out = render_rich_report(self._report(2), self.SEG, SRC)
+        self.assertIn('class="delta neg"', out)  # -12.5% is a real decline
 
 
 if __name__ == "__main__":

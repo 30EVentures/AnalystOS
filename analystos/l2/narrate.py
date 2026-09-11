@@ -92,9 +92,13 @@ it):
 - kpis: 3-5 headline metrics for the strip at the top of the report. Each \
   is {label, value_fact, delta_fact}: value_fact is the manifest number \
   of the metric's current value, delta_fact the manifest number of its \
-  year-over-year change (a [computed] fact), or -1 if there is no such \
-  change fact. Pick the figures a decision-maker scans first. [] only if \
-  the document truly has no headline numbers.
+  year-over-year change, or -1 if there is no such change fact. Use a \
+  "growth_percent" fact for delta_fact, never a "difference" - the strip \
+  colors the delta green/red by its sign, and a "difference"'s sign does \
+  not reliably mean a rise or a fall (see "Directional words" below); \
+  leave delta_fact -1 rather than point it at a "difference". Pick the \
+  figures a decision-maker scans first. [] only if the document truly has \
+  no headline numbers.
 - executive_summary: 2-3 sentences stating the single most important \
   takeaway as a conclusion, not a fact. A reader who stops here should \
   already know what matters and why. Only verified facts here - no \
@@ -173,6 +177,20 @@ where the source supports it; never force one that doesn't fit. If the \
 manifest note says no figure-to-figure comparison is available, say so \
 plainly rather than dressing a lone figure as if it were benchmarked.
 
+Directional words must match the fact's real direction - "rose," "grew," \
+"increased," "up," "expanded" only when the change is genuinely positive; \
+"fell," "declined," "decreased," "down," "compressed" only when it is \
+genuinely negative. Use a "growth_percent" fact for a directional claim - \
+its sign is well-defined (it is computed from-value to to-value, so \
+positive always means a real increase and negative a real decrease). \
+Never use a "difference" fact to justify a directional word - a \
+"difference"'s sign only reflects which number happened to be listed \
+first, not which period came later, so it proves nothing about direction. \
+State a "difference" as a plain magnitude ("changed by {{N}}", "a gap of \
+{{N}}") with no "rose"/"fell" attached. This is checked and a mismatch \
+gets the whole narrative rejected - a real fact rendered with the wrong \
+direction word is a wrong report, even though the number itself is real.
+
 Charts: give a section a chart only when it plots two or more facts you \
 are already citing and the shape carries real information - a "line" for \
 one metric across three or more periods, a "bar" to compare categories \
@@ -196,9 +214,13 @@ To use a "[citable]" fact's value, write {{N}} (its number in the \
 manifest) exactly where the value belongs - never write the number \
 itself, it is filled in for you afterward. A single paragraph typically \
 weaves in several facts this way as evidence for one point. An "[event]" \
-fact already carries its date, status, and next step - reference it with \
-{{N}} and write the sentence around it (it renders as a dated timeline); \
-do not retype the date yourself. A "[context, not citable]" fact is \
+fact's {{N}} substitutes just its short name - write the sentence around \
+it normally ("the {{N}} closed in May" -> "the acquisition of Halyard \
+Analytics closed in May"). Its date/status/next-step already appear in a \
+dedicated timeline elsewhere in the rendered report when the source \
+supports one - never retype those details from the manifest into your \
+own prose; that produces duplicated, run-on text. A "[context, not \
+citable]" fact is \
 already-verified prose you may draw on for tone or content, but it has no \
 number to cite - write your own sentence about it with no digits, except \
 a quarter/half/year reference (e.g. "Q4 2026" or "heading into 2027"), \
@@ -324,11 +346,116 @@ def _build_manifest(segments):
     return "\n".join(lines)
 
 
+_UP_WORDS_RE = re.compile(
+    r"\b(rose|rising|grew|grow|grown|growing|increased|increasing|gained|gaining|"
+    r"expanded|expanding|climbed|climbing|jumped|jumping|improved|improving)\b",
+    re.IGNORECASE,
+)
+_DOWN_WORDS_RE = re.compile(
+    r"\b(fell|falling|declined|declining|decreased|decreasing|dropped|dropping|"
+    r"shrank|shrunk|shrinking|compressed|compressing|contracted|contracting|"
+    r"worsened|worsening|deteriorated|deteriorating)\b",
+    re.IGNORECASE,
+)
+_DIRECTION_WINDOW = 70  # chars of prose that may precede a {{N}} and still describe it
+
+
+def _direction_problem(text, segments):
+    """A direction word ("rose"/"fell") next to a {{N}} must match what
+    that fact actually shows - found live 2026-09-11: net income
+    described as "rose... up $2.8M" when it had fallen $22.4M -> $19.6M.
+    The $2.8M was real and correctly computed; the direction word was
+    simply wrong, and nothing checked it against the fact's own sign.
+
+    Only "growth_percent" has a sign this codebase actually defines
+    (operands are [from, to] - analystos.l2.analyze - so positive is a
+    real increase). "difference"'s sign depends only on which operand the
+    model listed first, which nothing can verify after the fact - so a
+    direction word next to a "difference" fact is refused outright, not
+    sign-checked: the narrator must cite a "growth_percent" fact for a
+    directional claim, or drop the direction word and state the plain
+    magnitude (see the "Directional words" rule in _SYSTEM_PROMPT).
+    """
+    for match in _PLACEHOLDER_RE.finditer(text):
+        index = int(match.group(1))
+        if index < 0 or index >= len(segments):
+            continue
+        seg = segments[index]
+        if seg.get("type") != "computed" or seg.get("operation") not in ("growth_percent", "difference"):
+            continue
+        window = text[max(0, match.start() - _DIRECTION_WINDOW):match.start()]
+        up_matches = list(_UP_WORDS_RE.finditer(window))
+        down_matches = list(_DOWN_WORDS_RE.finditer(window))
+        nearest_up = up_matches[-1].start() if up_matches else -1
+        nearest_down = down_matches[-1].start() if down_matches else -1
+        if nearest_up < 0 and nearest_down < 0:
+            continue
+        said_up = nearest_up > nearest_down
+        if seg["operation"] == "difference":
+            return (
+                f"fact {index} is a 'difference' (its sign isn't a reliable "
+                f"direction) but a directional word appears next to it - cite a "
+                f"'growth_percent' fact for direction, or state the plain magnitude"
+            )
+        value = seg.get("value", 0)
+        if said_up and value < 0:
+            return f"fact {index} is described as an increase but its verified change is negative ({value})"
+        if not said_up and value > 0:
+            return f"fact {index} is described as a decrease but its verified change is positive ({value})"
+    return None
+
+
+_CONSECUTIVE_RE = re.compile(
+    r"\b(one|two|three|four|five|six|seven|eight|nine|ten|\d+)\s+"
+    r"(?:consecutive|straight)\s+quarters?\b",
+    re.IGNORECASE,
+)
+_NUMBER_WORDS = {w: i + 1 for i, w in enumerate(
+    ("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten")
+)}
+
+
+def _consecutive_count_problem(text, segments):
+    """"N consecutive quarters" needs N+1 data points (N is a count of
+    *transitions* between periods, not of periods) - found live
+    2026-09-11: a claim of five consecutive declines from what was, in a
+    different run, only four cited period figures (three real declines).
+    Only checks a sentence where the model itself cites the period
+    figures as {{N}} quotes - if it doesn't, there's nothing here to
+    verify the claim against, so this stays silent rather than guess.
+    """
+    for match in _CONSECUTIVE_RE.finditer(text):
+        word = match.group(1).lower()
+        claimed = _NUMBER_WORDS.get(word) or (int(word) if word.isdigit() else None)
+        if not claimed:
+            continue
+        start = text.rfind(".", 0, match.start()) + 1
+        stop = text.find(".", match.end())
+        sentence = text[start:] if stop == -1 else text[start:stop]
+        cited_periods = {
+            int(pm.group(1))
+            for pm in _PLACEHOLDER_RE.finditer(sentence)
+            if int(pm.group(1)) < len(segments)
+            and segments[int(pm.group(1))].get("type") == "quote"
+            and segments[int(pm.group(1))].get("value") is not None
+        }
+        if cited_periods and claimed > len(cited_periods) - 1:
+            return (
+                f"claims {claimed} consecutive quarters but only cites "
+                f"{len(cited_periods)} period figures in that sentence - "
+                f"{claimed} consecutive moves need at least {claimed + 1} data points"
+            )
+    return None
+
+
 def _validate_paragraph(text, segments):
     """``None`` if the paragraph is trustworthy - every {{N}} points to a
-    real, citable fact and no digit appears outside a placeholder -
-    otherwise a short human-readable reason it isn't, so a rejection can
-    be logged with something more useful than just "it failed."
+    real, citable fact, no digit appears outside a placeholder, any
+    directional word next to a computed fact matches its real direction,
+    and any "N consecutive quarters" claim is consistent with the period
+    figures cited in the same sentence - otherwise a short human-readable
+    reason it isn't, so a rejection can be logged with something more
+    useful than just "it failed."
     """
     for match in _PLACEHOLDER_RE.finditer(text):
         index = int(match.group(1))
@@ -339,7 +466,10 @@ def _validate_paragraph(text, segments):
     stripped = _CALENDAR_RE.sub("", _PLACEHOLDER_RE.sub("", text))
     if _DIGIT_RE.search(stripped):
         return "has a digit outside any {{N}} placeholder"
-    return None
+    problem = _direction_problem(text, segments)
+    if problem:
+        return problem
+    return _consecutive_count_problem(text, segments)
 
 
 def _validate_chart(chart, segments):

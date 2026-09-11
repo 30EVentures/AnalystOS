@@ -63,7 +63,9 @@ import os
 import shutil
 import sys
 import tempfile
+import time
 from pathlib import Path
+from threading import Lock
 
 from flask import Flask, jsonify, request
 
@@ -88,6 +90,66 @@ _PDF_WARNING = (
     "extraction infers column boundaries from the page's layout and can "
     "occasionally misread it. Check the preview below before generating."
 )
+
+# Slice 41 - per-IP rate limiting, defense in depth on top of the shared
+# access code (Slice 22 explicitly deferred this). In-memory, per-process:
+# an accepted tradeoff for a small preview deployment, not a guarantee
+# across multiple serverless instances - see specs/slice-41/spec.md.
+_RATE_LIMIT_MAX_ENV_VAR = "ANALYSTOS_RATE_LIMIT_MAX"
+_RATE_LIMIT_WINDOW_ENV_VAR = "ANALYSTOS_RATE_LIMIT_WINDOW_SECONDS"
+_DEFAULT_RATE_LIMIT_MAX = 30
+_DEFAULT_RATE_LIMIT_WINDOW_SECONDS = 60
+_rate_limit_lock = Lock()
+_rate_limit_buckets = {}  # client key -> (window_start, count in this window)
+
+
+def _rate_limit_config():
+    """(max_requests, window_seconds), falling back to the default for a
+    missing or unparseable env var - a throttle must never be the reason
+    the whole service goes down."""
+    def _int_env(name, default):
+        try:
+            return int(os.environ.get(name, default))
+        except (TypeError, ValueError):
+            return default
+
+    return (
+        _int_env(_RATE_LIMIT_MAX_ENV_VAR, _DEFAULT_RATE_LIMIT_MAX),
+        _int_env(_RATE_LIMIT_WINDOW_ENV_VAR, _DEFAULT_RATE_LIMIT_WINDOW_SECONDS),
+    )
+
+
+def _client_key():
+    """The client's IP: the first hop of ``X-Forwarded-For`` (the real
+    client behind Vercel's proxy) if present, else the direct connection's
+    address."""
+    forwarded = request.headers.get("X-Forwarded-For", "")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.remote_addr or "unknown"
+
+
+def _rate_limit_denied():
+    """Return a ``429`` response if this request's client has exceeded its
+    budget for the current fixed window; ``None`` if not. Records this
+    request against the budget either way, including a request that will
+    go on to fail the access-code check - a wrong-code guess must count
+    toward the same limit, or the limiter does nothing against the one
+    thing it exists to slow down (brute-forcing the shared code).
+    """
+    max_requests, window_seconds = _rate_limit_config()
+    key = _client_key()
+    now = time.time()
+    with _rate_limit_lock:
+        window_start, count = _rate_limit_buckets.get(key, (now, 0))
+        if now - window_start >= window_seconds:
+            window_start, count = now, 0
+        count += 1
+        _rate_limit_buckets[key] = (window_start, count)
+        over_limit = count > max_requests
+    if over_limit:
+        return jsonify(error="too many requests - please slow down and try again shortly"), 429
+    return None
 
 
 def _access_denied():
@@ -124,6 +186,9 @@ def _require_upload():
 
 @app.post("/api/extract")
 def extract():
+    limited = _rate_limit_denied()
+    if limited:
+        return limited
     denied = _access_denied()
     if denied:
         return denied
@@ -151,6 +216,9 @@ def extract():
 
 @app.post("/api/analyze")
 def analyze():
+    limited = _rate_limit_denied()
+    if limited:
+        return limited
     denied = _access_denied()
     if denied:
         return denied

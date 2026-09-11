@@ -360,6 +360,67 @@ class PipelineTest(unittest.TestCase):
         # pass's own wording, not a silent fallback to Slice 26's rendering
         self.assertNotIn("Revenue was $18.4M", out)
 
+    def test_a_gate2_failure_is_repaired_not_immediately_fallen_back(self):  # slice 40
+        # Found live 2026-09-11: a report can pass Gate 1 (every number
+        # correctly cited) and still fail Gate 2 on pure wording - before
+        # this, that meant an instant fallback to the flat renderer with
+        # no attempt to fix the actual flagged sentence.
+        job = self.tmp / "gate2-repair-job"
+        job.mkdir()
+        (job / "data.csv").write_text("period,revenue\nFY2024,18400000\n", encoding="utf-8")
+
+        report_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
+            "segments": [{
+                "type": "quote", "display": "inline", "label": "Revenue",
+                "exact_text": "18400000", "has_value": True, "value": 18400000.0,
+                "sentence": "Revenue was {value}.", "format": "usd",
+            }],
+        })])
+        narrative_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
+            "executive_summary": [{"text": "The headline figure this quarter was {{0}}."}],
+            "sections": [{
+                "heading": "Revenue",
+                "paragraphs": [{"text": "That figure {{0}}, that figure, set the tone."}],
+                "has_chart": False,
+                "chart": {"type": "bar", "title": "", "format": "number", "series": []},
+            }],
+            "outlook": [],
+        })])
+        failed_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
+            "passed": False,
+            "issues": [{"location": "That figure {{0}}, that figure, set the tone.",
+                        "problem": "repeats 'that figure' awkwardly"}],
+        })])
+        passed_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
+            "passed": True, "issues": [],
+        })])
+        fixed_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
+            "text": "That figure, {{0}}, set the tone for the quarter.",
+        })])
+        proofread_calls = {"n": 0}
+
+        def _create(**kwargs):
+            name = kwargs["tool_choice"]["name"]
+            if name == "write_narrative":
+                return narrative_response
+            if name == "report_issues":
+                proofread_calls["n"] += 1
+                return failed_response if proofread_calls["n"] == 1 else passed_response
+            if name == "fixed_paragraph":
+                return fixed_response
+            return report_response
+
+        fake_client = SimpleNamespace(messages=SimpleNamespace(create=_create))
+
+        out = build_report(
+            job / "data.csv", title="X", evidence_dir=self.tmp / "ev", llm_client=fake_client,
+        )
+        self.assertTrue(out.lstrip().lower().startswith("<!doctype html"))  # rich path, not fallback
+        self.assertIn("That figure, $18.4M", out)  # the repaired wording landed
+        self.assertIn("set the tone for the quarter.", out)
+        self.assertNotIn("that figure, set the tone", out.lower())  # the awkward repeat is gone
+        self.assertEqual(proofread_calls["n"], 2)  # failed once, repaired, passed on recheck
+
     def test_an_event_flows_through_to_the_rendered_report(self):  # slice 32
         job = self.tmp / "event-job"
         job.mkdir()

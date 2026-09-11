@@ -41,18 +41,23 @@ Validation, all before any of it is trusted:
 - every ``{{N}}`` in every paragraph (summary, each section, outlook) must
   reference a real, citable fact, and no digit may appear outside a
   placeholder (calendar references carved out - see ``_CALENDAR_RE`` in
-  ``analystos.l2.analyze``). A failure raises ``ValueError``; no partial
-  acceptance, no retry.
+  ``analystos.l2.analyze``); no placeholder may be followed by a
+  redundant spelled-out unit ("million"/"billion"/"thousand"/"percent" -
+  a rendered value already carries its own). A failure never raises
+  straight to the caller - see the repair-then-retry escalation in
+  ``write_narrative`` below.
 - ``executive_summary`` and ``sections`` must be non-empty; every section
   needs a heading and at least one paragraph. A malformed structure
-  raises.
+  cannot be single-paragraph repaired; it always goes through a full
+  regenerate.
 - a malformed chart is the *one* non-fatal case - it is dropped
-  (``chart`` -> ``None``), never raised, matching
+  (``chart`` -> ``None``), never rejects the paragraph, matching
   ``rich_export._resolve_chart``'s "a bad chart is left out, the report
   is never lost" rule.
 
-A raised ``ValueError`` is caught by ``analystos.pipeline``, which falls
-back to Slice 26's plain per-segment rendering - a worse-structured
+A ``ValueError`` that survives repair and every retry is caught by
+``analystos.pipeline``, which falls back to Slice 26's plain per-segment
+rendering - a worse-structured
 report, never a lost one. See ``specs/slice-27/spec.md`` and
 ``specs/slice-30/spec.md``.
 """
@@ -71,6 +76,15 @@ from analystos.l4.export import display_value
 
 _MODEL = "claude-sonnet-5"
 _MAX_TOKENS = 8192  # a rich report over a dense document can outgrow 4096 - see analyze.py
+# A single-paragraph repair (write_narrative's first line of defence) is a
+# small, cheap call with a much smaller blast radius than regenerating the
+# whole report, so it gets a more generous budget than the full-regenerate
+# fallback below it.
+_MAX_REPAIR_ATTEMPTS = 3
+# 2, not 1 - two live runs back to back each burned their only retry fixing
+# the reported violation while introducing a different one; see the retry
+# loop in write_narrative and specs/slice-40/spec.md.
+_MAX_RETRIES = 2
 _PLACEHOLDER_RE = re.compile(r"\{\{(\d+)\}\}")
 _CHART_TYPES = ("bar", "line", "donut", "waterfall")
 _CHART_FORMATS = ("usd", "percent", "number")
@@ -102,7 +116,15 @@ it):
 - executive_summary: 2-3 sentences stating the single most important \
   takeaway as a conclusion, not a fact. A reader who stops here should \
   already know what matters and why. Only verified facts here - no \
-  interpretation.
+  interpretation. This is the densest prose in the report - several \
+  figures in one sentence - and exactly where a bare digit slips in \
+  instead of a placeholder most often. Every single figure still needs \
+  its own {{N}}, with no exceptions for how naturally a percent or dollar \
+  amount reads inline. Correct: "Revenue reached {{0}}, up {{1}} \
+  year-over-year and {{2}} sequentially, driven by a segment now \
+  generating {{3}} of total revenue." Wrong: the same sentence with any \
+  one of those four numbers typed as a literal digit instead of {{N}} - \
+  that single slip rejects the whole narrative.
 - executive_insight: exactly ONE paragraph that reads two or three facts \
   together into a single synthesized judgment the individual facts don't \
   state on their own (e.g. margin compression + a new interest burden + \
@@ -191,6 +213,36 @@ State a "difference" as a plain magnitude ("changed by {{N}}", "a gap of \
 gets the whole narrative rejected - a real fact rendered with the wrong \
 direction word is a wrong report, even though the number itself is real.
 
+This rule bites hardest, and most often, on a margin or rate's \
+period-over-period move (gross margin, operating margin, any percentage- \
+point change) - the manifest almost always carries that as a "difference" \
+in points, never a "growth_percent", because a growth_percent of two \
+already-percentage values is not a number anyone reports. Writing \
+"margin fell {{N}} points" is the natural instinct and exactly what gets \
+rejected. Correct: "gross margin moved {{N}} points, from {{M}} to \
+{{P}}" or "a {{N}}-point change in gross margin, to {{P}} from {{M}}" - \
+magnitude and both endpoints, no "fell"/"rose"/"compressed"/"expanded". \
+The reader sees {{M}} and {{P}} and draws the direction themselves; you \
+never need the word for it to be clear.
+
+This restriction is scoped to a "difference" fact specifically - it does \
+NOT apply when you cite several individual period quotes in a row (e.g. \
+five separate quarterly margin figures for a trend sentence). Each of \
+those is its own verified value, not a "difference", so a plain, accurate \
+direction word ("declined," "fell") is expected and correct there - \
+avoiding it when it is warranted reads as evasive, not careful. Use the \
+word exactly where a "growth_percent" or a run of raw period quotes \
+supports it; withhold it only next to an actual "difference" fact.
+
+A claim of "N consecutive quarters" or "N straight quarters" of a trend \
+needs at least N+1 distinct period figures cited as {{N}} placeholders in \
+that same sentence - N consecutive moves are the transitions between N+1 \
+data points, not N of them. If the sentence doesn't cite that many period \
+figures, either cite them or make a claim your citations actually \
+support (fewer quarters, or a plain "declined across recent periods" \
+with no specific count). This is checked the same way directional words \
+are, and a shortfall gets the whole narrative rejected.
+
 Charts: give a section a chart only when it plots two or more facts you \
 are already citing and the shape carries real information - a "line" for \
 one metric across three or more periods, a "bar" to compare categories \
@@ -213,13 +265,31 @@ part of a section - never asserted as a historical result.
 To use a "[citable]" fact's value, write {{N}} (its number in the \
 manifest) exactly where the value belongs - never write the number \
 itself, it is filled in for you afterward. A single paragraph typically \
-weaves in several facts this way as evidence for one point. An "[event]" \
+weaves in several facts this way as evidence for one point. Every \
+placeholder's rendered value already carries its own unit ("$34.0M", \
+"58.7%") - never follow one with "million"/"billion"/"thousand"/"percent" \
+spelled out; that either doubles the unit or, for a fact with no numeric \
+value at all (see the next paragraph), silently misuses it as if it were \
+one. An "[event]" \
 fact's {{N}} substitutes just its short name - write the sentence around \
 it normally ("the {{N}} closed in May" -> "the acquisition of Halyard \
-Analytics closed in May"). Its date/status/next-step already appear in a \
+Analytics closed in May") - it is never a number, so it can never be \
+followed by "million" or any other unit. Its date/status/next-step \
+already appear in a \
 dedicated timeline elsewhere in the rendered report when the source \
 supports one - never retype those details from the manifest into your \
-own prose; that produces duplicated, run-on text. A "[context, not \
+own prose; that produces duplicated, run-on text. An event's \
+date/status/next_step text is shown to you so you understand the event, \
+not so you can cite what's inside it - it often contains a real number \
+(a dollar figure, a percent) that has no {{N}} of its own, because the \
+only placeholder an event carries substitutes its short name, never a \
+number from within it. If that number matters enough to state, check \
+whether it already exists as its own separate [citable] fact elsewhere \
+in the manifest and cite that instead; if it doesn't, leave the specific \
+figure out and describe the event qualitatively ("costs are expected to \
+decline in Q4" rather than a dollar amount you have no placeholder for). \
+Writing that number as a bare digit because you can see it in an event's \
+status is exactly the violation this rule catches. A "[context, not \
 citable]" fact is \
 already-verified prose you may draw on for tone or content, but it has no \
 number to cite - write your own sentence about it with no digits, except \
@@ -316,6 +386,52 @@ _TOOL = {
     },
 }
 
+# A small, scoped tool for fixing one rejected paragraph in place - see
+# write_narrative's repair loop and specs/slice-40/spec.md. Reuses
+# _PARAGRAPH_SCHEMA: the response is just the corrected text.
+_REPAIR_TOOL = {
+    "name": "fixed_paragraph",
+    "description": "Return a corrected version of one rejected report paragraph.",
+    "strict": True,
+    "input_schema": _PARAGRAPH_SCHEMA,
+}
+
+_REPAIR_SYSTEM_PROMPT = """\
+You are fixing exactly one paragraph from a verified financial report that \
+failed a specific, stated check - not writing a new report. Keep the \
+paragraph's point and as much of its original wording as you reasonably \
+can; change only what the rejection reason requires.
+
+Every number is a {{N}} placeholder referencing the manifest below - never \
+a literal digit (a bare quarter/year reference like "Q4 2026" is the one \
+exception). A directional word ("rose"/"fell"/"grew"/"declined"/etc.) next \
+to a {{N}} is only allowed beside a "growth_percent" fact whose sign \
+matches - never beside a "difference" fact; state a "difference" as a \
+plain magnitude with no directional word. This bites hardest on a margin \
+or rate's period-over-period move (gross margin, operating margin, any \
+percentage-point change) - that is almost always a "difference" in \
+points, not a "growth_percent", so "margin fell {{N}} points" is exactly \
+the violation this rule catches. Correct: "gross margin moved {{N}} \
+points, from {{M}} to {{P}}" - magnitude and both endpoints, no "fell"/ \
+"rose"/"compressed"/"expanded"; the reader sees {{M}} and {{P}} and draws \
+the direction themselves. This scoping is only for an actual "difference" \
+fact - if instead you're citing several individual period quotes in a \
+row (raw values, not a computed difference), a plain accurate direction \
+word is correct and expected there; do not strip one out that was \
+already fine. A claim of "N consecutive" or "N straight \
+quarters" needs at least N+1 distinct period figures cited as {{N}} \
+placeholders in that same sentence - cite that many or claim less. Every \
+placeholder's rendered value already carries its own unit ("$34.0M", \
+"58.7%") - never follow one with "million"/"billion"/"thousand"/"percent" \
+spelled out, and never treat an event's {{N}} (a short name, not a \
+number) as if it had one. If the digit you're being asked to remove came \
+from an event's date/status/next_step text in the manifest, it has no \
+{{N}} of its own - check for a separate [citable] fact with that same \
+number elsewhere in the manifest and cite that instead; if there isn't \
+one, drop the specific figure and describe the event qualitatively \
+instead of inventing a placeholder for it.
+"""
+
 
 def _build_manifest(segments):
     lines = []
@@ -384,6 +500,17 @@ def _direction_problem(text, segments):
         if seg.get("type") != "computed" or seg.get("operation") not in ("growth_percent", "difference"):
             continue
         window = text[max(0, match.start() - _DIRECTION_WINDOW):match.start()]
+        # A direction word only describes *this* {{N}} if no other
+        # placeholder sits between the word and {{N}} - found live
+        # 2026-09-11: "Net income declined to {{7}} from {{8}}, a change
+        # of {{6}}" correctly used "declined" for the {{7}}-vs-{{8}}
+        # comparison, but the word still fell inside {{6}}'s lookback
+        # window and got flagged as though it described the "difference"
+        # fact {{6}} instead - a false positive on an already-correct
+        # sentence, not a real violation.
+        other_placeholders = list(_PLACEHOLDER_RE.finditer(window))
+        if other_placeholders:
+            window = window[other_placeholders[-1].end():]
         up_matches = list(_UP_WORDS_RE.finditer(window))
         down_matches = list(_DOWN_WORDS_RE.finditer(window))
         nearest_up = up_matches[-1].start() if up_matches else -1
@@ -448,9 +575,44 @@ def _consecutive_count_problem(text, segments):
     return None
 
 
+_REDUNDANT_UNIT_RE = re.compile(
+    r"\{\{(\d+)\}\}\s*(million|billion|thousand|percent)\b", re.IGNORECASE
+)
+
+
+def _redundant_unit_problem(text):
+    """A {{N}}'s rendered value already carries its own unit - "$34.0M" for
+    a usd fact, "58.7%" for a percent one - display_value/format_number
+    never spell "million"/"billion"/"thousand"/"percent" out. Typing one of
+    those words right after a placeholder is always wrong: at best it
+    doubles up the unit, at worst it silently repurposes a non-numeric
+    fact (an event, a qualitative quote) as if it were a dollar or percent
+    figure with no numeric value behind it at all.
+
+    Found live 2026-09-11: {{18}} correctly named an acquisition event in
+    one sentence ("the {{18}}") and was then written as "approximately
+    {{18}} million" in another - Gate 2 (language quality) caught the
+    inconsistency, but nothing before it refused the paragraph outright,
+    so a report could still be internally inconsistent and merely
+    "sound wrong" rather than fail a checked rule. ("Points"/"pts" is
+    deliberately not covered - a percentage-point disambiguator like
+    "{{N}} points" is a real, necessary clarification a percent-formatted
+    value doesn't carry on its own; see the "Directional words" rule in
+    _SYSTEM_PROMPT.)
+    """
+    match = _REDUNDANT_UNIT_RE.search(text)
+    if match:
+        return (
+            f'fact {match.group(1)} is followed by the spelled-out word '
+            f'"{match.group(2)}" - its rendered value already includes its own unit'
+        )
+    return None
+
+
 def _validate_paragraph(text, segments):
     """``None`` if the paragraph is trustworthy - every {{N}} points to a
-    real, citable fact, no digit appears outside a placeholder, any
+    real, citable fact, no digit appears outside a placeholder, no
+    placeholder is followed by a redundant spelled-out unit, any
     directional word next to a computed fact matches its real direction,
     and any "N consecutive quarters" claim is consistent with the period
     figures cited in the same sentence - otherwise a short human-readable
@@ -466,6 +628,9 @@ def _validate_paragraph(text, segments):
     stripped = _CALENDAR_RE.sub("", _PLACEHOLDER_RE.sub("", text))
     if _DIGIT_RE.search(stripped):
         return "has a digit outside any {{N}} placeholder"
+    problem = _redundant_unit_problem(text)
+    if problem:
+        return problem
     problem = _direction_problem(text, segments)
     if problem:
         return problem
@@ -521,14 +686,76 @@ def _validate_chart(chart, segments):
     }
 
 
-def _first_paragraph_problem(paragraphs, segments, where):
-    """The first reason a paragraph in this group isn't trustworthy, or
-    ``None`` if they all are."""
-    for paragraph in paragraphs:
-        text = paragraph.get("text", "")
-        reason = _validate_paragraph(text, segments)
-        if reason is not None:
-            return f"{where} paragraph {reason}: {text!r}"
+def _locate_problem(report, segments):
+    """Find the single paragraph responsible for ``report`` failing
+    validation, if any - the exact same walk ``_assemble_report`` uses, so
+    what this finds is exactly what would reject the report. Used to
+    repair just that one paragraph instead of regenerating the whole
+    narrative (see ``write_narrative``'s repair loop).
+
+    Returns ``None`` if the report is clean, ``("structural", reason)`` for
+    a problem no single-paragraph fix can address (missing/malformed
+    sections - needs a real rewrite), or ``(get, set_text, reason)`` for one
+    repairable paragraph: ``get()`` returns its current text, ``set_text(t)``
+    replaces it in place within ``report``.
+    """
+    def _leaf(container, index=None):
+        if index is None:
+            return (lambda: container.get("text") or "",
+                    lambda t: container.__setitem__("text", t))
+        return (lambda: container[index].get("text") or "",
+                lambda t: container[index].__setitem__("text", t))
+
+    executive_summary = report.get("executive_summary") or []
+    raw_sections = report.get("sections") or []
+    outlook = report.get("outlook") or []
+
+    if not executive_summary:
+        return ("structural", "empty executive_summary")
+    if not raw_sections:
+        return ("structural", "no sections")
+
+    for i, p in enumerate(executive_summary):
+        reason = _validate_paragraph(p.get("text", ""), segments)
+        if reason:
+            get, set_text = _leaf(executive_summary, i)
+            return get, set_text, f"executive-summary paragraph {reason}"
+
+    for si, section in enumerate(raw_sections):
+        heading = (section.get("heading") or "").strip()
+        paragraphs = section.get("paragraphs") or []
+        if not heading or not paragraphs:
+            return ("structural", f"section {si} has no heading or no paragraphs")
+        for pi, p in enumerate(paragraphs):
+            reason = _validate_paragraph(p.get("text", ""), segments)
+            if reason:
+                get, set_text = _leaf(paragraphs, pi)
+                return get, set_text, f"section {si} paragraph {reason}"
+
+    for i, p in enumerate(outlook):
+        reason = _validate_paragraph(p.get("text", ""), segments)
+        if reason:
+            get, set_text = _leaf(outlook, i)
+            return get, set_text, f"outlook paragraph {reason}"
+
+    insight_obj = report.get("executive_insight")
+    if isinstance(insight_obj, dict):
+        insight = (insight_obj.get("text") or "").strip()
+        if insight:
+            reason = _validate_paragraph(insight, segments)
+            if reason:
+                get, set_text = _leaf(insight_obj)
+                return get, set_text, f"executive_insight {reason}"
+
+    interp_obj = report.get("outlook_interpretation")
+    if isinstance(interp_obj, dict):
+        interp = (interp_obj.get("text") or "").strip()
+        if interp:
+            reason = _validate_paragraph(interp, segments)
+            if reason:
+                get, set_text = _leaf(interp_obj)
+                return get, set_text, f"outlook_interpretation {reason}"
+
     return None
 
 
@@ -569,38 +796,35 @@ def _resolve_kpis(raw_kpis, segments):
     return out
 
 
-def _assemble_report(tool_use, segments, title):
-    """Validate one ``write_narrative`` tool response into a render-ready
-    report dict. Returns ``(report, None)`` or ``(None, reason)`` and never
-    raises - so the caller can retry once with the reason before falling
-    back. A malformed chart is dropped (``chart`` -> ``None``), never a
-    reason to reject the whole report.
+def _assemble_report(report, segments, title):
+    """Validate one ``write_narrative`` tool response, already unwrapped to
+    its plain dict (``None`` if the model's response had no usable
+    tool_use block), into a render-ready report dict. Returns
+    ``(report, None)`` or ``(None, reason)`` and never raises - so the
+    caller can retry with the reason before falling back. A malformed
+    chart is dropped (``chart`` -> ``None``), never a reason to reject the
+    whole report. Validation itself is ``_locate_problem`` - the single
+    source of truth also used to find and repair one bad paragraph without
+    rejecting the rest of an otherwise-good report.
     """
-    if tool_use is None:
+    if report is None:
         return None, "response had no tool_use block"
-    report = tool_use.input if isinstance(tool_use.input, dict) else {}
+
+    problem = _locate_problem(report, segments)
+    if problem is not None:
+        if problem[0] == "structural":
+            return None, problem[1]
+        get, _set_text, reason = problem
+        return None, f"{reason}: {get()!r}"
+
     executive_summary = report.get("executive_summary") or []
     raw_sections = report.get("sections") or []
     outlook = report.get("outlook") or []
 
-    if not executive_summary:
-        return None, "empty executive_summary"
-    if not raw_sections:
-        return None, "no sections"
-
-    problem = _first_paragraph_problem(executive_summary, segments, "executive-summary")
-    if problem:
-        return None, problem
-
     sections = []
-    for i, section in enumerate(raw_sections):
+    for section in raw_sections:
         heading = (section.get("heading") or "").strip()
         paragraphs = section.get("paragraphs") or []
-        if not heading or not paragraphs:
-            return None, f"section {i} has no heading or no paragraphs"
-        problem = _first_paragraph_problem(paragraphs, segments, f"section {i}")
-        if problem:
-            return None, problem
         chart = _validate_chart(section.get("chart"), segments) if section.get("has_chart") else None
         sections.append(
             {
@@ -610,17 +834,8 @@ def _assemble_report(tool_use, segments, title):
             }
         )
 
-    problem = _first_paragraph_problem(outlook, segments, "outlook")
-    if problem:
-        return None, problem
-
     insight = (report.get("executive_insight") or {}).get("text", "").strip()
-    if insight and _validate_paragraph(insight, segments) is not None:
-        return None, f"executive_insight {_validate_paragraph(insight, segments)}: {insight!r}"
-
     interp = (report.get("outlook_interpretation") or {}).get("text", "").strip()
-    if interp and _validate_paragraph(interp, segments) is not None:
-        return None, f"outlook_interpretation {_validate_paragraph(interp, segments)}: {interp!r}"
 
     return {
         "title": title,
@@ -632,6 +847,40 @@ def _assemble_report(tool_use, segments, title):
         "outlook": [{"text": p["text"]} for p in outlook] or None,
         "outlook_interpretation": interp or None,
     }, None
+
+
+def _repair_paragraph(client, manifest, text, reason):
+    """One small, scoped call to fix a single rejected paragraph instead of
+    regenerating the whole narrative - see write_narrative's repair loop
+    and specs/slice-40/spec.md. Returns the corrected text, or ``None`` if
+    the call didn't produce a usable one (caller falls back to a full
+    retry). A real API failure still becomes ``ValueError`` via
+    ``_create_message``, exactly as it does everywhere else in this file -
+    not caught here.
+    """
+    response = _create_message(
+        client,
+        model=_MODEL,
+        max_tokens=1024,
+        system=_REPAIR_SYSTEM_PROMPT,
+        tools=[_REPAIR_TOOL],
+        tool_choice={"type": "tool", "name": "fixed_paragraph"},
+        messages=[{
+            "role": "user",
+            "content": (
+                f"{manifest}\n\nThis paragraph was rejected: {reason}.\n\n"
+                f"Original paragraph: {text!r}\n\nReturn the corrected paragraph."
+            ),
+        }],
+    )
+    tool_use = next(
+        (b for b in getattr(response, "content", []) if getattr(b, "type", None) == "tool_use"),
+        None,
+    )
+    if tool_use is None or not isinstance(tool_use.input, dict):
+        return None
+    fixed = (tool_use.input.get("text") or "").strip()
+    return fixed or None
 
 
 def write_narrative(segments, title, client=None):
@@ -684,37 +933,80 @@ def write_narrative(segments, title, client=None):
                 "the narrative was truncated",
                 file=sys.stderr,
             )
-        return next(
+        tool_use = next(
             (b for b in getattr(response, "content", [])
              if getattr(b, "type", None) == "tool_use"),
             None,
         )
+        return tool_use.input if tool_use is not None and isinstance(tool_use.input, dict) else None
 
-    report, reason = _assemble_report(_call(), segments, title)
-    if report is None:
-        # One retry with the concrete reason - the common failure is a
-        # stray digit the model typed instead of a {{N}} placeholder, and
-        # a nudge fixes it far more often than a fresh call. Falling back
-        # to the plain rendering over a fixable writing slip is what made
-        # real reports look "grade 1" (found live 2026-09-09).
+    raw_report = _call()
+    report, reason = _assemble_report(raw_report, segments, title)
+
+    # Repair phase: the common failure is one bad paragraph in an
+    # otherwise-good report - fix just that paragraph (a small, cheap call)
+    # rather than regenerating the whole document, where every other
+    # paragraph gets a fresh, independent chance to break a *different*
+    # rule. Found live 2026-09-11, three runs in a row: a full regenerate
+    # reliably fixed the reported violation while introducing a new one
+    # elsewhere, burning every retry on lateral moves instead of progress.
+    # See specs/slice-40/spec.md.
+    for repair_attempt in range(1, _MAX_REPAIR_ATTEMPTS + 1):
+        if report is not None or raw_report is None:
+            break
+        problem = _locate_problem(raw_report, segments)
+        if problem is None or problem[0] == "structural":
+            break  # nothing a single-paragraph fix can do - fall through
+        get, set_text, para_reason = problem
         print(
-            f"[analystos.l2.narrate] narrative rejected ({reason}) - retrying once",
+            f"[analystos.l2.narrate] repairing one paragraph "
+            f"(attempt {repair_attempt} of {_MAX_REPAIR_ATTEMPTS}): {para_reason}",
+            file=sys.stderr,
+        )
+        fixed = _repair_paragraph(client, manifest, get(), para_reason)
+        if fixed is None:
+            break
+        set_text(fixed)
+        report, reason = _assemble_report(raw_report, segments, title)
+
+    # Full-regenerate fallback - a nudge fixes it far more often than a
+    # fresh call. Falling back to the plain rendering over a fixable
+    # writing slip is what made real reports look "grade 1" (found live
+    # 2026-09-09). Kept as the safety net for a structural problem (missing
+    # sections, an empty executive summary) that no paragraph-level repair
+    # can address, or if repair itself didn't converge.
+    for attempt in range(1, _MAX_RETRIES + 1):
+        if report is not None:
+            break
+        print(
+            f"[analystos.l2.narrate] narrative rejected ({reason}) - "
+            f"retrying (attempt {attempt} of {_MAX_RETRIES})",
             file=sys.stderr,
         )
         report, reason = _assemble_report(
             _call(
                 f"\n\nYour previous narrative was rejected: {reason}. Fix exactly "
-                "that. Every number must be a {{N}} placeholder - never write a "
-                'digit outside one (a date like "September 30, 2026" or "Q4 2026" '
-                "is fine). Return kpis, executive_summary (3-5 sentences, verified "
-                "facts only), executive_insight, 3-5 sections each with a heading "
+                "that - and check every other rule below still holds, since "
+                "fixing one violation must never introduce another: (1) every "
+                "number is a {{N}} placeholder, never a digit outside one (a "
+                'date like "September 30, 2026" or "Q4 2026" is fine); (2) a '
+                'directional word ("rose"/"fell"/etc.) next to a {{N}} only '
+                'appears beside a "growth_percent" fact whose sign matches - '
+                'never a "difference" fact; (3) "N consecutive/straight '
+                'quarters" cites at least N+1 distinct period figures in that '
+                "same sentence, or claims less. Return kpis, executive_summary "
+                "(3-5 sentences, verified facts only), executive_insight, 3-5 "
+                "sections each with a heading "
                 "and a paragraph, disclosure_gaps, outlook, outlook_interpretation."
             ),
             segments,
             title,
         )
     if report is None:
-        raise ValueError(f"narrative rejected after one retry: {reason}")
+        raise ValueError(
+            f"narrative rejected after paragraph repair and {_MAX_RETRIES} "
+            f"full retries: {reason}"
+        )
 
     print(
         f"[analystos.l2.narrate] narrative accepted: {len(report['sections'])} "
@@ -722,4 +1014,86 @@ def write_narrative(segments, title, client=None):
         f"outlook={'yes' if report['outlook'] else 'no'}",
         file=sys.stderr,
     )
+    return report
+
+
+def _field_leaf(container, index, field):
+    return (lambda: container[index].get(field) or "",
+            lambda t: container[index].__setitem__(field, t))
+
+
+def _top_level_leaf(report, key):
+    return (lambda: report.get(key) or "", lambda t: report.__setitem__(key, t))
+
+
+def _report_text_locations(report):
+    """Every ``(get, set_text)`` pair for a piece of reader-facing prose in
+    an *assembled* report - the exact traversal
+    ``analystos.l2.proofread._report_text`` uses to build what Gate 2
+    reads, so one of its quoted ``location`` fragments can be found and
+    patched in place. Unlike ``_locate_problem`` (the pre-assembly shape,
+    where every text field is nested in a ``{"text": ...}`` dict),
+    ``executive_insight``/``outlook_interpretation`` are plain strings on
+    an assembled report - hence the separate top-level leaf.
+    """
+    locations = []
+    for i in range(len(report.get("executive_summary") or [])):
+        locations.append(_field_leaf(report["executive_summary"], i, "text"))
+    if report.get("executive_insight"):
+        locations.append(_top_level_leaf(report, "executive_insight"))
+    for si in range(len(report.get("sections") or [])):
+        locations.append(_field_leaf(report["sections"], si, "heading"))
+        paragraphs = report["sections"][si].get("paragraphs") or []
+        for pi in range(len(paragraphs)):
+            locations.append(_field_leaf(paragraphs, pi, "text"))
+    for i in range(len(report.get("disclosure_gaps") or [])):
+        locations.append(_field_leaf(report["disclosure_gaps"], i, "text"))
+    for i in range(len(report.get("outlook") or [])):
+        locations.append(_field_leaf(report["outlook"], i, "text"))
+    if report.get("outlook_interpretation"):
+        locations.append(_top_level_leaf(report, "outlook_interpretation"))
+    return locations
+
+
+def repair_language_issues(report, issues, segments, client=None):
+    """Best-effort patch of each Gate 2 (language-quality) issue's flagged
+    text in place, rather than losing the whole report to a wording nit -
+    the same "repair one small piece instead of a full regenerate"
+    principle ``write_narrative``'s own repair loop already uses, applied
+    to Gate 2 instead of Gate 1. Mutates and returns ``report``; never
+    raises (a real API failure surfaces as ``ValueError`` from
+    ``_create_message``, same as everywhere else, and just leaves that one
+    issue unpatched rather than losing every other fix in progress - see
+    the try/except below).
+
+    A repair is only kept if the result still satisfies Gate 1's own
+    ``_validate_paragraph`` - a wording fix must never quietly reintroduce
+    a correctness violation (a dropped placeholder, a stray digit, a
+    flipped direction word). An issue whose ``location`` can't be found in
+    the report, or whose repair doesn't validate, is left as-is; the
+    caller re-runs Gate 2 afterward to see what's actually still wrong.
+    """
+    client = _resolve_client(client)
+    manifest = _build_manifest(segments)
+    locations = _report_text_locations(report)
+    for issue in issues:
+        loc_text = (issue.get("location") or "").strip()
+        if not loc_text:
+            continue
+        # Exact-uniqueness match only - a short/generic location (Gate 2's
+        # prompt only promises "a short, exact fragment," not a unique
+        # one) can be a substring of more than one field. Patching the
+        # first hit risks silently rewriting the wrong sentence; safer to
+        # skip an ambiguous issue than to guess which one it meant.
+        matches = [entry for entry in locations if loc_text in entry[0]()]
+        if len(matches) != 1:
+            continue
+        get, set_text = matches[0]
+        try:
+            fixed = _repair_paragraph(client, manifest, get(), issue.get("problem") or "")
+        except ValueError:
+            continue
+        if fixed is None or _validate_paragraph(fixed, segments) is not None:
+            continue
+        set_text(fixed)
     return report

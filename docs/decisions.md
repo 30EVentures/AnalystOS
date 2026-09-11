@@ -2,6 +2,151 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-11 — evidence encryption at rest + a retention window (Slice 43)
+
+`evidence/` has held plain, unencrypted copies of every uploaded source
+since Slice 2, kept indefinitely. Both gaps closed together: `store` now
+writes `Fernet(key).encrypt(...)` to disk instead of raw bytes, and
+`purge_expired_evidence` deletes anything past a configurable retention
+window. `hash_of` deliberately still hashes the *plaintext*, before
+encryption - Fernet's fresh random nonce means the same source would file
+under a different address every time otherwise, breaking the whole
+"same bytes -> same name" point of a content-addressed store.
+
+Added `cryptography` as a direct, pinned dependency
+(`requirements.txt`) - it was already present transitively (via `anthropic`
+and/or `flask`'s dependency tree), so this makes an existing implicit
+dependency explicit rather than adding real new surface. `Fernet`
+specifically: the standard, well-audited choice in this library for
+"encrypt a blob with one symmetric key," no need to hand-roll AES modes or
+authentication.
+
+Key source: `ANALYSTOS_EVIDENCE_KEY` if set - a real per-deployment secret,
+the same pattern as `ANALYSTOS_ACCESS_CODE` (Slice 22). If unset, a stable,
+repo-known fallback derived from a fixed local constant, so the store is
+never plaintext-by-default in a dev environment - but this fallback is
+explicitly *not* a secret (anyone with this source can derive it) and must
+never be relied on where real data matters. This differs from Slice 22's
+access code, which fails *closed* (500) when unconfigured - encryption
+fails *soft* to a known-weak default instead, because the alternative
+(refusing to store anything without a real key configured) would silently
+break every existing caller and test that has never needed to think about
+this. Documented, not hidden - anyone auditing this file sees exactly
+where the weaker default is.
+
+Retention: `ANALYSTOS_EVIDENCE_RETENTION_DAYS` unset means no expiry
+enforced - the same opt-in pattern Slices 41/42 already use for their own
+ceilings, not a surprise auto-deletion policy. Deletion, not archiving, for
+simplicity (the task's own framing allowed either). `store()` runs the
+cleanup pass itself on every call (best-effort - never lets a cleanup
+problem break the store it's riding along with), so retention is actually
+enforced over time with no external cron job needed, while
+`purge_expired_evidence` stays independently callable for a script or a
+test.
+
+Not migrated: any evidence already on disk from before this change, stored
+under the old plaintext format. `evidence/` is git-ignored dev/test data at
+this stage, and `retrieve()` (the only thing that would ever try to
+decrypt an old file) isn't currently called anywhere in the live pipeline -
+confirmed by inspection, not assumption - so this has no live-behavior
+impact today.
+
+## 2026-09-11 — an in-code spend hard-stop, second layer over the account cap (Slice 42)
+
+The only spend safety net before this was external to the repo entirely: a
+monthly cap set on the Anthropic account itself (see the 2026-09-05 entry
+below). Real, but this repo's code can't see, configure, or test it.
+Added a second layer inside `_create_message` - the one choke point every
+Anthropic call in the codebase already goes through - checked *before*
+dispatching a call, so a runaway loop hits an internal stop before (or
+even without) ever touching the account-level cap.
+
+Tracks **call count, not dollar cost**. Considered token-usage-based
+tracking (the SDK response does carry `usage.input_tokens`/
+`output_tokens`), but that means embedding a per-model price table in this
+repo that goes silently stale the moment Anthropic's pricing changes -
+exactly the kind of drift a safety net shouldn't have. Call count degrades
+safely instead: worst case the ceiling trips a bit earlier or later than a
+dollar-exact one would, never silently and never wrong-currency.
+
+`ANALYSTOS_MAX_API_CALLS` unset means **no internal ceiling** - this is a
+second layer on top of the account-level cap, not a replacement forced on
+every deployment by default. Set it, and it's enforced with the same
+clean `ValueError` a real `anthropic.APIError` already produces, so a
+caller can't tell "hit the account cap" from "hit the internal one"
+without reading server logs.
+
+## 2026-09-11 — per-IP rate limiting on the access-code endpoints (Slice 41)
+
+Slice 22 explicitly deferred this ("an accepted, disclosed tradeoff for
+this stage, not an oversight"). Added as defense in depth, not a redesign
+of auth: the shared-code, no-accounts model is unchanged. In-memory,
+per-process fixed-window counter keyed by client IP
+(`X-Forwarded-For`'s first hop, else `request.remote_addr`), checked
+*before* the access-code comparison so a wrong-code guess still counts
+against the budget - the actual point of rate-limiting this endpoint is
+slowing down someone trying to brute-force the shared code, not just
+capping legitimate traffic. Configurable via `ANALYSTOS_RATE_LIMIT_MAX`
+(default 30) and `ANALYSTOS_RATE_LIMIT_WINDOW_SECONDS` (default 60); an
+unset or unparseable value falls back to the default rather than raising -
+a throttle must never be the reason the whole service goes down.
+
+In-memory per-process, not a shared store (Redis, etc.): correct for a
+single Vercel function instance, not guaranteed across many concurrent
+instances under real distributed load. Accepted for this stage - the same
+category of tradeoff Slice 22 already made for the access code itself
+(good enough to keep this off casual abuse, not hardened against a
+determined distributed attacker). A real shared-store limiter is future
+work if the threat model changes.
+
+## 2026-09-11 — repair the one flagged piece, not a full regenerate (Slice 40)
+
+Live-tested Slice 39's fix twice more, back to back, and both runs still
+fell back to the plain renderer with zero trace of why -
+`analystos.pipeline`'s except clause swallowed the fallback reason
+entirely. Fixed the logging gap first (now every Gate 1/Gate 2 fallback
+reason prints to stderr), which is what made the rest of this diagnosable
+live at all.
+
+What the logs then showed, repeatedly: `write_narrative` throws away the
+*entire* report on any rejection and asks the model to regenerate
+everything from scratch. A report this size (exec summary + 3-5 sections +
+KPIs + outlook) has enough sentences that a full reroll is a fresh chance
+to break a *different* rule anywhere else in the document, even while
+correctly fixing the one that was actually reported - watched happen live,
+several times in a row, on the same test document. Replaced "reject and
+reroll the whole document" with "repair just the one flagged paragraph in
+place" for both gates: `write_narrative` now tries a scoped, small repair
+call first (chasing a second problem the first repair's fix exposes,
+within a bounded budget) before falling back to a full regenerate; Gate 2
+(language quality) gets the same treatment instead of an instant,
+unconditional fallback on any wording issue.
+
+A repair is only ever kept if it still satisfies Gate 1's own paragraph
+validator - a wording fix must never quietly reintroduce a correctness
+violation. And a Gate 2 issue's flagged location is only patched if it
+matches exactly one field in the report; an ambiguous match (a short,
+generic quote that could be more than one sentence) is left alone rather
+than risking a patch to the wrong one - safer to leave an issue unfixed
+than to guess and rewrite something that wasn't actually broken.
+
+Also closed three specific validator/prompt gaps the live diagnosis
+surfaced along the way, each a real, separately-found live bug, not
+speculative hardening: a missing rule (an "N consecutive quarters" claim
+needs N+1 citations - now stated in the prompt itself, not just checked
+after the fact); a false positive in the direction-word check (a
+direction word separated from a "difference" fact by another placeholder
+was wrongly flagged as describing that fact instead of the comparison it
+actually modified); and a new check for a placeholder followed by a
+spelled-out unit ("million," "percent") - always wrong, since a rendered
+value already carries its own unit, and for a non-numeric fact (an event)
+it was silently being used as though it had a value at all. The last of
+these traced back one layer further, to L2's extraction prompt: an
+event's `status`/`next_step` text can legitimately contain a real,
+material figure (an acquisition's integration-cost peak and step-down)
+that the model could see but had no `{{N}}` to cite - now asked to also
+surface such a figure as its own separate citable fact.
+
 ## 2026-09-11 — growth_percent operand order made order-independent (Slice 39)
 
 Live-tested Slice 38 immediately after merge: a report that should have

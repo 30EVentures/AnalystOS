@@ -10,7 +10,15 @@ from types import SimpleNamespace
 import anthropic
 import httpx2
 
-from analystos.l2.narrate import _validate_paragraph, write_narrative
+from analystos.l2.narrate import (
+    _MAX_REPAIR_ATTEMPTS,
+    _MAX_RETRIES,
+    _locate_problem,
+    _redundant_unit_problem,
+    _validate_paragraph,
+    repair_language_issues,
+    write_narrative,
+)
 
 SEGMENTS = [
     {  # 0: citable quote with a value
@@ -263,6 +271,22 @@ class DirectionWordGateTest(unittest.TestCase):
     def test_a_difference_fact_with_no_direction_word_is_accepted(self):
         self.assertIsNone(_validate_paragraph("Net income changed by {{2}} year over year.", self.SEGS))
 
+    def test_a_direction_word_separated_by_another_placeholder_does_not_false_positive(self):
+        # Found live 2026-09-11: "declined" correctly describes the
+        # {{1}}-from-{{0}} comparison (both plain quotes, no sign-safety
+        # issue), and only afterward does a separate, comma-appositive
+        # restate the same move as a "difference" ({{2}}) - the direction
+        # word was never describing {{2}} at all.
+        text = "Net income declined to {{1}} from {{0}}, a change of {{2}}."
+        self.assertIsNone(_validate_paragraph(text, self.SEGS))
+
+    def test_a_direction_word_immediately_before_a_difference_fact_is_still_rejected(self):
+        # The original live bug (no other placeholder intervening) must
+        # still be caught - the fix narrows the window, it doesn't disable it.
+        problem = _validate_paragraph("Net income rose, up {{2}} year over year.", self.SEGS)
+        self.assertIsNotNone(problem)
+        self.assertIn("difference", problem)
+
 
 class ConsecutiveCountGateTest(unittest.TestCase):
     """Slice 38, Gate 1 check #4 - "N consecutive quarters" needs N+1 data
@@ -285,6 +309,268 @@ class ConsecutiveCountGateTest(unittest.TestCase):
         # nothing to verify the claim against in this sentence - stays
         # silent rather than guess (no false positive)
         self.assertIsNone(_validate_paragraph("Margin declined for five consecutive quarters.", self.SEGS))
+
+
+class RedundantUnitGateTest(unittest.TestCase):  # Slice 40
+    """A {{N}}'s rendered value already carries its own unit - found live
+    2026-09-11: {{18}} correctly named an acquisition event in one
+    sentence and was then written as "approximately {{18}} million" in
+    another, an inconsistency only Gate 2 (language quality) caught."""
+
+    def test_million_spelled_out_after_a_placeholder_is_rejected(self):
+        problem = _redundant_unit_problem("Integration costs were approximately {{18}} million in Q3.")
+        self.assertIsNotNone(problem)
+        self.assertIn("million", problem)
+
+    def test_billion_percent_and_thousand_are_also_rejected(self):
+        for word in ("billion", "percent", "thousand"):
+            with self.subTest(word=word):
+                self.assertIsNotNone(_redundant_unit_problem(f"Guidance implies {{{{0}}}} {word} for the year."))
+
+    def test_points_is_not_flagged_its_a_real_disambiguator(self):
+        self.assertIsNone(_redundant_unit_problem("A {{16}}-point change in gross margin, from {{15}} to {{14}}."))
+        self.assertIsNone(_redundant_unit_problem("Gross margin moved {{16}} points, from {{15}} to {{14}}."))
+
+    def test_a_placeholder_with_no_trailing_unit_word_is_fine(self):
+        self.assertIsNone(_redundant_unit_problem("Revenue reached {{0}}, up from {{1}}."))
+
+    def test_wired_into_validate_paragraph(self):
+        segs = [{"type": "event", "date": "May 14, 2026", "what": "acquisition of Halyard Analytics"}]
+        text = "Integration costs tied to the {{0}} were approximately {{0}} million in Q3."
+        problem = _validate_paragraph(text, segs)
+        self.assertIsNotNone(problem)
+        self.assertIn("million", problem)
+
+
+class LocateProblemTest(unittest.TestCase):  # Slice 40
+    def test_a_clean_report_has_no_problem(self):
+        self.assertIsNone(_locate_problem(_report(), SEGMENTS))
+
+    def test_empty_executive_summary_is_structural(self):
+        problem = _locate_problem(_report(executive_summary=[]), SEGMENTS)
+        self.assertEqual(problem, ("structural", "empty executive_summary"))
+
+    def test_no_sections_is_structural(self):
+        problem = _locate_problem(_report(sections=[]), SEGMENTS)
+        self.assertEqual(problem, ("structural", "no sections"))
+
+    def test_a_bad_executive_summary_paragraph_is_located_and_patchable(self):
+        report = _report(executive_summary=[{"text": "Revenue reached $10,000,000."}])
+        get, set_text, reason = _locate_problem(report, SEGMENTS)
+        self.assertIn("digit outside any {{N}} placeholder", reason)
+        self.assertEqual(get(), "Revenue reached $10,000,000.")
+        set_text("Revenue reached {{0}}.")
+        self.assertIsNone(_locate_problem(report, SEGMENTS))
+        self.assertEqual(report["executive_summary"][0]["text"], "Revenue reached {{0}}.")
+
+    def test_a_bad_section_paragraph_is_located_by_its_section_index(self):
+        report = _report()
+        report["sections"][0]["paragraphs"][0]["text"] = "Revenue was $10,000,000 flat."
+        _get, _set_text, reason = _locate_problem(report, SEGMENTS)
+        self.assertIn("section 0 paragraph", reason)
+
+
+def _assembled_report(**over):
+    """A report in the shape _assemble_report/write_narrative returns
+    (post-assembly) - different from _report() above, which is the raw
+    pre-assembly tool_use.input shape (nested "has_chart"/"chart" specs,
+    dict executive_insight). repair_language_issues operates on this
+    shape, the one render_rich_report actually consumes."""
+    base = {
+        "title": TITLE,
+        "kpis": [],
+        "executive_summary": [{"text": "Revenue reached {{0}}, up from {{1}}."}],
+        "executive_insight": None,
+        "sections": [{
+            "heading": "Revenue",
+            "paragraphs": [{"text": "Revenue was {{0}} against {{1}} a year earlier."}],
+            "chart": None,
+        }],
+        "disclosure_gaps": [],
+        "outlook": [{"text": "Guidance implies {{4}} for the full year."}],
+        "outlook_interpretation": None,
+    }
+    base.update(over)
+    return base
+
+
+def _fixed_paragraph_client(fixed_text):
+    response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={"text": fixed_text})])
+    return SimpleNamespace(messages=SimpleNamespace(create=lambda **kw: response))
+
+
+class RepairLanguageIssuesTest(unittest.TestCase):  # Slice 40
+    """Gate 2 (language quality) gets the same "patch the one flagged
+    piece, don't lose the whole report" treatment Gate 1 already has -
+    found live 2026-09-11: a report can pass Gate 1 cleanly and still
+    fail Gate 2 on pure wording, which had no repair path at all before."""
+
+    def test_a_located_issue_is_repaired_in_place(self):
+        report = _assembled_report()
+        issues = [{"location": "Revenue was {{0}} against {{1}} a year earlier.",
+                   "problem": "awkward phrasing"}]
+        client = _fixed_paragraph_client("Revenue of {{0}} compared with {{1}} a year earlier.")
+
+        out = repair_language_issues(report, issues, SEGMENTS, client=client)
+
+        self.assertEqual(
+            out["sections"][0]["paragraphs"][0]["text"],
+            "Revenue of {{0}} compared with {{1}} a year earlier.",
+        )
+
+    def test_an_unlocatable_issue_is_left_unchanged(self):
+        report = _assembled_report()
+        original = report["sections"][0]["paragraphs"][0]["text"]
+        issues = [{"location": "text that appears nowhere in the report", "problem": "..."}]
+        client = _fixed_paragraph_client("should never be used")
+
+        out = repair_language_issues(report, issues, SEGMENTS, client=client)
+
+        self.assertEqual(out["sections"][0]["paragraphs"][0]["text"], original)
+
+    def test_a_repair_that_would_break_gate_1_is_rejected(self):
+        report = _assembled_report()
+        original = report["sections"][0]["paragraphs"][0]["text"]
+        issues = [{"location": "Revenue was {{0}} against {{1}} a year earlier.", "problem": "..."}]
+        # a "fix" that drops a placeholder for a bare digit - a real Gate 1
+        # violation - must never be accepted just because Gate 2 asked for it
+        client = _fixed_paragraph_client("Revenue was $10,000,000 against {{1}} a year earlier.")
+
+        out = repair_language_issues(report, issues, SEGMENTS, client=client)
+
+        self.assertEqual(out["sections"][0]["paragraphs"][0]["text"], original)
+
+    def test_executive_insight_is_repairable(self):
+        report = _assembled_report(executive_insight="Revenue of {{0}} tells the story on its own.")
+        issues = [{"location": "tells the story on its own", "problem": "cliche phrasing"}]
+        client = _fixed_paragraph_client("Revenue of {{0}} is the single clearest signal this quarter.")
+
+        out = repair_language_issues(report, issues, SEGMENTS, client=client)
+
+        self.assertEqual(out["executive_insight"], "Revenue of {{0}} is the single clearest signal this quarter.")
+
+    def test_an_ambiguous_location_matching_multiple_fields_is_left_unchanged(self):
+        # The default fixture's heading ("Revenue") is also a substring of
+        # both the executive summary and the section paragraph - exactly
+        # the kind of short, non-unique "location" Gate 2's own prompt
+        # allows ("a short, exact fragment," not a guaranteed-unique one).
+        # Patching the first match blind risks silently rewriting the
+        # wrong sentence, so an ambiguous issue must be left alone.
+        report = _assembled_report()
+        original_summary = report["executive_summary"][0]["text"]
+        original_heading = report["sections"][0]["heading"]
+        original_paragraph = report["sections"][0]["paragraphs"][0]["text"]
+        issues = [{"location": "Revenue", "problem": "..."}]
+        client = _fixed_paragraph_client("should never be used")
+
+        out = repair_language_issues(report, issues, SEGMENTS, client=client)
+
+        self.assertEqual(out["executive_summary"][0]["text"], original_summary)
+        self.assertEqual(out["sections"][0]["heading"], original_heading)
+        self.assertEqual(out["sections"][0]["paragraphs"][0]["text"], original_paragraph)
+
+    def test_a_section_heading_is_repairable(self):
+        report = _assembled_report()
+        report["sections"][0]["heading"] = "Segment Performance"
+        issues = [{"location": "Segment Performance", "problem": "heading is a bare label, not a point"}]
+        client = _fixed_paragraph_client("Segment Performance Accelerates")
+
+        out = repair_language_issues(report, issues, SEGMENTS, client=client)
+
+        self.assertEqual(out["sections"][0]["heading"], "Segment Performance Accelerates")
+
+
+class WriteNarrativeRepairLoopTest(unittest.TestCase):  # Slice 40
+    """A single bad paragraph should be patched with one small call, not
+    force a full-document regenerate - see specs/slice-40/spec.md."""
+
+    def _dispatching_client(self, write_responses, repair_response=None):
+        calls = {"write_narrative": 0, "fixed_paragraph": 0}
+
+        def _create(**kwargs):
+            name = kwargs["tool_choice"]["name"]
+            calls[name] += 1
+            if name == "fixed_paragraph":
+                return repair_response
+            i = min(calls["write_narrative"], len(write_responses)) - 1
+            return write_responses[i]
+
+        client = SimpleNamespace(messages=SimpleNamespace(create=_create))
+        return client, calls
+
+    def test_one_bad_paragraph_is_repaired_without_a_full_regenerate(self):
+        bad = _report(executive_summary=[{"text": "Revenue reached $10,000,000, up from {{1}}."}])
+        write_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input=bad)])
+        repair_response = SimpleNamespace(content=[SimpleNamespace(
+            type="tool_use", input={"text": "Revenue reached {{0}}, up from {{1}}."},
+        )])
+        client, calls = self._dispatching_client([write_response], repair_response)
+
+        out = write_narrative(SEGMENTS, TITLE, client=client)
+
+        self.assertEqual(out["executive_summary"][0]["text"], "Revenue reached {{0}}, up from {{1}}.")
+        self.assertEqual(calls["write_narrative"], 1)  # no full regenerate needed
+        self.assertEqual(calls["fixed_paragraph"], 1)
+
+    def test_a_repair_call_with_no_usable_response_falls_back_to_full_regenerate(self):
+        bad = _report(executive_summary=[{"text": "Revenue reached $10,000,000, up from {{1}}."}])
+        write_bad = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input=bad)])
+        write_good = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input=_report())])
+        no_tool_use = SimpleNamespace(content=[SimpleNamespace(type="text", text="oops")])
+        client, calls = self._dispatching_client([write_bad, write_good], no_tool_use)
+
+        out = write_narrative(SEGMENTS, TITLE, client=client)
+
+        self.assertEqual(out["executive_summary"][0]["text"], "Revenue reached {{0}}, up from {{1}}.")
+        self.assertEqual(calls["fixed_paragraph"], 1)  # repair attempted once, gave up
+        self.assertEqual(calls["write_narrative"], 2)  # then one full regenerate
+
+    def test_a_structural_problem_skips_repair_entirely(self):
+        empty = SimpleNamespace(content=[SimpleNamespace(
+            type="tool_use", input=_report(executive_summary=[]),
+        )])
+        client, calls = self._dispatching_client([empty])
+
+        with self.assertRaises(ValueError):
+            write_narrative(SEGMENTS, TITLE, client=client)
+
+        self.assertEqual(calls["fixed_paragraph"], 0)
+        self.assertEqual(calls["write_narrative"], 1 + _MAX_RETRIES)
+
+    def test_repair_keeps_chasing_a_second_paragraph_the_first_repair_exposes(self):
+        # Fixing paragraph A can reveal (or introduce) a problem in B - the
+        # repair loop should chase B too rather than immediately falling
+        # back to a full regenerate. Found live 2026-09-11.
+        bad = _report(
+            executive_summary=[{"text": "Revenue reached $10,000,000, up from {{1}}."}],
+            outlook=[{"text": "Guidance implies $45,000,000 for the full year."}],
+        )
+        write_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input=bad)])
+        fixes = iter([
+            SimpleNamespace(content=[SimpleNamespace(
+                type="tool_use", input={"text": "Revenue reached {{0}}, up from {{1}}."},
+            )]),
+            SimpleNamespace(content=[SimpleNamespace(
+                type="tool_use", input={"text": "Guidance implies {{4}} for the full year."},
+            )]),
+        ])
+        calls = {"write_narrative": 0, "fixed_paragraph": 0}
+
+        def _create(**kwargs):
+            name = kwargs["tool_choice"]["name"]
+            calls[name] += 1
+            if name == "fixed_paragraph":
+                return next(fixes)
+            return write_response
+
+        client = SimpleNamespace(messages=SimpleNamespace(create=_create))
+        out = write_narrative(SEGMENTS, TITLE, client=client)
+
+        self.assertEqual(out["executive_summary"][0]["text"], "Revenue reached {{0}}, up from {{1}}.")
+        self.assertEqual(out["outlook"][0]["text"], "Guidance implies {{4}} for the full year.")
+        self.assertEqual(calls["write_narrative"], 1)
+        self.assertEqual(calls["fixed_paragraph"], 2)
+        self.assertLessEqual(2, _MAX_REPAIR_ATTEMPTS)
 
 
 if __name__ == "__main__":

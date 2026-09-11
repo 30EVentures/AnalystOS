@@ -226,15 +226,20 @@ ignore them:
   "percent_of_total" with has_total true. "" / 0 otherwise.
 - "result": for "computed", your computed result (checked against \
   independently). 0 otherwise.
-- "event": for "event", an object {what, date, status, next_step}. Every \
-  part is a verbatim substring copied from the document - never composed, \
-  never a date you half-remember. "what" names the event and is required. \
-  "date" is when it happened or is expected ("" if the document gives \
-  none). "status" is where it stands now ("" if none). "next_step" is the \
-  concrete next move the document states ("" if none). For any non-"event" \
-  segment, fill every part with "". A "what" that isn't a real substring, \
-  or any non-empty part that isn't, drops the whole event - a \
-  half-verified timeline is not shown.
+- "event": for "event", an object {what, date, status, next_step, \
+  milestones}. Every string is a verbatim substring copied from the \
+  document - never composed, never a date you half-remember. "what" names \
+  the event and is required. "date" is when it happened or is expected \
+  ("" if the document gives none). "status" is where it stands now ("" if \
+  none). "next_step" is the concrete next move the document states ("" if \
+  none). "milestones" is an ordered list of {date, detail} for a dated \
+  sequence the document lays out (a closing, then an integration peak, \
+  then a guided next step, then expected accretion) - both parts of each \
+  milestone verbatim from the document; [] if there is no such sequence. \
+  For any non-"event" segment, fill "what"/"date"/"status"/"next_step" \
+  with "" and "milestones" with []. A "what" that isn't a real substring, \
+  or any non-empty part that isn't, drops the whole event; a milestone \
+  whose date or detail isn't a real substring is dropped on its own.
 
 When the document describes a dated event, capture it as an "event" \
 segment (not a plain "quote"), so the report can narrate it as a \
@@ -288,8 +293,20 @@ _TOOL = {
                                 "date": {"type": "string"},
                                 "status": {"type": "string"},
                                 "next_step": {"type": "string"},
+                                "milestones": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "date": {"type": "string"},
+                                            "detail": {"type": "string"},
+                                        },
+                                        "required": ["date", "detail"],
+                                        "additionalProperties": False,
+                                    },
+                                },
                             },
-                            "required": ["what", "date", "status", "next_step"],
+                            "required": ["what", "date", "status", "next_step", "milestones"],
                             "additionalProperties": False,
                         },
                     },
@@ -578,6 +595,11 @@ def _verify_computed(seg, match_document, doc_scale):
         "label": seg.get("label"), "sentence": sentence,
         "value": recomputed, "format": seg.get("format", "number"),
         "citation": citations,
+        # the arithmetic itself, so L4 can show "$142.0M - $88.0M - $34.0M
+        # = $20.0M" rather than just a citation number - canonical (scaled)
+        # operand values, in the order they were given.
+        "operands": values,
+        "total": total_canonical,
     }, None
 
 
@@ -595,9 +617,11 @@ def _verify_event(seg, match_document):
     ``status`` / ``next_step``, every one a substring of the source. ``what``
     is required; each *supplied* (non-empty) other part must check out too,
     or the whole event is dropped - a half-verified timeline is worse than
-    none. The model never writes an event's dates into prose; L4's
-    ``event_line`` composes the verified parts, so every digit on an event
-    line traces to the source.
+    none. ``milestones`` is an ordered ``{date, detail}`` list for a dated
+    sequence - each milestone whose date or detail isn't a real substring
+    is dropped on its own (drop the row, not the timeline). The model never
+    writes an event's dates into prose; L4 composes the verified parts, so
+    every digit on the timeline traces to the source.
     """
     event = seg.get("event") or {}
     what = (event.get("what") or "").strip()
@@ -609,10 +633,22 @@ def _verify_event(seg, match_document):
         if piece and not _really_in_document(piece, match_document):
             return None, f"event {key!r} not found in document: {piece!r}"
         parts[key] = piece
+    milestones = []
+    for m in event.get("milestones") or []:
+        m_date = (m.get("date") or "").strip()
+        m_detail = (m.get("detail") or "").strip()
+        if not m_date or not m_detail:
+            continue
+        if not _really_in_document(m_date, match_document):
+            continue
+        if not _really_in_document(m_detail, match_document):
+            continue
+        milestones.append({"date": m_date, "detail": m_detail})
     return {
         "type": "event", "horizon": _horizon(seg),
         "what": what, "date": parts["date"], "status": parts["status"],
-        "next_step": parts["next_step"], "citation": what,
+        "next_step": parts["next_step"], "milestones": milestones,
+        "citation": what,
     }, None
 
 

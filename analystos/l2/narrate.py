@@ -72,8 +72,9 @@ from analystos.l4.export import display_value
 _MODEL = "claude-sonnet-5"
 _MAX_TOKENS = 8192  # a rich report over a dense document can outgrow 4096 - see analyze.py
 _PLACEHOLDER_RE = re.compile(r"\{\{(\d+)\}\}")
-_CHART_TYPES = ("bar", "line", "donut")
+_CHART_TYPES = ("bar", "line", "donut", "waterfall")
 _CHART_FORMATS = ("usd", "percent", "number")
+_BRIDGE_TOL = 0.01  # a waterfall must actually bridge: start + Σcomponents ≈ end
 
 _SYSTEM_PROMPT = """\
 You are a senior analyst writing the kind of report a Fortune 10 board or \
@@ -83,23 +84,45 @@ below has already been checked against the real source document; your job \
 is judgment, structure, and writing, not verification, and you must not \
 introduce any new number.
 
-Call write_narrative once with three parts, structured the way real \
-executive memos and research notes are (the Pyramid Principle / SCQA \
-pattern McKinsey, BCG, and equity-research desks all use - lead with the \
-answer, then support it):
+Call write_narrative once, structured the way real executive memos and \
+research notes are (the Pyramid Principle / SCQA pattern McKinsey, BCG, \
+and equity-research desks all use - lead with the answer, then support \
+it):
 
+- kpis: 3-5 headline metrics for the strip at the top of the report. Each \
+  is {label, value_fact, delta_fact}: value_fact is the manifest number \
+  of the metric's current value, delta_fact the manifest number of its \
+  year-over-year change (a [computed] fact), or -1 if there is no such \
+  change fact. Pick the figures a decision-maker scans first. [] only if \
+  the document truly has no headline numbers.
 - executive_summary: 2-3 sentences stating the single most important \
   takeaway as a conclusion, not a fact. A reader who stops here should \
-  already know what matters and why.
+  already know what matters and why. Only verified facts here - no \
+  interpretation.
+- executive_insight: exactly ONE paragraph that reads two or three facts \
+  together into a single synthesized judgment the individual facts don't \
+  state on their own (e.g. margin compression + a new interest burden + \
+  reiterated guidance, read together, as evidence a dip is temporary). \
+  This is analysis, not a source claim - it renders in a distinct "boxed" \
+  treatment. {"text": ""} if the material doesn't support one honest \
+  synthesis.
 - sections: 3-5 sections, each built around ONE analytical point - never \
   one number. The heading names the point. Weave facts into the point as \
   evidence: a number is a building block for a sentence, never the whole \
-  sentence. Group related figures together instead of listing them as \
-  separate lines. You do not have to use every fact - one that doesn't \
-  serve a point is better left out. Never write a section that is just \
-  "Label: sentence with one number," repeated fact after fact.
-- outlook: forward-looking or risk material, if the source supports any. \
-  Leave it empty otherwise - do not manufacture an outlook.
+  sentence. Never write a section that is just "Label: sentence with one \
+  number," repeated fact after fact.
+- disclosure_gaps: things a real analyst reading this would want that the \
+  document does NOT provide - a decline whose driver-split isn't broken \
+  out, a metric (EPS, cash flow) absent entirely. State the gap plainly; \
+  you may cite a verified figure it relates to via {{N}}. Never estimate \
+  the missing number - flag it. [] if nothing material is missing.
+- outlook: forward-looking or guidance material the source states, if \
+  any. Leave it empty otherwise - do not manufacture an outlook.
+- outlook_interpretation: ONE paragraph of your own forward-looking \
+  judgment about what the guidance implies (e.g. "reiterating rather than \
+  lowering margin guidance right after the steepest decline is itself a \
+  signal"). Clearly labelled interpretation, not a source claim. \
+  {"text": ""} if you have no defensible read.
 
 Within that structure, five disciplines separate real analysis from a \
 fact sheet - apply every one the source material supports:
@@ -153,9 +176,13 @@ plainly rather than dressing a lone figure as if it were benchmarked.
 Charts: give a section a chart only when it plots two or more facts you \
 are already citing and the shape carries real information - a "line" for \
 one metric across three or more periods, a "bar" to compare categories \
-or segments, a "donut" for parts of a stated whole. Set has_chart false \
-for every other section (a single number, or a point better made in \
-prose). Reference each chart point by its fact number - the same numbers \
+or segments, a "donut" for parts of a stated whole, a "waterfall" for a \
+genuine start -> components -> end bridge where the components actually \
+sum to the move (first series point is the start level, the middle \
+points are the signed components, the last is the end level - it is \
+dropped if it does not add up). Set has_chart false for every other \
+section (a single number, or a point better made in prose). Reference \
+each chart point by its fact number - the same numbers \
 you cite in the text - and set the chart's format to match those facts \
 (usd / percent / number). When has_chart is false, still fill chart with \
 placeholders (type "bar", title "", format "number", series []) - it is \
@@ -226,21 +253,43 @@ _SECTION_SCHEMA = {
     "additionalProperties": False,
 }
 
+# Slice 36: a KPI strip entry - a headline metric, its year-over-year delta
+# (a computed segment), or -1 for "no delta". Both indices point into the
+# already-verified segments; the ✓ / ∑ tag comes from segments[i]["type"].
+_KPI_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "label": {"type": "string"},
+        "value_fact": {"type": "integer"},
+        "delta_fact": {"type": "integer"},
+    },
+    "required": ["label", "value_fact", "delta_fact"],
+    "additionalProperties": False,
+}
+
 _TOOL = {
     "name": "write_narrative",
     "description": (
-        "Submit the finished report: an executive summary, 3-5 sections "
-        "(each with an optional chart), and an outlook."
+        "Submit the finished report: a KPI strip, an executive summary with "
+        "one boxed cross-section insight, 3-5 sections (each with an "
+        "optional chart), any disclosure gaps, and an outlook."
     ),
     "strict": True,
     "input_schema": {
         "type": "object",
         "properties": {
+            "kpis": {"type": "array", "items": _KPI_SCHEMA},
             "executive_summary": {"type": "array", "items": _PARAGRAPH_SCHEMA},
+            "executive_insight": _PARAGRAPH_SCHEMA,
             "sections": {"type": "array", "items": _SECTION_SCHEMA},
+            "disclosure_gaps": {"type": "array", "items": _PARAGRAPH_SCHEMA},
             "outlook": {"type": "array", "items": _PARAGRAPH_SCHEMA},
+            "outlook_interpretation": _PARAGRAPH_SCHEMA,
         },
-        "required": ["executive_summary", "sections", "outlook"],
+        "required": [
+            "kpis", "executive_summary", "executive_insight", "sections",
+            "disclosure_gaps", "outlook", "outlook_interpretation",
+        ],
         "additionalProperties": False,
     },
 }
@@ -260,11 +309,16 @@ def _build_manifest(segments):
             for key in ("date", "status", "next_step"):
                 if segment.get(key):
                     parts.append(f'{key}="{segment[key]}"')
+            for m in segment.get("milestones") or []:
+                parts.append(f'milestone("{m["date"]}": {m["detail"]})')
             lines.append(f"Fact {i} [event]{tag}: " + ", ".join(parts))
         else:
+            # "quote" = a direct source figure (renders with a ✓ tag);
+            # "computed" = independently recomputed (renders with a ∑ tag).
+            kind = "quote" if segment["type"] == "quote" else "computed"
             label = segment.get("label") or "Fact"
             lines.append(
-                f'Fact {i} [citable]{tag}: label="{label}", '
+                f'Fact {i} [citable, {kind}]{tag}: label="{label}", '
                 f'value={display_value(segment, "actual")}'
             )
     return "\n".join(lines)
@@ -316,6 +370,19 @@ def _validate_chart(chart, segments):
         series.append({"label": str(point.get("label") or ""), "fact_index": index})
     if len(series) < 2:
         return None
+
+    if chart["type"] == "waterfall":
+        # start -> signed components -> end. Only render it if it genuinely
+        # bridges: a waterfall that doesn't add up is a fabricated
+        # attribution, exactly what the verification guarantee forbids for
+        # a chart. Needs at least start + one component + end.
+        vals = [segments[p["fact_index"]]["value"] for p in series]
+        if len(vals) < 3:
+            return None
+        bridged = vals[0] + sum(vals[1:-1])
+        if abs(bridged - vals[-1]) > _BRIDGE_TOL * max(abs(vals[-1]), 1.0):
+            return None
+
     return {
         "type": chart["type"],
         "title": str(chart.get("title") or ""),
@@ -333,6 +400,43 @@ def _first_paragraph_problem(paragraphs, segments, where):
         if reason is not None:
             return f"{where} paragraph {reason}: {text!r}"
     return None
+
+
+def _clean_paragraphs(items, segments):
+    """Keep only the paragraphs in ``items`` that pass ``_validate_paragraph``
+    - used for advisory blocks (disclosure gaps) where one bad entry should
+    drop that entry, not the whole report."""
+    out = []
+    for p in items or []:
+        text = (p.get("text") or "").strip()
+        if text and _validate_paragraph(text, segments) is None:
+            out.append({"text": text})
+    return out
+
+
+def _resolve_kpis(raw_kpis, segments):
+    """Up to 5 KPI-strip entries. Each keeps only if ``value_fact`` points
+    at a numeric verified segment; ``delta_fact`` is kept when it points at
+    a computed one, else set to -1 (no delta). Bad entries are dropped, not
+    fatal."""
+    out = []
+    for k in raw_kpis or []:
+        try:
+            vi = int(k.get("value_fact"))
+        except (TypeError, ValueError):
+            continue
+        if not (0 <= vi < len(segments)) or segments[vi].get("value") is None:
+            continue
+        try:
+            di = int(k.get("delta_fact"))
+        except (TypeError, ValueError):
+            di = -1
+        if not (0 <= di < len(segments)) or segments[di].get("type") != "computed":
+            di = -1
+        out.append({"label": str(k.get("label") or ""), "value_fact": vi, "delta_fact": di})
+        if len(out) == 5:
+            break
+    return out
 
 
 def _assemble_report(tool_use, segments, title):
@@ -380,11 +484,23 @@ def _assemble_report(tool_use, segments, title):
     if problem:
         return None, problem
 
+    insight = (report.get("executive_insight") or {}).get("text", "").strip()
+    if insight and _validate_paragraph(insight, segments) is not None:
+        return None, f"executive_insight {_validate_paragraph(insight, segments)}: {insight!r}"
+
+    interp = (report.get("outlook_interpretation") or {}).get("text", "").strip()
+    if interp and _validate_paragraph(interp, segments) is not None:
+        return None, f"outlook_interpretation {_validate_paragraph(interp, segments)}: {interp!r}"
+
     return {
         "title": title,
+        "kpis": _resolve_kpis(report.get("kpis"), segments),
         "executive_summary": [{"text": p["text"]} for p in executive_summary],
+        "executive_insight": insight or None,
         "sections": sections,
+        "disclosure_gaps": _clean_paragraphs(report.get("disclosure_gaps"), segments),
         "outlook": [{"text": p["text"]} for p in outlook] or None,
+        "outlook_interpretation": interp or None,
     }, None
 
 
@@ -459,9 +575,10 @@ def write_narrative(segments, title, client=None):
             _call(
                 f"\n\nYour previous narrative was rejected: {reason}. Fix exactly "
                 "that. Every number must be a {{N}} placeholder - never write a "
-                'digit outside one (a quarter or year like "Q4 2026" is fine). '
-                "Return an executive_summary plus 3-5 sections, each with a "
-                "heading and at least one paragraph."
+                'digit outside one (a date like "September 30, 2026" or "Q4 2026" '
+                "is fine). Return kpis, executive_summary (3-5 sentences, verified "
+                "facts only), executive_insight, 3-5 sections each with a heading "
+                "and a paragraph, disclosure_gaps, outlook, outlook_interpretation."
             ),
             segments,
             title,

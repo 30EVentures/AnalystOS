@@ -64,7 +64,7 @@ from analystos.l1.detect import extract_any
 from analystos.l1.document_text import extract_document_text
 from analystos.l2.analyze import analyze_document
 from analystos.l2.answer import answer_growth, answer_lookup, answer_ratio
-from analystos.l2.narrate import write_narrative
+from analystos.l2.narrate import repair_language_issues, write_narrative
 from analystos.l2.proofread import proofread_report
 from analystos.l4.export import (
     render_html,
@@ -74,6 +74,11 @@ from analystos.l4.export import (
 )
 from analystos.l4.rich_export import render_rich_report
 from analystos.templates import build_asks
+
+# A Gate 2 repair is a small, targeted call per flagged issue, not a full
+# regenerate - see repair_language_issues - so it gets a couple of rounds
+# to converge before falling back.
+_MAX_GATE2_REPAIR_ROUNDS = 2
 
 
 def _pdf_preview(rows):
@@ -172,14 +177,42 @@ def build_report(
             # Gate 2, run separately and blind to the facts: language
             # quality only (spelling, grammar, duplicated text, leftover
             # artifacts). Both gates are mandatory - a report that fails
-            # either one is never shown; it falls back the same way a
-            # Gate 1 failure does, not a special case. See
-            # specs/slice-38/spec.md ("two mandatory quality gates").
-            passed, _issues = proofread_report(report, client=llm_client)
+            # either one is never shown. Unlike a raw fallback, a Gate 2
+            # rejection gets the same "repair the one flagged piece,
+            # don't regenerate everything" treatment Gate 1 already has -
+            # found live 2026-09-11: a report can pass Gate 1 (every
+            # number correctly cited) and still fail Gate 2 on pure
+            # wording (redundant phrasing, inconsistent terminology),
+            # which a full regenerate would just as likely trade for a
+            # different wording nit as actually fix. See
+            # specs/slice-38/spec.md and specs/slice-40/spec.md.
+            passed, issues = proofread_report(report, client=llm_client)
+            for _ in range(_MAX_GATE2_REPAIR_ROUNDS):
+                if passed:
+                    break
+                print(
+                    f"[analystos.pipeline] Gate 2 failed ({len(issues)} issue(s)) - repairing",
+                    file=sys.stderr,
+                )
+                for issue in issues:
+                    print(
+                        f"[analystos.pipeline] Gate 2 issue at "
+                        f"{issue.get('location') or '(unlocated)'}: {issue.get('problem')}",
+                        file=sys.stderr,
+                    )
+                report = repair_language_issues(report, issues, segments, client=llm_client)
+                passed, issues = proofread_report(report, client=llm_client)
             if not passed:
-                raise ValueError("Gate 2 (language quality) did not pass")
+                for issue in issues:
+                    print(
+                        f"[analystos.pipeline] Gate 2 issue at "
+                        f"{issue.get('location') or '(unlocated)'}: {issue.get('problem')}",
+                        file=sys.stderr,
+                    )
+                raise ValueError(f"Gate 2 (language quality) did not pass after repair ({len(issues)} issue(s))")
             return render_rich_report(report, segments, source_hash, "actual")  # L4 (rich HTML)
-        except ValueError:
+        except ValueError as exc:
+            print(f"[analystos.pipeline] rich report fell back to plain rendering: {exc}", file=sys.stderr)
             return render_narrated_section(title, source_hash, segments, "actual")  # L4 (plain fallback)
 
     schema, rows = extract_any(source_path, schema, extract_options)        # L1 (table)

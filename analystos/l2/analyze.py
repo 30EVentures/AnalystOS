@@ -249,6 +249,17 @@ When the document describes a dated event, capture it as an "event" \
 segment (not a plain "quote"), so the report can narrate it as a \
 timeline. If you cannot find a real number to support a claim, leave the \
 claim out rather than estimate one.
+
+An event's "status"/"next_step"/"milestones" text can itself contain a \
+real, standalone figure (a dollar cost, a percentage) that matters enough \
+to report on its own - a peak integration cost, a headcount affected, a \
+percentage completed. When it does, ALSO emit that figure as its own \
+separate "quote" segment (with its own exact_text/value/format), in \
+addition to the "event" segment - the two segments both draw on the same \
+sentence, but only a "quote" can be cited as a standalone number \
+downstream; an event's own placeholder substitutes just its short name, \
+never a figure from inside it. Skipping this means a real, verified \
+number sits in the manifest with no way to responsibly cite it.
 """
 
 _TOOL = {

@@ -2,6 +2,54 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-11 — repair the one flagged piece, not a full regenerate (Slice 40)
+
+Live-tested Slice 39's fix twice more, back to back, and both runs still
+fell back to the plain renderer with zero trace of why -
+`analystos.pipeline`'s except clause swallowed the fallback reason
+entirely. Fixed the logging gap first (now every Gate 1/Gate 2 fallback
+reason prints to stderr), which is what made the rest of this diagnosable
+live at all.
+
+What the logs then showed, repeatedly: `write_narrative` throws away the
+*entire* report on any rejection and asks the model to regenerate
+everything from scratch. A report this size (exec summary + 3-5 sections +
+KPIs + outlook) has enough sentences that a full reroll is a fresh chance
+to break a *different* rule anywhere else in the document, even while
+correctly fixing the one that was actually reported - watched happen live,
+several times in a row, on the same test document. Replaced "reject and
+reroll the whole document" with "repair just the one flagged paragraph in
+place" for both gates: `write_narrative` now tries a scoped, small repair
+call first (chasing a second problem the first repair's fix exposes,
+within a bounded budget) before falling back to a full regenerate; Gate 2
+(language quality) gets the same treatment instead of an instant,
+unconditional fallback on any wording issue.
+
+A repair is only ever kept if it still satisfies Gate 1's own paragraph
+validator - a wording fix must never quietly reintroduce a correctness
+violation. And a Gate 2 issue's flagged location is only patched if it
+matches exactly one field in the report; an ambiguous match (a short,
+generic quote that could be more than one sentence) is left alone rather
+than risking a patch to the wrong one - safer to leave an issue unfixed
+than to guess and rewrite something that wasn't actually broken.
+
+Also closed three specific validator/prompt gaps the live diagnosis
+surfaced along the way, each a real, separately-found live bug, not
+speculative hardening: a missing rule (an "N consecutive quarters" claim
+needs N+1 citations - now stated in the prompt itself, not just checked
+after the fact); a false positive in the direction-word check (a
+direction word separated from a "difference" fact by another placeholder
+was wrongly flagged as describing that fact instead of the comparison it
+actually modified); and a new check for a placeholder followed by a
+spelled-out unit ("million," "percent") - always wrong, since a rendered
+value already carries its own unit, and for a non-numeric fact (an event)
+it was silently being used as though it had a value at all. The last of
+these traced back one layer further, to L2's extraction prompt: an
+event's `status`/`next_step` text can legitimately contain a real,
+material figure (an acquisition's integration-cost peak and step-down)
+that the model could see but had no `{{N}}` to cite - now asked to also
+surface such a figure as its own separate citable fact.
+
 ## 2026-09-11 — growth_percent operand order made order-independent (Slice 39)
 
 Live-tested Slice 38 immediately after merge: a report that should have

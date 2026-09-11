@@ -108,6 +108,7 @@ p{margin:0 0 .8rem;max-width:74ch}
 .kpi .value{font-family:var(--font-display);font-size:1.4rem;font-weight:600}
 .kpi .delta{font-size:.8rem;margin-top:3px}
 .kpi .delta.pos{color:var(--pos)} .kpi .delta.neg{color:var(--neg)}
+.kpi .delta.neutral{color:var(--ink-soft)}
 .legend{display:flex;gap:20px;flex-wrap:wrap;font-size:.75rem;color:var(--ink-soft);margin:10px 0 0}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .legend .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
@@ -190,7 +191,13 @@ def _substitute(text, segments, source_hash, currency_unit, footnote_number, foo
                 _rich_footnote(footnote_number[index], source_hash, segment, currency_unit)
             )
         n = footnote_number[index]
-        rendered = display_value(segment, currency_unit)
+        # An event's display_value() is the FULL composed timeline ("what
+        # (date) - status - next: ...") - right for the dedicated .timeline
+        # widget, wrong mid-sentence: a model writing "the {{N}} closed in
+        # May" expects a short phrase, not the whole timeline dumped inline.
+        # Found live 2026-09-11: the full string leaking into 6+ places,
+        # verbatim, with "next:" showing through as a raw artifact.
+        rendered = segment["what"] if segment.get("type") == "event" else display_value(segment, currency_unit)
         horizon = segment.get("horizon", "reported")
         h_tag = f" ⟦{horizon}⟧" if horizon in _FORWARD_HORIZONS else ""
         # ✓ for a direct source quote, ∑ for an independently computed value.
@@ -236,22 +243,85 @@ def _paragraphs_html(paragraphs, segments, source_hash, currency_unit, footnote_
     )
 
 
-def _fmt(value, spec, currency_unit):
-    return html.escape(format_number(value, spec or "number", currency_unit))
+def _fmt(value, spec, currency_unit, decimals=1):
+    return html.escape(format_number(value, spec or "number", currency_unit, decimals))
 
 
-def _operand_fmt(value, currency_unit):
-    return _fmt(value, "usd" if abs(value) >= 1000 else "number", currency_unit)
+def _operand_fmt(value, currency_unit, decimals=1):
+    return _fmt(value, "usd" if abs(value) >= 1000 else "number", currency_unit, decimals)
+
+
+_COMPACT_NUM_RE = re.compile(r"-?[\d,]*\.?\d+")
+_COMPACT_SCALE = {"B": 1_000_000_000, "M": 1_000_000, "K": 1_000}
+
+
+def _parse_compact_usd(rendered):
+    """Reverse of ``_operand_fmt``'s usd branch - "$1.95B" -> 1_950_000_000.0
+    - used only to confirm an arithmetic footnote's *displayed* numbers
+    actually foot, never to change what's shown. ``None`` if it isn't a
+    compact usd string (a percent, a plain count - nothing to re-derive).
+    """
+    match = _COMPACT_NUM_RE.search(rendered)
+    if not match:
+        return None
+    scale = _COMPACT_SCALE.get(rendered[-1], 1)
+    return float(match.group(0).replace(",", "")) * scale
+
+
+def _ties_out(op, operand_strs, result_str):
+    """Does the expression foot using the numbers exactly as displayed?
+
+    A footnote showing "$1.9B - $498.0M - ... = $565.0M" only proves the
+    math if $1.9B really is $1.9 billion to the precision shown - but
+    $1.9B is the 1-decimal *compaction* of $1,950,000,000, and
+    1.9B - 498M - 455M - 432M = $515M, not $565M. The underlying
+    recomputation (analystos.l2.analyze) is still correct; the *display*
+    silently dropped the precision that made it correct. Found live,
+    2026-09-11. Returns True (nothing to check) for a non-usd expression.
+    """
+    parsed_ops = [_parse_compact_usd(s) for s in operand_strs]
+    parsed_result = _parse_compact_usd(result_str)
+    if any(p is None for p in parsed_ops) or parsed_result is None:
+        return True
+    if op == "difference" and len(parsed_ops) >= 2:
+        recomputed = parsed_ops[0] - sum(parsed_ops[1:])
+    elif op == "sum" and parsed_ops:
+        recomputed = sum(parsed_ops)
+    else:
+        return True
+    tolerance = max(abs(parsed_result) * 0.0005, 1.0)
+    return abs(recomputed - parsed_result) <= tolerance
 
 
 def _arithmetic(segment, currency_unit):
     """The visible math for a computed segment - "$142.0M - $88.0M - $34.0M
     = $20.0M" - built from the canonical operand values Slice 35 carries.
-    Returns "" if the shape isn't one we can spell out."""
+    Returns "" if the shape isn't one we can spell out.
+
+    For "difference"/"sum" in usd, the precision shown is escalated (1 ->
+    2 -> 3 decimals) until the displayed numbers actually foot (see
+    ``_ties_out``) - never left showing an expression that looks wrong
+    even though the real recomputation behind it is right.
+    """
     op = segment.get("operation")
     ops = segment.get("operands") or []
-    result = _fmt(segment.get("value", 0), segment.get("format"), currency_unit)
-    o = [_operand_fmt(v, currency_unit) for v in ops]
+    fmt = segment.get("format") or "number"
+    result_val = segment.get("value", 0)
+    total = segment.get("total")
+
+    escalate = op in ("difference", "sum") and fmt == "usd" and len(ops) >= 1
+    for decimals in ((1, 2, 3) if escalate else (1,)):
+        o = [_operand_fmt(v, currency_unit, decimals) for v in ops]
+        result = _fmt(result_val, fmt, currency_unit, decimals)
+        if not escalate or _ties_out(op, o, result):
+            expr = _build_expr(op, o, result, segment, currency_unit, decimals, total)
+            if expr:
+                return expr
+            break
+    return ""
+
+
+def _build_expr(op, o, result, segment, currency_unit, decimals, total):
     if op == "difference" and len(o) >= 2:
         return f"{o[0]} − {' − '.join(o[1:])} = {result}"
     if op == "sum" and o:
@@ -262,8 +332,8 @@ def _arithmetic(segment, currency_unit):
         return f"({o[1]} − {o[0]}) / {o[0]} = {result}"
     if op == "ratio" and len(o) == 2:
         return f"{o[0]} / {o[1]} = {result}"
-    if op == "percent_of_total" and len(o) == 1 and segment.get("total") is not None:
-        return f"{o[0]} / {_operand_fmt(segment['total'], currency_unit)} = {result}"
+    if op == "percent_of_total" and len(o) == 1 and total is not None:
+        return f"{o[0]} / {_operand_fmt(total, currency_unit, decimals)} = {result}"
     return ""
 
 
@@ -301,9 +371,19 @@ def _kpi_strip_html(kpis, segments, currency_unit):
                 else '<sup class="cite">&#10003;</sup>')
         delta = ""
         di = k.get("delta_fact", -1)
-        if di is not None and di >= 0:
+        if di is not None and di >= 0 and di < len(segments):
             dseg = segments[di]
-            cls = "pos" if (dseg.get("value") or 0) >= 0 else "neg"
+            # Only "growth_percent" has a sign this codebase actually
+            # defines (operands are [from, to], so positive is a real
+            # increase) - a "difference"'s sign only reflects which
+            # operand the model listed first, so it is never colored as
+            # a rise or a fall (found live 2026-09-11: a $2.8M net-income
+            # *decline*, computed as a "difference", rendered green/"pos"
+            # because the raw subtraction happened to come out positive).
+            if dseg.get("operation") == "growth_percent":
+                cls = "pos" if (dseg.get("value") or 0) >= 0 else "neg"
+            else:
+                cls = "neutral"
             delta = (f'<div class="delta {cls}">{html.escape(display_value(dseg, currency_unit))}'
                      '<sup class="cite calc">&#8721;</sup></div>')
         cells.append(

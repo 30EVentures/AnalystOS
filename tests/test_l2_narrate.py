@@ -10,7 +10,7 @@ from types import SimpleNamespace
 import anthropic
 import httpx2
 
-from analystos.l2.narrate import write_narrative
+from analystos.l2.narrate import _validate_paragraph, write_narrative
 
 SEGMENTS = [
     {  # 0: citable quote with a value
@@ -224,6 +224,67 @@ class WriteNarrativeFailurePathsTest(unittest.TestCase):
 
 def _empty_chart():
     return {"type": "bar", "title": "", "format": "number", "series": []}
+
+
+class DirectionWordGateTest(unittest.TestCase):
+    """Slice 38, Gate 1 check #1 - reproduces the live bug directly: net
+    income described as "rose... up $2.8M" when the verified fact behind
+    it had actually fallen. Confirms the checker catches it, and that a
+    correctly-signed growth_percent claim is unaffected.
+    """
+
+    GROWTH_UP = {"type": "computed", "operation": "growth_percent", "value": 12.5}
+    GROWTH_DOWN = {"type": "computed", "operation": "growth_percent", "value": -12.5}
+    DIFFERENCE = {"type": "computed", "operation": "difference", "value": 2.8}
+    SEGS = [GROWTH_UP, GROWTH_DOWN, DIFFERENCE]
+
+    def test_an_increase_word_on_a_declining_growth_percent_fact_is_rejected(self):
+        problem = _validate_paragraph("Net income rose, up {{1}} year over year.", self.SEGS)
+        self.assertIsNotNone(problem)
+        self.assertIn("increase", problem)
+
+    def test_a_decrease_word_on_a_rising_growth_percent_fact_is_rejected(self):
+        problem = _validate_paragraph("Revenue fell, down {{0}}.", self.SEGS)
+        self.assertIsNotNone(problem)
+        self.assertIn("decrease", problem)
+
+    def test_the_live_bug_a_difference_fact_paired_with_any_direction_word_is_rejected(self):
+        # This is exactly the live failure: difference = $22.4M - $19.6M =
+        # +$2.8M (positive only because of operand order), described as a
+        # rise. A difference's sign is never trusted for direction, full stop.
+        problem = _validate_paragraph("Net income rose, up {{2}} year over year.", self.SEGS)
+        self.assertIsNotNone(problem)
+        self.assertIn("difference", problem)
+
+    def test_a_correctly_signed_growth_percent_claim_is_accepted(self):
+        self.assertIsNone(_validate_paragraph("Revenue grew {{0}} year over year.", self.SEGS))
+        self.assertIsNone(_validate_paragraph("Net income declined {{1}} year over year.", self.SEGS))
+
+    def test_a_difference_fact_with_no_direction_word_is_accepted(self):
+        self.assertIsNone(_validate_paragraph("Net income changed by {{2}} year over year.", self.SEGS))
+
+
+class ConsecutiveCountGateTest(unittest.TestCase):
+    """Slice 38, Gate 1 check #4 - "N consecutive quarters" needs N+1 data
+    points (N transitions, not N periods)."""
+
+    QUOTE = {"type": "quote", "value": 1.0}
+    SEGS = [QUOTE, QUOTE, QUOTE, QUOTE]  # four period figures, citable as 0-3
+
+    def test_five_consecutive_claimed_from_four_cited_points_is_rejected(self):
+        text = "Margin declined for five consecutive quarters, from {{0}} to {{1}} to {{2}} to {{3}}."
+        problem = _validate_paragraph(text, self.SEGS)
+        self.assertIsNotNone(problem)
+        self.assertIn("claims 5 consecutive quarters", problem)
+
+    def test_three_consecutive_from_four_cited_points_is_accepted(self):
+        text = "Margin declined for three consecutive quarters, from {{0}} to {{1}} to {{2}} to {{3}}."
+        self.assertIsNone(_validate_paragraph(text, self.SEGS))
+
+    def test_a_consecutive_claim_with_no_cited_periods_is_not_flagged(self):
+        # nothing to verify the claim against in this sentence - stays
+        # silent rather than guess (no false positive)
+        self.assertIsNone(_validate_paragraph("Margin declined for five consecutive quarters.", self.SEGS))
 
 
 if __name__ == "__main__":

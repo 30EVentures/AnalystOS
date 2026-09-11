@@ -395,11 +395,10 @@ class PipelineTest(unittest.TestCase):
             job / "memo.csv", title="Acme deal", evidence_dir=self.tmp / "ev",
             llm_client=fake_client,
         )
-        self.assertIn(
-            "completed its acquisition of Halyard (May 14 2026) — "
-            "integration is underway — next: expected to be accretive in 2027",
-            out,
-        )
+        # Slice 38: an event's {{N}} substitutes its short name inline, not
+        # the full composed timeline - that was leaking into prose verbatim
+        self.assertIn("Acme completed its acquisition of Halyard", out)
+        self.assertNotIn("(May 14 2026) — integration is underway", out)
 
     def test_both_asks_and_template_still_raises(self):  # unchanged guard
         job = self.tmp / "both-still-bad-job"

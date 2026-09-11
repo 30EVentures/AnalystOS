@@ -440,6 +440,62 @@ class DifferenceOperationTest(unittest.TestCase):
             analyze_document(self.DOC, TITLE, client=_fake_client([seg]))
 
 
+class RemainderOperationTest(unittest.TestCase):  # Slice 47
+    """The organic-vs-inorganic (and similar) derived split, generalized
+    from the Meridian Data Services bridge (total growth, minus the
+    Halyard acquisition's stated contribution, equals organic growth)
+    into a native, reusable operation - not a one-off. Same recompute-
+    and-check standard as every other operation: the claimed remainder is
+    independently rederived from the same verified operand values and
+    dropped if it doesn't match, never taken on the model's word.
+    """
+
+    DOC = (
+        "Total Data Services revenue grew $43.0 million year-over-year. "
+        "The Halyard acquisition, completed during the period, contributed "
+        "$34.0 million of that growth."
+    )
+
+    def _seg(self, **over):
+        base = {
+            "type": "computed", "display": "inline", "label": "Organic Data Services growth",
+            "operation": "remainder",
+            "operands": [
+                {"exact_text": "$43.0 million", "value": 43000000.0},
+                {"exact_text": "$34.0 million", "value": 34000000.0},
+            ],
+            "has_total": False, "total_exact_text": "", "total_value": 0,
+            "result": 9000000.0,
+            "sentence": "Organic growth was {value}, excluding the Halyard contribution.",
+            "format": "usd",
+        }
+        base.update(over)
+        return base
+
+    def test_correct_remainder_is_recomputed_and_kept(self):  # Done when
+        out = analyze_document(self.DOC, TITLE, client=_fake_client([self._seg()]))
+        self.assertEqual(len(out), 1)
+        self.assertEqual(out[0]["value"], 9000000.0)
+        self.assertEqual(out[0]["operation"], "remainder")
+
+    def test_a_remainder_with_a_wrong_result_is_dropped(self):  # not asserted, verified
+        with self.assertRaises(ValueError):
+            analyze_document(self.DOC, TITLE, client=_fake_client([self._seg(result=15000000.0)]))
+
+    def test_a_remainder_operand_not_actually_in_the_document_is_dropped(self):
+        seg = self._seg(operands=[
+            {"exact_text": "$43.0 million", "value": 43000000.0},
+            {"exact_text": "$99.0 million", "value": 99000000.0},  # not in DOC at all
+        ])
+        with self.assertRaises(ValueError):
+            analyze_document(self.DOC, TITLE, client=_fake_client([seg]))
+
+    def test_remainder_counts_as_a_comparison_for_coverage(self):
+        out_segments = analyze_document(self.DOC, TITLE, client=_fake_client([self._seg()]))
+        summary = coverage_summary(out_segments)
+        self.assertEqual(summary["comparisons"], 1)
+
+
 class HorizonFieldTest(unittest.TestCase):
     """Slice 29: every verified segment carries a horizon; a guidance
     figure is verified exactly like any other quote.

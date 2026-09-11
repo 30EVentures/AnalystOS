@@ -422,6 +422,60 @@ def _timeline_html(segment):
     return f'<div class="timeline">{items}</div>'
 
 
+_PERIOD_LABEL_RE = re.compile(
+    r"^(Q[1-4]\s*'?\s*\d{2,4}"                                    # "Q3 2026", "Q3 '26"
+    r"|FY\s*'?\s*\d{2,4}"                                          # "FY2026", "FY '26"
+    r"|(?:H[12]|1H|2H)\s*'?\s*\d{2,4}"                             # "H1 2026", "1H26"
+    r"|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)"
+    r"[a-z]*\.?\s*'?\s*\d{2,4}"                                    # "March 2026", "Mar '26"
+    r"|\d{4})\s*$",                                                # a bare year, "2026"
+    re.IGNORECASE,
+)
+
+
+def _is_bridge_shape(values):
+    """True if ``values`` has a genuine start -> components -> end shape -
+    the exact tie-out property the waterfall renderer's own post-hoc
+    check (below, kept as a separate safety layer) already requires:
+    the first point plus the signed middle points equals the last."""
+    if len(values) < 3:
+        return False
+    return abs(values[0] + sum(values[1:-1]) - values[-1]) <= 0.01 * max(abs(values[-1]), 1.0)
+
+
+def _is_time_series_shape(labels):
+    """True if there are three or more points and *every* label reads as
+    a period (a quarter, fiscal year, half, month, or bare calendar
+    year) - the same "three or more periods" bar the writer's own prompt
+    guidance already names for a trend chart. A mixed set of labels -
+    some periods, some not - is a categorical comparison, not a trend,
+    so this requires all of them to match, not a majority.
+    """
+    if len(labels) < 3:
+        return False
+    return all(_PERIOD_LABEL_RE.match(label.strip()) for label in labels)
+
+
+def _detect_chart_type(labels, values):
+    """Code, not the model, decides the chart type from the verified
+    data's own shape - see specs/slice-47/spec.md. A start -> components
+    -> end bridge is a waterfall; three or more period-labelled points
+    are a line (a trend over time); anything else - a discrete,
+    non-chronological comparison (segments, categories, two arbitrary
+    figures side by side) - renders as a bar chart, the safe default
+    shape for "these are different things, compared." Donut (parts of a
+    stated whole) is not auto-detected in this slice - deliberately out
+    of scope, not a silent regression; see the spec's "Not in this
+    slice." A chart spec's own ``type`` field is no longer consulted for
+    rendering at all once this runs.
+    """
+    if _is_bridge_shape(values):
+        return "waterfall"
+    if _is_time_series_shape(labels):
+        return "line"
+    return "bar"
+
+
 def _resolve_chart(chart, segments):
     """Turn a chart spec's ``fact_index`` list into real ``(label, value)``
     pairs, or ``None`` if what's left isn't a real chart.
@@ -454,17 +508,25 @@ def _chart_html(chart, segments, currency_unit):
     if resolved is None:
         return ""
     labels, values = resolved
-    renderer = _CHART_RENDERERS.get(chart.get("type"))
+    # The model's own chart.get("type") is no longer consulted for
+    # rendering at all - code decides from the verified data's shape.
+    # See specs/slice-47/spec.md.
+    chart_type = _detect_chart_type(labels, values)
+    renderer = _CHART_RENDERERS.get(chart_type)
     if renderer is None:
         return ""
-    if chart.get("type") == "waterfall":
-        # defence in depth: only draw a bridge that actually bridges
+    if chart_type == "waterfall":
+        # Kept as a separate, independent safety layer on top of
+        # _detect_chart_type's own bridge check above - not a
+        # replacement for it. Defence in depth: only draw a bridge that
+        # actually bridges, even if a future change to the detector
+        # above ever got this wrong.
         if len(values) < 3 or abs(
             values[0] + sum(values[1:-1]) - values[-1]
         ) > 0.01 * max(abs(values[-1]), 1.0):
             return ""
     svg = renderer(chart.get("title", ""), labels, values, chart.get("format", "number"), currency_unit)
-    tag = ("&#8721; Computed &amp; verified" if chart.get("type") == "waterfall"
+    tag = ("&#8721; Computed &amp; verified" if chart_type == "waterfall"
            else "&#10003; Direct quote")
     return f'<figure class="chart-card">{svg}<figcaption><span class="cite">{tag}</span></figcaption></figure>'
 

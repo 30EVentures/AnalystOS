@@ -258,19 +258,25 @@ figure - is usually the more informative sentence than either number \
 alone.
 
 Charts: give a section a chart only when it plots two or more facts you \
-are already citing and the shape carries real information - a "line" for \
-one metric across three or more periods, a "bar" to compare categories \
-or segments, a "donut" for parts of a stated whole, a "waterfall" for a \
-genuine start -> components -> end bridge where the components actually \
-sum to the move (first series point is the start level, the middle \
-points are the signed components, the last is the end level - it is \
-dropped if it does not add up). Set has_chart false for every other \
-section (a single number, or a point better made in prose). Reference \
-each chart point by its fact number - the same numbers \
-you cite in the text - and set the chart's format to match those facts \
-(usd / percent / number). When has_chart is false, still fill chart with \
-placeholders (type "bar", title "", format "number", series []) - it is \
-ignored.
+are already citing and the shape carries real information. The chart's \
+"type" field is a formality, not your decision - fill it with any valid \
+value, it is never consulted for rendering. What actually determines the \
+chart's real, rendered type is the shape of the data you cite, decided \
+by code: a start -> components -> end bridge (first series point is the \
+start level, the middle points are the signed components, the last is \
+the end level - only rendered if they actually sum to the move) renders \
+as a waterfall; three or more period-labelled points (a quarter, a \
+fiscal year, a month) render as a line, a trend over time; anything else \
+- categories or segments compared side by side - renders as a bar. So \
+what matters is which facts you plot and their order, never a type name: \
+cite the start, then each component, then the end, in that order, for a \
+bridge; cite periods in chronological order for a trend. Set has_chart \
+false for every other section (a single number, or a point better made \
+in prose). Reference each chart point by its fact number - the same \
+numbers you cite in the text - and set the chart's format to match those \
+facts (usd / percent / number). When has_chart is false, still fill \
+chart with placeholders (type "bar", title "", format "number", \
+series []) - it is ignored.
 
 Forward-looking facts in the manifest are tagged [guidance] or \
 [projected]. They belong in the outlook, or in a clearly forward-marked \
@@ -508,13 +514,19 @@ def _direction_problem(text, segments):
     sign-checked: the narrator must cite a "growth_percent" fact for a
     directional claim, or drop the direction word and state the plain
     magnitude (see the "Directional words" rule in _SYSTEM_PROMPT).
+    "remainder" (Slice 47's organic-vs-inorganic split) is the same
+    arithmetic as "difference" and gets the same treatment - nothing
+    verifies that operand[0] genuinely is "the total" as opposed to just
+    the first number listed, so its sign is exactly as untrustworthy.
     """
     for match in _PLACEHOLDER_RE.finditer(text):
         index = int(match.group(1))
         if index < 0 or index >= len(segments):
             continue
         seg = segments[index]
-        if seg.get("type") != "computed" or seg.get("operation") not in ("growth_percent", "difference"):
+        if seg.get("type") != "computed" or seg.get("operation") not in (
+            "growth_percent", "difference", "remainder",
+        ):
             continue
         window = text[max(0, match.start() - _DIRECTION_WINDOW):match.start()]
         # A direction word only describes *this* {{N}} if no other
@@ -535,9 +547,9 @@ def _direction_problem(text, segments):
         if nearest_up < 0 and nearest_down < 0:
             continue
         said_up = nearest_up > nearest_down
-        if seg["operation"] == "difference":
+        if seg["operation"] in ("difference", "remainder"):
             return (
-                f"fact {index} is a 'difference' (its sign isn't a reliable "
+                f"fact {index} is a {seg['operation']!r} (its sign isn't a reliable "
                 f"direction) but a directional word appears next to it - cite a "
                 f"'growth_percent' fact for direction, or state the plain magnitude"
             )

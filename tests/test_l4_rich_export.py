@@ -3,6 +3,7 @@ specs/slice-28/spec.md that concerns analystos.l4.rich_export.
 """
 
 import unittest
+from unittest.mock import patch
 
 from analystos.l4.rich_export import render_rich_report
 
@@ -398,10 +399,30 @@ class V4StructureTest(unittest.TestCase):  # Slice 36
         self.assertIn("($19.6M − $22.4M) / $22.4M", out)  # 7 footnote shows the actual arithmetic
         self.assertIn("IBM Plex Serif", out)                       # 8 typography system
 
-    def test_a_waterfall_that_does_not_tie_out_is_dropped(self):
+    def test_data_that_does_not_form_a_real_bridge_renders_as_a_bar_not_a_waterfall(self):
+        # Slice 47: chart type is now decided by code from the verified
+        # data's own shape, not by whatever the model declared - see
+        # specs/slice-47/spec.md. Breaking the bridge no longer means the
+        # chart vanishes; it means code correctly stops calling it a
+        # bridge and shows the same real numbers as an honest bar
+        # comparison instead - no chart lost, no misleading bridge shown.
         bad = self._report()
         bad["sections"][0]["chart"]["series"][1]["fact_index"] = 0  # $498M component breaks the bridge
         out = render_rich_report(bad, self.SEG, SRC)
+        self.assertIn("<svg", out)
+        self.assertNotIn("&#8721; Computed &amp; verified", out)  # the waterfall-only footer tag
+        self.assertIn("&#10003; Direct quote", out)  # the bar/line footer tag instead
+
+    def test_the_post_hoc_waterfall_tie_out_check_is_still_an_independent_safety_layer(self):
+        # Proves the existing validation genuinely still runs as its own
+        # check, not just inferred from the detector agreeing with
+        # itself: force the detector to (wrongly) call broken-bridge data
+        # "waterfall" and confirm the separate, untouched tie-out check
+        # in _chart_html still refuses to render it.
+        with patch("analystos.l4.rich_export._detect_chart_type", return_value="waterfall"):
+            bad = self._report()
+            bad["sections"][0]["chart"]["series"][1]["fact_index"] = 0  # breaks the bridge
+            out = render_rich_report(bad, self.SEG, SRC)
         self.assertNotIn("<svg", out)
 
     def test_a_bad_kpi_reference_is_skipped_not_fatal(self):
@@ -434,6 +455,71 @@ class V4StructureTest(unittest.TestCase):  # Slice 36
         # white, losing the verified-vs-interpretation visual system.
         out = render_rich_report(self._report(), self.SEG, SRC)
         self.assertIn("print-color-adjust:exact", out)
+
+
+class ChartTypeAutoDetectionTest(unittest.TestCase):  # Slice 47
+    """Chart type is decided by code from the verified data's own shape,
+    not by whatever the model declared in chart["type"] - each test here
+    deliberately declares the *wrong* type to prove the override is real,
+    not just a case where the model happened to guess correctly.
+    """
+
+    def _quote(self, value):
+        return {"type": "quote", "horizon": "reported", "value": value,
+                "format": "usd", "citation": f"${value:,.0f}"}
+
+    def _report_with_chart(self, declared_type, series):
+        return {
+            "title": "Acme Q3",
+            "kpis": [],
+            "executive_summary": [{"text": "See the chart below."}],
+            "executive_insight": None,
+            "sections": [{
+                "heading": "Chart",
+                "paragraphs": [{"text": "The figures are charted below."}],
+                "chart": {"type": declared_type, "title": "Chart", "format": "usd",
+                          "series": series},
+            }],
+            "disclosure_gaps": [],
+            "outlook": None,
+            "outlook_interpretation": None,
+        }
+
+    def test_a_start_components_end_bridge_renders_as_a_waterfall(self):
+        # 100 -> +20 -> 120: a real, tying bridge - model wrongly declared "bar".
+        segments = [self._quote(100_000_000.0), self._quote(20_000_000.0), self._quote(120_000_000.0)]
+        report = self._report_with_chart("bar", [
+            {"label": "start", "fact_index": 0},
+            {"label": "component", "fact_index": 1},
+            {"label": "end", "fact_index": 2},
+        ])
+        out = render_rich_report(report, segments, SRC)
+        self.assertIn('stroke-dasharray="3,3"', out)  # the waterfall connector - unique to it
+        self.assertNotIn("<polyline", out)
+
+    def test_a_categorical_comparison_renders_as_a_bar_chart(self):
+        # Three distinct, non-chronological categories - model wrongly declared "line".
+        segments = [self._quote(10_000_000.0), self._quote(25_000_000.0), self._quote(15_000_000.0)]
+        report = self._report_with_chart("line", [
+            {"label": "Product A", "fact_index": 0},
+            {"label": "Product B", "fact_index": 1},
+            {"label": "Product C", "fact_index": 2},
+        ])
+        out = render_rich_report(report, segments, SRC)
+        self.assertIn("<rect", out)
+        self.assertNotIn("<polyline", out)
+        self.assertNotIn('stroke-dasharray="3,3"', out)  # not mistaken for a waterfall
+
+    def test_a_trend_over_three_or_more_periods_renders_as_a_line(self):
+        # Model wrongly declared "donut".
+        segments = [self._quote(100_000_000.0), self._quote(110_000_000.0), self._quote(120_000_000.0)]
+        report = self._report_with_chart("donut", [
+            {"label": "Q1 2026", "fact_index": 0},
+            {"label": "Q2 2026", "fact_index": 1},
+            {"label": "Q3 2026", "fact_index": 2},
+        ])
+        out = render_rich_report(report, segments, SRC)
+        self.assertIn("<polyline", out)
 
 
 class PrecisionConsistencyGateTest(unittest.TestCase):

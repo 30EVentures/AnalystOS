@@ -2,6 +2,34 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-12 — the deterministic floor didn't recognize "Q3 FY2026" (Slice 54)
+
+A newly-generated test document ("Orion Industrial Group") hit Gate 1/
+Gate 2 failure on a live run (a different, non-deterministic outcome
+than an earlier run of the same document) and fell to Slice 52's
+deterministic floor - which then produced a visibly broken result: a
+KPI strip listing "Revenue" five times across five different quarters,
+a jumbled chart mixing unrelated facts, and no trend sentence despite
+five consecutive quarters of real growth in the data.
+
+Root cause: the model labelled quarters "Q2 FY2027" (quarter + "FY" +
+year combined) - a real, common fiscal-quarter convention this
+codebase's period-detection regex only half-recognized, matching just
+the trailing "FY2027" and silently losing the quarter number. That one
+lost token broke three things that all depend on it: metric-key
+deduplication (every quarter of "Revenue" looked like a different
+metric), chronological sort order, and time-series/trend grouping. The
+identical gap existed in `rich_export._PERIOD_LABEL_RE` (Slice 47's
+chart-type detector) too, not only the deterministic tier - fixed in
+both places, since a model-declared chart using this same label
+convention would have hit the identical misclassification on the
+best-case rich-narrative path.
+
+Confirmed by reconstructing the exact real segment set visible in the
+captured Test #10 output and running it through the fixed code
+directly - no second live API call needed, since the real data was
+already fully visible in what the user had already captured.
+
 ## 2026-09-12 — root cause found: a fake, non-numeric placeholder (Slice 53)
 
 The actual reason Test #4/#8 fell back to the flat renderer, deliberately

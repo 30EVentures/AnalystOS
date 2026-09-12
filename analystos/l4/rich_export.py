@@ -423,7 +423,8 @@ def _timeline_html(segment):
 
 
 _PERIOD_LABEL_RE = re.compile(
-    r"^(Q[1-4]\s*'?\s*\d{2,4}"                                    # "Q3 2026", "Q3 '26"
+    r"^(Q[1-4]\s*'?\s*FY\s*'?\s*\d{2,4}"                          # "Q3 FY2026", "Q3 FY'26"
+    r"|Q[1-4]\s*'?\s*\d{2,4}"                                     # "Q3 2026", "Q3 '26"
     r"|FY\s*'?\s*\d{2,4}"                                          # "FY2026", "FY '26"
     r"|(?:H[12]|1H|2H)\s*'?\s*\d{2,4}"                             # "H1 2026", "1H26"
     r"|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)"

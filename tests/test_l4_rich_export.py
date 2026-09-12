@@ -521,6 +521,23 @@ class ChartTypeAutoDetectionTest(unittest.TestCase):  # Slice 47
         out = render_rich_report(report, segments, SRC)
         self.assertIn("<polyline", out)
 
+    def test_the_combined_quarter_fy_year_label_is_also_recognized_as_a_period(self):
+        # Slice 54, found live 2026-09-12: a real document labelled
+        # quarters "Q2 FY2027" (quarter + "FY" + year combined) - a real,
+        # common fiscal-quarter convention that was silently only
+        # half-recognized (matching just the trailing "FY2027"), which
+        # would misclassify a genuine trend as a bar chart here too, the
+        # same underlying gap that broke the deterministic floor's own
+        # trend/KPI grouping for the same document.
+        segments = [self._quote(100_000_000.0), self._quote(110_000_000.0), self._quote(120_000_000.0)]
+        report = self._report_with_chart("bar", [
+            {"label": "Q1 FY2026", "fact_index": 0},
+            {"label": "Q2 FY2026", "fact_index": 1},
+            {"label": "Q3 FY2026", "fact_index": 2},
+        ])
+        out = render_rich_report(report, segments, SRC)
+        self.assertIn("<polyline", out)
+
 
 class PrecisionConsistencyGateTest(unittest.TestCase):
     """Slice 38, Gate 1 check #3 - reproduces the live bug exactly:

@@ -61,14 +61,28 @@ _DISCLOSURE_GAP_CHECKLIST = (
 )
 
 _PERIOD_TOKEN_RE = re.compile(
-    r"(Q[1-4]\s*'?\s*\d{2,4}"
+    # The combined "Q3 FY2026" form MUST come before the bare quarter and
+    # bare FY alternatives - found live 2026-09-12: a real document
+    # labelled quarters "Q2 FY2027" (quarter + "FY" + year, a common
+    # real-world fiscal-quarter convention this hadn't accounted for).
+    # With the bare alternatives tried first, this token search only
+    # ever matched the trailing "FY2027" part, silently losing the
+    # quarter number - which broke metric grouping (every quarter of
+    # "Revenue" looked like a different, undeduplicated metric),
+    # chronological ordering (_period_sort_key had no quarter to sort
+    # by), and time-series/trend detection (no group of 3+ ever formed)
+    # all at once.
+    r"(Q[1-4]\s*'?\s*FY\s*'?\s*\d{2,4}"
+    r"|Q[1-4]\s*'?\s*\d{2,4}"
     r"|FY\s*'?\s*\d{2,4}"
     r"|(?:H[12]|1H|2H)\s*'?\s*\d{2,4}"
     r"|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*'?\s*\d{2,4}"
     r"|\b\d{4}\b)",
     re.IGNORECASE,
 )
-_QUARTER_RE = re.compile(r"^Q([1-4])\s*'?\s*(\d{2,4})$", re.IGNORECASE)
+# Optional "FY" between the quarter and the year - "Q3 2026" and
+# "Q3 FY2026" both parse to the same (year, quarter) sort key.
+_QUARTER_RE = re.compile(r"^Q([1-4])\s*'?\s*(?:FY\s*'?\s*)?(\d{2,4})$", re.IGNORECASE)
 _FY_RE = re.compile(r"^FY\s*'?\s*(\d{2,4})$", re.IGNORECASE)
 _YEAR_RE = re.compile(r"^(\d{4})$")
 

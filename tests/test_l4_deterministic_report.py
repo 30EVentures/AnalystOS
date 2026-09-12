@@ -330,6 +330,54 @@ class ChartSelectionTest(unittest.TestCase):
         self.assertIsNone(_select_chart([_quote("Solo", 1.0, "number", "a")]))
 
 
+class FiscalYearPeriodFormatTest(unittest.TestCase):  # Slice 54, found live 2026-09-12
+    """A real document ("Test #10") labelled quarters "Q2 FY2027"
+    (quarter + "FY" + year combined) - a real, common fiscal-quarter
+    convention. Reproduces the exact real data behind that failure:
+    before Slice 54, this label format broke KPI dedup (5 "Revenue" KPIs
+    across 5 quarters instead of 1), benchmark attachment (attached to
+    the wrong quarter), the trend sentence (never fired - no 3+ group
+    ever formed), and the chart (a jumbled bar mixing unrelated facts
+    instead of a clean revenue line)."""
+
+    SEGMENTS = [
+        _quote("Q2 FY2027 Revenue", 486_000_000.0, "usd", "cite-q2fy27"),
+        _quote("Q1 FY2027 Revenue", 461_000_000.0, "usd", "cite-q1fy27"),
+        _quote("Q4 FY2026 Revenue", 438_000_000.0, "usd", "cite-q4fy26"),
+        _quote("Q3 FY2026 Revenue", 419_000_000.0, "usd", "cite-q3fy26"),
+        _quote("Q2 FY2026 Revenue", 402_000_000.0, "usd", "cite-q2fy26"),
+        _growth("Revenue growth QoQ", 5.4, "cite-q1fy27", "cite-q2fy27"),
+        _growth("Revenue growth YoY", 20.9, "cite-q2fy26", "cite-q2fy27"),
+        _quote("Industrial Systems Segment Revenue", 302_000_000.0, "usd", "cite-seg"),
+    ]
+
+    def test_kpis_deduplicate_to_one_per_distinct_metric(self):
+        kpis = _select_kpis(self.SEGMENTS)
+        self.assertEqual(len(kpis), 2)  # Revenue (once) + Industrial Systems
+        self.assertEqual(kpis[0]["value_fact"], 0)  # Q2 FY2027, the current quarter
+        self.assertEqual(kpis[0]["delta_fact"], 5)
+
+    def test_both_growth_facts_attach_to_the_current_quarter(self):
+        text = _benchmark_sentences(self.SEGMENTS)[0]["text"]
+        self.assertIn("{{0}}", text)
+        self.assertIn("{{5}}", text)
+        self.assertIn("{{6}}", text)
+        self.assertNotIn("{{1}}", text)
+        self.assertNotIn("{{4}}", text)
+
+    def test_a_genuine_trend_sentence_fires(self):
+        text = _trend_sentences(self.SEGMENTS)[0]["text"]
+        self.assertIn("grown", text)
+        self.assertIn("4 consecutive periods", text)
+
+    def test_the_chart_is_a_clean_same_metric_revenue_series_not_a_jumbled_mix(self):
+        chart = _select_chart(self.SEGMENTS)
+        labels = [p["label"] for p in chart["series"]]
+        self.assertEqual(labels, ["Q2 FY2026", "Q3 FY2026", "Q4 FY2026", "Q1 FY2027", "Q2 FY2027"])
+        # the unrelated segment figure never gets mixed into the revenue trend
+        self.assertNotIn(7, [p["fact_index"] for p in chart["series"]])
+
+
 class BuildDeterministicReportTest(unittest.TestCase):  # Done when #1, #2
     def _report(self):
         segments = REVENUE_SERIES + [

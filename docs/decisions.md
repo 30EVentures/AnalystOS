@@ -2,6 +2,61 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-12 — a mandatory, deterministic "advanced" floor (Slice 52)
+
+Gate 1/Gate 2 rejecting the model's narrative previously meant a bare,
+chart-less, KPI-less text fallback - the safety behavior was right (never
+show a narrative that couldn't be verified) but what it fell back *to*
+had no charts and no KPI strip at all, because those were entirely the
+model's own narrative JSON to produce. Added
+`analystos/l4/deterministic_report.py` - a second, zero-model-call tier
+between the rich narrative and true bare text: a KPI strip, at least one
+chart, and analytical sentences (benchmarking, trend, relationship,
+disclosure-gap) assembled entirely from already-verified segments, using
+a fixed-template approach rather than a bounded model call - reasoned
+through explicitly before building: none of the four sentence types
+require *discovering* a relationship (that's already done by extraction
+or the existing chart-shape detector), only *phrasing* one already
+known, which templates handle without needing any generative step that
+could itself need a quality gate.
+
+Produces the *exact* report-dict shape `write_narrative` already
+returns, so `render_rich_report`/`render_rich_pdf` render it completely
+unchanged - no new rendering code, no visual "degraded" signal, by
+construction rather than convention.
+
+One correction made before building, not after: the task's framing
+assumed disclosure-gap detection was "already code-driven, reusable" -
+it wasn't. `disclosure_gaps` was, until this slice, content the *model*
+wrote inside `write_narrative`'s own response; nothing detected a gap
+independently of that. Built a genuinely new, fixed checklist detector
+instead (EPS, cash flow, gross margin, etc., keyword-matched) rather
+than silently assuming code that didn't exist.
+
+Two real bugs surfaced only by running an actual document through this
+tier (not by any hand-built fixture) - both instructive, both now
+covered by regression tests built directly from the failure:
+
+1. Determining which of a computed fact's two cited quotes was the
+   "current" one by *citation position* seemed reasonable but wasn't -
+   `analyze.py`'s own `growth_percent` verification already tries
+   operands in either order and accepts whichever matches, proving a
+   model is never actually constrained to one order. A real document
+   produced "Net Income Q3 2025 was $22.4M, a change of $-2.8M" -
+   attached to the older quarter. Fixed by determining "current" from
+   each quote's own period token (chronology), never from position.
+2. `_select_bridge` treated any 2-citation `difference`/`remainder` as
+   a bridge, producing a nonsensical "moved from X to Y" sentence for
+   an ordinary two-point YoY comparison with no named component at all.
+   Fixed by requiring 3+ citations - a genuine start/components/end
+   bridge, never a plain two-point difference.
+
+Confirmed via the pattern already established this session: engineered-
+failure automated tests (a permanently broken `write_narrative` mock
+still yields a full rich-rendered report with all four sentence types,
+zero model dependency) *and* a real live run against the actual Meridian
+document behind Test #8/#9, read directly, not asserted to work.
+
 ## 2026-09-11 — a deliberate, real-money live-test suite (Slice 51)
 
 The 458 tests in `tests/` are entirely mocked - valuable and permanently

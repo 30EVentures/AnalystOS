@@ -64,6 +64,7 @@ from analystos.l1.detect import extract_any
 from analystos.l1.boilerplate import strip_forward_looking_boilerplate
 from analystos.l1.document_text import extract_document_text
 from analystos.l1.image_facts import tag_image_sourced_segments
+from analystos.l4.deterministic_report import build_deterministic_report
 from analystos.l2.analyze import analyze_document
 from analystos.l2.answer import answer_growth, answer_lookup, answer_ratio
 from analystos.l2.narrate import repair_language_issues, write_narrative
@@ -228,7 +229,25 @@ def build_report(
                 return html, render_rich_pdf(report, segments, source_hash, "actual")
             return html
         except ValueError as exc:
-            print(f"[analystos.pipeline] rich report fell back to plain rendering: {exc}", file=sys.stderr)
+            print(f"[analystos.pipeline] rich report fell back: {exc}", file=sys.stderr)
+            # Slice 52 - a mandatory, deterministic floor: zero model
+            # calls, so it cannot fail Gate 1/Gate 2 the way the
+            # narrative that just failed did. Renders through the exact
+            # same render_rich_report/render_rich_pdf as the best case -
+            # no visual "degraded" signal, ever. Only None (fewer than 2
+            # numeric facts anywhere) falls through to the true last
+            # resort below.
+            deterministic = build_deterministic_report(segments, title)
+            if deterministic is not None:
+                html = render_rich_report(deterministic, segments, source_hash, "actual")
+                if want_pdf:
+                    return html, render_rich_pdf(deterministic, segments, source_hash, "actual")
+                return html
+            print(
+                "[analystos.pipeline] deterministic floor also had too few "
+                "numeric facts - falling through to the plain renderer",
+                file=sys.stderr,
+            )
             plain = render_narrated_section(title, source_hash, segments, "actual")  # L4 (plain fallback)
             if want_pdf:
                 return plain, render_pdf(plain)

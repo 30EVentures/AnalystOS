@@ -14,6 +14,7 @@ from analystos.l2.narrate import (
     _MAX_REPAIR_ATTEMPTS,
     _MAX_RETRIES,
     _build_manifest,
+    _fake_placeholder_problem,
     _locate_problem,
     _redundant_unit_problem,
     _synthesis_problem,
@@ -396,6 +397,49 @@ class SynthesisGateTest(unittest.TestCase):  # Slice 49
         # be treated as a one-fact restatement - it's simply absent.
         report = _report(executive_insight={"text": ""})
         self.assertIsNone(_locate_problem(report, SEGMENTS))
+
+
+class FakePlaceholderGateTest(unittest.TestCase):  # Slice 53
+    """Found live 2026-09-12 against a real document: the model wrote
+    "{{5.0M}}" for a real, source-stated figure with no matching
+    manifest fact - not a real {{N}} index, a value dressed up to look
+    like one. _PLACEHOLDER_RE correctly never matches it, so its digits
+    already tripped the generic digit-outside-placeholder check, but
+    with no specific reason - 3 repair attempts and 2 full retries all
+    failed to fix the real problem. This check names it directly."""
+
+    def test_the_exact_captured_live_failure_is_caught_with_a_specific_reason(self):
+        text = (
+            "Integration and purchase-accounting costs tied to the Halyard "
+            "acquisition are projected to decline to approximately {{5.0M}} "
+            "in Q4 2026, down from the {{22}} peak in Q3 2026."
+        )
+        problem = _fake_placeholder_problem(text)
+        self.assertIsNotNone(problem)
+        self.assertIn("{{5.0M}}", problem)
+        self.assertIn("fake placeholder", problem)
+
+    def test_a_dollar_sign_and_unit_inside_braces_is_also_caught(self):
+        problem = _fake_placeholder_problem("Guidance implies {{$5.0 million}} for the year.")
+        self.assertIsNotNone(problem)
+
+    def test_a_real_integer_placeholder_is_never_flagged(self):
+        self.assertIsNone(_fake_placeholder_problem("Revenue reached {{0}}, up {{1}} year over year."))
+
+    def test_an_empty_placeholder_is_also_a_fake_one(self):
+        self.assertIsNotNone(_fake_placeholder_problem("The figure was {{}} this quarter."))
+
+    def test_wired_into_validate_paragraph_with_the_specific_reason_not_the_generic_one(self):
+        segs = [{"type": "quote", "value": 22_000_000.0}]
+        text = "The peak was {{0}}, projected to decline to {{5.0M}} next quarter."
+        problem = _validate_paragraph(text, segs)
+        self.assertIn("fake placeholder", problem)
+
+    def test_wired_into_locate_problem_for_the_outlook_section(self):
+        report = _report(outlook=[{"text": "Costs are projected to decline to {{5.0M}} next quarter."}])
+        _get, _set_text, reason = _locate_problem(report, SEGMENTS)
+        self.assertIn("outlook paragraph", reason)
+        self.assertIn("fake placeholder", reason)
 
 
 class LocateProblemTest(unittest.TestCase):  # Slice 40

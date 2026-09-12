@@ -124,7 +124,15 @@ it):
   year-over-year and {{2}} sequentially, driven by a segment now \
   generating {{3}} of total revenue." Wrong: the same sentence with any \
   one of those four numbers typed as a literal digit instead of {{N}} - \
-  that single slip rejects the whole narrative.
+  that single slip rejects the whole narrative. A {{N}} is ALWAYS a bare \
+  integer that is a real index into the manifest below - never a value, \
+  a unit, or anything else inside the braces ({{5.0M}} and \
+  {{$5.0 million}} are exactly as invalid as a bare digit - a fake \
+  placeholder, not a real one). If a real, source-stated number has no \
+  matching manifest fact to cite, you may NOT approximate it inside a \
+  fake placeholder - omit that specific figure, or describe the point \
+  qualitatively without it, the same way you already handle any other \
+  claim the manifest can't support.
 - executive_insight: exactly ONE paragraph that reads two or three facts \
   together into a single synthesized judgment the individual facts don't \
   state on their own (e.g. margin compression + a new interest burden + \
@@ -424,7 +432,14 @@ can; change only what the rejection reason requires.
 
 Every number is a {{N}} placeholder referencing the manifest below - never \
 a literal digit (a bare quarter/year reference like "Q4 2026" is the one \
-exception). A directional word ("rose"/"fell"/"grew"/"declined"/etc.) next \
+exception), and {{N}} is ALWAYS a bare integer that is a real manifest \
+index - never a value or a unit inside the braces ({{5.0M}} is exactly \
+as invalid as a bare digit: a fake placeholder, not a real one, and \
+rejects the paragraph the same way). If the number you need has no \
+matching fact anywhere in the manifest - not just an event's date/status/ \
+next_step text, any number at all - do not approximate it inside a fake \
+placeholder: drop that specific figure, or describe the point \
+qualitatively without it. A directional word ("rose"/"fell"/"grew"/"declined"/etc.) next \
 to a {{N}} is only allowed beside a "growth_percent" fact whose sign \
 matches - never beside a "difference" fact; state a "difference" as a \
 plain magnitude with no directional word. This bites hardest on a margin \
@@ -658,9 +673,39 @@ def _synthesis_problem(text):
     return None
 
 
+_FAKE_PLACEHOLDER_RE = re.compile(r"\{\{([^{}]*)\}\}")
+
+
+def _fake_placeholder_problem(text):
+    """Found live 2026-09-12: the model wrote ``{{5.0M}}`` for a real,
+    source-stated figure ("...projected to decline to approximately
+    $5.0 million...") that had no verified segment behind it to cite -
+    not a real ``{{N}}`` manifest index, a literal value dressed up to
+    look like one. ``_PLACEHOLDER_RE`` correctly never matches this (it
+    only matches pure-digit placeholders), so its digits already get
+    caught by the generic "digit outside any {{N}} placeholder" check
+    below - but that message doesn't say *why*, and 3 single-paragraph
+    repair attempts plus 2 full retries all failed to fix the real
+    failure this once, each producing a new variation of the same
+    mistake. This check names the actual failure directly - a
+    non-numeric ``{{...}}`` token - so a repair call is told exactly
+    what happened instead of just "there's a stray digit somewhere."
+    """
+    for match in _FAKE_PLACEHOLDER_RE.finditer(text):
+        content = match.group(1)
+        if not content.isdigit():
+            return (
+                f"wrote a fake placeholder {{{{{content}}}}} instead of a real "
+                f"{{{{N}}}} manifest index - cite a real fact by its index, or "
+                f"drop the figure/describe it qualitatively if none exists"
+            )
+    return None
+
+
 def _validate_paragraph(text, segments):
-    """``None`` if the paragraph is trustworthy - every {{N}} points to a
-    real, citable fact, no digit appears outside a placeholder, no
+    """``None`` if the paragraph is trustworthy - every {{N}} is a real
+    manifest index (never a fake, non-numeric placeholder) pointing to
+    a real, citable fact, no digit appears outside a placeholder, no
     placeholder is followed by a redundant spelled-out unit, any
     directional word next to a computed fact matches its real direction,
     and any "N consecutive quarters" claim is consistent with the period
@@ -668,6 +713,9 @@ def _validate_paragraph(text, segments):
     reason it isn't, so a rejection can be logged with something more
     useful than just "it failed."
     """
+    problem = _fake_placeholder_problem(text)
+    if problem:
+        return problem
     for match in _PLACEHOLDER_RE.finditer(text):
         index = int(match.group(1))
         if index < 0 or index >= len(segments):

@@ -2,6 +2,46 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-12 — root cause found: a fake, non-numeric placeholder (Slice 53)
+
+The actual reason Test #4/#8 fell back to the flat renderer, deliberately
+left unresolved through Slice 52's own floor (that floor guarantees a
+*good* output; it doesn't explain or fix why the *best* output failed).
+A real, captured live run showed the model writing `{{5.0M}}` - not a
+real `{{N}}` manifest index, a literal value dressed up to look like
+one - for a real, source-stated figure ("...projected to decline to
+approximately $5.0 million...") that had no verified segment behind it
+to cite. `_PLACEHOLDER_RE` correctly never matches a non-digit token
+like this, so its digits were already caught by the generic
+"digit outside any {{N}} placeholder" check - but that message doesn't
+say *why*, and 3 single-paragraph repair attempts plus 2 full retries
+all failed, each producing a new variation of the same underlying
+mistake, because nothing told the writer or the repair pass what
+actually went wrong.
+
+Added `_fake_placeholder_problem` - a specific, named check for this
+exact failure class, distinct from the generic digit check - plus
+explicit prompt guidance in both `_SYSTEM_PROMPT` and
+`_REPAIR_SYSTEM_PROMPT`: a placeholder is always a bare manifest index,
+never a value or unit; a number with no matching fact must be dropped
+or described qualitatively, never approximated inside fake braces. The
+repair prompt's prior guidance for this exact situation was scoped only
+to a digit from an event's date/status/next_step text - generalized to
+any missing fact, since the real failure here was an ordinary quote/
+computed fact that simply wasn't extracted, not an event digit.
+
+Deliberately not attempted: making extraction guarantee it never misses
+a real number in the source text. Not achievable with certainty for an
+LLM-driven extraction step, and not the actual point of failure -
+Gate 1's job is refusing an uncited number through, not guaranteeing
+every real number gets extracted; the fix belongs in how the writer/
+repair handle a genuinely missing fact, not in trying to make extraction
+perfect.
+
+Confirmed via a mocked reproduction of the exact captured failure text,
+not a second live API call - the user's explicit requirement going in
+was not needing to run this more than once to get it fixed.
+
 ## 2026-09-12 — a mandatory, deterministic "advanced" floor (Slice 52)
 
 Gate 1/Gate 2 rejecting the model's narrative previously meant a bare,

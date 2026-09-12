@@ -474,6 +474,148 @@ class PipelineTest(unittest.TestCase):
         self.assertNotIn("that figure, set the tone", out.lower())  # the awkward repeat is gone
         self.assertEqual(proofread_calls["n"], 2)  # failed once, repaired, passed on recheck
 
+    def test_a_permanent_gate1_failure_still_produces_charts_kpis_and_analysis(self):  # slice 52
+        # Engineers a Gate 1 failure that never recovers (write_narrative
+        # always returns a structurally broken response - empty
+        # executive_summary, the same technique
+        # test_neither_asks_nor_template_runs_the_narrated_default and
+        # test_narrated_default_always_uses_actual_currency_scale already
+        # use, just with real, multi-fact data behind it this time).
+        # Proves the mandatory deterministic floor (Slice 52): the
+        # rendered report still has a KPI strip, at least one chart, and
+        # all four sentence types - benchmarking, trend, relationship,
+        # disclosure-gap - with zero reliance on write_narrative or
+        # proofread_report's underlying model call ever succeeding, and
+        # no field anywhere marking the output as degraded.
+        job = self.tmp / "deterministic-floor-job"
+        job.mkdir()
+        (job / "data.csv").write_text(
+            "metric,value\n"
+            "q3_2025_revenue,402000000\n"
+            "q4_2025_revenue,410000000\n"
+            "q1_2026_revenue,432000000\n"
+            "q2_2026_revenue,455000000\n"
+            "q3_2026_revenue,498000000\n"
+            "data_services_q3_2026,142000000\n"
+            "data_services_q3_2025,88000000\n"
+            "halyard_contribution,34000000\n",
+            encoding="utf-8",
+        )
+
+        def _quote(label, exact_text, value):
+            return {
+                "type": "quote", "display": "stat", "label": label,
+                "exact_text": exact_text, "has_value": True, "value": value,
+                "sentence": "{value} was reported.", "format": "usd",
+            }
+
+        def _growth(label, from_text, from_value, to_text, to_value):
+            return {
+                "type": "computed", "operation": "growth_percent", "display": "inline",
+                "label": label, "format": "percent",
+                "operands": [
+                    {"exact_text": from_text, "value": from_value},
+                    {"exact_text": to_text, "value": to_value},
+                ],
+                "result": (to_value - from_value) / from_value * 100,
+                "sentence": "It grew {value}.",
+            }
+
+        def _remainder(label, end_text, end_value, start_text, start_value, comp_text, comp_value):
+            return {
+                "type": "computed", "operation": "remainder", "display": "inline",
+                "label": label, "format": "usd",
+                "operands": [
+                    {"exact_text": end_text, "value": end_value},
+                    {"exact_text": start_text, "value": start_value},
+                    {"exact_text": comp_text, "value": comp_value},
+                ],
+                "result": end_value - start_value - comp_value,
+                "sentence": "The remainder was {value}.",
+            }
+
+        raw_segments = [
+            _quote("Q3 2025 Revenue", "402000000", 402_000_000.0),
+            _quote("Q4 2025 Revenue", "410000000", 410_000_000.0),
+            _quote("Q1 2026 Revenue", "432000000", 432_000_000.0),
+            _quote("Q2 2026 Revenue", "455000000", 455_000_000.0),
+            _quote("Q3 2026 Revenue", "498000000", 498_000_000.0),
+            _growth("Revenue growth QoQ", "455000000", 455_000_000.0, "498000000", 498_000_000.0),
+            _quote("Data Services Q3 2026", "142000000", 142_000_000.0),
+            _quote("Data Services Q3 2025", "88000000", 88_000_000.0),
+            _quote("Halyard contribution", "34000000", 34_000_000.0),
+            _remainder(
+                "Data Services organic growth",
+                "142000000", 142_000_000.0, "88000000", 88_000_000.0,
+                "34000000", 34_000_000.0,
+            ),
+        ]
+        report_response = SimpleNamespace(
+            content=[SimpleNamespace(type="tool_use", input={"segments": raw_segments})]
+        )
+        # Permanently broken - same wrong-shape response on every retry,
+        # so write_narrative exhausts _MAX_RETRIES and raises.
+        broken_narrative_response = SimpleNamespace(
+            content=[SimpleNamespace(type="tool_use", input={"segments": []})]
+        )
+
+        def _create(**kwargs):
+            name = kwargs["tool_choice"]["name"]
+            if name == "write_narrative":
+                return broken_narrative_response
+            return report_response
+
+        fake_client = SimpleNamespace(messages=SimpleNamespace(create=_create))
+
+        out = build_report(
+            job / "data.csv", title="Deterministic floor test",
+            evidence_dir=self.tmp / "ev", llm_client=fake_client,
+        )
+
+        self.assertTrue(out.lstrip().lower().startswith("<!doctype html"))  # rendered rich, not flat text
+        self.assertIn('class="kpi-strip"', out)
+        self.assertIn("<svg", out)  # a real chart drew
+        body = out[out.index("<body"):]
+        self.assertTrue(any(w in body for w in ("grew", "declined")))  # benchmarking
+        self.assertIn("consecutive periods", body)  # trend
+        self.assertIn("Halyard", body)  # relationship
+        self.assertIn("is not disclosed", body)  # disclosure gap
+
+    def test_fewer_than_two_numeric_facts_still_falls_through_to_plain_text(self):  # slice 52
+        # The true tier-3 trigger: not enough facts for even a KPI or a
+        # benchmark sentence. Same permanently-broken write_narrative as
+        # above, but only one verifiable fact exists at all.
+        job = self.tmp / "true-bare-text-job"
+        job.mkdir()
+        (job / "data.csv").write_text("metric,value\nsolo_fact,777000000\n", encoding="utf-8")
+
+        report_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
+            "segments": [{
+                "type": "quote", "display": "stat", "label": "Solo Fact",
+                "exact_text": "777000000", "has_value": True, "value": 777_000_000.0,
+                "sentence": "{value} was reported.", "format": "usd",
+            }],
+        })])
+        broken_narrative_response = SimpleNamespace(
+            content=[SimpleNamespace(type="tool_use", input={"segments": []})]
+        )
+
+        def _create(**kwargs):
+            name = kwargs["tool_choice"]["name"]
+            if name == "write_narrative":
+                return broken_narrative_response
+            return report_response
+
+        fake_client = SimpleNamespace(messages=SimpleNamespace(create=_create))
+
+        out = build_report(
+            job / "data.csv", title="Bare text test",
+            evidence_dir=self.tmp / "ev", llm_client=fake_client,
+        )
+        self.assertFalse(out.lstrip().lower().startswith("<!doctype html"))
+        self.assertIn("Solo Fact", out)
+        self.assertIn("$777.0M", out)
+
     def test_an_event_flows_through_to_the_rendered_report(self):  # slice 32
         job = self.tmp / "event-job"
         job.mkdir()

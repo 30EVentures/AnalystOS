@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AnalystOS — an operating system for the analyst's core loop</title>
+<meta name="description" content="AnalystOS gathers evidence, structures it, reasons over it, and writes a defensible answer — with every figure footnoted back to its exact source. Early access preview.">
+<link rel="canonical" href="https://analyst-os-phi.vercel.app/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%232F5CE0%22>▸</text></svg>">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AnalystOS">
+<meta property="og:url" content="https://analyst-os-phi.vercel.app/">
+<meta property="og:title" content="AnalystOS — every number in your report, traceable to its source">
+<meta property="og:description" content="Gathers evidence, structures it, reasons over it, and writes the answer — with every figure and every computed metric footnoted back to the exact cell it came from. No black box. No &quot;trust me.&quot;">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AnalystOS — every number in your report, traceable to its source">
+<meta name="twitter:description" content="Gathers evidence, structures it, reasons over it, and writes the answer — with every figure and every computed metric footnoted back to the exact cell it came from.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --paper:#F3F4F7; --surface:#FBFBFD; --raised:#FFFFFF;
+  --ink:#10151F; --graphite:#565E6B; --faint:#8A93A1;
+  --hairline:#D9DCE3; --hairline-strong:#C3C8D2;
+  --institutional:#1B3A6B; --signal:#2F5CE0; --signal-ink:#22326b;
+  --amber:#A9631A; --amber-ink:#8a5115; --good:#1C7A57;
+  --font-display:"Newsreader",Georgia,"Times New Roman",serif;
+  --font-sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --measure:62ch; --pad:clamp(1.25rem,5vw,4rem);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0B0F16; --surface:#121824; --raised:#161D2B;
+  --ink:#E9ECF2; --graphite:#9AA4B4; --faint:#6C7787;
+  --hairline:#25303F; --hairline-strong:#33404F;
+  --institutional:#A8C1EA; --signal:#7297FF; --signal-ink:#b9caff;
+  --amber:#D79A5C; --amber-ink:#E4B27E; --good:#57C79E;
+}}
+:root[data-theme="dark"]{
+  --paper:#0B0F16; --surface:#121824; --raised:#161D2B;
+  --ink:#E9ECF2; --graphite:#9AA4B4; --faint:#6C7787;
+  --hairline:#25303F; --hairline-strong:#33404F;
+  --institutional:#A8C1EA; --signal:#7297FF; --signal-ink:#b9caff;
+  --amber:#D79A5C; --amber-ink:#E4B27E; --good:#57C79E;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--font-sans);font-size:1.05rem;line-height:1.6;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+h1,h2,h3{font-family:var(--font-display);font-weight:500;text-wrap:balance;line-height:1.15;margin:0}
+p{margin:0}
+a{color:var(--signal);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--signal) 35%,transparent)}
+a:hover{border-bottom-color:var(--signal)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:2px}
+.mono{font-family:var(--font-mono)}
+.wrap{max-width:68rem;margin:0 auto;padding:0 var(--pad)}
+.eyebrow{font-family:var(--font-mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+
+/* nav */
+header.top{border-bottom:1px solid var(--hairline);position:sticky;top:0;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);z-index:10}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:1.1rem var(--pad);max-width:68rem;margin:0 auto}
+.wordmark{font-family:var(--font-sans);font-weight:600;font-size:1.15rem;letter-spacing:-.01em;display:inline-flex;align-items:baseline;gap:.12em;color:var(--ink)}
+.wordmark .os{font-family:var(--font-mono);font-weight:500;font-size:.78em;border:1px solid var(--hairline-strong);border-radius:3px;padding:0 .28em;color:var(--signal-ink)}
+.caret{color:var(--signal)}
+@media (prefers-reduced-motion:no-preference){.caret{animation:blink 1.15s steps(1,end) infinite}}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:8px;padding:.6rem 1.15rem;font-size:.92rem;font-weight:600;border:1px solid var(--signal);background:var(--signal);color:#fff;border-bottom:none}
+.btn:hover{filter:brightness(1.06)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--hairline-strong)}
+.topbar-ctas{display:flex;gap:.7rem;flex-wrap:wrap;justify-content:flex-end}
+
+/* hero */
+.hero{padding:clamp(3rem,8vw,6rem) 0 clamp(2.5rem,6vw,4rem)}
+.hero h1{font-size:clamp(2.4rem,6vw,4rem);letter-spacing:-.02em;max-width:16ch;margin:1.1rem 0 1.4rem}
+.hero h1 em{font-style:normal;color:var(--signal-ink)}
+.hero .lede{font-family:var(--font-display);font-size:clamp(1.1rem,2.4vw,1.35rem);line-height:1.5;color:var(--graphite);max-width:46ch;margin-bottom:2rem}
+.hero .cta-row{display:flex;flex-wrap:wrap;gap:.9rem;align-items:center}
+.hero .fine{font-family:var(--font-mono);font-size:.78rem;color:var(--faint);margin-top:1.4rem}
+
+/* loop strip */
+.loop{border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);padding:2.4rem 0}
+.loop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:0}
+.loop-grid > div{padding:0 1.4rem;border-left:1px solid var(--hairline)}
+.loop-grid > div:first-child{border-left:0;padding-left:0}
+.loop-grid .k{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--signal-ink);margin-bottom:.45rem}
+.loop-grid .v{font-size:.92rem;color:var(--graphite);line-height:1.5}
+
+/* section shell */
+section{padding:clamp(3rem,7vw,5rem) 0}
+.sec-head{max-width:38rem;margin-bottom:2.4rem}
+.sec-head h2{font-size:clamp(1.7rem,4vw,2.3rem);margin-top:.6rem}
+.sec-head p{color:var(--graphite);margin-top:.8rem;font-size:1rem;line-height:1.6}
+
+/* example card */
+.example{border:1px solid var(--hairline);border-radius:12px;background:var(--surface);overflow:hidden}
+.example .bar{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.4rem;border-bottom:1px solid var(--hairline);background:var(--raised)}
+.example .bar .fname{font-family:var(--font-mono);font-size:.78rem;color:var(--faint)}
+.example .bar .tag{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--amber-ink);border:1px solid color-mix(in srgb,var(--amber) 45%,var(--hairline-strong));border-radius:999px;padding:.15rem .6rem}
+.example .body{padding:1.8rem 1.6rem}
+.example h3{font-family:var(--font-display);font-size:1.15rem;margin-bottom:1rem}
+.example p.line{font-size:1rem;line-height:1.85;color:var(--ink);margin-bottom:.2rem}
+.example sup{color:var(--signal-ink);font-family:var(--font-mono);font-size:.7em}
+.example hr{border:0;border-top:1px solid var(--hairline);margin:1.4rem 0 1rem}
+.example .notes{font-family:var(--font-mono);font-size:.76rem;line-height:1.9;color:var(--faint)}
+.example .notes b{color:var(--graphite);font-weight:600}
+
+/* how it works */
+.layers{border-left:2px solid var(--signal);margin-top:.5rem}
+.layer{padding:1.1rem 1.3rem;border-bottom:1px solid var(--hairline);display:grid;grid-template-columns:3.4rem 1fr;gap:1rem;background:var(--surface)}
+.layer:first-child{border-radius:0 10px 0 0}
+.layer:last-child{border-bottom:0;border-radius:0 0 10px 0}
+.layer .code{font-family:var(--font-mono);font-weight:600;color:var(--signal-ink);font-size:.85rem;padding-top:.1rem}
+.layer .name{font-weight:600;color:var(--ink);margin-bottom:.25rem}
+.layer .desc{color:var(--graphite);font-size:.92rem;line-height:1.55}
+
+/* proof strip */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));border:1px solid var(--hairline);border-radius:12px;overflow:hidden}
+.stats > div{padding:1.6rem 1.4rem;border-left:1px solid var(--hairline);background:var(--surface)}
+.stats > div:first-child{border-left:0}
+.stats .n{font-family:var(--font-display);font-size:2.1rem;color:var(--ink);line-height:1}
+.stats .l{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-top:.5rem}
+
+/* early access */
+.access{border:1px solid var(--hairline);border-radius:16px;background:linear-gradient(180deg,var(--surface),var(--paper));padding:clamp(2rem,5vw,3.2rem);text-align:left}
+.access h2{font-size:clamp(1.6rem,3.6vw,2.1rem);max-width:24ch}
+.access p{color:var(--graphite);margin-top:.9rem;max-width:44ch;line-height:1.6}
+.access .cta-row{margin-top:1.6rem}
+
+footer{border-top:1px solid var(--hairline);padding:2.4rem 0 3rem}
+footer .row{display:flex;flex-wrap:wrap;gap:1rem 2rem;justify-content:space-between;align-items:baseline}
+footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);line-height:1.7;max-width:60ch}
+
+@media (max-width:640px){
+  .loop-grid > div{border-left:0;border-top:1px solid var(--hairline);padding:1rem 0 0}
+  .loop-grid > div:first-child{border-top:0;padding-top:0}
+  .stats > div{border-left:0;border-top:1px solid var(--hairline)}
+  .stats > div:first-child{border-top:0}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="topbar">
+    <span class="wordmark">Analyst<span class="os">OS</span><span class="caret">▸</span></span>
+    <span class="topbar-ctas">
+      <a class="btn ghost" href="upload.html">Try it now →</a>
+      <a class="btn" href="#access">Get early access</a>
+    </span>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Early access preview</p>
+      <h1>Every number in your report, <em>traceable to its source.</em></h1>
+      <p class="lede">AnalystOS gathers evidence, structures it, reasons over it, and writes the answer — with every figure and every computed metric footnoted back to the exact cell it came from. No black box. No "trust me."</p>
+      <div class="cta-row">
+        <a class="btn" href="#access">Get early access →</a>
+        <a class="btn ghost" href="#example">See a real example ↓</a>
+      </div>
+      <p class="fine">Currently in private preview. Built for analysts who have to defend every figure they publish.</p>
+    </div>
+  </section>
+
+  <div class="loop">
+    <div class="wrap">
+      <div class="loop-grid">
+        <div><p class="k">01 · Gather</p><p class="v">Every source stored once, addressed by its exact fingerprint.</p></div>
+        <div><p class="k">02 · Structure</p><p class="v">Raw tables become typed, validated data — no silent errors.</p></div>
+        <div><p class="k">03 · Reason</p><p class="v">Answers and computed metrics, each citing the cells behind it.</p></div>
+        <div><p class="k">04 · Deliver</p><p class="v">A written section with every claim footnoted — ready to send.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <section id="example">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">See it work</p>
+        <h2>An excerpt from a real run</h2>
+        <p>Every number and every footnote below is real, unedited output from AnalystOS reading a public company's income statement — the sentences are arranged for this preview, but no figure or citation was touched by a person.</p>
+      </div>
+      <div class="example">
+        <div class="bar"><span class="fname mono">income_statement.csv → section.md</span><span class="tag">early preview</span></div>
+        <div class="body">
+          <h3>Revenue &amp; margin review — FY2023–FY2025</h3>
+          <p class="line">Revenue grew 114.2%<sup>[1]</sup> year over year, reaching $130.5B<sup>[2]</sup> in FY2025.</p>
+          <p class="line">Gross margin expanded from 56.9% in FY2023 to 75.0%<sup>[3]</sup> in FY2025.</p>
+          <p class="line">Operating margin reached 62.4%<sup>[4]</sup>, with operating expenses at just 12.6% of revenue<sup>[5]</sup>.</p>
+          <hr>
+          <div class="notes">
+            <p><b>[1]</b> computed from: source 8ecc10fc… — row 3, column "revenue"; row 4, column "revenue"</p>
+            <p><b>[2]</b> source 8ecc10fc… — row 4, column "revenue"</p>
+            <p><b>[3]</b> computed from: source 8ecc10fc… — row 4, column "gross_profit"; row 4, column "revenue"</p>
+            <p><b>[4]</b> computed from: source 8ecc10fc… — row 4, column "operating_income"; row 4, column "revenue"</p>
+            <p><b>[5]</b> computed from: source 8ecc10fc… — row 4, column "operating_expenses"; row 4, column "revenue"</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">How it works</p>
+        <h2>A layered stack, not a black box</h2>
+        <p>Each layer adds one thing. The layer below it is its source of truth — so nothing downstream can drift from the evidence.</p>
+      </div>
+      <div class="layers">
+        <div class="layer"><span class="code">L0</span><div><p class="name">Evidence kernel</p><p class="desc">Every source stored once, addressed by the hash of its exact contents. Tamper-evident by construction.</p></div></div>
+        <div class="layer"><span class="code">L1</span><div><p class="name">Structure layer</p><p class="desc">Raw tables become typed, schema-checked data — a bad value is rejected, not silently accepted.</p></div></div>
+        <div class="layer"><span class="code">L2</span><div><p class="name">Reasoning layer</p><p class="desc">Lookups and computed metrics — growth, margin, ratio — each returning an answer and a citation.</p></div></div>
+        <div class="layer"><span class="code">L4</span><div><p class="name">Deliverable</p><p class="desc">A written, footnoted section — plain text, formatted HTML, or a page ready to print to PDF.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="stats">
+        <div><p class="n mono">0</p><p class="l">Uncited figures</p></div>
+        <div><p class="n mono">1</p><p class="l">Fingerprint per source, forever</p></div>
+        <div><p class="n mono">100%</p><p class="l">Of numbers traceable to a cell</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="access">
+    <div class="wrap">
+      <div class="access">
+        <p class="eyebrow">Early access</p>
+        <h2>Building it in the open, one real user at a time.</h2>
+        <p>AnalystOS is in early, hands-on preview — we're working directly with a small number of analysts to get the core loop right before opening it up. If your job depends on figures you can defend, we'd like to hear from you.</p>
+        <div class="cta-row">
+          <a class="btn" href="mailto:calebsolway@gmail.com?subject=AnalystOS%20early%20access">Request early access →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <span class="wordmark">Analyst<span class="os">OS</span></span>
+      <p class="fine">AnalystOS is an early-stage, working preview. Figures and citations shown in the example are the system's real, unedited output; the sentences carrying them were arranged for this page. This describes a project in active development, not a general-availability product.</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

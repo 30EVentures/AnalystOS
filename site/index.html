@@ -1,262 +1,1028 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AnalystOS — an operating system for the analyst's core loop</title>
-<meta name="description" content="AnalystOS gathers evidence, structures it, reasons over it, and writes a defensible answer — with every figure footnoted back to its exact source. Early access preview.">
-<link rel="canonical" href="https://analyst-os-phi.vercel.app/">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%232F5CE0%22>▸</text></svg>">
-
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="AnalystOS">
-<meta property="og:url" content="https://analyst-os-phi.vercel.app/">
-<meta property="og:title" content="AnalystOS — every number in your report, traceable to its source">
-<meta property="og:description" content="Gathers evidence, structures it, reasons over it, and writes the answer — with every figure and every computed metric footnoted back to the exact cell it came from. No black box. No &quot;trust me.&quot;">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="AnalystOS — every number in your report, traceable to its source">
-<meta name="twitter:description" content="Gathers evidence, structures it, reasons over it, and writes the answer — with every figure and every computed metric footnoted back to the exact cell it came from.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AnalystOS: every number in the report, proven</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#F3F4F7; --surface:#FBFBFD; --raised:#FFFFFF;
-  --ink:#10151F; --graphite:#565E6B; --faint:#8A93A1;
-  --hairline:#D9DCE3; --hairline-strong:#C3C8D2;
-  --institutional:#1B3A6B; --signal:#2F5CE0; --signal-ink:#22326b;
-  --amber:#A9631A; --amber-ink:#8a5115; --good:#1C7A57;
-  --font-display:"Newsreader",Georgia,"Times New Roman",serif;
-  --font-sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-  --font-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  --measure:62ch; --pad:clamp(1.25rem,5vw,4rem);
+  --bg:#eef1f4; --paper:#ffffff; --ink:#0f1b2d; --muted:#556172; --line:#cfd6df;
+  --tick:#0a7d5a; --tick-soft:#dcf1e9; --pencil:#c2412d; --pencil-soft:#f8e1dc;
+  --amber:#8f5a00; --amber-soft:#f7ebd0; --slate:#3f4f70; --slate-soft:#e0e6f2;
+  --display:'Bricolage Grotesque','Avenir Next','Segoe UI',system-ui,sans-serif;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --serif:'IBM Plex Serif',Georgia,'Times New Roman',serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --paper:#0B0F16; --surface:#121824; --raised:#161D2B;
-  --ink:#E9ECF2; --graphite:#9AA4B4; --faint:#6C7787;
-  --hairline:#25303F; --hairline-strong:#33404F;
-  --institutional:#A8C1EA; --signal:#7297FF; --signal-ink:#b9caff;
-  --amber:#D79A5C; --amber-ink:#E4B27E; --good:#57C79E;
-}}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1320; --paper:#131c2c; --ink:#e7ecf3; --muted:#9aa8bb; --line:#26334a;
+    --tick:#46c99e; --tick-soft:#103528; --pencil:#f08a76; --pencil-soft:#3b1d18;
+    --amber:#e6b04b; --amber-soft:#33270e; --slate:#93a6d1; --slate-soft:#1c2540;
+  }
+}
 :root[data-theme="dark"]{
-  --paper:#0B0F16; --surface:#121824; --raised:#161D2B;
-  --ink:#E9ECF2; --graphite:#9AA4B4; --faint:#6C7787;
-  --hairline:#25303F; --hairline-strong:#33404F;
-  --institutional:#A8C1EA; --signal:#7297FF; --signal-ink:#b9caff;
-  --amber:#D79A5C; --amber-ink:#E4B27E; --good:#57C79E;
+  --bg:#0c1320; --paper:#131c2c; --ink:#e7ecf3; --muted:#9aa8bb; --line:#26334a;
+  --tick:#46c99e; --tick-soft:#103528; --pencil:#f08a76; --pencil-soft:#3b1d18;
+  --amber:#e6b04b; --amber-soft:#33270e; --slate:#93a6d1; --slate-soft:#1c2540;
 }
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 68px);scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 var(--sans);font-variant-numeric:tabular-nums}
+h1,h2,h3,h4{font-family:var(--display);margin:0;letter-spacing:-.015em;line-height:1.12}
+p{margin:0 0 12px}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--tick);outline-offset:2px;border-radius:3px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
 
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
-body{
-  margin:0;background:var(--paper);color:var(--ink);
-  font-family:var(--font-sans);font-size:1.05rem;line-height:1.6;
-  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
-}
-h1,h2,h3{font-family:var(--font-display);font-weight:500;text-wrap:balance;line-height:1.15;margin:0}
-p{margin:0}
-a{color:var(--signal);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--signal) 35%,transparent)}
-a:hover{border-bottom-color:var(--signal)}
-a:focus-visible,button:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:2px}
-.mono{font-family:var(--font-mono)}
-.wrap{max-width:68rem;margin:0 auto;padding:0 var(--pad)}
-.eyebrow{font-family:var(--font-mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.topin{max-width:1100px;margin:0 auto;padding:8px 20px;display:flex;align-items:center;gap:14px}
+.brand{font-family:var(--display);font-weight:800;font-size:19px;text-decoration:none;white-space:nowrap}
+.brand span{color:var(--tick)}
+.nav{display:flex;gap:2px;overflow-x:auto;flex:1;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{padding:6px 11px;border-radius:999px;text-decoration:none;font-size:14.5px;color:var(--muted);white-space:nowrap}
+.nav a:hover{color:var(--ink)}
+.nav a.active{background:var(--ink);color:var(--bg)}
+.iconbtn{border:1px solid var(--line);background:var(--paper);border-radius:999px;width:36px;height:36px;cursor:pointer;flex:none}
 
-/* nav */
-header.top{border-bottom:1px solid var(--hairline);position:sticky;top:0;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);z-index:10}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:1.1rem var(--pad);max-width:68rem;margin:0 auto}
-.wordmark{font-family:var(--font-sans);font-weight:600;font-size:1.15rem;letter-spacing:-.01em;display:inline-flex;align-items:baseline;gap:.12em;color:var(--ink)}
-.wordmark .os{font-family:var(--font-mono);font-weight:500;font-size:.78em;border:1px solid var(--hairline-strong);border-radius:3px;padding:0 .28em;color:var(--signal-ink)}
-.caret{color:var(--signal)}
-@media (prefers-reduced-motion:no-preference){.caret{animation:blink 1.15s steps(1,end) infinite}}
-@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
-.btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:8px;padding:.6rem 1.15rem;font-size:.92rem;font-weight:600;border:1px solid var(--signal);background:var(--signal);color:#fff;border-bottom:none}
-.btn:hover{filter:brightness(1.06)}
-.btn.ghost{background:transparent;color:var(--ink);border-color:var(--hairline-strong)}
-.topbar-ctas{display:flex;gap:.7rem;flex-wrap:wrap;justify-content:flex-end}
+/* headings */
+.s{padding:76px 0 4px}
+.sh{border-bottom:3px double var(--ink);padding-bottom:12px;margin-bottom:16px}
+.sh h2{font-size:clamp(28px,4.2vw,42px);font-weight:800}
+.lede{max-width:66ch;color:var(--muted);font-size:18px;margin:0 0 28px}
+.note{font-size:14.5px;color:var(--muted)}
+
+/* primitives */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:20px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+.tag{display:inline-block;font-size:12.5px;font-weight:600;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.t-built{background:var(--tick-soft);color:var(--tick)}
+.t-prog{background:var(--amber-soft);color:var(--amber)}
+.t-plan{background:var(--slate-soft);color:var(--slate)}
+.t-local{background:var(--tick-soft);color:var(--tick)}
+.t-ext{background:var(--amber-soft);color:var(--amber)}
+.t-bad{background:var(--pencil-soft);color:var(--pencil)}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:4px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn:hover{opacity:.88}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.scroll{overflow-x:auto;max-width:100%}
+details{border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+details+details{margin-top:10px}
+summary{cursor:pointer;padding:14px 18px;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:12px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:22px;line-height:1;color:var(--muted);flex:none}
+details[open]>summary::after{content:"\2212"}
+details .dbody{padding:0 18px 16px;color:var(--muted)}
+details .dbody ul{margin:6px 0 0;padding-left:20px}
 
 /* hero */
-.hero{padding:clamp(3rem,8vw,6rem) 0 clamp(2.5rem,6vw,4rem)}
-.hero h1{font-size:clamp(2.4rem,6vw,4rem);letter-spacing:-.02em;max-width:16ch;margin:1.1rem 0 1.4rem}
-.hero h1 em{font-style:normal;color:var(--signal-ink)}
-.hero .lede{font-family:var(--font-display);font-size:clamp(1.1rem,2.4vw,1.35rem);line-height:1.5;color:var(--graphite);max-width:46ch;margin-bottom:2rem}
-.hero .cta-row{display:flex;flex-wrap:wrap;gap:.9rem;align-items:center}
-.hero .fine{font-family:var(--font-mono);font-size:.78rem;color:var(--faint);margin-top:1.4rem}
+.hero{padding:48px 0 8px}
+.hero .cols{display:grid;grid-template-columns:1.15fr 1fr;gap:36px;align-items:start}
+@media (max-width:860px){.hero .cols{grid-template-columns:1fr}}
+.prep{color:var(--muted);font-size:15px;margin-bottom:18px}
+.hero h1{font-size:clamp(36px,6.2vw,66px);font-weight:800;letter-spacing:-.03em;line-height:1.02;margin-bottom:20px}
+.hero .sub{font-size:19px;max-width:54ch;margin-bottom:12px}
+.proof{background:var(--paper);border:1px solid var(--ink);border-radius:6px;padding:22px;box-shadow:6px 6px 0 var(--ink)}
+.proof .cap{font-size:13.5px;color:var(--muted);margin-bottom:10px}
+.proof .line{font-family:var(--serif);font-size:20px;line-height:1.75}
+.num{font:inherit;font-family:var(--serif);background:none;border:0;border-bottom:2px solid var(--tick);padding:0 2px;cursor:pointer;position:relative}
+.num.ok::after{content:"\2713";color:var(--tick);font-family:var(--sans);font-size:.7em;font-weight:700;margin-left:2px;position:relative;top:-.35em}
+.num.bad{text-decoration:line-through;text-decoration-color:var(--pencil);text-decoration-thickness:2px;border-bottom-color:var(--pencil)}
+.num.bad::after{content:"\2717";color:var(--pencil);font-family:var(--sans);font-size:.7em;font-weight:700;margin-left:2px;position:relative;top:-.35em}
+.num.sel{background:var(--tick-soft)}
+.num.bad.sel{background:var(--pencil-soft)}
+.tracebox{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px;min-height:88px;font-size:15px}
+.tracebox b{display:block;margin-bottom:2px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;margin-top:40px;border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+.stat{padding:16px 18px;border-right:1px solid var(--line)}
+.stat:last-child{border-right:0}
+.stat strong{display:block;font-family:var(--display);font-size:30px;font-weight:800;letter-spacing:-.02em}
+.stat span{font-size:14px;color:var(--muted)}
+@media (max-width:640px){.stat{border-right:0;border-bottom:1px solid var(--line)}.stat:last-child{border-bottom:0}}
+@media (prefers-reduced-motion:no-preference){
+  .proof .num.ok::after,.proof .num.bad::after{animation:tickin .5s .3s both}
+  @keyframes tickin{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+}
 
-/* loop strip */
-.loop{border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);padding:2.4rem 0}
-.loop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:0}
-.loop-grid > div{padding:0 1.4rem;border-left:1px solid var(--hairline)}
-.loop-grid > div:first-child{border-left:0;padding-left:0}
-.loop-grid .k{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--signal-ink);margin-bottom:.45rem}
-.loop-grid .v{font-size:.92rem;color:var(--graphite);line-height:1.5}
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr));gap:8px}
+.pn{border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:12px;text-align:left;cursor:pointer;display:block;width:100%}
+.pn small{display:block;color:var(--muted);font-size:13px}
+.pn strong{display:block;font-size:16px}
+.pn[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 -4px 0 var(--tick)}
+.pdet{margin-top:14px}
+.pdet h3{font-size:24px;margin-bottom:8px}
 
-/* section shell */
-section{padding:clamp(3rem,7vw,5rem) 0}
-.sec-head{max-width:38rem;margin-bottom:2.4rem}
-.sec-head h2{font-size:clamp(1.7rem,4vw,2.3rem);margin-top:.6rem}
-.sec-head p{color:var(--graphite);margin-top:.8rem;font-size:1rem;line-height:1.6}
+/* walkthrough */
+.wt{background:var(--paper);border:1px solid var(--line);border-radius:6px}
+.wthead{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap;align-items:center}
+.dots{display:flex;gap:6px;flex-wrap:wrap}
+.dot{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:4px 12px;font-size:14px;cursor:pointer}
+.dot[aria-current="step"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.wtbody{padding:20px;min-height:340px}
+.wtbody h3{font-size:24px;margin-bottom:6px}
+.wtfoot{padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
+.srcdoc{font-family:var(--serif);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:16px;line-height:1.75}
+.cand{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.cand:last-child{border-bottom:0}
+.cand .verdict{font-size:14px;max-width:44ch}
+.cand.pass .mark{color:var(--tick)}
+.cand.fail .mark{color:var(--pencil)}
+.cand .mark{font-weight:700;font-size:20px;width:22px;text-align:center}
+.cand.hidden .verdict,.cand.hidden .mark{visibility:hidden}
+.cand.fail .lbl{text-decoration:line-through;text-decoration-color:var(--pencil)}
+.cand .lbl{font-weight:500}
+.cand .ty{font-size:12.5px;color:var(--muted)}
+.chip{display:inline-block;background:var(--tick-soft);color:var(--tick);font-weight:600;border-radius:4px;padding:0 6px;margin:0 1px}
+.gate{border:1px solid var(--line);border-left:4px solid var(--tick);border-radius:4px;padding:12px 14px;margin-bottom:10px;background:var(--bg)}
+.gate b{display:block}
+@media (prefers-reduced-motion:no-preference){.cand .verdict,.cand .mark{transition:opacity .35s}.cand.hidden .verdict,.cand.hidden .mark{opacity:0}}
 
-/* example card */
-.example{border:1px solid var(--hairline);border-radius:12px;background:var(--surface);overflow:hidden}
-.example .bar{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.4rem;border-bottom:1px solid var(--hairline);background:var(--raised)}
-.example .bar .fname{font-family:var(--font-mono);font-size:.78rem;color:var(--faint)}
-.example .bar .tag{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--amber-ink);border:1px solid color-mix(in srgb,var(--amber) 45%,var(--hairline-strong));border-radius:999px;padding:.15rem .6rem}
-.example .body{padding:1.8rem 1.6rem}
-.example h3{font-family:var(--font-display);font-size:1.15rem;margin-bottom:1rem}
-.example p.line{font-size:1rem;line-height:1.85;color:var(--ink);margin-bottom:.2rem}
-.example sup{color:var(--signal-ink);font-family:var(--font-mono);font-size:.7em}
-.example hr{border:0;border-top:1px solid var(--hairline);margin:1.4rem 0 1rem}
-.example .notes{font-family:var(--font-mono);font-size:.76rem;line-height:1.9;color:var(--faint)}
-.example .notes b{color:var(--graphite);font-weight:600}
+/* brief (report look) */
+.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 16px;cursor:pointer;font-weight:500}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.doc{background:var(--paper);border:1px solid var(--ink);border-radius:2px;padding:30px clamp(18px,4vw,44px);font-family:var(--serif);box-shadow:6px 6px 0 var(--line)}
+.doc h3{font-family:var(--serif);font-weight:600;font-size:26px;letter-spacing:-.01em;margin-bottom:4px}
+.doc .meta{font-family:var(--sans);font-size:13.5px;color:var(--muted);margin-bottom:18px}
+.doc h4{font-family:var(--sans);font-size:15px;font-weight:600;margin:22px 0 6px;padding-top:12px;border-top:1px solid var(--line)}
+.doc p{line-height:1.8;font-size:17px;max-width:72ch}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));border:1px solid var(--line);margin:8px 0 18px;font-family:var(--sans)}
+.kpi{padding:12px 14px;border-right:1px solid var(--line)}
+.kpi:last-child{border-right:0}
+.kpi b{display:block;font-size:22px;font-family:var(--display)}
+.kpi span{font-size:13px;color:var(--muted)}
+.fn{font:600 11px/1 var(--sans);vertical-align:super;border:1px solid var(--tick);background:var(--tick-soft);color:var(--tick);border-radius:3px;padding:2px 4px;margin:0 2px;cursor:pointer}
+.fn.sel{background:var(--tick);color:var(--paper)}
+.lab{font:600 11.5px/1 var(--sans);border-radius:3px;padding:2px 5px;margin-left:3px;background:var(--slate-soft);color:var(--slate);vertical-align:1px}
+.outlook{border-left:4px solid var(--amber);background:var(--amber-soft);padding:12px 16px;margin-top:8px}
+.outlook .cap{font:600 13.5px var(--sans);color:var(--amber);margin-bottom:4px}
+.tr{position:sticky;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);margin-top:18px;background:var(--ink);color:var(--bg);border-radius:4px;padding:12px 16px;font-family:var(--sans);font-size:15px}
+.tr b{color:inherit}
+.chart text{font-family:var(--sans);fill:var(--muted);font-size:12px}
 
-/* how it works */
-.layers{border-left:2px solid var(--signal);margin-top:.5rem}
-.layer{padding:1.1rem 1.3rem;border-bottom:1px solid var(--hairline);display:grid;grid-template-columns:3.4rem 1fr;gap:1rem;background:var(--surface)}
-.layer:first-child{border-radius:0 10px 0 0}
-.layer:last-child{border-bottom:0;border-radius:0 0 10px 0}
-.layer .code{font-family:var(--font-mono);font-weight:600;color:var(--signal-ink);font-size:.85rem;padding-top:.1rem}
-.layer .name{font-weight:600;color:var(--ink);margin-bottom:.25rem}
-.layer .desc{color:var(--graphite);font-size:.92rem;line-height:1.55}
+/* roadmap */
+.stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:8px;margin-bottom:14px}
+.st{border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:12px;text-align:left;cursor:pointer;display:block;width:100%}
+.st strong{display:block;margin-bottom:6px;font-size:15.5px;line-height:1.25}
+.st[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 -4px 0 var(--ink)}
+.st.today{outline:2px dashed var(--amber);outline-offset:2px}
+.sdet{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px}
+.sdet h4{font-size:15px;margin-bottom:4px}
+.sdet p{font-size:15px;color:var(--muted)}
+.score{margin-top:22px}
+.crit{display:grid;grid-template-columns:minmax(150px,1.1fr) 2fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.crit:last-child{border-bottom:0}
+.crit b{display:block}
+.crit small{color:var(--muted);font-size:13.5px}
+.bar{display:flex;gap:4px}
+.bar i{height:12px;flex:1;background:var(--line);border-radius:2px}
+.bar i.on{background:var(--tick)}
+.bar.part i.on{background:var(--amber)}
+@media (max-width:640px){.crit{grid-template-columns:1fr}}
 
-/* proof strip */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));border:1px solid var(--hairline);border-radius:12px;overflow:hidden}
-.stats > div{padding:1.6rem 1.4rem;border-left:1px solid var(--hairline);background:var(--surface)}
-.stats > div:first-child{border-left:0}
-.stats .n{font-family:var(--font-display);font-size:2.1rem;color:var(--ink);line-height:1}
-.stats .l{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-top:.5rem}
+/* trust */
+.ft{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px}
+.ft h4{font-size:18px;margin-bottom:6px}
+.ft p{font-size:15px;color:var(--muted)}
+.flow{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:720px){.flow{grid-template-columns:1fr}}
+.flow ul{margin:8px 0 0;padding-left:20px}
+.flow li{margin-bottom:5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:720px){.two{grid-template-columns:1fr}}
+ul.clean{margin:0;padding-left:20px}
+ul.clean li{margin-bottom:6px}
 
-/* early access */
-.access{border:1px solid var(--hairline);border-radius:16px;background:linear-gradient(180deg,var(--surface),var(--paper));padding:clamp(2rem,5vw,3.2rem);text-align:left}
-.access h2{font-size:clamp(1.6rem,3.6vw,2.1rem);max-width:24ch}
-.access p{color:var(--graphite);margin-top:.9rem;max-width:44ch;line-height:1.6}
-.access .cta-row{margin-top:1.6rem}
+/* calc */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media (max-width:760px){.calc{grid-template-columns:1fr}}
+.fld{margin-bottom:14px}
+.fld label{display:block;font-weight:600;margin-bottom:4px}
+.fld input[type=number]{width:100%;font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink)}
+.fld input[type=range]{width:100%;accent-color:var(--tick)}
+.out{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.out div{border:1px solid var(--line);border-radius:4px;padding:12px;background:var(--bg)}
+.out b{display:block;font-family:var(--display);font-size:26px}
+.out span{font-size:13.5px;color:var(--muted)}
 
-footer{border-top:1px solid var(--hairline);padding:2.4rem 0 3rem}
-footer .row{display:flex;flex-wrap:wrap;gap:1rem 2rem;justify-content:space-between;align-items:baseline}
-footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);line-height:1.7;max-width:60ch}
+/* pilot */
+.weeks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px}
+.weeks h4{font-size:18px;margin-bottom:6px}
+.weeks p{font-size:15px;color:var(--muted)}
 
-@media (max-width:640px){
-  .loop-grid > div{border-left:0;border-top:1px solid var(--hairline);padding:1rem 0 0}
-  .loop-grid > div:first-child{border-top:0;padding-top:0}
-  .stats > div{border-left:0;border-top:1px solid var(--hairline)}
-  .stats > div:first-child{border-top:0}
+/* summary */
+.sum{background:var(--paper);border:1px solid var(--ink);border-radius:2px;padding:26px;font-family:var(--serif);box-shadow:6px 6px 0 var(--line)}
+.sum h3{font-family:var(--serif);font-size:24px;margin-bottom:12px}
+.sum h4{font-family:var(--sans);font-size:15px;margin:14px 0 2px}
+.sum p{font-size:16.5px}
+footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
+
+@media print{
+  .top,.no-print{display:none !important}
+  body{background:#fff;color:#000}
+  body.print-summary main>section:not(#summary){display:none}
+  body.print-summary #summary{padding-top:0}
+  .sum{box-shadow:none;border-color:#000}
 }
 </style>
 </head>
 <body>
-
 <header class="top">
-  <div class="topbar">
-    <span class="wordmark">Analyst<span class="os">OS</span><span class="caret">▸</span></span>
-    <span class="topbar-ctas">
-      <a class="btn ghost" href="upload.html">Try it now →</a>
-      <a class="btn" href="#access">Get early access</a>
-    </span>
+  <div class="topin">
+    <a class="brand" href="#top">Analyst<span>OS</span></a>
+    <nav class="nav" id="nav" aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#walkthrough">Walkthrough</a>
+      <a href="#brief">Sample brief</a>
+      <a href="#modules">Modules</a>
+      <a href="#fit">Use cases</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#trust">Trust</a>
+      <a href="#proof">Proof</a>
+      <a href="#value">Value</a>
+      <a href="#pilot">Pilot</a>
+      <a href="#faq">FAQ</a>
+      <a href="#ask">Next step</a>
+    </nav>
+    <a class="btn no-print" href="upload.html" style="padding:7px 16px;font-size:14.5px;white-space:nowrap">Try it</a>
+    <button class="iconbtn" id="themeBtn" aria-label="Switch between light and dark theme" title="Switch theme">&#9680;</button>
   </div>
 </header>
 
-<main>
-  <section class="hero">
-    <div class="wrap">
-      <p class="eyebrow">Early access preview</p>
-      <h1>Every number in your report, <em>traceable to its source.</em></h1>
-      <p class="lede">AnalystOS gathers evidence, structures it, reasons over it, and writes the answer — with every figure and every computed metric footnoted back to the exact cell it came from. No black box. No "trust me."</p>
-      <div class="cta-row">
-        <a class="btn" href="#access">Get early access →</a>
-        <a class="btn ghost" href="#example">See a real example ↓</a>
-      </div>
-      <p class="fine">Currently in private preview. Built for analysts who have to defend every figure they publish.</p>
-    </div>
-  </section>
+<main id="top">
 
-  <div class="loop">
-    <div class="wrap">
-      <div class="loop-grid">
-        <div><p class="k">01 · Gather</p><p class="v">Every source stored once, addressed by its exact fingerprint.</p></div>
-        <div><p class="k">02 · Structure</p><p class="v">Raw tables become typed, validated data — no silent errors.</p></div>
-        <div><p class="k">03 · Reason</p><p class="v">Answers and computed metrics, each citing the cells behind it.</p></div>
-        <div><p class="k">04 · Deliver</p><p class="v">A written section with every claim footnoted — ready to send.</p></div>
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h1>Every number in the report is proven against your document.</h1>
+        <p class="sub">AnalystOS turns a spreadsheet, Word file, PowerPoint, PDF or CSV into a written analytical report. Each figure is either a quote checked against your source or a calculation the software redoes itself. No figure is ever taken on an AI model&rsquo;s word.</p>
+        <p class="note">Built solo by Caleb Solway. Early stage, and this page says exactly where things stand.</p>
+        <div class="row" style="margin-top:18px">
+          <a class="btn" href="upload.html">Try it on your document</a>
+          <a class="btn ghost" href="#walkthrough">Watch a report get proven</a>
+          <a class="btn ghost" href="#brief">Read a sample brief</a>
+        </div>
+      </div>
+      <div class="proof" aria-label="Interactive example of number verification">
+        <div class="cap">Tap a figure to see how AnalystOS treats it. Example from a synthetic test document.</div>
+        <div class="line">
+          Orion delivered revenue of <button class="num ok sel" data-k="a">$486.0M</button>, up <button class="num ok" data-k="b">20.9%</button> year over year, with an operating margin of <button class="num bad" data-k="c">18%</button>.
+        </div>
+        <div class="tracebox" id="heroTrace" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><strong>5</strong><span>file formats read: CSV, Excel, Word, PowerPoint, PDF</span></div>
+      <div class="stat"><strong>503</strong><span>automated tests passing</span></div>
+      <div class="stat"><strong>3</strong><span>report tiers, so a weak AI draft degrades quality, not trust</span></div>
+      <div class="stat"><strong>49</strong><span>written specs behind the build</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="s" id="problem">
+  <div class="wrap">
+    <div class="sh"><h2>A published number has to survive a challenge</h2></div>
+    <p class="lede">Analysts, consultants and finance teams put their names next to figures. Both common ways of producing a report have a weak spot.</p>
+    <div class="grid g3">
+      <div class="card"><h3 style="font-size:20px;margin-bottom:8px">Writing it by hand</h3><p class="note" style="font-size:16px">Careful work, but slow turnaround. Every figure gets pulled, calculated and re-checked by a person.</p></div>
+      <div class="card"><h3 style="font-size:20px;margin-bottom:8px">Free-form AI writing</h3><p class="note" style="font-size:16px">Fast, but the model reports its own sources, so a confidently wrong number reads exactly like a right one.</p></div>
+      <div class="card" style="border-color:var(--tick)"><h3 style="font-size:20px;margin-bottom:8px">AnalystOS</h3><p style="font-size:16px">Let the AI write, but make ordinary software prove every number first. Anything unproven is thrown away before a reader sees it.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section class="s" id="how">
+  <div class="wrap">
+    <div class="sh"><h2>How a document becomes a report</h2></div>
+    <p class="lede">Seven stages, in order. Select one to see what happens there and whether it runs on your machine or calls a model.</p>
+    <div class="pipe" id="pipe"></div>
+    <div class="card pdet" id="pipeDetail" aria-live="polite"></div>
+    <p class="note" style="margin-top:12px">There is also a structured path for jobs that use a template (for example an income statement). That path answers questions straight from a table and makes zero external model calls.</p>
+  </div>
+</section>
+
+<!-- WALKTHROUGH -->
+<section class="s" id="walkthrough">
+  <div class="wrap">
+    <div class="sh"><h2>Watch a report get proven, step by step</h2></div>
+    <p class="lede">A scripted walkthrough on a small synthetic document. It shows what the system does; it is not a live run.</p>
+    <div class="wt">
+      <div class="wthead">
+        <div class="dots" id="wtdots" role="tablist" aria-label="Walkthrough steps"></div>
+        <span class="tag t-plan">Illustrative: fictional company</span>
+      </div>
+      <div class="wtbody" id="wtbody" aria-live="polite"></div>
+      <div class="wtfoot">
+        <button class="btn ghost" id="wtPrev">Back</button>
+        <button class="btn" id="wtNext">Next step</button>
       </div>
     </div>
   </div>
+</section>
 
-  <section id="example">
-    <div class="wrap">
-      <div class="sec-head">
-        <p class="eyebrow">See it work</p>
-        <h2>An excerpt from a real run</h2>
-        <p>Every number and every footnote below is real, unedited output from AnalystOS reading a public company's income statement — the sentences are arranged for this preview, but no figure or citation was touched by a person.</p>
-      </div>
-      <div class="example">
-        <div class="bar"><span class="fname mono">income_statement.csv → section.md</span><span class="tag">early preview</span></div>
-        <div class="body">
-          <h3>Revenue &amp; margin review — FY2023–FY2025</h3>
-          <p class="line">Revenue grew 114.2%<sup>[1]</sup> year over year, reaching $130.5B<sup>[2]</sup> in FY2025.</p>
-          <p class="line">Gross margin expanded from 56.9% in FY2023 to 75.0%<sup>[3]</sup> in FY2025.</p>
-          <p class="line">Operating margin reached 62.4%<sup>[4]</sup>, with operating expenses at just 12.6% of revenue<sup>[5]</sup>.</p>
-          <hr>
-          <div class="notes">
-            <p><b>[1]</b> computed from: source 8ecc10fc… — row 3, column "revenue"; row 4, column "revenue"</p>
-            <p><b>[2]</b> source 8ecc10fc… — row 4, column "revenue"</p>
-            <p><b>[3]</b> computed from: source 8ecc10fc… — row 4, column "gross_profit"; row 4, column "revenue"</p>
-            <p><b>[4]</b> computed from: source 8ecc10fc… — row 4, column "operating_income"; row 4, column "revenue"</p>
-            <p><b>[5]</b> computed from: source 8ecc10fc… — row 4, column "operating_expenses"; row 4, column "revenue"</p>
-          </div>
+<!-- BRIEF -->
+<section class="s" id="brief">
+  <div class="wrap">
+    <div class="sh"><h2>What comes out: a sample brief</h2></div>
+    <p class="lede">Two real output styles. Tap any footnote number to see exactly how that figure was verified.</p>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-tab="orion">Narrated report</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="nvidia">Structured report from public data</button>
+    </div>
+
+    <div id="tab-orion">
+      <article class="doc">
+        <h3>Orion Industrial Group: Q2 FY2027</h3>
+        <div class="meta">Condensed from a system run on a synthetic test document. Illustrative example, not a real company.</div>
+        <div class="kpis">
+          <div class="kpi"><b>$486.0M</b><span>Revenue, up 20.9%</span></div>
+          <div class="kpi"><b>$302.0M</b><span>Industrial Systems revenue</span></div>
+          <div class="kpi"><b>54.2%</b><span>Gross margin</span></div>
+          <div class="kpi"><b>$41.2M</b><span>GAAP net income</span></div>
+          <div class="kpi"><b>$612.0M</b><span>Record backlog</span></div>
         </div>
+        <h4>Executive summary</h4>
+        <p>Orion Industrial Group delivered Q2 FY2027 revenue of $486.0M<button class="fn" data-s="orion" data-n="1">1</button>, up 20.9%<button class="fn" data-s="orion" data-n="2">2</button> year over year and 5.4%<button class="fn" data-s="orion" data-n="3">3</button> sequentially from $461.0M<button class="fn" data-s="orion" data-n="4">4</button>, powered by Industrial Systems revenue that climbed to $302.0M<button class="fn" data-s="orion" data-n="5">5</button> from $210.0M<button class="fn" data-s="orion" data-n="6">6</button> a year earlier. Gross margin fell 1.6 points<button class="fn" data-s="orion" data-n="7">7</button> to 54.2%<button class="fn" data-s="orion" data-n="8">8</button> from 55.8%<button class="fn" data-s="orion" data-n="9">9</button>, and GAAP net income of $41.2M<button class="fn" data-s="orion" data-n="10">10</button><span class="lab">GAAP</span> sits $22.3M<button class="fn" data-s="orion" data-n="11">11</button> below management&rsquo;s adjusted figure of $63.5M<button class="fn" data-s="orion" data-n="12">12</button><span class="lab">non-GAAP</span>. The company closed the quarter with a record $612.0M<button class="fn" data-s="orion" data-n="13">13</button> backlog, repurchased $45.0M<button class="fn" data-s="orion" data-n="14">14</button> of shares, and guided to $1.9B<button class="fn" data-s="orion" data-n="15">15</button><span class="lab">guidance</span> in FY2027 revenue.</p>
+
+        <h4>Revenue, current quarter against two reference points</h4>
+        <svg class="chart" viewBox="0 0 520 190" role="img" aria-label="Bar chart: revenue was 402.0 million in the prior-year quarter, 461.0 million in the prior quarter and 486.0 million in Q2 FY2027" style="width:100%;max-width:520px;height:auto">
+          <line x1="40" y1="150" x2="500" y2="150" stroke="var(--line)"/>
+          <rect x="70" y="63" width="90" height="87" fill="var(--line)"/>
+          <rect x="215" y="46" width="90" height="104" fill="var(--line)"/>
+          <rect x="360" y="40" width="90" height="110" fill="var(--tick)"/>
+          <text x="115" y="56" text-anchor="middle">$402.0M</text>
+          <text x="260" y="39" text-anchor="middle">$461.0M</text>
+          <text x="405" y="33" text-anchor="middle" style="fill:var(--ink);font-weight:600">$486.0M</text>
+          <text x="115" y="170" text-anchor="middle">Prior-year quarter</text>
+          <text x="260" y="170" text-anchor="middle">Prior quarter</text>
+          <text x="405" y="170" text-anchor="middle">Q2 FY2027</text>
+        </svg>
+
+        <h4>Analysis</h4>
+        <p>Taken together, the revenue acceleration and record backlog point to real demand strength, concentrated in Industrial Systems. But gross margin slipped 1.6 points<button class="fn" data-s="orion" data-n="7">7</button> while a $22.3M<button class="fn" data-s="orion" data-n="11">11</button> gap opened between GAAP and adjusted earnings. That suggests growth is currently being bought at some cost to the quality of profit, which is worth watching as the Vantage Robotics acquisition is integrated.</p>
+
+        <h4>What the source does not disclose</h4>
+        <p>The document does not break out how much of the gross margin move comes from product mix versus input cost. It also gives no EPS or cash flow figures, which limits any view of per-share value creation or liquidity.</p>
+
+        <h4>Outlook</h4>
+        <div class="outlook"><div class="cap">Interpretation, not verified fact</div>
+        <p style="margin:0">Reiterating full-year guidance right after a quarter of margin softness suggests management sees the pressure as transitory rather than a structural reset, likely tied to integration costs from the Vantage Robotics acquisition and a mix shift toward faster-growing, lower-margin Industrial Systems volume.</p></div>
+      </article>
+      <p class="note" style="margin-top:12px">Today&rsquo;s output stops at analysis and outlook. It does not yet make a recommendation or lay out options; see Stage 3 on the roadmap.</p>
+    </div>
+
+    <div id="tab-nvidia" hidden>
+      <article class="doc">
+        <h3>NVIDIA: three-year income statement review (FY2023&ndash;FY2025)</h3>
+        <div class="meta">Built from NVIDIA&rsquo;s own public financial figures. Structured path, no AI model calls.</div>
+        <p>FY2025 revenue was $130.5B<button class="fn" data-s="nvidia" data-n="1">1</button>. Revenue grew 125.9%<button class="fn" data-s="nvidia" data-n="2">2</button> from FY2023 to FY2024, then a further 114.2%<button class="fn" data-s="nvidia" data-n="3">3</button> from FY2024 to FY2025. FY2025 gross profit was $97.9B<button class="fn" data-s="nvidia" data-n="4">4</button>. Gross margin was 56.9%<button class="fn" data-s="nvidia" data-n="5">5</button> in FY2023, rose to 72.7%<button class="fn" data-s="nvidia" data-n="6">6</button> in FY2024, and reached 75.0%<button class="fn" data-s="nvidia" data-n="7">7</button> in FY2025. FY2025 operating income was $81.5B<button class="fn" data-s="nvidia" data-n="8">8</button>, an operating margin of 62.4%<button class="fn" data-s="nvidia" data-n="9">9</button>. Operating income grew 147.0%<button class="fn" data-s="nvidia" data-n="10">10</button> from FY2024 to FY2025. FY2025 net income was $72.9B<button class="fn" data-s="nvidia" data-n="11">11</button>. Net income grew 581.3%<button class="fn" data-s="nvidia" data-n="12">12</button> from FY2023 to FY2024. Operating expenses were 12.6%<button class="fn" data-s="nvidia" data-n="13">13</button> of revenue in FY2025.</p>
+      </article>
+    </div>
+
+    <div class="tr" id="briefTrace" aria-live="polite">Select a footnote number to see how that figure was verified.</div>
+  </div>
+</section>
+
+<!-- MODULES -->
+<section class="s" id="modules">
+  <div class="wrap">
+    <div class="sh"><h2>What has been built</h2></div>
+    <p class="lede">The working parts, grouped by job. Open a group for the detail. Everything below is built and tested unless it says otherwise.</p>
+
+    <details>
+      <summary><span>Evidence store <span class="tag t-built">Built</span></span></summary>
+      <div class="dbody"><ul>
+        <li>Every upload is saved once, named by the SHA-256 fingerprint of its content, and encrypted at rest.</li>
+        <li>Optional automatic purge of old evidence after a set number of days.</li>
+      </ul></div>
+    </details>
+    <details>
+      <summary><span>Reading any document <span class="tag t-built">Built</span></span></summary>
+      <div class="dbody"><ul>
+        <li>One entry point reads CSV, Excel, Word, PowerPoint and PDF into a table, guessing column types if none are given.</li>
+        <li>A plain-text reader takes paragraphs, bullets and tables from any format, which powers the upload-anything path.</li>
+        <li>Shared cleaning of number formats: $ signs, commas, percentages, parentheses as negatives.</li>
+        <li>Legal &ldquo;forward-looking statements&rdquo; boilerplate is stripped so it is never mistaken for a fact.</li>
+        <li>Word footnotes are linked to their markers. Two-column PDFs are read left then right.</li>
+        <li>Charts embedded in PDFs are transcribed by a vision model and tagged as image-derived.</li>
+      </ul></div>
+    </details>
+    <details>
+      <summary><span>Fact extraction and proof <span class="tag t-built">Built</span></span></summary>
+      <div class="dbody"><ul>
+        <li>A model proposes facts; software verifies each one. Unproven facts are dropped.</li>
+        <li>Direct answers to lookup, growth and ratio questions, each with a citation.</li>
+        <li>Four fact types are checked independently: quotes, calculations, dated events and connective prose.</li>
+      </ul></div>
+    </details>
+    <details>
+      <summary><span>Writing and quality gates <span class="tag t-built">Built</span> <span class="tag t-prog">Quality still being tuned</span></span></summary>
+      <div class="dbody"><ul>
+        <li>A writer call structures the report from verified facts only. It cites facts by index and cannot type a number.</li>
+        <li>An independent proofreader judges prose quality without seeing the data, with a rubric against filler and fact-listing, plus up to two repair rounds.</li>
+        <li>GAAP, non-GAAP and guidance labels appear wherever a figure appears.</li>
+      </ul></div>
+    </details>
+    <details>
+      <summary><span>Delivery <span class="tag t-built">Built</span></span></summary>
+      <div class="dbody"><ul>
+        <li>Reports render to HTML and to a real server-generated PDF with bundled IBM Plex fonts, not a print-to-PDF.</li>
+        <li>Two visual styles: a flat report with footnotes, and a rich report with executive summary, KPI strip, inline charts and a separate outlook block.</li>
+        <li>Charts are plain inline SVG with no charting library.</li>
+        <li>A zero-model fallback assembles a full report from verified facts using fixed templates.</li>
+      </ul></div>
+    </details>
+    <details>
+      <summary><span>Web app and command line <span class="tag t-built">Built</span></span></summary>
+      <div class="dbody"><ul>
+        <li>A live upload page and API: preview a table first, then get a full cited report back. Access is gated by a shared code and per-IP rate limiting.</li>
+        <li>A command-line path that scaffolds a job file from a CSV and runs it end to end.</li>
+        <li>An income-statement template that recognizes common column names and generates the standard latest-period, growth and margin questions.</li>
+      </ul></div>
+    </details>
+    <details>
+      <summary><span>Testing <span class="tag t-built">Built</span></span></summary>
+      <div class="dbody"><ul>
+        <li>503 automated tests with mocked calls: no network, no cost, passing in about 2.3 seconds.</li>
+        <li>A separate manual suite makes real, paid model calls against four fixed real documents, under a hard $1.00 spend ceiling.</li>
+      </ul></div>
+    </details>
+    <details>
+      <summary><span>Not built yet <span class="tag t-plan">Planned</span></span></summary>
+      <div class="dbody"><ul>
+        <li>An analyst workspace (canvas, model and memo review), multi-tenant distribution, and participation in a real cross-agent mesh. Only a local, offline manifest validator exists for the mesh today.</li>
+        <li>Per-user accounts, an audit log, and a policy engine for what data reaches a model.</li>
+      </ul></div>
+    </details>
+  </div>
+</section>
+
+<!-- FIT -->
+<section class="s" id="fit">
+  <div class="wrap">
+    <div class="sh"><h2>Three places it could fit</h2></div>
+    <p class="lede">These are proposals based on what the system does today, not on knowing your workflow yet. The best first use case is whatever you actually publish numbers from.</p>
+    <div class="grid g3">
+      <div class="card">
+        <span class="tag t-plan">Proposed</span>
+        <h3 style="font-size:20px;margin:10px 0 6px">Filing and earnings briefs</h3>
+        <p class="note" style="font-size:15.5px"><b>Input:</b> a quarterly filing or press release in PDF or Word.</p>
+        <p class="note" style="font-size:15.5px"><b>Output:</b> a cited executive summary with GAAP, non-GAAP and guidance labels, and a list of what the document does not disclose.</p>
+        <p style="font-size:15.5px"><b>Before:</b> an analyst pulls and re-checks each figure. <b>After:</b> a draft where every figure already carries its source, so the analyst reviews instead of re-deriving.</p>
+      </div>
+      <div class="card">
+        <span class="tag t-plan">Proposed</span>
+        <h3 style="font-size:20px;margin:10px 0 6px">Management packs</h3>
+        <p class="note" style="font-size:15.5px"><b>Input:</b> a monthly Excel or PowerPoint pack.</p>
+        <p class="note" style="font-size:15.5px"><b>Output:</b> a written summary with year-over-year growth and margin calculations, each recomputed and footnoted.</p>
+        <p style="font-size:15.5px"><b>Before:</b> figures copied into prose by hand. <b>After:</b> prose generated from verified figures only.</p>
+      </div>
+      <div class="card">
+        <span class="tag t-plan">Proposed</span>
+        <h3 style="font-size:20px;margin:10px 0 6px">PDF extracts with human sign-off</h3>
+        <p class="note" style="font-size:15.5px"><b>Input:</b> a PDF whose tables have no real structure.</p>
+        <p class="note" style="font-size:15.5px"><b>Output:</b> a report where a person confirms each extracted table before any figure from it can be cited.</p>
+        <p style="font-size:15.5px"><b>Before:</b> transcription errors slip through quietly. <b>After:</b> a required review step catches them.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section>
-    <div class="wrap">
-      <div class="sec-head">
-        <p class="eyebrow">How it works</p>
-        <h2>A layered stack, not a black box</h2>
-        <p>Each layer adds one thing. The layer below it is its source of truth — so nothing downstream can drift from the evidence.</p>
+<!-- ROADMAP -->
+<section class="s" id="roadmap">
+  <div class="wrap">
+    <div class="sh"><h2>Roadmap to executive-grade analyst output</h2></div>
+    <p class="lede">The aim is reports a Fortune 10 executive could rely on for a decision. This is where AnalystOS stands against that bar today, and what it takes to close the gap. The current stage is outlined in amber.</p>
+    <div class="stages" id="stages"></div>
+    <div class="card" id="stageDetail" aria-live="polite"></div>
+
+    <div class="score card">
+      <h3 style="font-size:22px;margin-bottom:4px">What executive-grade means, and how each stage scores</h3>
+      <p class="note" style="margin-bottom:6px" id="scoreNote"></p>
+      <div id="crits"></div>
+    </div>
+    <p class="note" style="margin-top:12px">Timing shown is the project&rsquo;s own stated targets, not results. Stages 1 and 2 reflect the code and decision log as of 2026-09-21; stages 3 to 5 are plans.</p>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section class="s" id="trust">
+  <div class="wrap">
+    <div class="sh"><h2>Can I rely on it? How it stays honest</h2></div>
+    <p class="lede">Trust here is enforced in software, not requested from the model. Each fact a model proposes is one of four types, and each type has its own check.</p>
+    <div class="ft">
+      <div class="card"><h4>Quote</h4><p>Must be a real substring of your source text. Formatting differences like $ and commas are normalized; the digits themselves never change.</p></div>
+      <div class="card"><h4>Calculation</h4><p>Sum, average, ratio, growth, share of total, difference or remainder. AnalystOS recomputes it with its own code and drops it on any mismatch.</p></div>
+      <div class="card"><h4>Dated event</h4><p>What, when, status and next step. Each part is verified separately.</p></div>
+      <div class="card"><h4>Connective prose</h4><p>Scanned and rejected if it contains any digit that is not cited.</p></div>
+    </div>
+
+    <div class="flow" style="margin-top:22px">
+      <div class="card">
+        <span class="tag t-local">Stays on your machine</span>
+        <ul>
+          <li>The original file and the encrypted evidence store</li>
+          <li>Table extraction</li>
+          <li>All citation and number verification</li>
+          <li>Both fallback report tiers</li>
+          <li>Everything on the structured, template path</li>
+        </ul>
       </div>
-      <div class="layers">
-        <div class="layer"><span class="code">L0</span><div><p class="name">Evidence kernel</p><p class="desc">Every source stored once, addressed by the hash of its exact contents. Tamper-evident by construction.</p></div></div>
-        <div class="layer"><span class="code">L1</span><div><p class="name">Structure layer</p><p class="desc">Raw tables become typed, schema-checked data — a bad value is rejected, not silently accepted.</p></div></div>
-        <div class="layer"><span class="code">L2</span><div><p class="name">Reasoning layer</p><p class="desc">Lookups and computed metrics — growth, margin, ratio — each returning an answer and a citation.</p></div></div>
-        <div class="layer"><span class="code">L4</span><div><p class="name">Deliverable</p><p class="desc">A written, footnoted section — plain text, formatted HTML, or a page ready to print to PDF.</p></div></div>
+      <div class="card">
+        <span class="tag t-ext">Goes to a model</span>
+        <ul>
+          <li>On the narrated path only: the extracted text, sent to Anthropic&rsquo;s API (Claude Sonnet 5)</li>
+          <li>Typically 3 model calls per report, plus 1 for each embedded image, whose cropped image is also sent</li>
+        </ul>
       </div>
     </div>
-  </section>
 
-  <section>
-    <div class="wrap">
-      <div class="stats">
-        <div><p class="n mono">0</p><p class="l">Uncited figures</p></div>
-        <div><p class="n mono">1</p><p class="l">Fingerprint per source, forever</p></div>
-        <div><p class="n mono">100%</p><p class="l">Of numbers traceable to a cell</p></div>
+    <div class="two" style="margin-top:22px">
+      <div class="card">
+        <h4 style="font-size:20px;margin-bottom:8px">Controls in place</h4>
+        <ul class="clean">
+          <li>Two independent quality gates: one for correctness, one for prose, each blind to the other&rsquo;s inputs.</li>
+          <li>Three-tier fallback: written report, then zero-AI template report, then plain fact list. A report is never lost and never shown unverified.</li>
+          <li>PDF tables need a person&rsquo;s confirmation before they can be cited.</li>
+          <li>A figure is tagged GAAP only if the source says so; otherwise it defaults to &ldquo;n/a&rdquo;.</li>
+          <li>Forward-looking figures are visibly tagged wherever they appear.</li>
+          <li>Every fallback and its reason is logged.</li>
+          <li>Spend safety: an optional cap on API calls, an account-level monthly cap, and a $1.00 ceiling in the live test runner.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="font-size:20px;margin-bottom:8px">Known limits, stated plainly</h4>
+        <ul class="clean">
+          <li>Early-stage security posture: one shared access code and no per-user accounts yet. No audit log, no policy engine, no SOC 2 and no external security review yet.</li>
+          <li>It analyzes one document at a time. There is no peer, sector or market-data benchmarking.</li>
+          <li>Scanned, image-only PDFs that need OCR are out of scope.</li>
+          <li>On the structured path, the currency scale (thousands, millions, actual) is set by hand and a mistake there produces a confidently wrong number.</li>
+          <li>Whether a real model consistently writes to the intended quality is the project&rsquo;s own stated open question, and live-run defects were still being found and fixed on 2026-09-12.</li>
+        </ul>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section id="access">
-    <div class="wrap">
-      <div class="access">
-        <p class="eyebrow">Early access</p>
-        <h2>Building it in the open, one real user at a time.</h2>
-        <p>AnalystOS is in early, hands-on preview — we're working directly with a small number of analysts to get the core loop right before opening it up. If your job depends on figures you can defend, we'd like to hear from you.</p>
-        <div class="cta-row">
-          <a class="btn" href="mailto:calebsolway@gmail.com?subject=AnalystOS%20early%20access">Request early access →</a>
+<!-- PROOF -->
+<section class="s" id="proof">
+  <div class="wrap">
+    <div class="sh"><h2>Evidence, and what hasn&rsquo;t been measured</h2></div>
+    <p class="lede">Only figures found in the project are shown here.</p>
+    <div class="grid g3">
+      <div class="card"><b style="font-family:var(--display);font-size:28px">503 / 503</b><p class="note" style="margin:4px 0 0">automated tests passing, run in 2.3 seconds</p></div>
+      <div class="card"><b style="font-family:var(--display);font-size:28px">4 real documents</b><p class="note" style="margin:4px 0 0">in a live test suite with paid model calls, capped at $1.00 and typically a few cents to a few tens of cents per full run</p></div>
+      <div class="card"><b style="font-family:var(--display);font-size:28px">49 specs</b><p class="note" style="margin:4px 0 0">written before the code they describe, each with a &ldquo;done when&rdquo; and a retrospective</p></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h4 style="font-size:20px;margin-bottom:8px">A defect, and how it was closed</h4>
+      <p>A model once smuggled a fabricated &ldquo;$7.6M operating income&rdquo; through a signed-subtraction trick. The fix was to check every operand&rsquo;s actual value against its quoted text, not just that the quoted text exists. Dozens of defects like this are logged with root cause and proof of the fix.</p>
+      <p class="note" style="margin:0">Timing data point: a normal call on an ~8,500-character document should take 20 to 40 seconds. A run of 1 minute 38 seconds was diagnosed as the model hitting its output-length ceiling.</p>
+    </div>
+    <div class="card" style="margin-top:16px;border-color:var(--amber)">
+      <h4 style="font-size:20px;margin-bottom:8px">Not yet measured</h4>
+      <p style="margin:0">There is no accuracy benchmark of the report-writing quality, no user-satisfaction or adoption data, and no commercial metrics. A pilot is how those get created.</p>
+    </div>
+  </div>
+</section>
+
+<!-- VALUE -->
+<section class="s" id="value">
+  <div class="wrap">
+    <div class="sh"><h2>Estimate the value for your team</h2></div>
+    <p class="lede">Enter your own numbers. AnalystOS has no measured time-saved benchmark yet, so the savings slider starts at a placeholder you should replace with your own judgment.</p>
+    <div class="card calc">
+      <div>
+        <div class="fld"><label for="cReports">Reports per month</label><input type="number" id="cReports" min="0" step="1" value="20"></div>
+        <div class="fld"><label for="cHours">Hours per report today</label><input type="number" id="cHours" min="0" step="0.5" value="6"></div>
+        <div class="fld"><label for="cSave">Share of that time you expect to save: <span id="cSaveVal">30</span>%</label><input type="range" id="cSave" min="0" max="100" step="5" value="30"><div class="note">Placeholder assumption, not a measured result.</div></div>
+        <div class="fld"><label for="cRate">Hourly cost, optional</label><input type="number" id="cRate" min="0" step="5" placeholder="Leave blank to skip"></div>
+      </div>
+      <div>
+        <div class="out">
+          <div><b id="oMonth">0</b><span>hours saved per month</span></div>
+          <div><b id="oYear">0</b><span>hours saved per year</span></div>
+          <div><b id="oValue">n/a</b><span>value per year</span></div>
+          <div><b id="oCalls">0</b><span>model calls per month</span></div>
         </div>
+        <p class="note" style="margin-top:12px">Estimate only. Model calls assume about 3 per report on the narrated path, plus 1 per embedded image not counted here. A pilot would replace the placeholder with a measured figure from your own documents.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
+
+<!-- PILOT -->
+<section class="s" id="pilot">
+  <div class="wrap">
+    <div class="sh"><h2>A 30-day pilot, kept small</h2></div>
+    <p class="lede">A proposal, to be shaped together. It starts with non-confidential documents because per-user accounts and an audit log are not built yet.</p>
+    <div class="weeks">
+      <div class="card"><h4>Week 1: choose and set up</h4><p>Pick 3 to 5 representative documents, public or sanitized. Agree what a good report looks like. Set up access.</p></div>
+      <div class="card"><h4>Week 2: run and review</h4><p>Run every document. Review each output together, footnote by footnote, and log every defect.</p></div>
+      <div class="card"><h4>Week 3: fix and rerun</h4><p>Fix what broke, rerun the same documents, and test the weakest formats, including the PDF confirmation step.</p></div>
+      <div class="card"><h4>Week 4: readout</h4><p>Compare time and edits against your current process on the same documents. Decide whether to continue, widen, or stop.</p></div>
+    </div>
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card"><h4 style="margin-bottom:6px">What I need from you</h4><ul class="clean"><li>3 to 5 documents you would normally analyze</li><li>One or two people to review outputs</li><li>A 30-minute check-in each week</li></ul></div>
+      <div class="card"><h4 style="margin-bottom:6px">How success is measured (proposed)</h4><ul class="clean"><li>Share of figures traced to a source</li><li>Reviewer edits needed per report</li><li>Time per report against your current baseline</li></ul></div>
+    </div>
+    <div class="card no-print" style="margin-top:16px;text-align:center">
+      <p style="margin-bottom:10px">Interested in a pilot?</p>
+      <a class="btn" href="mailto:30eventures@gmail.com?subject=AnalystOS%20pilot">Get in touch</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="s" id="faq">
+  <div class="wrap">
+    <div class="sh"><h2>Questions you are likely to ask</h2></div>
+    <details><summary>How is this different from asking a chat AI to summarize a document?</summary><div class="dbody">A chat AI reports its own sources. Here the model only proposes facts. Ordinary code then confirms each quote exists in the source and recomputes each calculation, and unproven facts are discarded. The writing step sees only verified facts and can refer to them by index, not type a number.</div></details>
+    <details><summary>What if the AI writes something poor?</summary><div class="dbody">Two independent quality gates check every report, with up to two repair rounds. If they still fail, the system falls back to a template report with no AI writing, then to a plain list of verified facts. A bad response lowers the quality of a report, not its trustworthiness.</div></details>
+    <details><summary>What data leaves my environment?</summary><div class="dbody">On the narrated path, the extracted text of the document, and any cropped embedded images, go to Anthropic&rsquo;s API. The original file, the evidence store and all verification stay local. The structured template path makes no external calls.</div></details>
+    <details><summary>Which files does it accept?</summary><div class="dbody">CSV, Excel, Word, PowerPoint and PDF. Scanned, image-only PDFs that need OCR are not supported yet.</div></details>
+    <details><summary>Can it compare against peers or market data?</summary><div class="dbody">No. It sees one document, by design for now, and has no integration with market data, news or accounting systems.</div></details>
+    <details><summary>Is it ready for confidential production data?</summary><div class="dbody">Not yet. Access is a single shared code and there are no per-user accounts, audit log or policy engine, and no SOC 2 or external security review. That is why the pilot starts with non-confidential documents. Those controls are on the roadmap.</div></details>
+    <details><summary>How do you know it works?</summary><div class="dbody">503 automated tests, a live suite of real model calls on four real documents, and a defect log with root causes and proof of each fix. What does not exist yet is an accuracy benchmark on writing quality, which is one of the things a pilot would create.</div></details>
+  </div>
+</section>
+
+<!-- BUILDER -->
+<section class="s" id="builder">
+  <div class="wrap">
+    <div class="sh"><h2>Who built it</h2></div>
+    <div class="card" style="max-width:760px">
+      <p style="font-size:18px">I&rsquo;m Caleb Solway. I built AnalystOS on my own, writing a spec before every piece of code and recording every real bug with its root cause. I care about one thing above the rest: a report should never contain a number nobody can defend.</p>
+      <p style="margin:0">It is early, and I would rather show you where it is weak than hide it. That is why this page lists its limits next to its strengths.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ASK -->
+<section class="s" id="ask">
+  <div class="wrap">
+    <div class="sh"><h2>Try it on one real document</h2></div>
+    <p class="lede">Upload a filing, report or spreadsheet and see the cited report AnalystOS produces from it. If you&rsquo;d rather talk it through first, that&rsquo;s the 30-day pilot above.</p>
+    <div class="row no-print">
+      <a class="btn" href="upload.html">Try AnalystOS now</a>
+      <a class="btn ghost" href="#summary">See the one-page summary</a>
+    </div>
+  </div>
+</section>
+
+<!-- SUMMARY -->
+<section class="s" id="summary">
+  <div class="wrap">
+    <div class="sh"><h2>One-page summary</h2></div>
+    <p class="lede no-print">Short enough to forward to a colleague.</p>
+    <div class="sum" id="sumBox">
+      <h3>AnalystOS: every number in the report, proven</h3>
+      <h4>What it is</h4>
+      <p>Software that turns a source document (CSV, Excel, Word, PowerPoint or PDF) into a written analytical report in which every figure is either a verbatim quote checked against the source or a calculation the software recomputes itself.</p>
+      <h4>Why it is different</h4>
+      <p>A model proposes facts, but ordinary code proves each one and discards the rest. The writing step can cite facts by index and cannot type a number. Two independent quality gates and a three-tier fallback mean a weak draft lowers a report&rsquo;s quality, never its trustworthiness.</p>
+      <h4>Where it stands</h4>
+      <p>Built solo, early stage. Reading, verification, writing, PDF and HTML delivery and a live upload page work, with 503 automated tests passing. Writing quality is still being tuned. Accounts, audit log, policy engine and SOC 2 are planned, not built.</p>
+      <h4>What has not been measured</h4>
+      <p>No accuracy benchmark for writing quality, no adoption data, no commercial metrics.</p>
+      <h4>Proposed next step</h4>
+      <p>A 30-minute walkthrough on a real or public document, then a 30-day pilot on 3 to 5 non-confidential documents.</p>
+    </div>
+    <div class="row no-print" style="margin-top:14px">
+      <button class="btn" id="copyBtn">Copy summary</button>
+      <button class="btn ghost" id="printBtn">Print summary</button>
+      <span class="note" id="copyMsg" aria-live="polite"></span>
+    </div>
+  </div>
+</section>
+
 </main>
 
 <footer>
-  <div class="wrap">
-    <div class="row">
-      <span class="wordmark">Analyst<span class="os">OS</span></span>
-      <p class="fine">AnalystOS is an early-stage, working preview. Figures and citations shown in the example are the system's real, unedited output; the sentences carrying them were arranged for this page. This describes a project in active development, not a general-availability product.</p>
-    </div>
-  </div>
+  <div class="wrap">Statuses reflect the project&rsquo;s own code, tests and documents as of 2026-09-21. Examples marked illustrative use synthetic or public data. Roadmap timing is a set of targets, not results.</div>
 </footer>
 
+<script>
+(function(){
+  var $ = function(s, r){ return (r||document).querySelector(s); };
+  var $$ = function(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+
+  /* theme */
+  var root = document.documentElement;
+  $('#themeBtn').addEventListener('click', function(){
+    var cur = root.getAttribute('data-theme');
+    var dark = cur ? cur === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    root.setAttribute('data-theme', dark ? 'light' : 'dark');
+  });
+
+  /* scroll spy */
+  var nav = $('#nav');
+  var links = $$('#nav a');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (!e.isIntersecting) return;
+        links.forEach(function(l){
+          var on = l.getAttribute('href') === '#' + e.target.id;
+          l.classList.toggle('active', on);
+          if (on) {
+            var left = l.offsetLeft - nav.clientWidth / 2 + l.clientWidth / 2;
+            try { nav.scrollTo({left: left, behavior: 'smooth'}); } catch (err) { nav.scrollLeft = left; }
+          }
+        });
+      });
+    }, {rootMargin: '-35% 0px -60% 0px'});
+    links.forEach(function(l){
+      var t = document.getElementById(l.getAttribute('href').slice(1));
+      if (t) io.observe(t);
+    });
+  }
+
+  /* hero trace */
+  var HERO = {
+    a: ['Quoted figure: verified', 'Found verbatim in the source text: &ldquo;revenue of $486.0M&rdquo;.'],
+    b: ['Calculation: verified', 'Recomputed independently by AnalystOS: ($486.0M &minus; $402.0M) / $402.0M = 20.9%. It matches, so it stays.'],
+    c: ['Proposed by the model, then dropped', 'No &ldquo;18% operating margin&rdquo; appears anywhere in the source. The claim fails the check and never reaches a reader.']
+  };
+  function heroSet(k){
+    $$('.proof .num').forEach(function(b){ b.classList.toggle('sel', b.getAttribute('data-k') === k); });
+    $('#heroTrace').innerHTML = '<b>' + HERO[k][0] + '</b>' + HERO[k][1];
+  }
+  $$('.proof .num').forEach(function(b){ b.addEventListener('click', function(){ heroSet(b.getAttribute('data-k')); }); });
+  heroSet('a');
+
+  /* pipeline */
+  var PIPE = [
+    {tag:'L0', name:'Store', where:'local', body:'Your file is saved once, named by the SHA-256 fingerprint of its content, and encrypted at rest. An optional setting purges old evidence after a set number of days.'},
+    {tag:'L1', name:'Read', where:'local', body:'Any supported file becomes a table or plain text. Number formats are cleaned the same way for every format, legal forward-looking boilerplate is stripped, Word footnotes are linked, and two-column PDFs are read in order. Charts embedded in a PDF are transcribed by a vision model and tagged as image-derived, which is the one part of this stage that calls a model.'},
+    {tag:'L2', name:'Propose and prove', where:'ext', body:'Model call one reads the document and proposes facts. Ordinary code then checks each: quotes must be real substrings of the source, and calculations are recomputed and dropped on mismatch. Anything unproven is discarded and never shown. The model proposes; the software decides.'},
+    {tag:'Gate 1', name:'Write', where:'ext', body:'Model call two decides structure and wording, seeing only the already-verified facts, not the raw document. It refers to facts by index number and cannot type a number itself. Correctness is checked here.'},
+    {tag:'Gate 2', name:'Proofread', where:'ext', body:'Model call three judges only the prose: grammar, filler, and whether the analysis genuinely connects facts into a judgment. It is blind to the data. If it fails, up to two targeted repair rounds run.'},
+    {tag:'Fallback', name:'Degrade safely', where:'local', body:'If a gate fails and cannot be repaired, a zero-model template report is assembled from verified facts: KPI strip, one chart, fixed-pattern analytical sentences. If even that has too few facts, one plain sentence per fact. A bad AI response lowers the quality of a report, never its trustworthiness.'},
+    {tag:'L4', name:'Deliver', where:'local', body:'The report renders to HTML and to a real server-generated PDF, with every number footnoted to its exact source.'}
+  ];
+  var pipeEl = $('#pipe');
+  PIPE.forEach(function(p, i){
+    var b = document.createElement('button');
+    b.className = 'pn'; b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    b.innerHTML = '<small>' + p.tag + '</small><strong>' + p.name + '</strong>';
+    b.addEventListener('click', function(){ pipeSet(i); });
+    pipeEl.appendChild(b);
+  });
+  function pipeSet(i){
+    $$('.pn', pipeEl).forEach(function(b, j){ b.setAttribute('aria-pressed', i === j ? 'true' : 'false'); });
+    var p = PIPE[i];
+    var w = p.where === 'local' ? '<span class="tag t-local">Runs locally</span>' : '<span class="tag t-ext">Calls a model</span>';
+    $('#pipeDetail').innerHTML = '<div class="row" style="margin-bottom:8px">' + w + '</div><h3>' + p.name + '</h3><p style="margin:0;max-width:70ch">' + p.body + '</p>';
+  }
+  pipeSet(0);
+
+  /* walkthrough */
+  var SRC = [
+    'Orion Industrial Group reported Q2 FY2027 revenue of $486.0M, compared with $402.0M in the prior-year quarter.',
+    'Q1 revenue was $461.0M.',
+    'Industrial Systems revenue was $302.0M.',
+    'Gross margin was 54.2%, down from 55.8%.',
+    'GAAP net income was $41.2M.',
+    'Record backlog reached $612.0M.'
+  ];
+  var CANDS = [
+    {ty:'Quote', lbl:'Revenue of $486.0M', ok:true, v:'Found verbatim in the source.', idx:1},
+    {ty:'Quote', lbl:'$402.0M in the prior-year quarter', ok:true, v:'Found verbatim in the source.', idx:2},
+    {ty:'Quote', lbl:'Q1 revenue of $461.0M', ok:true, v:'Found verbatim in the source.', idx:3},
+    {ty:'Calculation', lbl:'Year-over-year growth of 20.9%', ok:true, v:'Recomputed (486.0 \u2212 402.0) / 402.0 = 20.9%. Matches.', idx:4},
+    {ty:'Calculation', lbl:'Sequential growth of 5.4%', ok:true, v:'Recomputed (486.0 \u2212 461.0) / 461.0 = 5.4%. Matches.', idx:5},
+    {ty:'Quote', lbl:'Operating margin of 18%', ok:false, v:'Not found anywhere in the source. Dropped.'},
+    {ty:'Calculation', lbl:'Year-over-year growth of 22.1%', ok:false, v:'Recomputed 20.9%, not 22.1%. Mismatch. Dropped.'}
+  ];
+  var wtStep = 0, wtTimers = [];
+  var STEPS = ['1 Source','2 Propose','3 Prove','4 Write','5 Gates','6 Report'];
+  var dotsEl = $('#wtdots');
+  STEPS.forEach(function(s, i){
+    var d = document.createElement('button');
+    d.className = 'dot'; d.textContent = s; d.setAttribute('role','tab');
+    d.addEventListener('click', function(){ wtGo(i); });
+    dotsEl.appendChild(d);
+  });
+  function clearTimers(){ wtTimers.forEach(clearTimeout); wtTimers = []; }
+  function candRows(revealed){
+    return CANDS.map(function(c, i){
+      var cls = 'cand ' + (revealed ? (c.ok ? 'pass' : 'fail') : '');
+      return '<div class="' + cls + '" data-i="' + i + '"><span class="mark">' + (revealed ? (c.ok ? '\u2713' : '\u2717') : '\u2022') + '</span><div><div class="lbl">' + c.lbl + '</div><div class="ty">' + c.ty + '</div></div><div class="verdict">' + (revealed ? c.v : '') + '</div></div>';
+    }).join('');
+  }
+  function wtGo(i){
+    clearTimers();
+    wtStep = Math.max(0, Math.min(STEPS.length - 1, i));
+    $$('.dot', dotsEl).forEach(function(d, j){ if (j === wtStep) d.setAttribute('aria-current','step'); else d.removeAttribute('aria-current'); });
+    $('#wtPrev').disabled = wtStep === 0;
+    $('#wtNext').textContent = wtStep === STEPS.length - 1 ? 'Replay' : 'Next step';
+    var h = '';
+    if (wtStep === 0) {
+      h = '<h3>You upload a document</h3><p class="note">A short synthetic filing for a fictional company. Real inputs can be CSV, Excel, Word, PowerPoint or PDF.</p><div class="srcdoc">' + SRC.join(' ') + '</div>';
+    } else if (wtStep === 1) {
+      h = '<h3>A model proposes candidate facts</h3><p class="note">It reads the document and lists what it thinks is true. At this point nothing has been checked, so some of these are wrong on purpose.</p>' + candRows(false).replace(/class="cand /g, 'class="cand ');
+    } else if (wtStep === 2) {
+      h = '<h3>Software proves each one</h3><p class="note">Plain code, not a model, checks every candidate against the source. Watch the results come in.</p><div id="candBox">' + candRows(false).replace(/class="cand "/g, 'class="cand hidden"') + '</div>';
+    } else if (wtStep === 3) {
+      var facts = CANDS.filter(function(c){ return c.ok; });
+      h = '<h3>The writer sees only proven facts</h3><p class="note">Five facts survive. The two rejected claims never reach the writing step, and the writer cannot type a number. It can only point at a fact by its index.</p>';
+      h += '<div class="grid g2"><div class="srcdoc" style="font-family:var(--sans)"><b>Verified facts given to the writer</b><br>' + facts.map(function(f){ return '<div><span class="chip">' + f.idx + '</span> ' + f.lbl + '</div>'; }).join('') + '</div>';
+      h += '<div class="srcdoc"><b style="font-family:var(--sans)">What the writer produces</b><br>Revenue reached <span class="chip">1</span>, up <span class="chip">4</span> year over year and <span class="chip">5</span> sequentially from <span class="chip">3</span>.</div></div>';
+    } else if (wtStep === 4) {
+      h = '<h3>Two independent quality gates</h3><div class="gate"><b>Gate 1: correctness</b>Every number in the draft maps to a verified fact by index. Pass.</div><div class="gate"><b>Gate 2: prose quality</b>A separate model call, blind to the data, checks for filler and whether the sentence connects facts into a point. Pass.</div><p class="note">If either failed and could not be repaired in two rounds, the system would fall back to a template report built from the same verified facts, with no AI writing at all.</p>';
+    } else {
+      h = '<h3>The finished, footnoted report</h3><div class="srcdoc">Orion Industrial Group reported revenue of $486.0M<span class="chip">1</span>, up 20.9%<span class="chip">4</span> year over year and 5.4%<span class="chip">5</span> sequentially from $461.0M<span class="chip">3</span>.</div><p class="note" style="margin-top:12px">Every figure carries a footnote to its exact source. The invented 18% operating margin and the 22.1% growth claim are nowhere in the output. See the full sample below.</p><a class="btn" href="#brief">See the full sample brief</a>';
+    }
+    $('#wtbody').innerHTML = h;
+    if (wtStep === 2) {
+      $$('#candBox .cand').forEach(function(row, k){
+        wtTimers.push(setTimeout(function(){
+          var c = CANDS[k];
+          row.classList.remove('hidden');
+          row.classList.add(c.ok ? 'pass' : 'fail');
+          row.querySelector('.mark').textContent = c.ok ? '\u2713' : '\u2717';
+          row.querySelector('.verdict').textContent = c.v;
+        }, 350 + k * 450));
+      });
+    }
+  }
+  $('#wtPrev').addEventListener('click', function(){ wtGo(wtStep - 1); });
+  $('#wtNext').addEventListener('click', function(){ wtGo(wtStep === STEPS.length - 1 ? 0 : wtStep + 1); });
+  wtGo(0);
+
+  /* brief tabs + footnotes */
+  var FN = {
+    orion: {
+      1:['Quoted figure','Q2 FY2027 revenue of $486.0M, matched verbatim in the source text.'],
+      2:['Calculation','($486.0M \u2212 $402.0M) / $402.0M = 20.9%, verified by recomputation.'],
+      3:['Calculation','($486.0M \u2212 $461.0M) / $461.0M = 5.4%, verified by recomputation.'],
+      4:['Quoted figure','Prior-quarter revenue of $461.0M, matched verbatim in the source text.'],
+      5:['Quoted figure','Industrial Systems revenue of $302.0M, matched verbatim in the source text.'],
+      6:['Quoted figure','Year-earlier Industrial Systems revenue of $210.0M, matched verbatim in the source text.'],
+      7:['Calculation','55.8% \u2212 54.2% = 1.6 points, verified by recomputation from the two quoted margins.'],
+      8:['Quoted figure','Gross margin of 54.2%, matched verbatim in the source text.'],
+      9:['Quoted figure','Prior gross margin of 55.8%, matched verbatim in the source text.'],
+      10:['Quoted figure','GAAP net income of $41.2M, matched verbatim. Tagged GAAP because the source states it.'],
+      11:['Calculation','$63.5M \u2212 $41.2M = $22.3M, verified by recomputation.'],
+      12:['Quoted figure','Adjusted net income of $63.5M, matched verbatim. Tagged non-GAAP.'],
+      13:['Quoted figure','Record backlog of $612.0M, matched verbatim in the source text.'],
+      14:['Quoted figure','Share repurchases of $45.0M, matched verbatim in the source text.'],
+      15:['Quoted figure','FY2027 revenue guidance of $1.9B, matched verbatim. Tagged as guidance, never as a historical result.']
+    },
+    nvidia: {
+      1:['Direct lookup','Row 4, column \u201crevenue\u201d of the source file.'],
+      2:['Calculation','Computed from source rows 2 and 3, column \u201crevenue\u201d.']
+    }
+  };
+  var NV_DEFAULT = ['Cited to the source file','This figure is cited to specific rows and columns of the same source file.'];
+  function fnShow(s, n){
+    var e = (FN[s] && FN[s][n]) || NV_DEFAULT;
+    $('#briefTrace').innerHTML = '<b>Footnote ' + n + ' \u00b7 ' + e[0] + '.</b> ' + e[1];
+    $$('.fn').forEach(function(b){ b.classList.toggle('sel', b.getAttribute('data-s') === s && b.getAttribute('data-n') === String(n)); });
+  }
+  $$('.fn').forEach(function(b){
+    b.addEventListener('click', function(){ fnShow(b.getAttribute('data-s'), b.getAttribute('data-n')); });
+  });
+  $$('.tab').forEach(function(t){
+    t.addEventListener('click', function(){
+      var k = t.getAttribute('data-tab');
+      $$('.tab').forEach(function(x){ x.setAttribute('aria-selected', x === t ? 'true' : 'false'); });
+      $('#tab-orion').hidden = k !== 'orion';
+      $('#tab-nvidia').hidden = k !== 'nvidia';
+      $('#briefTrace').textContent = 'Select a footnote number to see how that figure was verified.';
+      $$('.fn').forEach(function(b){ b.classList.remove('sel'); });
+    });
+  });
+
+  /* roadmap */
+  var STAGES = [
+    {name:'Provable facts', st:'built', stl:'Built', when:'Working today',
+     out:'A set of facts, each a verbatim quote or an independently recomputed calculation, with a footnote to its exact source.',
+     build:'Evidence store, readers for five formats, fact extraction and verification, and the zero-model fallback.',
+     meas:'503 mocked tests passing, plus a live suite of real model calls on four real documents under a $1.00 ceiling.',
+     ctl:'PDF tables need a person\u2019s confirmation before citing. Unproven facts are discarded.'},
+    {name:'Written like an analyst', st:'prog', stl:'In progress', today:true, when:'Active now. Latest fixes dated 2026-09-12.',
+     out:'An executive summary, sectioned analysis, a chart, a disclosure-gap section and a separate outlook block, in prose that connects facts into judgments.',
+     build:'Narrative writer, both quality gates with an anti-filler rubric and repair loop, and GAAP, non-GAAP and guidance labeling. Live-run defects are still being found and fixed.',
+     meas:'Two independent gates on every report, and each defect logged with root cause and proof of fix. Whether a real model reliably meets the bar is the project\u2019s own stated open question.',
+     ctl:'Both gates are mandatory. Failures fall back to a template or plain report instead of shipping.'},
+    {name:'Shaped for the decision', st:'plan', stl:'Planned', when:'Target: Oct\u2013Dec 2026, with a weekly cohort of about 15 analysts',
+     out:'Output in the shape the reader needs (one-pager, memo or slide), a way to say what is wrong and get a revision, and support for documents too large for one model call. Proposed: decision framing with options and trade-offs.',
+     build:'Output-shape selector, feedback and revision loop, true multi-call chunking, mix-versus-rate bridges and multi-event chronology.',
+     meas:'Proposed: reviewer edits per report across the analyst cohort.',
+     ctl:'Analysts review and correct, and the feedback loop captures what was wrong.'},
+    {name:'Measured against a bar', st:'plan', stl:'Planned', when:'Not yet scheduled',
+     out:'Quality stops being a judgment call: every report is scored against a written rubric.',
+     build:'A written grading rubric, a graded evaluation set, a live smoke test after each merge, and an accuracy benchmark.',
+     meas:'Proposed: scores on the evaluation set tracked release over release.',
+     ctl:'Proposed: releases gated on evaluation results.'},
+    {name:'Enterprise-grade controls', st:'plan', stl:'Planned', when:'Target: Q1\u2013Q2 2027',
+     out:'The same reports, with an audit trail and policy controls over who can send what data to which model.',
+     build:'Per-user accounts, an append-only audit log, a policy engine for data reaching a model, a swappable model, a SOC 2 Type I track, an unattended production run, external security review, and integration with the wider agent ecosystem (today only a local offline manifest validator exists).',
+     meas:'Proposed: audit coverage, control testing and external review findings.',
+     ctl:'Human approval tiers and policy-gated data flows.'}
+  ];
+  var CRIT = [
+    {n:'Answer first', d:'The conclusion leads and the analysis follows.', l:[0,2,2,2,2]},
+    {n:'Decision-ready', d:'Framed around the choice the executive faces, with options, trade-offs and a recommendation.', l:[0,0,1,2,2]},
+    {n:'Quantified', d:'Impact stated in numbers, with the calculations visible.', l:[1,2,2,2,2]},
+    {n:'Sourced and traceable', d:'Every claim links back to its source or its calculation.', l:[2,2,2,2,2]},
+    {n:'Defensible', d:'Anticipates hard questions and says what the source does not disclose.', l:[0,1,1,2,2]},
+    {n:'Consistent and auditable', d:'The same input gives the same quality, with a review trail.', l:[1,1,1,2,2]},
+    {n:'Concise', d:'One page of signal, with depth on request.', l:[0,1,2,2,2]}
+  ];
+  var stagesEl = $('#stages');
+  STAGES.forEach(function(s, i){
+    var b = document.createElement('button');
+    b.className = 'st' + (s.today ? ' today' : '');
+    b.setAttribute('aria-pressed', i === 1 ? 'true' : 'false');
+    b.innerHTML = '<strong>Stage ' + (i + 1) + ': ' + s.name + '</strong><span class="tag t-' + s.st + '">' + s.stl + '</span>';
+    b.addEventListener('click', function(){ stageSet(i); });
+    stagesEl.appendChild(b);
+  });
+  var LV = ['Not yet', 'Partial', 'Met'];
+  function stageSet(i){
+    $$('.st', stagesEl).forEach(function(b, j){ b.setAttribute('aria-pressed', i === j ? 'true' : 'false'); });
+    var s = STAGES[i];
+    $('#stageDetail').innerHTML =
+      '<div class="row" style="margin-bottom:10px"><h3 style="font-size:24px">Stage ' + (i + 1) + ': ' + s.name + '</h3><span class="tag t-' + s.st + '">' + s.stl + '</span></div>' +
+      '<p class="note" style="margin-bottom:14px"><b>Timing:</b> ' + s.when + '</p>' +
+      '<div class="sdet"><div><h4>What the output looks like</h4><p>' + s.out + '</p></div><div><h4>What gets built or improved</h4><p>' + s.build + '</p></div><div><h4>How quality is measured</h4><p>' + s.meas + '</p></div><div><h4>Human review and controls</h4><p>' + s.ctl + '</p></div></div>';
+    $('#scoreNote').textContent = (i <= 1 ? 'Assessment of the current build at this stage.' : 'Target profile once this stage is delivered. A plan, not a result.');
+    $('#crits').innerHTML = CRIT.map(function(c){
+      var lv = c.l[i];
+      var bars = '';
+      for (var k = 0; k < 2; k++) bars += '<i class="' + (k < lv ? 'on' : '') + '"></i>';
+      return '<div class="crit"><div><b>' + c.n + '</b><small>' + c.d + '</small></div><div class="bar ' + (lv === 1 ? 'part' : '') + '" role="img" aria-label="' + LV[lv] + '">' + bars + '</div><span class="tag ' + (lv === 2 ? 't-built' : lv === 1 ? 't-prog' : 't-plan') + '">' + LV[lv] + '</span></div>';
+    }).join('');
+  }
+  stageSet(1);
+
+  /* calculator */
+  function num(id){ var v = parseFloat($(id).value); return isFinite(v) && v > 0 ? v : 0; }
+  var nf = new Intl.NumberFormat(undefined, {maximumFractionDigits: 0});
+  var cf = new Intl.NumberFormat(undefined, {style: 'currency', currency: 'USD', maximumFractionDigits: 0});
+  function calc(){
+    var r = num('#cReports'), h = num('#cHours'), s = Math.min(100, num('#cSave')), rate = num('#cRate');
+    $('#cSaveVal').textContent = String(s);
+    var m = r * h * s / 100;
+    $('#oMonth').textContent = nf.format(m);
+    $('#oYear').textContent = nf.format(m * 12);
+    $('#oValue').textContent = rate > 0 ? cf.format(m * 12 * rate) : 'n/a';
+    $('#oCalls').textContent = nf.format(r * 3);
+  }
+  ['#cReports', '#cHours', '#cSave', '#cRate'].forEach(function(id){ $(id).addEventListener('input', calc); });
+  calc();
+
+  /* summary */
+  $('#copyBtn').addEventListener('click', function(){
+    var text = $('#sumBox').innerText;
+    var msg = $('#copyMsg');
+    function ok(){ msg.textContent = 'Copied.'; }
+    function fallback(){
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        var done = document.execCommand('copy');
+        document.body.removeChild(ta);
+        msg.textContent = done ? 'Copied.' : 'Copy is blocked here. Select the text above and copy it manually.';
+      } catch (e) { msg.textContent = 'Copy is blocked here. Select the text above and copy it manually.'; }
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, fallback);
+      else fallback();
+    } catch (e) { fallback(); }
+  });
+  $('#printBtn').addEventListener('click', function(){
+    try {
+      document.body.classList.add('print-summary');
+      window.print();
+    } catch (e) {
+      $('#copyMsg').textContent = 'Printing is blocked here. Use your browser\u2019s print option.';
+    }
+    setTimeout(function(){ document.body.classList.remove('print-summary'); }, 500);
+  });
+})();
+</script>
 </body>
 </html>

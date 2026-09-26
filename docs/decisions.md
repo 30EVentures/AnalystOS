@@ -2,6 +2,17 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-26 - deployed; FlashyOS Level 2 passes (verification of Slices 55-63)
+
+Merged and deployed. Checked the live site with read-only requests: every new file
+serves with the intended content type, `.well-known` and the rewrites work on
+Vercel, the API is closed without keys, and the live charter passes our checker and
+FlashyOS's own. Before running `@flashyos/conformance` I read the published code of it
+and its two dependencies (no install scripts, GET-only requests, no local reads for
+the check, no shell or eval) and ran it with install scripts disabled: Level 1 and 2
+pass. Limits stated: the source repo is private so only the shipped JavaScript was
+read; the mark (Level 3) needs a running agent on the network and is not claimed.
+
 ## 2026-09-26 - no server-side reports by default; results go to the reader's Downloads (Slice 63)
 
 30E Ventures decided reports should land in people's Downloads. That answers the

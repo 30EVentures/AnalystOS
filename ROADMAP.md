@@ -138,9 +138,9 @@ Slices 35-39 were built without a spec of their own (see the audit).
   (PDF and seal returned by the API; three download buttons on the upload page);
   server-side storage is off by default.
 
-**Built but not deployed or verified in production:** Slices 59-62. Merging
-them is gated on the open decisions in `docs/mesh-identity.md` (who owns the
-existing `analystos` org on the FlashyOS network).
+**Deployed 2026-09-26** (Slices 55-63). Verified live: the well-known files, headers,
+API routes and rewrites, and FlashyOS Level 2. Not yet exercised in production: a
+real analysis upload and the new download buttons.
 
 ## R1 — trusted on one desk (Oct–Dec 2026)
 
@@ -154,12 +154,12 @@ Mesh, in this order (evidence and open questions:
    claim it or agree its fate before creating anything. **Answered by the owner
    (30E Ventures, 2026-09-26); confirm by signing in as that org.**
 2. Serve `/.well-known/flashyos.json` and `/.well-known/flashyos-charter.json`
-   on the production domain. **Files written (Slice 59); not deployed** until
-   step 1 is settled.
+   on the production domain. **Done: deployed 2026-09-26 (Slices 59-63).**
 3. Run `npx @flashyos/conformance <domain> --level 2`. Levels 1-2 are
    self-claimed and need no account. Level 3 (authorized / revocable /
-   auditable) is read from FlashyOS's register and cannot be declared. **Not
-   run**: needs the site deployed and approval to run the npm package.
+   auditable) is read from FlashyOS's register and cannot be declared. **Run
+   2026-09-26: Level 1 and Level 2 pass** (`@flashyos/conformance` 0.2.3). Level 3
+   is not attempted.
 4. Replace the invented rules in `analystos/aao/validate.py` with the published
    schema plus its documented cross-field rules, emitting machine-readable
    codes. **Done (Slice 58).**

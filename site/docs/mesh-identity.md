@@ -44,11 +44,22 @@ deployed and an agent token exists.
 
 ```
 python3 -m analystos.aao site/.well-known/flashyos-charter.json     # ours (docs/aao.md)
-npx @flashyos/conformance analystos.dev --level 2                   # FlashyOS's; needs the site deployed
+npx @flashyos/conformance analystos.dev --level 2                   # FlashyOS's
 ```
 
-The second command has **not** been run: it needs the files deployed, and it is
-an npm package that has not been reviewed or approved for execution here.
+**Result, 2026-09-26:** the second command was run against the deployed site
+(`@flashyos/conformance` 0.2.3, run with install scripts disabled) and exited 0:
+Level 1 (Discoverable) and Level 2 (Chartered) both passed, every check ticked.
+The package's published code was read before it was run: it makes only GET
+requests to the domain (and, at Level 3, to `api.flashyos.com`'s public
+conformance record), reads no local files for the check, and has no install
+scripts. The source repository is private, so the published code was read, not
+its source. Level 3 (the mark) is granted from FlashyOS's register and needs a
+running agent; it is not attempted here. To repeat the run:
+
+```
+npm_config_ignore_scripts=true npx @flashyos/conformance@0.2.3 analystos.dev --level 2
+```
 
 ## Deliberately not served
 
@@ -74,7 +85,13 @@ someone signs in at app.flashyos.com as that org.
 
 ## Not verified
 
-- That Vercel serves the `.well-known` directory and applies the headers: this
-  is only checkable after deployment.
-- That FlashyOS's own validator accepts the charter: it was checked with our
-  checker against the published schema, not with theirs.
+Verified against the deployed site on 2026-09-26: Vercel serves `.well-known`
+and the headers apply (JSON, `application/linkset+json`, CORS); our checker and
+FlashyOS's Level 2 check both pass the live charter.
+
+Still not verified:
+
+- A real upload through `/api/v1/analyses` or the upload page's new download
+  buttons (needs an access code or API key, and spends real model calls).
+- That the `analystos` org is controlled by 30E Ventures on the FlashyOS network
+  (the owner's statement; confirm by signing in at app.flashyos.com).

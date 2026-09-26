@@ -58,14 +58,18 @@ an npm package that has not been reviewed or approved for execution here.
 | `/directory.fragment.json` | asserts people and relationships on someone's authority; the owner's decision. |
 | `/.well-known/canon.json`, `backlog.json` | nothing to pin or publish yet. |
 
+## Ownership and contact (stated by the owner, 2026-09-26)
+
+30E Ventures owns AnalystOS and the `analystos` org on the FlashyOS network, and
+`30eventures@gmail.com` is the accountable email. This is the owner's statement;
+the public directory does not list org owners, so it is confirmed for real when
+someone signs in at app.flashyos.com as that org.
+
 ## Open decisions before deploying
 
-1. **Who owns the existing `analystos` org on the FlashyOS network?** It
-   exists (0 agents, capability `analytics`, created about 2026-09-03, owner
-   unknown). Serving this handshake reads as a claim to that slug. Resolve the
-   owner first.
-2. **Is `30eventures@gmail.com` the right accountable human?** It is already
-   public on the homepage.
+1. ~~Who owns the existing `analystos` org?~~ Answered above: 30E Ventures.
+   Still worth confirming by signing in as that org before the handshake goes live.
+2. ~~Is `30eventures@gmail.com` the right accountable human?~~ Yes, per the owner.
 3. **Are the measures right?** They are computable, not yet computed.
 
 ## Not verified

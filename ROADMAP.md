@@ -134,6 +134,9 @@ Slices 35-39 were built without a spec of their own (see the audit).
   OpenAPI (storage not durable on Vercel).
 - Slice 62 — machine navigation (`llms.txt`, API catalog, docs as markdown) and
   documentation brought up to date.
+- Slice 63 — reports are handed back as files for the reader's Downloads folder
+  (PDF and seal returned by the API; three download buttons on the upload page);
+  server-side storage is off by default.
 
 **Built but not deployed or verified in production:** Slices 59-62. Merging
 them is gated on the open decisions in `docs/mesh-identity.md` (who owns the
@@ -148,7 +151,8 @@ Mesh, in this order (evidence and open questions:
 
 1. Resolve the `analystos` org that already exists on the FlashyOS network
    (created ~2026-09-03, 0 agents, capability `analytics`, owner unknown) -
-   claim it or agree its fate before creating anything. **Open.**
+   claim it or agree its fate before creating anything. **Answered by the owner
+   (30E Ventures, 2026-09-26); confirm by signing in as that org.**
 2. Serve `/.well-known/flashyos.json` and `/.well-known/flashyos-charter.json`
    on the production domain. **Files written (Slice 59); not deployed** until
    step 1 is settled.

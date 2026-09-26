@@ -2,6 +2,21 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-26 - no server-side reports by default; results go to the reader's Downloads (Slice 63)
+
+30E Ventures decided reports should land in people's Downloads. That answers the
+open storage question from Slice 61: AnalystOS keeps nothing by default. The
+hosted endpoint now returns the PDF and the seal alongside the HTML, and the
+upload page saves report, PDF and seal through the browser. Consequences accepted:
+(1) no durable report URL, so a mesh task's `evidenceUrl` points at the
+requester's own storage (a seal verifies anywhere, which is why this works);
+(2) no server-side audit trail of viewing, since nothing is viewed on the server;
+(3) the privacy story gets simpler and stronger (only the transient upload and
+Anthropic's API ever see the text). `FileStore` and signed links remain for a
+deployment that wants them. Also recorded: the owner states 30E Ventures owns the
+`analystos` org and `30eventures@gmail.com` is the accountable email; not
+independently verifiable from the public directory.
+
 ## 2026-09-25 - machine-facing files are generated from one source (Slice 62)
 
 Added `llms.txt`, `llms-full.txt`, an RFC 9727 API catalog, a sitemap, robots and

@@ -38,7 +38,8 @@ def build_openapi():
                 "requestBody": {"required": True, "content": {"multipart/form-data": {"schema": {
                     "type": "object", "required": ["file"],
                     "properties": {"file": {"type": "string", "format": "binary", "description": "csv, xlsx, docx, pptx or pdf; at most 10 MB"},
-                                   "title": {"type": "string"}}}}}},
+                                   "title": {"type": "string"},
+                                   "include_pdf": {"type": "boolean", "description": "also return the generated PDF as pdf_base64"}}}}}},
                 "responses": {
                     "201": {"description": "Analyzed", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Analysis"}}}},
                     "400": _err("no file"), "401": _err("missing or invalid API key"), "415": _err("unsupported file type"),
@@ -114,7 +115,8 @@ def build_openapi():
                     "created": {"type": "string"}, "signed": {"type": "boolean"}, "stored": {"type": "boolean"},
                     "counts": {"type": "object", "properties": {"proposed": {"type": "integer"}, "verified": {"type": "integer"}, "dropped": {"type": "integer"}}},
                     "seal": {"$ref": "#/components/schemas/SealBundle"}, "html": {"type": "string"},
-                    "links": {"type": ["object", "null"]}, "expires": {"type": ["string", "null"]}}},
+                    "links": {"type": ["object", "null"]}, "expires": {"type": ["string", "null"]},
+                    "pdf_base64": {"type": ["string", "null"], "description": "present only when include_pdf was set"}}},
             },
         },
     }

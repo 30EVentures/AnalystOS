@@ -3,6 +3,7 @@
 ``api/analyze.py``; each route also has a one-line door file in ``api/v1/``
 because Vercel routes one file to one path."""
 
+import base64
 import json
 import os
 import shutil
@@ -181,6 +182,8 @@ def create_analysis():
         body["links"] = _paths(digest)
         body["expires"] = store_mod.iso(now + ttl)
         response_headers["Location"] = body["links"]["report"]
+    if request.form.get("include_pdf", "").strip().lower() in ("1", "true", "yes", "on"):
+        body["pdf_base64"] = base64.b64encode(pdf).decode("ascii") if pdf else None
     response = jsonify(body)
     response.status_code = 201
     response.headers.update(response_headers)

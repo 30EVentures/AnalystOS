@@ -30,6 +30,20 @@ is the digest to carry alongside it. Whoever receives it can check the seal with
 `POST /api/v1/verify` or, offline, `python3 -m analystos.l4.seal_verify`
 (`docs/seal.md`).
 
+## Default: nothing is kept
+
+AnalystOS keeps no reports on a server by default (decision by 30E Ventures,
+2026-09-26): the upload is deleted when the request ends and the result comes
+back in the response, for the caller to save. `POST /api/v1/analyses` returns
+the report (`html`) and its seal (`seal`); add `include_pdf=true` to also get the
+generated PDF as `pdf_base64`. The hosted upload page does the same and saves the
+report, the PDF and the seal to the reader's own Downloads folder.
+
+For the mesh this means whoever receives a seal hosts it themselves. A seal
+verifies anywhere (`docs/seal.md`), so a task's `evidenceUrl` can point at the
+requester's own storage. Server-side storage and signed links, below, are
+optional and stay off unless `ANALYSTOS_STORE_DIR` is set.
+
 ## The `id`
 
 `sha256(canonical(seal payload))`. The payload holds the Merkle root, the source
@@ -41,7 +55,7 @@ its own id.
 | Variable | Needed for | If unset |
 |---|---|---|
 | `ANALYSTOS_API_KEYS` | any authenticated call: comma-separated `name:sha256hex` | every authenticated call is a 503 (fails closed) |
-| `ANALYSTOS_STORE_DIR` | storing reports, links, `GET /reports`, `GET /verify/{id}`, the audit log file | responses carry the report and seal inline; those routes are 503 `store_not_configured`; audit lines go to stderr |
+| `ANALYSTOS_STORE_DIR` | *optional*: storing reports, links, `GET /reports`, `GET /verify/{id}`, the audit log file | the default: responses carry the report and seal inline; those routes are 503 `store_not_configured`; audit lines go to stderr |
 | `ANALYSTOS_LINK_SECRET` | `POST /links` and honouring links | 503; no default secret |
 | `ANALYSTOS_SEAL_KEY` | signing seals (`python3 -m analystos.l4.seal keygen`) | unsigned seals (integrity only), and they say so. A *malformed* value is a 503, not a downgrade |
 | `ANALYSTOS_REPORT_TTL_DAYS` | retention of stored reports | 30 |

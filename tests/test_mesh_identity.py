@@ -82,7 +82,7 @@ class VercelHeadersTest(unittest.TestCase):
                 self.assertEqual(headers["Access-Control-Allow-Origin"], "*")
 
     def test_the_function_exclusions_are_untouched(self):
-        self.assertIn("api/*.py", self.config["functions"])
+        self.assertIn("api/**/*.py", self.config["functions"])  # covers api/v1/ too (Slice 61)
 
     def test_no_secret_shaped_string_in_any_published_file(self):
         for path in (CHARTER_PATH, LEGACY_PATH, HANDSHAKE_PATH):

@@ -106,8 +106,36 @@ then build the frontend controls last. Full plan in `docs/decisions.md`.
 
 ## R1 — trusted on one desk (Oct–Dec 2026)
 
-Attestation v1 (answers the seven AAO questions); weekly test cohort ~15;
-first analysis calls fulfilled for other AAOs on the mesh.
+Attestation v1; weekly test cohort ~15.
+
+Mesh, in this order (evidence and open questions:
+`docs/flashyos-alignment-2026-09-25.md`):
+
+1. Resolve the `analystos` org that already exists on the FlashyOS network
+   (created ~2026-09-03, 0 agents, capability `analytics`, owner unknown) -
+   claim it or agree its fate before creating anything.
+2. Serve `/.well-known/flashyos.json` (the `flashyos/1` handshake) and
+   `/.well-known/flashyos-charter.json` (an AAO 0.1 charter for slug
+   `analystos`) on the production domain. Both are 404 today. Validate the
+   charter against `https://flashyos.com/aao.schema.json`.
+3. Run `npx @flashyos/conformance <domain> --level 2`. Levels 1-2 are
+   self-claimed and need no account. Level 3 (authorized / revocable /
+   auditable) is read from FlashyOS's register and needs a running agent with
+   a record - it cannot be declared.
+4. Replace the invented rules in `analystos/aao/validate.py` with the
+   published schema plus its documented cross-field rules, and have it emit
+   machine-readable rule codes (it disagrees with the spec on 15 of 21
+   probes today).
+5. Only then: sign in at app.flashyos.com, mint an agent token, declare a
+   real capability. The "seven AAO questions" are four static ones answered
+   from the charter plus three runtime facts that stay "deferred" until the
+   org is live with tokens, events and decisions.
+
+Not in R1: "analysis calls fulfilled for other AAOs." That needs an
+agent-callable endpoint and a durable, access-controlled report URL - the
+mesh's task completion takes an https evidence URL, while FlashyOS's own
+guidance says never to send document contents to the mesh. Open questions are
+in the alignment doc, section 8.
 
 ## R2 — hardened at Gord (Q1–Q2 2027)
 
@@ -126,7 +154,21 @@ analysis-attestation wire format published open with a conformance suite.
 
 ## R5 — the analysis layer of the mesh (2030+)
 
-Public multi-tenant, module SDK, discovery + delegation across AAOs.
+Public multi-tenant, module SDK. Cross-organization discovery and delegation
+as FlashyOS actually specifies them today
+(`docs/flashyos-spec-notes-2026-09-25.md`):
+
+- Discovery: an org that is public and declares at least one capability
+  appears in the public directory; matching is exact on the canonical
+  capability tag.
+- Delegation: an agent joins an ACTIVE joint initiative, claims a task, and
+  completes it with an https evidence URL (optionally plus a `shipEvidence`
+  `{entryId, sha256}`). A human at each org must consent to the initiative;
+  agents cannot propose one.
+- Governance v1 records decisions but does not enforce them, so any control
+  has to live in AnalystOS's own runtime.
+
+None of this is buildable until R1's mesh steps are done.
 
 ## Cadence
 

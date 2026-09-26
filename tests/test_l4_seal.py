@@ -361,6 +361,36 @@ class PipelineSealTest(unittest.TestCase):
         self.assertNotIn("999999999", sealed)
 
 
+class WrittenTierSealTest(unittest.TestCase):
+    def test_a_successful_narrative_run_seals_at_the_written_tier(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            job = Path(tmp)
+            (job / "data.csv").write_text("period,revenue\nFY2024,18400000\n", encoding="utf-8")
+            report_response = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={"segments": [{
+                "type": "quote", "display": "inline", "label": "Revenue", "exact_text": "18400000",
+                "has_value": True, "value": 18400000.0, "sentence": "Revenue was {value}.", "format": "usd"}]})])
+            narrative = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={
+                "executive_summary": [{"text": "The headline figure this quarter was {{0}}."}],
+                "sections": [{"heading": "Revenue", "paragraphs": [{"text": "That figure, {{0}}, set the tone."}],
+                              "has_chart": False, "chart": {"type": "bar", "title": "", "format": "number", "series": []}}],
+                "outlook": []})])
+            proof = SimpleNamespace(content=[SimpleNamespace(type="tool_use", input={"passed": True, "issues": []})])
+
+            def create(**kwargs):
+                return {"write_narrative": narrative, "report_issues": proof}.get(kwargs["tool_choice"]["name"], report_response)
+
+            t = {}
+            build_report(job / "data.csv", title="X", evidence_dir=job / "ev",
+                         llm_client=SimpleNamespace(messages=SimpleNamespace(create=create)), trace=t)
+            self.assertEqual(t["tier"], "written")
+            self.assertIsNone(t["fallback_reason"])
+            self.assertEqual(t["analysis"], {"proposed": 1, "verified": 1, "dropped": 0})
+            bundle = build_bundle(t)
+            out = verify_bundle(bundle, source_text=t["document_text"])
+            self.assertTrue(out["ok"] and out["content_checked"], out)
+            self.assertIn("headline figure", json.dumps(bundle["report"]))
+
+
 class CliWritesTheSealTest(unittest.TestCase):
     def test_main_writes_section_seal_json_for_a_narrated_run(self):
         from analystos import pipeline

@@ -58,5 +58,5 @@ fact; the seal records the outcome), and events' inner dates.
 6. The verifier's text folding, recomputation and citation matching agree with
    the analyzer's on a differential sample.
 7. A real (mocked-model) pipeline run's trace seals and fully verifies for the
-   deterministic tier (the written tier shares the same trace path).
+   written and deterministic tiers.
 8. Full suite OK.

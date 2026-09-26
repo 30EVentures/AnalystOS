@@ -108,6 +108,8 @@ Vercel maps one file to one path, so each route has a door in `api/v1/`
 (`index`, `analyses`, `reports`, `links`, `verify`, `openapi`) that imports the
 shared Flask app, and `vercel.json` rewrites `/api/v1/openapi.json`,
 `/api/v1/reports/:digest` and `/api/v1/verify/:digest` onto them. The routes
-accept both the pretty path and the `?digest=` form. **Not verified on Vercel
-until deployed** (a test proves the doors and rewrites exist and agree, not
-that Vercel forwards the paths as expected).
+accept both the pretty path and the `?digest=` form. **Verified on the deployed
+site, 2026-09-26:** `/api/v1`, `/api/v1/openapi.json` and both forms of the
+`reports` and `verify` routes reach the app (an unconfigured store answers 503
+`store_not_configured`, an unconfigured key set answers 503 `unavailable`, as
+designed). Not yet exercised in production: a real analysis upload.

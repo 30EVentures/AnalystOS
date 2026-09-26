@@ -2,6 +2,22 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-25 - the AAO checker now follows the published schema (Slice 58)
+
+`analystos/aao/validate.py` was a stand-in written before the published
+schema was read: it invented a tier (`NONE`), rejected the real `CRITICAL`,
+required two optional fields, refused the `x-` extension convention, and
+disagreed with the schema on 15 of 21 probes. Replaced by a pinned copy of
+`https://flashyos.com/aao.schema.json` (sha256 in code and test), a
+keyword-limited JSON Schema checker (no new dependency; a test fails if the
+schema starts using a keyword it lacks), the schema's documented cross-field
+rules, and the documented naming rules. Problems now carry `aao.*` codes so the
+checker can speak the conformance-kit line protocol. The codes are ours
+because FlashyOS's aao/0.1 corpus is not public; that is stated in
+`docs/aao.md` rather than implied. Rejected: adding `jsonschema` as a
+dependency - the keyword subset is small and a dependency would add a
+second thing to keep in step with the pinned schema.
+
 ## 2026-09-25 - public claims corrected to match the code (Slice 57)
 
 The audit found the homepage describing the local command line ("stays on

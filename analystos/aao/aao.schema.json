@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://flashyos.com/aao.schema.json",
+  "title": "AAO charter document (aao 0.1)",
+  "description": "The AAO manifest format with the additive charter fields, as shipped in @flashyos/aao. This schema is necessary but not sufficient: cross-field rules (duplicate role names, worksIn referring to declared repositories, escalation naming an existing role, at most one default repository, every repository having an owning role, and the full role-naming standard's codename/vendor denylist) are enforced by validateCharterDocument() in @flashyos/aao and by `npx @flashyos/agent conform`. Validate here first for structure in any language; run the conformance suite for the standard. Keys prefixed x- are carried but not enforced, the format's explicit extension convention.",
+  "type": "object",
+  "properties": {
+    "aao": {
+      "const": "0.1",
+      "description": "Spec version this manifest is written against."
+    },
+    "name": {
+      "type": "string",
+      "pattern": "\\S",
+      "description": "Human-readable product name, e.g. \"StartupOS\"."
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "URL-safe org slug on the network. Lowercase letters, numbers and single hyphens."
+    },
+    "description": {
+      "type": "string",
+      "pattern": "\\S",
+      "description": "One line on what this org is for."
+    },
+    "accountableTo": {
+      "type": "string",
+      "pattern": "^[^@\\s]+@[^@\\s.]+\\.[^@\\s]+$",
+      "description": "The human accountable for this organization — question five of seven. An email address, so the accountable human is reachable. Conformance additionally fails the template placeholder you@example.com."
+    },
+    "roles": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/role" },
+      "description": "An org with no roles is not an organization. Role names are unique within an org (cross-field rule, enforced by the validator)."
+    },
+    "network": {
+      "type": "object",
+      "properties": {
+        "offers": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "\\S" },
+          "description": "Capabilities this org offers other orgs — what it can be asked for."
+        },
+        "wants": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "\\S" },
+          "description": "Capabilities this org wants from other orgs — what it will broadcast for."
+        }
+      },
+      "additionalProperties": false
+    },
+    "repositories": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/repository" },
+      "description": "Charter field: what this organization owns. Additive — a manifest without it stays valid."
+    },
+    "escalation": {
+      "type": "string",
+      "pattern": "\\S",
+      "description": "Charter field: the role that answers a question the charter does not. Must name a role that exists in this document (cross-field rule)."
+    }
+  },
+  "required": ["aao", "name", "slug", "description", "accountableTo", "roles"],
+  "patternProperties": {
+    "^x-": {
+      "description": "Explicit extension: carried, never enforced."
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "impact": {
+      "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"],
+      "description": "Matches FlashyOS DecisionImpact exactly, so a threshold declared here is enforceable there."
+    },
+    "family": {
+      "enum": [
+        "growth",
+        "revenue",
+        "product",
+        "engineering",
+        "operations",
+        "data",
+        "finance",
+        "risk",
+        "governance",
+        "support"
+      ],
+      "description": "The ten closed families. Closed on purpose: a taxonomy each organization extends cannot sort across organizations."
+    },
+    "role": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "minLength": 3,
+          "maxLength": 24,
+          "description": "A standing responsibility, never a person or a codename. Becomes the agent's name on the network. The full naming standard (vendor names, git names, placeholders and known codenames rejected; at most three words) is enforced by validateRoleName in @flashyos/aao."
+        },
+        "purpose": {
+          "type": "string",
+          "pattern": "\\S",
+          "description": "One line a human can read. Why this role exists."
+        },
+        "capabilities": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "pattern": "\\S" },
+          "description": "What this role is permitted to do. Actions, not departments — `deploy` and `review`, never `engineering`."
+        },
+        "humanApprovalAtOrAbove": {
+          "$ref": "#/$defs/impact",
+          "description": "Decisions at or above this impact wait for a human. Omit for a role that never needs approval; LOW for one that always does."
+        },
+        "family": { "$ref": "#/$defs/family" },
+        "measure": {
+          "type": "string",
+          "pattern": "\\S",
+          "description": "Charter field: the number this role moves. Optional, strongly encouraged."
+        },
+        "worksIn": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "pattern": "\\S" },
+          "description": "Charter field: repository names this role may push to — its jurisdiction. Each must be a repository declared in this document (cross-field rule)."
+        },
+        "renamedFrom": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "\\S" },
+          "description": "Charter field: prior names, newest first — succession, so history follows the role."
+        }
+      },
+      "required": ["name", "purpose", "capabilities"],
+      "patternProperties": {
+        "^x-": {
+          "description": "Explicit extension: carried, never enforced."
+        }
+      },
+      "additionalProperties": false
+    },
+    "repository": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9._-]+$",
+          "description": "Short name that roles[].worksIn refers to."
+        },
+        "url": {
+          "type": "string",
+          "pattern": "\\S",
+          "description": "Where it lives. Host and path, no protocol needed."
+        },
+        "holds": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "pattern": "\\S" },
+          "description": "Subject areas this repository holds, for routing work to it. Free-form on purpose."
+        },
+        "default": {
+          "type": "boolean",
+          "description": "Where work goes when nothing else matches. At most one per charter (cross-field rule)."
+        }
+      },
+      "required": ["name", "url", "holds"],
+      "additionalProperties": false
+    }
+  }
+}

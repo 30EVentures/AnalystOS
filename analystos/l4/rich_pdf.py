@@ -34,6 +34,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import KeepTogether, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 from reportlab.graphics.shapes import Drawing, Line, Rect, String
 
+from analystos.l4.basis import IMAGE_FOOTNOTE, basis_text
 from analystos.l4.export import _BOLD_RE, _MARKER_RE, display_value, format_number
 from analystos.l4.rich_export import (
     _FORWARD_HORIZONS,
@@ -42,6 +43,7 @@ from analystos.l4.rich_export import (
     _as_text,
     _detect_chart_type,
     _resolve_chart,
+    chart_basis_note,
 )
 
 _FONTS_DIR = Path(__file__).resolve().parent / "fonts"
@@ -105,6 +107,8 @@ _STYLES = {
     "kpi_value": ParagraphStyle("kpi_value", fontName="IBMPlexSerif-Bold", fontSize=15, leading=18, textColor=_INK),
     "kpi_delta_pos": ParagraphStyle("kpi_delta_pos", fontName="IBMPlexSans", fontSize=8.5, textColor=_VERIFIED),
     "kpi_delta_neg": ParagraphStyle("kpi_delta_neg", fontName="IBMPlexSans", fontSize=8.5, textColor=_NEG),
+    "kpi_basis": ParagraphStyle("kpi_basis", fontName="IBMPlexSans", fontSize=6, leading=8, textColor=_INTERP),
+    "chart_basis": ParagraphStyle("chart_basis", fontName="IBMPlexSans", fontSize=6.5, leading=9, textColor=_INTERP),
     "kpi_delta_neutral": ParagraphStyle("kpi_delta_neutral", fontName="IBMPlexSans", fontSize=8.5, textColor=_INK_SOFT),
     "footnote": ParagraphStyle("footnote", fontName="IBMPlexMono", fontSize=7.5, leading=11, textColor=_INK_SOFT),
     "footnote_heading": ParagraphStyle(
@@ -113,7 +117,7 @@ _STYLES = {
     "timeline": ParagraphStyle("timeline", fontName="IBMPlexSans", fontSize=9, leading=13, textColor=_INK),
 }
 
-_TAG_RE = re.compile(r"\[(GUIDANCE|PROJECTED|NON-GAAP)\]")
+_TAG_RE = re.compile(r"\[(GUIDANCE|PROJECTED|NON-GAAP|FROM IMAGE)\]")
 _TAG_COLOR = _INTERP.hexval()[2:]  # "#RRGGBB" -> "RRGGBB", reportlab's own hex form
 _VERIFIED_HEX = _VERIFIED.hexval()[2:]
 
@@ -137,7 +141,8 @@ def _substitute_pdf(text, segments, source_hash, currency_unit, footnote_number,
         horizon = segment.get("horizon", "reported")
         h_tag = f" [{horizon.upper()}]" if horizon in _FORWARD_HORIZONS else ""
         g_tag = " [NON-GAAP]" if segment.get("gaap_status") == "non_gaap" else ""
-        return f"{rendered}{h_tag}{g_tag} [{n}]"
+        i_tag = " [FROM IMAGE]" if segment.get("source") == "image" else ""
+        return f"{rendered}{h_tag}{g_tag}{i_tag} [{n}]"
 
     return _PLACEHOLDER_RE.sub(_sub, text)
 
@@ -165,13 +170,15 @@ def _rich_footnote_text(n, source_hash, segment, currency_unit):
     if segment.get("type") == "computed":
         expr = _arithmetic(segment, currency_unit)
         if expr:
-            return f"{n}. {expr}, verified by recomputation. Source {source_hash}."
+            text = f"{n}. {expr}, verified by recomputation. Source {source_hash}."
+            return text + (" " + IMAGE_FOOTNOTE if segment.get("source") == "image" else "")
     citation = segment.get("citation")
     if isinstance(citation, list):
         cite_text = "computed from: " + "; ".join(f'source {source_hash} - "{c}"' for c in citation)
     else:
         cite_text = f'source {source_hash} - "{citation}"'
-    return f"{n}. {cite_text}"
+    text = f"{n}. {cite_text}"
+    return text + (" " + IMAGE_FOOTNOTE if segment.get("source") == "image" else "")
 
 
 def _paragraphs_flowables(paragraphs, segments, source_hash, currency_unit, footnote_number, footnotes, style):
@@ -207,6 +214,9 @@ def _kpi_strip_table(kpis, segments, currency_unit):
             else:
                 cls = "kpi_delta_neutral"
             block.append(Paragraph(xml_escape(display_value(dseg, currency_unit)), _STYLES[cls]))
+        basis = basis_text(seg, segments[di]) if isinstance(di, int) and 0 <= di < len(segments) else basis_text(seg)
+        if basis:
+            block.append(Paragraph(xml_escape(basis.upper()), _STYLES["kpi_basis"]))
         cells.append(block)
     if not cells:
         return None
@@ -404,6 +414,9 @@ def render_rich_pdf(report, segments, source_hash, currency_unit="actual"):
             if drawing is not None:
                 section_flow.append(Spacer(1, 4))
                 section_flow.append(drawing)
+                note = chart_basis_note(section["chart"], segments)
+                if note:
+                    section_flow.append(Paragraph(xml_escape(note), _STYLES["chart_basis"]))
         story.append(KeepTogether(section_flow))
         story.append(Spacer(1, 4))
 

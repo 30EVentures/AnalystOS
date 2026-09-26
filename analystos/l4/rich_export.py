@@ -46,6 +46,7 @@ from analystos.l4.charts import (
     line_chart_svg,
     waterfall_chart_svg,
 )
+from analystos.l4.basis import FORWARD_HORIZONS, IMAGE_FOOTNOTE, basis_text
 from analystos.l4.export import (
     _BOLD_RE,
     _FOOTNOTE_RE,
@@ -62,8 +63,8 @@ _PLACEHOLDER_RE = re.compile(r"\{\{(\d+)\}\}")
 # financial prose and pass through html.escape untouched.
 #   guidance/projected -> a forward-looking marker
 #   q / c              -> the source tag: quote (verified) / computed
-_TAG_RE = re.compile("⟦(guidance|projected|non-gaap|q|c)⟧")
-_FORWARD_HORIZONS = ("guidance", "projected")
+_TAG_RE = re.compile("⟦(guidance|projected|non-gaap|image|q|c)⟧")
+_FORWARD_HORIZONS = FORWARD_HORIZONS
 
 _CHART_RENDERERS = {
     "bar": bar_chart_svg,
@@ -109,6 +110,8 @@ p{margin:0 0 .8rem;max-width:74ch}
 .kpi .delta{font-size:.8rem;margin-top:3px}
 .kpi .delta.pos{color:var(--pos)} .kpi .delta.neg{color:var(--neg)}
 .kpi .delta.neutral{color:var(--ink-soft)}
+.kpi .basis,.chart-card .basis{font-family:var(--font-mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.04em;color:var(--interp)}
+.kpi .basis{margin-top:3px}
 .legend{display:flex;gap:20px;flex-wrap:wrap;font-size:.75rem;color:var(--ink-soft);margin:10px 0 0}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .legend .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
@@ -204,9 +207,10 @@ def _substitute(text, segments, source_hash, currency_unit, footnote_number, foo
         # forward-looking one does - never let an adjusted figure read as
         # though it were the audited measure. See specs/slice-45/spec.md.
         g_tag = " ⟦non-gaap⟧" if segment.get("gaap_status") == "non_gaap" else ""
+        i_tag = " ⟦image⟧" if segment.get("source") == "image" else ""
         # ✓ for a direct source quote, ∑ for an independently computed value.
         src_tag = " ⟦c⟧" if segment.get("type") == "computed" else " ⟦q⟧"
-        return f"{rendered}{h_tag}{g_tag}{src_tag} [{n}]"
+        return f"{rendered}{h_tag}{g_tag}{i_tag}{src_tag} [{n}]"
 
     return _PLACEHOLDER_RE.sub(_sub, text)
 
@@ -227,7 +231,8 @@ def _para_html(text, footnotes):
             return '<sup class="cite" title="Direct quote from source">&#10003;</sup>'
         if kind == "c":
             return '<sup class="cite calc" title="Independently computed &amp; verified">&#8721;</sup>'
-        return f'<span class="horizon-tag">{kind}</span>'
+        label = "from image" if kind == "image" else kind
+        return f'<span class="horizon-tag">{label}</span>'
 
     esc = _TAG_RE.sub(_tag, esc)
 
@@ -347,8 +352,14 @@ def _rich_footnote(n, source_hash, segment, currency_unit):
     if segment.get("type") == "computed":
         expr = _arithmetic(segment, currency_unit)
         if expr:
-            return f"[{n}] {expr}, verified by recomputation. Source {source_hash}."
-    return narrated_footnote(n, source_hash, segment["citation"])
+            text = f"[{n}] {expr}, verified by recomputation. Source {source_hash}."
+        else:
+            text = narrated_footnote(n, source_hash, segment["citation"])
+    else:
+        text = narrated_footnote(n, source_hash, segment["citation"])
+    if segment.get("source") == "image":
+        text += " " + IMAGE_FOOTNOTE
+    return text
 
 
 _LEGEND = (
@@ -390,10 +401,12 @@ def _kpi_strip_html(kpis, segments, currency_unit):
                 cls = "neutral"
             delta = (f'<div class="delta {cls}">{html.escape(display_value(dseg, currency_unit))}'
                      '<sup class="cite calc">&#8721;</sup></div>')
+        basis = basis_text(seg, segments[di]) if delta else basis_text(seg)
+        basis_html = f'<div class="basis">{html.escape(basis)}</div>' if basis else ""
         cells.append(
             f'<div class="kpi"><div class="label">{html.escape(k.get("label") or "")}</div>'
             f'<div class="value">{html.escape(display_value(seg, currency_unit))}{vtag}</div>'
-            f"{delta}</div>"
+            f"{delta}{basis_html}</div>"
         )
     return f'<div class="kpi-strip">{"".join(cells)}</div>{_LEGEND}'
 
@@ -490,6 +503,19 @@ def _resolve_chart(chart, segments):
     rendering it would suggest a shape the data doesn't actually have.
     """
     labels, values = [], []
+    for label, segment in chart_points(chart, segments):
+        labels.append(label)
+        values.append(segment["value"])
+    if len(values) < 2:
+        return None
+    return labels, values
+
+
+def chart_points(chart, segments):
+    """``(label, segment)`` for each plottable point of a chart spec - the
+    single definition of "plottable" shared by the drawn chart and its
+    basis note, so the note can never describe a point that is not drawn.
+    """
     for point in chart.get("series", []):
         index = point.get("fact_index")
         if index is None or index < 0 or index >= len(segments):
@@ -497,11 +523,18 @@ def _resolve_chart(chart, segments):
         segment = segments[index]
         if segment["type"] == "prose" or "value" not in segment:
             continue
-        labels.append(point.get("label") or display_value(segment))
-        values.append(segment["value"])
-    if len(values) < 2:
-        return None
-    return labels, values
+        yield (point.get("label") or display_value(segment)), segment
+
+
+def chart_basis_note(chart, segments):
+    """"Basis: Adj. NI: non-GAAP; FY27 guide: guidance" - only points that
+    have a basis; "" when none do."""
+    parts = []
+    for label, segment in chart_points(chart, segments):
+        text = basis_text(segment)
+        if text:
+            parts.append(f"{label}: {text}")
+    return "Basis: " + "; ".join(parts) if parts else ""
 
 
 def _chart_html(chart, segments, currency_unit):
@@ -529,7 +562,9 @@ def _chart_html(chart, segments, currency_unit):
     svg = renderer(chart.get("title", ""), labels, values, chart.get("format", "number"), currency_unit)
     tag = ("&#8721; Computed &amp; verified" if chart_type == "waterfall"
            else "&#10003; Direct quote")
-    return f'<figure class="chart-card">{svg}<figcaption><span class="cite">{tag}</span></figcaption></figure>'
+    note = chart_basis_note(chart, segments)
+    note_html = f' <span class="basis">{html.escape(note)}</span>' if note else ""
+    return f'<figure class="chart-card">{svg}<figcaption><span class="cite">{tag}</span>{note_html}</figcaption></figure>'
 
 
 def render_rich_report(report, segments, source_hash, currency_unit="actual"):

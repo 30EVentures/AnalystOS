@@ -2,6 +2,19 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-25 - one definition of a figure's basis, shown on every surface (Slice 56)
+
+Audit findings 5-6: GAAP/guidance tags were shown in body paragraphs but not
+on KPI tiles or chart bars, and the `source: "image"` marker from Slice 50
+was stored and never drawn. `analystos/l4/basis.py` is now the single
+definition (forward horizon, non-GAAP, from image) used by the HTML and PDF
+body text, KPI tiles and chart notes, plus an image note in footnotes.
+Chart basis is a note under the chart naming the tagged points, not a mark
+per bar - four chart types times two renderers would have meant touching
+every drawing routine for a marginal gain. Still not enforced: that the
+model's `horizon`/`gaap_status` labels are right (the audit lists that; the
+homepage wording in Slice 57 says so).
+
 ## 2026-09-25 - Gate 1 now checks relationships and spelled-out quantities (Slice 55)
 
 The code-verified audit (`docs/audit-2026-09-25.md`, findings 1-2) showed that

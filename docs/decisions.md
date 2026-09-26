@@ -2,6 +2,24 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-25 - reports are sealed; the verifier is standalone (Slice 60)
+
+The charter's `evidence` role promised that a stranger can re-verify a report
+offline. Built as a bundle (every fact hashed under a Merkle root, plus the
+report structure, the source/text hashes and the tier, all under one Ed25519
+signature). Choices: the construction matches Flashy's published provenance
+code so their tooling style can read it; every number in a sealed record is a
+string so no verifier depends on float formatting; the verifier is one
+stdlib-only file that imports nothing from AnalystOS, and is differentially
+tested against the analyzer's own folding and arithmetic; and there is **no
+default signing key** - an unsigned seal says it is integrity-only, because the
+evidence store's public fallback key (audit finding 4) is the mistake not to
+repeat. The three trust levels (`ok`, `authentic`, `content_checked`) are
+reported separately rather than as one "verified" flag. Deliberately left out:
+checking a quote's value against its citation in the standalone verifier (a
+second, larger implementation of the number parser), storage of bundles, a
+chain across reports.
+
 ## 2026-09-25 - mesh identity files added, deploy gated on the org question (Slice 59)
 
 Published a `flashyos/1` handshake and an AAO 0.1 charter for `analystos` in

@@ -127,7 +127,7 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
     <div class="page-head">
       <p class="eyebrow">Live preview</p>
       <h1>Upload a document, get a cited report.</h1>
-      <p>CSV, Excel, Word, PowerPoint, or PDF — any document, table-shaped or not. By default it's read as real text and analyzed by a model whose every number is independently checked against the source. Nothing you upload is stored; each request is processed and discarded.</p>
+      <p>CSV, Excel, Word, PowerPoint, or PDF — any document, table-shaped or not. By default it's read as real text and analyzed by a model whose every number is independently checked against the source. Nothing you upload is stored; each request is processed and discarded. While it is processed, the text extracted from your document (and any images cropped from it) is sent to Anthropic&rsquo;s API. Use non-confidential documents only.</p>
     </div>
 
     <form id="analyze-form" class="form-card">
@@ -203,7 +203,10 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
       <div class="result-head">
         <h2>Report</h2>
         <button type="button" class="btn small" id="download-pdf-btn">Download PDF ▸</button>
+        <button type="button" class="btn small" id="download-html-btn">Download report (.html) ▸</button>
+        <button type="button" class="btn small" id="download-seal-btn" hidden>Download seal (.json) ▸</button>
       </div>
+      <p class="hint" id="download-note">Downloads save to your browser's Downloads folder. Nothing is kept on our server.</p>
       <iframe id="report-frame" title="Generated report"></iframe>
     </div>
   </div>
@@ -233,9 +236,43 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
   // browser print dialog on the iframe's content - one real page, printed
   // pixel-for-pixel (real fonts, real inline SVG charts), no second
   // renderer to keep in sync with the HTML.
+  var downloadHtmlBtn = document.getElementById('download-html-btn');
+  var downloadSealBtn = document.getElementById('download-seal-btn');
+  var latest = { html: null, pdfBase64: null, seal: null, stem: 'analystos-report' };
+
+  // Slice 63: real files, saved by the browser to its Downloads folder.
+  function saveBlob(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+  function base64ToBlob(b64, type) {
+    var bin = atob(b64), bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new Blob([bytes], { type: type });
+  }
+
   downloadPdfBtn.addEventListener('click', function () {
+    if (latest.pdfBase64) {
+      saveBlob(base64ToBlob(latest.pdfBase64, 'application/pdf'), latest.stem + '.pdf');
+      return;
+    }
+    // No generated PDF came back: fall back to the browser's print dialog.
     frame.contentWindow.focus();
     frame.contentWindow.print();
+  });
+  downloadHtmlBtn.addEventListener('click', function () {
+    if (latest.html) saveBlob(new Blob([latest.html], { type: 'text/html' }), latest.stem + '.html');
+  });
+  downloadSealBtn.addEventListener('click', function () {
+    if (latest.seal) {
+      saveBlob(new Blob([JSON.stringify(latest.seal, null, 2)], { type: 'application/json' }), latest.stem + '.seal.json');
+    }
   });
 
   var fileInput = document.getElementById('file');
@@ -390,6 +427,10 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
       .then(function (data) {
         try { localStorage.setItem(ACCESS_CODE_KEY, accessCode); } catch (e) { /* ignore */ }
         frame.srcdoc = data.html;
+        var day = new Date().toISOString().slice(0, 10);
+        latest = { html: data.html, pdfBase64: data.pdf_base64 || null, seal: data.seal || null,
+                   stem: 'analystos-report-' + day };
+        downloadSealBtn.hidden = !latest.seal;
         resultEl.hidden = false;
       })
       .catch(function (err) {

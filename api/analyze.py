@@ -57,6 +57,7 @@ pipeline failure (400, using ``ValueError``'s own message) - nothing about
 the server internals leaks.
 """
 
+import base64
 import hmac
 import json
 import os
@@ -76,8 +77,10 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+from analystos.api_v1 import register as register_api_v1  # noqa: E402
 from analystos.l1.detect import SUPPORTED_EXTENSIONS, extract_any  # noqa: E402
 from analystos.l4.export import render_html  # noqa: E402
+from analystos.l4.seal import build_bundle, load_signing_key  # noqa: E402
 from analystos.pipeline import build_report  # noqa: E402
 
 app = Flask(__name__)
@@ -249,11 +252,12 @@ def analyze():
     )
 
     tmp_dir = Path(tempfile.mkdtemp(prefix="analystos-"))
+    trace = {}
     try:
         tmp_path = tmp_dir / upload.filename
         upload.save(tmp_path)
 
-        section = build_report(
+        result = build_report(
             tmp_path,
             schema,
             title,
@@ -261,10 +265,36 @@ def analyze():
             currency_unit=currency_unit,
             evidence_dir=tmp_dir / "evidence",
             extract_options={"pdf_confirmed": pdf_confirmed},
+            want_pdf=True,
+            trace=trace,
         )
     except ValueError as exc:
         return jsonify(error=str(exc)), 400
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)  # never keep the upload
 
-    return jsonify(section=section, html=render_html(section))
+    section, pdf = result if isinstance(result, tuple) else (result, None)
+    body = {"section": section, "html": render_html(section)}
+    # Slice 63: the result is handed back as files for the person to save to
+    # their own Downloads folder; nothing is kept on the server.
+    if pdf:
+        body["pdf_base64"] = base64.b64encode(pdf).decode("ascii")
+    seal = _seal_or_none(trace)
+    if seal is not None:
+        body["seal"] = seal
+    return jsonify(body)
+
+
+def _seal_or_none(trace):
+    """A narrated run's seal, or ``None`` (table path, or a misconfigured seal
+    key - the report is still delivered; the seal is an extra)."""
+    if not trace.get("segments"):
+        return None
+    try:
+        return build_bundle(trace, signing_key=load_signing_key())
+    except ValueError:
+        return None
+
+
+# Slice 61: the agent-callable /api/v1 routes share this app and its limiter.
+register_api_v1(app, rate_limit=_rate_limit_denied)

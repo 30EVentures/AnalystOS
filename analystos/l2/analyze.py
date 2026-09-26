@@ -914,7 +914,7 @@ def _request_report(client, user_content):
     return (tool_input.get("segments") or []), truncated
 
 
-def analyze_document(document_text, title, client=None):
+def analyze_document(document_text, title, client=None, stats=None):
     """Analyze ``document_text`` with Claude; return a list of *verified*
     segments (see module docstring for the three kinds).
 
@@ -926,6 +926,10 @@ def analyze_document(document_text, title, client=None):
     Anthropic-side outage) - callers already turn a ``ValueError`` into a
     clean, honest response; letting an ``anthropic.APIError`` through
     unconverted would instead surface as a raw, unhandled server error.
+
+    ``stats``, when a dict is passed, is filled with ``proposed`` (segments
+    the model returned), ``verified`` and ``dropped`` counts - the numbers
+    behind the charter's ``verification`` measure. Nothing else changes.
     """
     client = _resolve_client(client)
     match_document = _match_key(document_text)
@@ -984,6 +988,9 @@ def analyze_document(document_text, title, client=None):
             verified.append(result)
         elif reason:
             reasons.append(reason)
+    if stats is not None:
+        stats.update(proposed=len(raw_segments), verified=len(verified),
+                     dropped=len(raw_segments) - len(verified))
 
     if not verified:
         # Everything about the failure, to Vercel's function logs only (never

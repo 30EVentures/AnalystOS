@@ -1,0 +1,53 @@
+{
+  "aao": "0.1",
+  "name": "AnalystOS",
+  "slug": "analystos",
+  "description": "Reads a source document and returns a report in which every figure is a verified quote or an independently recomputed calculation.",
+  "accountableTo": "30eventures@gmail.com",
+  "escalation": "verification",
+  "roles": [
+    {
+      "name": "analysis",
+      "family": "data",
+      "purpose": "Reads one source document and drafts a cited report from verified facts only.",
+      "measure": "Reports delivered at the written tier, with both quality gates passed, as a share of reports delivered",
+      "capabilities": [
+        "extract",
+        "analyze",
+        "cite"
+      ],
+      "humanApprovalAtOrAbove": "MEDIUM"
+    },
+    {
+      "name": "verification",
+      "family": "risk",
+      "purpose": "Recomputes every calculation and refuses any figure it cannot prove against the source.",
+      "measure": "Facts refused for failing verification, as a share of facts proposed",
+      "capabilities": [
+        "verify",
+        "refuse"
+      ],
+      "humanApprovalAtOrAbove": "HIGH"
+    },
+    {
+      "name": "evidence",
+      "family": "governance",
+      "purpose": "Seals each delivered report so a stranger can re-verify it offline.",
+      "measure": "Delivered reports whose seal re-verifies offline, as a share of reports delivered",
+      "capabilities": [
+        "seal",
+        "publish",
+        "reverify"
+      ],
+      "humanApprovalAtOrAbove": "HIGH"
+    }
+  ],
+  "network": {
+    "offers": [
+      "document-analysis"
+    ],
+    "wants": [
+      "design-partner-documents"
+    ]
+  }
+}

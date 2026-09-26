@@ -64,6 +64,7 @@ from analystos.l1.detect import extract_any
 from analystos.l1.boilerplate import strip_forward_looking_boilerplate
 from analystos.l1.document_text import extract_document_text
 from analystos.l1.image_facts import tag_image_sourced_segments
+from analystos.l4.seal import build_bundle, load_signing_key
 from analystos.l4.deterministic_report import build_deterministic_report
 from analystos.l2.analyze import analyze_document
 from analystos.l2.answer import answer_growth, answer_lookup, answer_ratio
@@ -124,6 +125,15 @@ def _run_ask(rows, source, ask):
     raise ValueError(f"unknown ask kind: {kind!r}")
 
 
+def _fill_trace(trace, tier, source_hash, segments, report, document_text, analysis, reason=None):
+    if trace is None:
+        return
+    trace.update(
+        tier=tier, source_hash=source_hash, segments=segments, report=report,
+        document_text=document_text, analysis=dict(analysis), fallback_reason=reason,
+    )
+
+
 def build_report(
     source_path,
     schema=None,
@@ -136,6 +146,7 @@ def build_report(
     extract_options=None,
     llm_client=None,
     want_pdf=False,
+    trace=None,
 ):
     """Run L0 -> L1 -> L2 -> L4 for one source file; return the section text.
 
@@ -158,6 +169,13 @@ def build_report(
     ``render_rich_pdf`` for the rich (v4) report, ``render_pdf`` (the
     existing flat renderer) for the plain-fallback or schema/template
     path - so one call produces both without re-running the pipeline.
+
+    ``trace``, when a dict is passed, is filled with what the run did, for a
+    caller that must seal or log it (Slice 60): ``tier`` ("written",
+    "deterministic", "plain" or "table"), ``source_hash``, ``segments`` and
+    ``report`` (the structure that was rendered; ``None`` for plain/table),
+    ``document_text``, ``analysis`` (proposed/verified/dropped counts) and
+    ``fallback_reason``. It never changes what is returned.
     """
     if asks is not None and template is not None:
         raise ValueError('exactly one of "asks" or "template" is required')
@@ -170,7 +188,8 @@ def build_report(
     if asks is None and template is None:
         document_text = extract_document_text(source_path, client=llm_client)  # L1 (text)
         document_text = strip_forward_looking_boilerplate(document_text)    # L1 (legal boilerplate out)
-        segments = analyze_document(document_text, title, client=llm_client)  # L2 (verified)
+        analysis_stats = {}
+        segments = analyze_document(document_text, title, client=llm_client, stats=analysis_stats)  # L2 (verified)
         segments = tag_image_sourced_segments(segments, document_text)       # L1 (image provenance)
         # currency_unit ("thousands"/"millions") means "the source data is
         # pre-scaled by this factor" - true of a CSV/Excel table whose
@@ -225,10 +244,12 @@ def build_report(
                     )
                 raise ValueError(f"Gate 2 (language quality) did not pass after repair ({len(issues)} issue(s))")
             html = render_rich_report(report, segments, source_hash, "actual")  # L4 (rich HTML)
+            _fill_trace(trace, "written", source_hash, segments, report, document_text, analysis_stats)
             if want_pdf:
                 return html, render_rich_pdf(report, segments, source_hash, "actual")
             return html
         except ValueError as exc:
+            reason = str(exc)
             print(f"[analystos.pipeline] rich report fell back: {exc}", file=sys.stderr)
             # Slice 52 - a mandatory, deterministic floor: zero model
             # calls, so it cannot fail Gate 1/Gate 2 the way the
@@ -240,6 +261,8 @@ def build_report(
             deterministic = build_deterministic_report(segments, title)
             if deterministic is not None:
                 html = render_rich_report(deterministic, segments, source_hash, "actual")
+                _fill_trace(trace, "deterministic", source_hash, segments, deterministic, document_text,
+                            analysis_stats, reason)
                 if want_pdf:
                     return html, render_rich_pdf(deterministic, segments, source_hash, "actual")
                 return html
@@ -249,6 +272,7 @@ def build_report(
                 file=sys.stderr,
             )
             plain = render_narrated_section(title, source_hash, segments, "actual")  # L4 (plain fallback)
+            _fill_trace(trace, "plain", source_hash, segments, None, document_text, analysis_stats, reason)
             if want_pdf:
                 return plain, render_pdf(plain)
             return plain
@@ -276,12 +300,13 @@ def build_report(
         findings.append({"text": ask["text"], "format": ask.get("format"), **result})
 
     section = render_section(title, findings, currency_unit)                # L4
+    _fill_trace(trace, "table", source_hash, [], None, None, {})
     if want_pdf:
         return section, render_pdf(section)
     return section
 
 
-def run_job(job_dir, evidence_dir=None, want_pdf=False):
+def run_job(job_dir, evidence_dir=None, want_pdf=False, trace=None):
     """Run the job in ``job_dir`` (reads job.json); return the section text.
 
     ``build_report`` raises only if job.json has *both* "asks" and
@@ -303,6 +328,7 @@ def run_job(job_dir, evidence_dir=None, want_pdf=False):
         evidence_dir=evidence_dir,
         extract_options=job,
         want_pdf=want_pdf,
+        trace=trace,
     )
 
 
@@ -312,7 +338,8 @@ def main(argv=None):
         print("usage: python3 -m analystos <job-dir>", file=sys.stderr)
         return 2
     job_dir = Path(argv[0])
-    section, pdf_bytes = run_job(job_dir, want_pdf=True)
+    trace = {}
+    section, pdf_bytes = run_job(job_dir, want_pdf=True, trace=trace)
     html_path = job_dir / "section.html"
     pdf_path = job_dir / "section.pdf"
 
@@ -325,6 +352,14 @@ def main(argv=None):
         html_path.write_text(section, encoding="utf-8")
         pdf_path.write_bytes(pdf_bytes)
         print(f"(written to {html_path} and {pdf_path})", file=sys.stderr)
+        # Slice 60: a narrated report is sealed next to its HTML. Signed only
+        # when ANALYSTOS_SEAL_KEY is set; otherwise integrity-only.
+        if trace.get("segments"):
+            seal_path = job_dir / "section.seal.json"
+            bundle = build_bundle(trace, signing_key=load_signing_key())
+            seal_path.write_text(json.dumps(bundle, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            signed = "signed" if bundle["signature"] else "unsigned"
+            print(f"(sealed, {signed}: {seal_path})", file=sys.stderr)
     else:
         md_path = job_dir / "section.md"
         md_path.write_text(section, encoding="utf-8")

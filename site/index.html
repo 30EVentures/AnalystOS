@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AnalystOS: every number in the report, proven</title>
+<link rel="api-catalog" href="/.well-known/api-catalog">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;500;600&display=swap" rel="stylesheet">
@@ -288,7 +290,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
 
     <div class="stats">
       <div class="stat"><strong>5</strong><span>file formats read: CSV, Excel, Word, PowerPoint, PDF</span></div>
-      <div class="stat"><strong>503</strong><span>automated tests passing</span></div>
+      <div class="stat"><strong>673</strong><span>automated tests passing</span></div>
       <div class="stat"><strong>3</strong><span>report tiers, so a weak AI draft degrades quality, not trust</span></div>
       <div class="stat"><strong>49</strong><span>written specs behind the build</span></div>
     </div>
@@ -410,7 +412,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
     <details>
       <summary><span>Evidence store <span class="tag t-built">Built</span></span></summary>
       <div class="dbody"><ul>
-        <li>Every upload is saved once, named by the SHA-256 fingerprint of its content, and encrypted at rest.</li>
+        <li>When you run AnalystOS yourself, every source file is saved once, named by the SHA-256 fingerprint of its content, and encrypted at rest with a key you set. If you set none, a development key that is public in the source is used, which only stops casual reading. The hosted upload page does not keep the file (see Trust).</li>
         <li>Optional automatic purge of old evidence after a set number of days.</li>
       </ul></div>
     </details>
@@ -438,13 +440,13 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
       <div class="dbody"><ul>
         <li>A writer call structures the report from verified facts only. It cites facts by index and cannot type a number.</li>
         <li>An independent proofreader judges prose quality without seeing the data, with a rubric against filler and fact-listing, plus up to two repair rounds.</li>
-        <li>GAAP, non-GAAP and guidance labels appear wherever a figure appears.</li>
+        <li>Non-GAAP, guidance and image-read figures are tagged in the text, on KPI tiles, in a note under each chart, and in footnotes. The writer model assigns those labels and they are not yet checked against the source.</li>
       </ul></div>
     </details>
     <details>
       <summary><span>Delivery <span class="tag t-built">Built</span></span></summary>
       <div class="dbody"><ul>
-        <li>Reports render to HTML and to a real server-generated PDF with bundled IBM Plex fonts, not a print-to-PDF.</li>
+        <li>Reports render to HTML, and the code can also produce a real generated PDF with bundled IBM Plex fonts (command line and library). The hosted upload page currently returns HTML with a print button, not the generated PDF.</li>
         <li>Two visual styles: a flat report with footnotes, and a rich report with executive summary, KPI strip, inline charts and a separate outlook block.</li>
         <li>Charts are plain inline SVG with no charting library.</li>
         <li>A zero-model fallback assembles a full report from verified facts using fixed templates.</li>
@@ -461,8 +463,8 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
     <details>
       <summary><span>Testing <span class="tag t-built">Built</span></span></summary>
       <div class="dbody"><ul>
-        <li>503 automated tests with mocked calls: no network, no cost, passing in about 2.3 seconds.</li>
-        <li>A separate manual suite makes real, paid model calls against four fixed real documents, under a hard $1.00 spend ceiling.</li>
+        <li>673 automated tests with mocked calls: no network, no cost, passing in about 3 seconds.</li>
+        <li>A separate manual suite makes real, paid model calls against four fixed test documents, under a hard $1.00 spend ceiling.</li>
       </ul></div>
     </details>
     <details>
@@ -537,13 +539,14 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
 
     <div class="flow" style="margin-top:22px">
       <div class="card">
-        <span class="tag t-local">Stays on your machine</span>
+        <span class="tag t-local">No model call</span>
         <ul>
-          <li>The original file and the encrypted evidence store</li>
           <li>Table extraction</li>
           <li>All citation and number verification</li>
           <li>Both fallback report tiers</li>
           <li>Everything on the structured, template path</li>
+          <li>When you run it yourself, the original file and the encrypted evidence store stay on your machine</li>
+          <li>On the hosted upload page, your file is uploaded to our server, processed in a temporary folder and deleted when the request ends. Nothing is retained.</li>
         </ul>
       </div>
       <div class="card">
@@ -560,10 +563,10 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
         <h4 style="font-size:20px;margin-bottom:8px">Controls in place</h4>
         <ul class="clean">
           <li>Two independent quality gates: one for correctness, one for prose, each blind to the other&rsquo;s inputs.</li>
-          <li>Three-tier fallback: written report, then zero-AI template report, then plain fact list. A report is never lost and never shown unverified.</li>
+          <li>Three-tier fallback: written report, then zero-AI template report, then plain fact list. If a writing step fails, the report degrades but no figure is shown unverified. If a file cannot be read at all, no report is produced.</li>
           <li>PDF tables need a person&rsquo;s confirmation before they can be cited.</li>
-          <li>A figure is tagged GAAP only if the source says so; otherwise it defaults to &ldquo;n/a&rdquo;.</li>
-          <li>Forward-looking figures are visibly tagged wherever they appear.</li>
+          <li>A figure is tagged non-GAAP or forward-looking by the writer model&rsquo;s reading of the source. That label is not yet checked in code, and an unlabeled figure is treated as reported.</li>
+          <li>Tagged figures show their tag in the text, on KPI tiles, in a chart note and in footnotes.</li>
           <li>Every fallback and its reason is logged.</li>
           <li>Spend safety: an optional cap on API calls, an account-level monthly cap, and a $1.00 ceiling in the live test runner.</li>
         </ul>
@@ -574,6 +577,9 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
           <li>Early-stage security posture: one shared access code and no per-user accounts yet. No audit log, no policy engine, no SOC 2 and no external security review yet.</li>
           <li>It analyzes one document at a time. There is no peer, sector or market-data benchmarking.</li>
           <li>Scanned, image-only PDFs that need OCR are out of scope.</li>
+          <li>Every figure is proven. The relationships between figures are only partly checked: a sentence&rsquo;s named endpoints must match the change it cites, and spelled-out quantities are refused, but other wrong connections between real numbers can still pass.</li>
+          <li>Running the same document twice can prove a different number of facts, because the model that proposes them is not deterministic.</li>
+          <li>The hosted page returns one report per upload, with no durable link, saved history or audit trail.</li>
           <li>On the structured path, the currency scale (thousands, millions, actual) is set by hand and a mistake there produces a confidently wrong number.</li>
           <li>Whether a real model consistently writes to the intended quality is the project&rsquo;s own stated open question, and live-run defects were still being found and fixed on 2026-09-12.</li>
         </ul>
@@ -588,9 +594,9 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
     <div class="sh"><h2>Evidence, and what hasn&rsquo;t been measured</h2></div>
     <p class="lede">Only figures found in the project are shown here.</p>
     <div class="grid g3">
-      <div class="card"><b style="font-family:var(--display);font-size:28px">503 / 503</b><p class="note" style="margin:4px 0 0">automated tests passing, run in 2.3 seconds</p></div>
-      <div class="card"><b style="font-family:var(--display);font-size:28px">4 real documents</b><p class="note" style="margin:4px 0 0">in a live test suite with paid model calls, capped at $1.00 and typically a few cents to a few tens of cents per full run</p></div>
-      <div class="card"><b style="font-family:var(--display);font-size:28px">49 specs</b><p class="note" style="margin:4px 0 0">written before the code they describe, each with a &ldquo;done when&rdquo; and a retrospective</p></div>
+      <div class="card"><b style="font-family:var(--display);font-size:28px">673 / 673</b><p class="note" style="margin:4px 0 0">automated tests passing, run in about 3 seconds</p></div>
+      <div class="card"><b style="font-family:var(--display);font-size:28px">4 fixed test documents</b><p class="note" style="margin:4px 0 0">generated for testing, run in a live suite with paid model calls, capped at $1.00 and typically a few cents to a few tens of cents per full run</p></div>
+      <div class="card"><b style="font-family:var(--display);font-size:28px">57 specs</b><p class="note" style="margin:4px 0 0">written before the code they describe, each with a &ldquo;done when&rdquo; check</p></div>
     </div>
     <div class="card" style="margin-top:16px">
       <h4 style="font-size:20px;margin-bottom:8px">A defect, and how it was closed</h4>
@@ -656,12 +662,12 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
   <div class="wrap">
     <div class="sh"><h2>Questions you are likely to ask</h2></div>
     <details><summary>How is this different from asking a chat AI to summarize a document?</summary><div class="dbody">A chat AI reports its own sources. Here the model only proposes facts. Ordinary code then confirms each quote exists in the source and recomputes each calculation, and unproven facts are discarded. The writing step sees only verified facts and can refer to them by index, not type a number.</div></details>
-    <details><summary>What if the AI writes something poor?</summary><div class="dbody">Two independent quality gates check every report, with up to two repair rounds. If they still fail, the system falls back to a template report with no AI writing, then to a plain list of verified facts. A bad response lowers the quality of a report, not its trustworthiness.</div></details>
-    <details><summary>What data leaves my environment?</summary><div class="dbody">On the narrated path, the extracted text of the document, and any cropped embedded images, go to Anthropic&rsquo;s API. The original file, the evidence store and all verification stay local. The structured template path makes no external calls.</div></details>
+    <details><summary>What if the AI writes something poor?</summary><div class="dbody">Two independent quality gates check every report, with up to two repair rounds. If they still fail, the system falls back to a template report with no AI writing, then to a plain list of verified facts. A bad response lowers the quality of a report, not the proof behind each figure. What is proven is each figure; only some of the relationships between figures are checked (see Known limits).</div></details>
+    <details><summary>What data leaves my environment?</summary><div class="dbody">On the narrated path, the extracted text of the document, and any cropped embedded images, go to Anthropic&rsquo;s API. On the hosted upload page the file is also uploaded to our server for the length of one request and then deleted. If you run AnalystOS yourself, the original file and the evidence store stay on your machine. The structured template path makes no model call.</div></details>
     <details><summary>Which files does it accept?</summary><div class="dbody">CSV, Excel, Word, PowerPoint and PDF. Scanned, image-only PDFs that need OCR are not supported yet.</div></details>
     <details><summary>Can it compare against peers or market data?</summary><div class="dbody">No. It sees one document, by design for now, and has no integration with market data, news or accounting systems.</div></details>
     <details><summary>Is it ready for confidential production data?</summary><div class="dbody">Not yet. Access is a single shared code and there are no per-user accounts, audit log or policy engine, and no SOC 2 or external security review. That is why the pilot starts with non-confidential documents. Those controls are on the roadmap.</div></details>
-    <details><summary>How do you know it works?</summary><div class="dbody">503 automated tests, a live suite of real model calls on four real documents, and a defect log with root causes and proof of each fix. What does not exist yet is an accuracy benchmark on writing quality, which is one of the things a pilot would create.</div></details>
+    <details><summary>How do you know it works?</summary><div class="dbody">673 automated tests, a live suite of real model calls on four fixed test documents, and a defect log with root causes and proof of each fix. What does not exist yet is an accuracy benchmark on writing quality, which is one of the things a pilot would create.</div></details>
   </div>
 </section>
 
@@ -700,7 +706,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
       <h4>Why it is different</h4>
       <p>A model proposes facts, but ordinary code proves each one and discards the rest. The writing step can cite facts by index and cannot type a number. Two independent quality gates and a three-tier fallback mean a weak draft lowers a report&rsquo;s quality, never its trustworthiness.</p>
       <h4>Where it stands</h4>
-      <p>Built solo, early stage. Reading, verification, writing, PDF and HTML delivery and a live upload page work, with 503 automated tests passing. Writing quality is still being tuned. Accounts, audit log, policy engine and SOC 2 are planned, not built.</p>
+      <p>Built solo, early stage. Reading, verification, writing, PDF and HTML delivery and a live upload page work, with 673 automated tests passing. Writing quality is still being tuned. Accounts, audit log, policy engine and SOC 2 are planned, not built.</p>
       <h4>What has not been measured</h4>
       <p>No accuracy benchmark for writing quality, no adoption data, no commercial metrics.</p>
       <h4>Proposed next step</h4>
@@ -771,13 +777,13 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
 
   /* pipeline */
   var PIPE = [
-    {tag:'L0', name:'Store', where:'local', body:'Your file is saved once, named by the SHA-256 fingerprint of its content, and encrypted at rest. An optional setting purges old evidence after a set number of days.'},
+    {tag:'L0', name:'Store', where:'local', body:'In a local run, your file is saved once, named by the SHA-256 fingerprint of its content, and encrypted at rest. An optional setting purges old evidence after a set number of days. The hosted upload page skips this step and deletes the file after the request.'},
     {tag:'L1', name:'Read', where:'local', body:'Any supported file becomes a table or plain text. Number formats are cleaned the same way for every format, legal forward-looking boilerplate is stripped, Word footnotes are linked, and two-column PDFs are read in order. Charts embedded in a PDF are transcribed by a vision model and tagged as image-derived, which is the one part of this stage that calls a model.'},
     {tag:'L2', name:'Propose and prove', where:'ext', body:'Model call one reads the document and proposes facts. Ordinary code then checks each: quotes must be real substrings of the source, and calculations are recomputed and dropped on mismatch. Anything unproven is discarded and never shown. The model proposes; the software decides.'},
     {tag:'Gate 1', name:'Write', where:'ext', body:'Model call two decides structure and wording, seeing only the already-verified facts, not the raw document. It refers to facts by index number and cannot type a number itself. Correctness is checked here.'},
     {tag:'Gate 2', name:'Proofread', where:'ext', body:'Model call three judges only the prose: grammar, filler, and whether the analysis genuinely connects facts into a judgment. It is blind to the data. If it fails, up to two targeted repair rounds run.'},
     {tag:'Fallback', name:'Degrade safely', where:'local', body:'If a gate fails and cannot be repaired, a zero-model template report is assembled from verified facts: KPI strip, one chart, fixed-pattern analytical sentences. If even that has too few facts, one plain sentence per fact. A bad AI response lowers the quality of a report, never its trustworthiness.'},
-    {tag:'L4', name:'Deliver', where:'local', body:'The report renders to HTML and to a real server-generated PDF, with every number footnoted to its exact source.'}
+    {tag:'L4', name:'Deliver', where:'local', body:'The report renders to HTML, and the code can generate a real PDF, with every number footnoted to its exact source.'}
   ];
   var pipeEl = $('#pipe');
   PIPE.forEach(function(p, i){
@@ -790,7 +796,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
   function pipeSet(i){
     $$('.pn', pipeEl).forEach(function(b, j){ b.setAttribute('aria-pressed', i === j ? 'true' : 'false'); });
     var p = PIPE[i];
-    var w = p.where === 'local' ? '<span class="tag t-local">Runs locally</span>' : '<span class="tag t-ext">Calls a model</span>';
+    var w = p.where === 'local' ? '<span class="tag t-local">No model call</span>' : '<span class="tag t-ext">Calls a model</span>';
     $('#pipeDetail').innerHTML = '<div class="row" style="margin-bottom:8px">' + w + '</div><h3>' + p.name + '</h3><p style="margin:0;max-width:70ch">' + p.body + '</p>';
   }
   pipeSet(0);
@@ -918,7 +924,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
     {name:'Provable facts', st:'built', stl:'Built', when:'Working today',
      out:'A set of facts, each a verbatim quote or an independently recomputed calculation, with a footnote to its exact source.',
      build:'Evidence store, readers for five formats, fact extraction and verification, and the zero-model fallback.',
-     meas:'503 mocked tests passing, plus a live suite of real model calls on four real documents under a $1.00 ceiling.',
+     meas:'673 mocked tests passing, plus a live suite of real model calls on four fixed test documents under a $1.00 ceiling.',
      ctl:'PDF tables need a person\u2019s confirmation before citing. Unproven facts are discarded.'},
     {name:'Written like an analyst', st:'prog', stl:'In progress', today:true, when:'Active now. Latest fixes dated 2026-09-12.',
      out:'An executive summary, sectioned analysis, a chart, a disclosure-gap section and a separate outlook block, in prose that connects facts into judgments.',

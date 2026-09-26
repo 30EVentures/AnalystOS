@@ -221,6 +221,16 @@ State a "difference" as a plain magnitude ("changed by {{N}}", "a gap of \
 gets the whole narrative rejected - a real fact rendered with the wrong \
 direction word is a wrong report, even though the number itself is real.
 
+Name a change's endpoints only if they are the change's own. When a \
+sentence cites a "growth_percent" or "difference" fact and also says where \
+it ran "from {{N}}" or "to {{N}}", those two facts must be the two \
+operands that change was computed from - not neighbouring periods. A \
+four-quarter change must not be written as if it ran between the last two \
+quarters. Do not write any quantity in words either ("twenty percent," \
+"doubled," "two-thirds," "a third of," "double-digit," "twice"): cite a \
+fact with {{N}}, or describe the move without quantifying it. Both are \
+checked and a violation gets the paragraph sent back for repair.
+
 This rule bites hardest, and most often, on a margin or rate's \
 period-over-period move (gross margin, operating margin, any percentage- \
 point change) - the manifest almost always carries that as a "difference" \
@@ -702,14 +712,193 @@ def _fake_placeholder_problem(text):
     return None
 
 
+_ENDPOINT_QUALIFIER = r"(?:(?:about|roughly|approximately|nearly|around)\s+)?"
+_FROM_RE = re.compile(
+    r"\bfrom\s+" + _ENDPOINT_QUALIFIER + r"\{\{(\d+)\}\}"
+    r"(?:\s*(?:to|through|down\s+to|up\s+to)\s+" + _ENDPOINT_QUALIFIER + r"\{\{(\d+)\}\})?",
+    re.IGNORECASE,
+)
+_TO_RE = re.compile(r"\b(\w+)\s+to\s+" + _ENDPOINT_QUALIFIER + r"\{\{(\d+)\}\}", re.IGNORECASE)
+_NOT_AN_ENDPOINT_TO = {
+    "compared", "relative", "due", "according", "prior", "addition", "thanks", "owing",
+    "next", "close", "equal", "related", "similar", "subject", "attributable",
+    "attributed", "contributed", "compare", "comparable", "opposed",
+}
+_MOVE_WORDS_RE = re.compile(
+    r"\b(moved|shifted|reached|settled|slipped|slid|narrowed|widened|edged|ticked)\b",
+    re.IGNORECASE,
+)
+
+
+def _same_number(a, b):
+    return abs(a - b) <= 1e-6 * max(1.0, abs(a), abs(b))
+
+
+def _change_facts(sentence, segments):
+    found = []
+    for pm in _PLACEHOLDER_RE.finditer(sentence):
+        index = int(pm.group(1))
+        if index >= len(segments):
+            continue
+        seg = segments[index]
+        operands = seg.get("operands") or []
+        if (
+            seg.get("type") == "computed"
+            and seg.get("operation") in ("growth_percent", "difference")
+            and len(operands) == 2
+        ):
+            found.append((index, operands))
+    return found
+
+
+def _endpoint_problem(text, segments):
+    """A sentence that cites a verified change ("fell {{c}}") and also names
+    its endpoints ("to {{b}} from {{a}}") must name the change's *own*
+    endpoints - the two operands the software recomputed it from.
+
+    Found in a real run that passed both gates (audit 2026-09-25, finding
+    1): "Gross margin moved (4.7%) points to 54.2% from 55.8%". The 4.7 was
+    a correct four-quarter change (58.9 -> 54.2) and both quotes were real,
+    but 55.8 -> 54.2 is 1.6 points. Only explicit "from {{i}}", "from {{i}}
+    to {{j}}" and a moved-to "to {{j}}" (after a direction or movement word
+    in the sentence) are checked; operand order is not, because a
+    growth_percent accepts either order. A sentence with no two-operand
+    change fact, or endpoints that are not plain quotes, is left alone.
+    """
+    for sentence in re.split(r"(?<=[.!?])\s+", text):
+        changes = _change_facts(sentence, segments)
+        if not changes:
+            continue
+        pairs, singles = [], []
+        for m in _FROM_RE.finditer(sentence):
+            if m.group(2) is not None:
+                pairs.append((int(m.group(1)), int(m.group(2))))
+            else:
+                singles.append(int(m.group(1)))
+        has_direction = bool(
+            _UP_WORDS_RE.search(sentence) or _DOWN_WORDS_RE.search(sentence)
+            or _MOVE_WORDS_RE.search(sentence)
+        )
+        if has_direction:
+            for m in _TO_RE.finditer(sentence):
+                if m.group(1).lower() in _NOT_AN_ENDPOINT_TO:
+                    continue
+                idx = int(m.group(2))
+                if any(idx == p_[1] for p_ in pairs):
+                    continue
+                singles.append(idx)
+
+        def quote_value(i):
+            if i >= len(segments):
+                return None
+            seg = segments[i]
+            return seg.get("value") if seg.get("type") == "quote" else None
+
+        def describe(index, operands):
+            return f"fact {index} is a verified change between {operands[0]:g} and {operands[1]:g}"
+
+        for a, b in pairs:
+            va, vb = quote_value(a), quote_value(b)
+            if va is None or vb is None:
+                continue
+            if not any(
+                (_same_number(va, o[0]) and _same_number(vb, o[1]))
+                or (_same_number(va, o[1]) and _same_number(vb, o[0]))
+                for _, o in changes
+            ):
+                idx, ops = changes[0]
+                return (
+                    f"{describe(idx, ops)}, but the sentence presents it as running from "
+                    f"fact {a} to fact {b} ({va:g} to {vb:g}) - name only the change's own "
+                    f"endpoints, or cite a change fact computed between the endpoints you name"
+                )
+        for i in singles:
+            v = quote_value(i)
+            if v is None:
+                continue
+            if not any(_same_number(v, x) for _, o in changes for x in o):
+                idx, ops = changes[0]
+                return (
+                    f"{describe(idx, ops)}, but the sentence names fact {i} ({v:g}) as an "
+                    f"endpoint of it - name only the change's own endpoints, or cite a "
+                    f"change fact computed between the endpoints you name"
+                )
+    return None
+
+
+_NUM_WORD = (
+    r"(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|"
+    r"fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|"
+    r"sixty|seventy|eighty|ninety|hundred)(?:[- ](?:one|two|three|four|five|six|seven|eight|nine))?"
+)
+_QUANTITY_UNIT = (
+    r"(?:percent|per\s?cent|percentage\s+points?|basis\s+points?|bps|cents?|dollars?|"
+    r"euros?|million|billion|trillion|thousand|hundred|times)"
+)
+_FRACTION_UNIT = r"(?:halves|half|thirds?|fourths?|fifths?|sixths?|sevenths?|eighths?|ninths?|tenths?)"
+_NUMBER_WORD_RES = (
+    (re.compile(r"\b" + _NUM_WORD + r"\s+" + _QUANTITY_UNIT + r"\b", re.IGNORECASE), "a spelled-out amount"),
+    (re.compile(r"\b" + _NUM_WORD + r"[- ]" + _FRACTION_UNIT + r"\b", re.IGNORECASE), "a spelled-out fraction"),
+    (
+        re.compile(r"\b(?:a|one)[ -](?:third|half|fifth|tenth|sixth|quarter)\s+(?:of|more|less|higher|lower)\b", re.IGNORECASE),
+        "a spelled-out fraction",
+    ),
+    (
+        re.compile(
+            r"\b(?:doubl(?:ed|es|ing)|tripl(?:ed|es|ing)|quadrupl(?:ed|es|ing)|halv(?:ed|es|ing)|"
+            r"(?:two|three|four|five|six|seven|eight|nine|ten)fold|twice|thrice|"
+            r"(?:double|triple|single)-digits?|(?:double|triple|single)\s+digits?)\b",
+            re.IGNORECASE,
+        ),
+        "a spelled-out multiplier",
+    ),
+)
+_HALF_OF_RE = re.compile(r"\bhalf\s+of\b", re.IGNORECASE)
+_HALF_OF_PERIOD_RE = re.compile(
+    r"\b(?:first|second|latter|back|front|other)\s+half\s+of\b|\bhalf\s+of\s+(?:the\s+)?(?:fiscal|calendar|year|period|quarter)\b",
+    re.IGNORECASE,
+)
+
+
+def _number_word_problem(text):
+    """Digits outside a placeholder are already refused, but a writer can
+    state a quantity in words - "grew twenty percent", "roughly doubled",
+    "about two-thirds", "by nearly a third" - and none of those were
+    checked (audit 2026-09-25, finding 2), nor can Gate 2 catch them (it
+    never sees the data). A spelled-out amount, fraction or multiplier is
+    a number the software cannot verify, so it is refused the same way a
+    typed digit is; the writer must cite a {{N}} fact or describe the
+    move without quantifying it.
+    """
+    stripped = _PLACEHOLDER_RE.sub("", text)
+    for regex, kind in _NUMBER_WORD_RES:
+        match = regex.search(stripped)
+        if match:
+            return (
+                f'contains {kind} ("{match.group(0)}") outside a {{{{N}}}} placeholder - '
+                f"cite a verified fact, or describe the move without quantifying it"
+            )
+    for match in _HALF_OF_RE.finditer(stripped):
+        window = stripped[max(0, match.start() - 8):match.end() + 20]
+        if _HALF_OF_PERIOD_RE.search(window):
+            continue
+        return (
+            f'contains a spelled-out fraction ("{match.group(0)}") outside a {{{{N}}}} '
+            f"placeholder - cite a verified fact, or describe the move without quantifying it"
+        )
+    return None
+
+
 def _validate_paragraph(text, segments):
     """``None`` if the paragraph is trustworthy - every {{N}} is a real
     manifest index (never a fake, non-numeric placeholder) pointing to
     a real, citable fact, no digit appears outside a placeholder, no
     placeholder is followed by a redundant spelled-out unit, any
     directional word next to a computed fact matches its real direction,
-    and any "N consecutive quarters" claim is consistent with the period
-    figures cited in the same sentence - otherwise a short human-readable
+    any "N consecutive quarters" claim is consistent with the period
+    figures cited in the same sentence, no quantity is spelled out in
+    words, and a change fact's named endpoints are its own operands -
+    otherwise a short human-readable
     reason it isn't, so a rejection can be logged with something more
     useful than just "it failed."
     """
@@ -729,6 +918,12 @@ def _validate_paragraph(text, segments):
     if problem:
         return problem
     problem = _direction_problem(text, segments)
+    if problem:
+        return problem
+    problem = _number_word_problem(text)
+    if problem:
+        return problem
+    problem = _endpoint_problem(text, segments)
     if problem:
         return problem
     return _consecutive_count_problem(text, segments)

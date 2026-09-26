@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://analystos.dev/</loc></url>
+  <url><loc>https://analystos.dev/upload.html</loc></url>
+  <url><loc>https://analystos.dev/llms.txt</loc></url>
+  <url><loc>https://analystos.dev/llms-full.txt</loc></url>
+  <url><loc>https://analystos.dev/api/v1/openapi.json</loc></url>
+  <url><loc>https://analystos.dev/docs/api.md</loc></url>
+  <url><loc>https://analystos.dev/docs/seal.md</loc></url>
+  <url><loc>https://analystos.dev/docs/aao.md</loc></url>
+  <url><loc>https://analystos.dev/docs/mesh-identity.md</loc></url>
+  <url><loc>https://analystos.dev/docs/architecture.md</loc></url>
+  <url><loc>https://analystos.dev/docs/using-analystos.md</loc></url>
+</urlset>

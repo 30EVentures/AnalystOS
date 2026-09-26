@@ -104,6 +104,41 @@ then build the frontend controls last. Full plan in `docs/decisions.md`.
   section structure, which is its own follow-up  ✓ done (PR #43) - not
   yet live-tested (no L2 stage produces this shape yet)
 
+### Since Slice 28 — quality, hardening, and the mesh groundwork
+
+Recorded from the specs (`specs/slice-N/spec.md`) and `docs/decisions.md`.
+Slices 35-39 were built without a spec of their own (see the audit).
+
+- Slices 29-34 — extraction contract and horizon tags; the structured narrator
+  wired end to end; dated events as verified facts; verification that survives
+  real filings; the output-token ceiling.
+- Slice 40 — repair instead of regenerate, for both quality gates.
+- Slices 41-43 — per-IP rate limiting; an in-code API-call budget; L0
+  encryption at rest and a retention policy.
+- Slices 44-47 — one table-parsing standard; GAAP vs non-GAAP labels;
+  boilerplate exclusion; organic-vs-inorganic splits; code-owned chart type.
+- Slices 48-54 — a real server-side PDF; Gate 2's prose rubric; multi-column
+  PDFs and image-derived facts; the paid live-test suite; the mandatory
+  deterministic floor and two root-cause fixes to it.
+- Slice 55 — Gate 1 checks a change's named endpoints and refuses
+  spelled-out quantities.
+- Slice 56 — one definition of a figure's basis, shown on KPI tiles, charts,
+  text and footnotes.
+- Slice 57 — public claims corrected to match the code.
+- Slice 58 — an AAO checker that follows the published schema, with rule codes.
+- Slice 59 — the `flashyos/1` handshake and AAO charter, in the repo (not
+  deployed).
+- Slice 60 — narrated reports are sealed (Merkle root, optional Ed25519) with a
+  standalone verifier.
+- Slice 61 — `/api/v1`: analyses, stored reports, signed links, verification,
+  OpenAPI (storage not durable on Vercel).
+- Slice 62 — machine navigation (`llms.txt`, API catalog, docs as markdown) and
+  documentation brought up to date.
+
+**Built but not deployed or verified in production:** Slices 59-62. Merging
+them is gated on the open decisions in `docs/mesh-identity.md` (who owns the
+existing `analystos` org on the FlashyOS network).
+
 ## R1 — trusted on one desk (Oct–Dec 2026)
 
 Attestation v1; weekly test cohort ~15.
@@ -113,29 +148,25 @@ Mesh, in this order (evidence and open questions:
 
 1. Resolve the `analystos` org that already exists on the FlashyOS network
    (created ~2026-09-03, 0 agents, capability `analytics`, owner unknown) -
-   claim it or agree its fate before creating anything.
-2. Serve `/.well-known/flashyos.json` (the `flashyos/1` handshake) and
-   `/.well-known/flashyos-charter.json` (an AAO 0.1 charter for slug
-   `analystos`) on the production domain. Both are 404 today. Validate the
-   charter against `https://flashyos.com/aao.schema.json`.
+   claim it or agree its fate before creating anything. **Open.**
+2. Serve `/.well-known/flashyos.json` and `/.well-known/flashyos-charter.json`
+   on the production domain. **Files written (Slice 59); not deployed** until
+   step 1 is settled.
 3. Run `npx @flashyos/conformance <domain> --level 2`. Levels 1-2 are
    self-claimed and need no account. Level 3 (authorized / revocable /
-   auditable) is read from FlashyOS's register and needs a running agent with
-   a record - it cannot be declared.
-4. Replace the invented rules in `analystos/aao/validate.py` with the
-   published schema plus its documented cross-field rules, and have it emit
-   machine-readable rule codes (it disagrees with the spec on 15 of 21
-   probes today).
-5. Only then: sign in at app.flashyos.com, mint an agent token, declare a
-   real capability. The "seven AAO questions" are four static ones answered
-   from the charter plus three runtime facts that stay "deferred" until the
-   org is live with tokens, events and decisions.
+   auditable) is read from FlashyOS's register and cannot be declared. **Not
+   run**: needs the site deployed and approval to run the npm package.
+4. Replace the invented rules in `analystos/aao/validate.py` with the published
+   schema plus its documented cross-field rules, emitting machine-readable
+   codes. **Done (Slice 58).**
+5. Only then: sign in at app.flashyos.com, mint an agent token, declare a real
+   capability. **Not started**; the callable endpoint it would point at exists
+   (Slice 61) but is not deployed, and its storage is not durable.
 
-Not in R1: "analysis calls fulfilled for other AAOs." That needs an
-agent-callable endpoint and a durable, access-controlled report URL - the
-mesh's task completion takes an https evidence URL, while FlashyOS's own
-guidance says never to send document contents to the mesh. Open questions are
-in the alignment doc, section 8.
+Not in R1: "analysis calls fulfilled for other AAOs" through the mesh. The
+endpoint and the signed, expiring report URL exist (Slice 61), but they need
+durable storage, a deployment, and a counterparty. Open questions are in the
+alignment doc, section 8.
 
 ## R2 — hardened at Gord (Q1–Q2 2027)
 

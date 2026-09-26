@@ -1,0 +1,33 @@
+# AnalystOS
+
+> Reads a source document and returns a report in which every figure is a verified quote or an independently recomputed calculation, sealed so anyone can re-verify it offline. Early stage: use non-confidential documents only.
+
+## API
+
+- [OpenAPI 3.1](https://analystos.dev/api/v1/openapi.json): every endpoint, request and response
+- [API index](https://analystos.dev/api/v1): machine-readable list of endpoints and limits
+- [API guide](https://analystos.dev/docs/api.md): Endpoints, auth, configuration and limits of /api/v1
+
+## Verifying a report
+
+- [Seal specification](https://analystos.dev/docs/seal.md): How a report is sealed and how anyone re-verifies it offline; includes a worked test vector
+- `POST https://analystos.dev/api/v1/verify`: stateless verification of any seal bundle, no account
+
+## Identity and the FlashyOS mesh
+
+- [Handshake](https://analystos.dev/.well-known/flashyos.json): flashyos/1
+- [Charter](https://analystos.dev/.well-known/flashyos-charter.json): AAO 0.1, three roles, each with a measure
+- [Mesh identity](https://analystos.dev/docs/mesh-identity.md): The handshake and charter AnalystOS publishes, and what it does not
+- [AAO charter checking](https://analystos.dev/docs/aao.md): The FlashyOS AAO 0.1 charter checker, its rule codes and its limits
+
+## Limits, stated plainly
+
+- [Trust and known limits](https://analystos.dev/#trust): what leaves your environment, what is and is not checked
+- Every figure is proven; only some relationships between figures are checked
+- Sealing proves a report was built from the sealed facts, not that the facts are the important ones
+
+## Optional
+
+- [Architecture](https://analystos.dev/docs/architecture.md): The layer model (L0-L6) and what is built
+- [Using AnalystOS](https://analystos.dev/docs/using-analystos.md): Running it yourself from the command line
+- [Full documentation in one file](https://analystos.dev/llms-full.txt)

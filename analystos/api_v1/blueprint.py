@@ -92,7 +92,7 @@ def index():
         "api_version": VERSION,
         "description": "Reads a source document and returns a report whose every figure is a verified quote or a recomputed calculation, sealed so it can be re-verified offline.",
         "openapi": "/api/v1/openapi.json",
-        "docs": "https://analystos.dev/docs/api",
+        "docs": "https://analystos.dev/docs/api.md",
         "endpoints": [
             {"method": "POST", "path": "/api/v1/analyses", "auth": "bearer", "summary": "Analyze one uploaded document"},
             {"method": "GET", "path": "/api/v1/reports/{id}", "auth": "bearer or signed link", "summary": "Fetch a stored report (?format=html|pdf|seal)"},
@@ -100,7 +100,7 @@ def index():
             {"method": "GET", "path": "/api/v1/verify/{id}", "auth": "none", "summary": "Seal metadata for a stored report"},
             {"method": "POST", "path": "/api/v1/verify", "auth": "none", "summary": "Verify a seal bundle"},
         ],
-        "seal_spec": "https://analystos.dev/docs/seal",
+        "seal_spec": "https://analystos.dev/docs/seal.md",
         "limits": {"max_upload_bytes": 10 * 1024 * 1024, "supported_extensions": sorted(SUPPORTED_EXTENSIONS)},
     })
 

@@ -20,7 +20,7 @@ def build_openapi():
         "info": {
             "title": "AnalystOS API",
             "version": "1",
-            "description": "Analyze a document into a report whose every figure is a verified quote or a recomputed calculation, sealed so anyone can re-verify it offline (see /docs/seal).",
+            "description": "Analyze a document into a report whose every figure is a verified quote or a recomputed calculation, sealed so anyone can re-verify it offline (see https://analystos.dev/docs/seal.md).",
         },
         "servers": [{"url": "https://analystos.dev"}],
         "paths": {
@@ -98,7 +98,7 @@ def build_openapi():
                 "Error": {"type": "object", "required": ["error"], "properties": {"error": {
                     "type": "object", "required": ["code", "message"],
                     "properties": {"code": {"type": "string"}, "message": {"type": "string"}}}}},
-                "SealBundle": {"type": "object", "description": "analystos-seal/1; specified in /docs/seal",
+                "SealBundle": {"type": "object", "description": "analystos-seal/1; specified in https://analystos.dev/docs/seal.md",
                                "required": ["format", "payload", "facts"], "properties": {
                                    "format": {"const": "analystos-seal/1"}, "payload": {"type": "object"},
                                    "facts": {"type": "array"}, "report": {"type": ["object", "null"]},

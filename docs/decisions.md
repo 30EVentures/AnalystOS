@@ -2,6 +2,23 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-25 - Gate 1 now checks relationships and spelled-out quantities (Slice 55)
+
+The code-verified audit (`docs/audit-2026-09-25.md`, findings 1-2) showed that
+"every number is proven" was true but weaker than it sounds. A real run passed
+both gates with "Gross margin moved (4.7%) points to 54.2% from 55.8%": three
+individually-correct figures joined by a wrong relationship (55.8 -> 54.2 is
+1.6 points; 4.7 is the four-quarter change). Separately, "grew twenty percent",
+"roughly doubled" and "about two-thirds" got through because only digits were
+banned.
+
+Two deterministic checks were added to `_validate_paragraph` (no model call,
+no dependency): a change fact's named endpoints must be its own two operands,
+and spelled-out amounts, fractions and multipliers are refused outside a
+placeholder. Deliberately narrow (explicit "from"/"to" wording only; two-operand
+`growth_percent`/`difference` only) so a false positive costs one repair call,
+not a lost report. Not claimed: that all wrong relationships are now caught.
+
 ## 2026-09-12 — the deterministic floor didn't recognize "Q3 FY2026" (Slice 54)
 
 A newly-generated test document ("Orion Industrial Group") hit Gate 1/

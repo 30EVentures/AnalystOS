@@ -699,6 +699,111 @@ class ManifestGaapStatusTest(unittest.TestCase):  # Slice 45
         manifest = _build_manifest(segs)
         self.assertIn("[guidance, non-gaap]", manifest)
 
+def _quote(label, value):
+    return {"type": "quote", "label": label, "value": value, "format": "percent", "citation": f"{value}%"}
+
+
+def _change(operation, a, b, result):
+    return {
+        "type": "computed", "operation": operation, "label": "Change", "value": result,
+        "format": "percent", "operands": [a, b], "citation": [f"{a}%", f"{b}%"],
+    }
+
+
+class EndpointGateTest(unittest.TestCase):  # Slice 55
+    """A sentence naming a change's endpoints must name its own operands
+    (the real Orion run: "moved (4.7%) points to 54.2% from 55.8%")."""
+
+    # margin path 58.9 -> 58.0 -> 57.1 -> 55.8 -> 54.2
+    SEGS = [
+        _change("difference", 58.9, 54.2, -4.7),   # 0: four-quarter change
+        _quote("Margin Q2", 54.2),                 # 1
+        _quote("Margin Q1", 55.8),                 # 2
+        _quote("Margin Q-4", 58.9),                # 3
+        _change("growth_percent", 55.8, 54.2, -2.9),  # 4
+        _change("growth_percent", 58.9, 54.2, -8.0),  # 5: same span as fact 0
+    ]
+
+    def test_the_orion_sentence_shape_is_rejected(self):
+        problem = _validate_paragraph("Gross margin moved {{0}} to {{1}} from {{2}}.", self.SEGS)
+        self.assertIsNotNone(problem)
+        self.assertIn("fact 0", problem)
+        self.assertIn("55.8", problem)
+
+    def test_a_from_to_pair_that_is_not_the_changes_endpoints_is_rejected(self):
+        problem = _validate_paragraph("Margin moved {{0}}, from {{2}} to {{1}}.", self.SEGS)
+        self.assertIsNotNone(problem)
+
+    def test_matching_endpoints_are_accepted_in_either_wording(self):
+        self.assertIsNone(_validate_paragraph("Gross margin moved {{0}} to {{1}} from {{3}}.", self.SEGS))
+        self.assertIsNone(_validate_paragraph("Gross margin moved {{0}}, from {{3}} to {{1}}.", self.SEGS))
+        self.assertIsNone(_validate_paragraph("Gross margin fell {{5}} to {{1}} from {{3}}.", self.SEGS))
+        self.assertIsNone(_validate_paragraph("Margin fell, from {{1}} to {{3}}, a move of {{0}}.", self.SEGS))
+
+    def test_a_growth_percent_with_reversed_operands_still_matches(self):
+        self.assertIsNone(_validate_paragraph("Margin declined {{4}} to {{1}} from {{2}}.", self.SEGS))
+
+    def test_compared_to_is_not_an_endpoint(self):
+        text = "Margin moved {{0}}, well below {{2}} compared to {{3}}."
+        self.assertIsNone(_validate_paragraph(text, self.SEGS))
+
+    def test_a_sentence_without_a_change_fact_is_left_alone(self):
+        self.assertIsNone(_validate_paragraph("Margin fell to {{1}} from {{2}}.", self.SEGS))
+
+    def test_a_change_fact_without_two_operands_is_left_alone(self):
+        segs = [dict(self.SEGS[0], operands=[58.9]), self.SEGS[1], self.SEGS[2]]
+        self.assertIsNone(_validate_paragraph("Gross margin moved {{0}} to {{1}} from {{2}}.", segs))
+
+    def test_only_the_sentence_with_the_change_is_checked(self):
+        text = "Margin moved {{0}} from {{3}}. Last quarter it fell to {{1}} from {{2}}."
+        self.assertIsNone(_validate_paragraph(text, self.SEGS))
+
+
+class NumberWordGateTest(unittest.TestCase):  # Slice 55
+    """The four bypass sentences from audit 2026-09-25 finding 2."""
+
+    SEGS = [_quote("Revenue", 10.0)]
+
+    def test_each_audit_bypass_sentence_is_rejected(self):
+        for text in (
+            "Revenue grew twenty percent to {{0}}.",
+            "Revenue roughly doubled to {{0}}.",
+            "About two-thirds of the growth came from one segment, reaching {{0}}.",
+            "Revenue rose by nearly a third of its base, to {{0}}.",
+        ):
+            with self.subTest(text=text):
+                problem = _validate_paragraph(text, self.SEGS)
+                self.assertIsNotNone(problem)
+                self.assertIn("spelled-out", problem)
+
+    def test_other_spelled_out_quantities_are_rejected(self):
+        for text in (
+            "Margin widened by fifty basis points to {{0}}.",
+            "Sales were up threefold, reaching {{0}}.",
+            "Growth was in the double-digit range, at {{0}}.",
+            "Costs were twice what they were, at {{0}}.",
+            "Half of revenue came from services, at {{0}}.",
+            "Revenue is worth three hundred million dollars at {{0}}.",
+        ):
+            with self.subTest(text=text):
+                self.assertIsNotNone(_validate_paragraph(text, self.SEGS))
+
+    def test_ordinary_words_are_not_flagged(self):
+        for text in (
+            "One of the drivers was pricing, and revenue reached {{0}}.",
+            "Revenue reached {{0}} in the first half of the year.",
+            "Revenue reached {{0}} over the last three quarters.",
+            "No one expected revenue to reach {{0}}.",
+            "The team will double-check the segment split behind {{0}}.",
+            "Revenue reached {{0}}, one of the strongest results on record.",
+        ):
+            with self.subTest(text=text):
+                self.assertIsNone(_validate_paragraph(text, self.SEGS))
+
+    def test_a_placeholder_next_to_a_unit_word_is_still_the_redundant_unit_rule(self):
+        problem = _validate_paragraph("Revenue reached {{0}} million.", self.SEGS)
+        self.assertIn("spelled-out word", problem)
+
 
 if __name__ == "__main__":
     unittest.main()

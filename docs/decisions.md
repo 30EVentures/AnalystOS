@@ -2,6 +2,18 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-25 - mesh identity files added, deploy gated on the org question (Slice 59)
+
+Published a `flashyos/1` handshake and an AAO 0.1 charter for `analystos` in
+the repository (not deployed by the slice). Decisions: the handshake declares
+no capabilities until something is callable; the charter's three measures are
+each computable from the API audit log so nothing is published that cannot be
+measured; no front door and no directory fragment, because each needs
+something that does not exist (a monitored endpoint; an owner's assertions).
+The `analystos` org already exists on the network with an unknown owner, so
+the branch should not be merged and deployed until that is settled - serving
+the handshake would read as a claim to it.
+
 ## 2026-09-25 - the AAO checker now follows the published schema (Slice 58)
 
 `analystos/aao/validate.py` was a stand-in written before the published

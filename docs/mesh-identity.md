@@ -1,0 +1,72 @@
+# Mesh identity files
+
+What AnalystOS publishes so a FlashyOS conformance check (or any agent) can
+discover it, and what it deliberately does not.
+
+| URL (once deployed at analystos.dev) | File in this repo | Format | Purpose |
+|---|---|---|---|
+| `/.well-known/flashyos.json` | `site/.well-known/flashyos.json` | `flashyos/1` handshake | Level 1: discoverable |
+| `/.well-known/flashyos-charter.json` | `site/.well-known/flashyos-charter.json` | AAO 0.1 charter | Level 2: chartered |
+| `/flashyos.roles.json` | `site/flashyos.roles.json` | same charter, legacy path | some estates serve both; a test keeps the bytes identical |
+
+`vercel.json` serves these as JSON with `Access-Control-Allow-Origin: *` and a
+5-minute cache.
+
+## The charter in one screen
+
+Slug `analystos`; accountable human `30eventures@gmail.com`; escalation goes to
+`verification`. Three standing roles, each with one number it moves. Every
+measure must be computable from what the API's audit log records
+(`docs/api.md`), so nothing is published that cannot be measured.
+
+| Role | Family | Approval at or above | Measure |
+|---|---|---|---|
+| `analysis` | data | MEDIUM | reports delivered at the written tier, both gates passed, as a share of reports delivered |
+| `verification` | risk | HIGH | facts refused for failing verification, as a share of facts proposed |
+| `evidence` | governance | HIGH | delivered reports whose seal re-verifies offline, as a share of reports delivered |
+
+## The handshake
+
+```json
+{ "mesh": "flashyos/1",
+  "org": { "slug": "analystos", "name": "AnalystOS", "profile": "https://analystos.dev" } }
+```
+
+No `capabilities`: a capability is a claim that something is callable. Add
+`"capabilities": ["document-analysis"]` only after `docs/api.md`'s endpoints are
+deployed and an agent token exists.
+
+## Check it
+
+```
+python3 -m analystos.aao site/.well-known/flashyos-charter.json     # ours (docs/aao.md)
+npx @flashyos/conformance analystos.dev --level 2                   # FlashyOS's; needs the site deployed
+```
+
+The second command has **not** been run: it needs the files deployed, and it is
+an npm package that has not been reviewed or approved for execution here.
+
+## Deliberately not served
+
+| File | Why not |
+|---|---|
+| `/.well-known/frontdoor.json` | `frontdoor/1` requires a working `endpoint` and a person who reads what arrives. Neither exists. |
+| `/directory.fragment.json` | asserts people and relationships on someone's authority; the owner's decision. |
+| `/.well-known/canon.json`, `backlog.json` | nothing to pin or publish yet. |
+
+## Open decisions before deploying
+
+1. **Who owns the existing `analystos` org on the FlashyOS network?** It
+   exists (0 agents, capability `analytics`, created about 2026-09-03, owner
+   unknown). Serving this handshake reads as a claim to that slug. Resolve the
+   owner first.
+2. **Is `30eventures@gmail.com` the right accountable human?** It is already
+   public on the homepage.
+3. **Are the measures right?** They are computable, not yet computed.
+
+## Not verified
+
+- That Vercel serves the `.well-known` directory and applies the headers: this
+  is only checkable after deployment.
+- That FlashyOS's own validator accepts the charter: it was checked with our
+  checker against the published schema, not with theirs.

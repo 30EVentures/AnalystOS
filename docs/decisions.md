@@ -2,6 +2,16 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-25 - public claims corrected to match the code (Slice 57)
+
+The audit found the homepage describing the local command line ("stays on
+your machine", "encrypted at rest") on a page whose main call to action is
+the hosted upload, and promising more than the code checks ("never lost",
+tags "wherever a figure appears", "real documents", "a retrospective in every
+spec"). Copy corrected; `tests/test_site_claims.py` keeps the retired phrases
+from coming back. Chosen over hiding the detail: the mesh outreach points at
+the homepage Trust section, so it has to be the honest version.
+
 ## 2026-09-25 - one definition of a figure's basis, shown on every surface (Slice 56)
 
 Audit findings 5-6: GAAP/guidance tags were shown in body paragraphs but not

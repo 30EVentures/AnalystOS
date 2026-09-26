@@ -105,9 +105,15 @@ class ConstructionTest(unittest.TestCase):
         self.assertEqual(normalize({"a": (1, True, None, 2.5)}), {"a": ["1", True, None, "2.5"]})
 
     def test_the_same_run_seals_identically(self):
-        a = build_bundle(trace(), created="2026-09-25T00:00:00Z")
-        b = build_bundle(trace(), created="2026-09-25T00:00:00Z")
+        a = build_bundle(trace(), created="2026-09-25T00:00:00Z", nonce="0123456789abcdef")
+        b = build_bundle(trace(), created="2026-09-25T00:00:00Z", nonce="0123456789abcdef")
         self.assertEqual(json.dumps(a, sort_keys=True), json.dumps(b, sort_keys=True))
+
+    def test_every_seal_gets_a_fresh_nonce_so_ids_never_collide(self):
+        a, b = build_bundle(trace()), build_bundle(trace())
+        self.assertNotEqual(a["payload"]["nonce"], b["payload"]["nonce"])
+        self.assertEqual(a["payload"]["root"], b["payload"]["root"])
+        self.assertNotEqual(canonical_bytes(a["payload"]), canonical_bytes(b["payload"]))
 
 
 class RefusalsTest(unittest.TestCase):

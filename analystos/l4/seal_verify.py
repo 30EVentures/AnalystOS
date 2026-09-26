@@ -214,7 +214,7 @@ def verify_bundle(bundle, public_key=None, source_text=None):
         checks.append(_check("structure", "fail", f"not an {SEAL_FORMAT} bundle"))
         return result()
     payload, facts = bundle["payload"], bundle["facts"]
-    needed = ("version", "org", "entries", "created", "root", "source_sha256", "text_sha256", "report_sha256", "tier")
+    needed = ("version", "org", "entries", "created", "nonce", "root", "source_sha256", "text_sha256", "report_sha256", "tier")
     missing = [k for k in needed if k not in payload]
     if missing or payload.get("version") != PAYLOAD_VERSION:
         checks.append(_check("structure", "fail", f"payload missing {missing} or wrong version"))

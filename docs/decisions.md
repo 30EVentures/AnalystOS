@@ -2,6 +2,22 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-25 - an agent-callable API, honest about storage (Slice 61)
+
+Added `/api/v1` (analyses, reports, links, verify, index, OpenAPI) so another
+agent can hand over a document and get back a sealed report with an https URL
+for the mesh's `evidenceUrl`. Choices: per-caller hashed API keys instead of the
+shared access code; a signed expiring link per report and format instead of
+public URLs (FlashyOS says never to put document contents on the mesh, so the
+URL is access-controlled and short-lived); a public stateless verify endpoint
+because checking must not require an account; the audit log records counts and
+tiers but never text or filenames, and the charter's three measures are computed
+from it. Storage is a plain file store, **not durable on Vercel**; that is
+stated in the API docs and the spec rather than papered over with an unverified
+"works in production". Every secret (API keys, link secret, seal key) fails
+closed with no built-in default. Also: seal payloads gained a random nonce so two
+analyses in the same second cannot share an id.
+
 ## 2026-09-25 - reports are sealed; the verifier is standalone (Slice 60)
 
 The charter's `evidence` role promised that a stranger can re-verify a report

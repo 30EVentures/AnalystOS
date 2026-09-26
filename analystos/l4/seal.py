@@ -16,6 +16,7 @@ built-in default (the evidence store's public fallback key taught why).
 import base64
 import hashlib
 import os
+import secrets
 import sys
 from datetime import datetime, timezone
 
@@ -73,7 +74,7 @@ def _sign(payload, seed_b64):
     }
 
 
-def build_bundle(trace, *, org=ORG, created=None, signing_key=None):
+def build_bundle(trace, *, org=ORG, created=None, nonce=None, signing_key=None):
     """Seal one run. ``trace`` is the dict ``build_report`` fills. Raises
     ``ValueError`` for a run that cannot be sealed (the table path, or no
     facts)."""
@@ -99,6 +100,7 @@ def build_bundle(trace, *, org=ORG, created=None, signing_key=None):
         "org": org,
         "entries": len(facts),
         "created": created,
+        "nonce": nonce or secrets.token_hex(8),
         "root": merkle_root(leaves),
         "source_sha256": trace.get("source_hash"),
         "text_sha256": sha256_hex(text.encode("utf-8")),

@@ -34,6 +34,7 @@ An unsigned bundle (no `ANALYSTOS_SEAL_KEY` when it was made) is `ok` but never
   "payload": {
     "version": 1, "org": "analystos", "entries": 2,
     "created": "2026-09-25T00:00:00Z",
+    "nonce": "<16 hex chars, random per seal>",
     "root": "<hex sha256 Merkle root>",
     "source_sha256": "<sha256 of the uploaded file's bytes>",
     "text_sha256": "<sha256 of the UTF-8 extracted text the facts were verified against>",
@@ -46,7 +47,7 @@ An unsigned bundle (no `ANALYSTOS_SEAL_KEY` when it was made) is `ok` but never
 }
 ```
 
-`tier` is inside the signed payload so a fallback report cannot be relabelled
+`nonce` makes every seal's payload (and therefore the report id, `sha256(canonical(payload))`) unique even for identical content in the same second. `tier` is inside the signed payload so a fallback report cannot be relabelled
 as a written one. `source_sha256` is the same SHA-256 the evidence store names
 files by.
 

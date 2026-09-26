@@ -76,6 +76,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+from analystos.api_v1 import register as register_api_v1  # noqa: E402
 from analystos.l1.detect import SUPPORTED_EXTENSIONS, extract_any  # noqa: E402
 from analystos.l4.export import render_html  # noqa: E402
 from analystos.pipeline import build_report  # noqa: E402
@@ -268,3 +269,7 @@ def analyze():
         shutil.rmtree(tmp_dir, ignore_errors=True)  # never keep the upload
 
     return jsonify(section=section, html=render_html(section))
+
+
+# Slice 61: the agent-callable /api/v1 routes share this app and its limiter.
+register_api_v1(app, rate_limit=_rate_limit_denied)

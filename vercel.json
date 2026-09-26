@@ -40,5 +40,19 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/v1/openapi.json",
+      "destination": "/api/v1/openapi"
+    },
+    {
+      "source": "/api/v1/reports/:digest",
+      "destination": "/api/v1/reports?digest=:digest"
+    },
+    {
+      "source": "/api/v1/verify/:digest",
+      "destination": "/api/v1/verify?digest=:digest"
+    }
   ]
 }

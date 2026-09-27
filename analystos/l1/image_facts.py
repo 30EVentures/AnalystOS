@@ -39,8 +39,8 @@ from io import BytesIO
 import pdfplumber
 
 from analystos.l2.analyze import _create_message, _resolve_client
+from analystos.models import model_name
 
-_MODEL = "claude-sonnet-5"
 _MAX_TOKENS = 1024
 _RESOLUTION = 150  # DPI used to rasterize the page before cropping
 
@@ -91,7 +91,7 @@ def _transcribe(client, png_bytes):
     encoded = base64.standard_b64encode(png_bytes).decode("ascii")
     response = _create_message(
         client,
-        model=_MODEL,
+        model=model_name(),
         max_tokens=_MAX_TOKENS,
         system=_SYSTEM_PROMPT,
         tools=[_TOOL],

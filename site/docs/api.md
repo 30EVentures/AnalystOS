@@ -61,6 +61,7 @@ its own id.
 | `ANALYSTOS_REPORT_TTL_DAYS` | retention of stored reports | 30 |
 | `ANALYSTOS_PUBLIC_BASE_URL` | the host used in issued links | derived from the request (`X-Forwarded-*`) |
 | `ANTHROPIC_API_KEY` | the analysis itself | as for `/api/analyze` |
+| `ANALYSTOS_MODEL` | *optional*: which model every stage asks (default `claude-sonnet-5`). Recorded in each audit event | the default |
 
 Make a caller key (shown once, stored nowhere):
 
@@ -91,7 +92,7 @@ python3 -m analystos.api_v1 newkey partner-name
 
 Every analysis, view and link appends one JSON line (`audit.jsonl` in the store,
 else stderr): caller name, report id, tier, fallback reason, proposed / verified /
-dropped counts, whether the seal was signed and re-verified. **No document text and no
+dropped counts, the model used, whether the seal was signed and re-verified. **No document text and no
 filename.** The three measures in the published charter are computed from it:
 
 ```

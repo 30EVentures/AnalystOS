@@ -324,7 +324,7 @@ class PrivacyAndRetentionTest(ApiTestCase):
             self.assertNotIn(forbidden, log)
         event = json.loads(log.splitlines()[0])
         self.assertEqual(set(event), {"ts", "type", "caller", "id", "tier", "fallback_reason", "proposed", "verified",
-                                      "dropped", "signed", "seal_ok", "extension"})
+                                      "dropped", "signed", "seal_ok", "extension", "model"})
 
     def test_reports_expire_and_are_purged(self):
         body = self.created()

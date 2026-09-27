@@ -2,6 +2,16 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-27 - one model setting, recorded per run (Slice 70)
+
+The model name was a constant in four modules. It is now `ANALYSTOS_MODEL` through
+`analystos/models.py`, read at call time, validated, and recorded in the pipeline trace
+and the API audit event so an audited report can be tied to the model that wrote it. The
+default is unchanged. Deliberately not done: a model per stage or per API caller, and any
+claim that another model is *good* (only the live suite can say). The live suite's price
+table still refuses an unpriced model, which is the guard that keeps a model switch from
+defeating the $1.00 ceiling.
+
 ## 2026-09-27 - the homepage's counts are generated (Slice 69)
 
 The homepage's test and spec counts were typed by hand in seven places and were 158 tests

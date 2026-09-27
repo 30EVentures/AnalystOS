@@ -167,6 +167,7 @@ def create_analysis():
         "fallback_reason": trace.get("fallback_reason"), "proposed": analysis.get("proposed", 0),
         "verified": analysis.get("verified", 0), "dropped": analysis.get("dropped", 0),
         "signed": bundle["signature"] is not None, "seal_ok": seal_ok, "extension": suffix,
+        "model": trace.get("model"),
     })
     body = {
         "id": digest, "tier": trace["tier"], "created": bundle["payload"]["created"],

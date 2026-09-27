@@ -65,6 +65,13 @@ call's `max_tokens`, a few cents at most for this pipeline's calls) - it
 can never overshoot by an unbounded amount, and the moment the ceiling is
 reached, every subsequent call is refused before dispatch.
 
+## Changing the model
+
+`ANALYSTOS_MODEL` (default `claude-sonnet-5`) sets the model every stage asks. The
+live suite prices calls from `_PRICE_PER_MTOK`, and **refuses a model with no entry
+there** rather than guessing, so switching models cannot silently defeat the dollar
+ceiling: add the new model's price (and the date you checked it) first.
+
 ## The fixed document set
 
 `live_tests/fixtures/` (built by `build_fixtures.py` - regenerate with

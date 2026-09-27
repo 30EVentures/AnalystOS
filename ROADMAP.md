@@ -23,7 +23,7 @@ the session log. Nothing here is pushed until you say so.
 
 - [x] **Q1 - Round half up when displaying figures** (audit finding 11): a source `$1.95B` must not display as `$1.9B`; `12.25%` must not display as `12.2%`. Accept: a table of half-way cases across usd/percent/number formats renders half-up; existing outputs otherwise unchanged; suite OK.
 - [x] **Q2 - Make the spec record honest** (audit finding 9): `specs/README.md` indexing every slice, naming slices 35-39 (built without a spec) and 14 (empty); fix the code comment that cites a nonexistent spec. Accept: no source file cites a missing spec; a test keeps it that way.
-- [ ] **Q3 - Standalone verifier checks a quote's value against its citation** (closes the biggest gap in `docs/seal.md`): port the number parser, scale words, accounting negatives and document scale. Accept: differential test against the analyzer across a sample; a tampered value is caught even when hashes are rebuilt.
+- [x] **Q3 - Standalone verifier checks a quote's value against its citation** (closes the biggest gap in `docs/seal.md`): port the number parser, scale words, accounting negatives and document scale. Accept: differential test against the analyzer across a sample; a tampered value is caught even when hashes are rebuilt.
 - [ ] **Q4 - Live-suite PASS means something** (audit finding 8): assert the expected tier and minimum fact counts, not only "did not raise". Accept: mocked tests prove a fallback fails the check; docs say what PASS means. (No paid run here.)
 - [ ] **Q5 - Post-deploy smoke script** (`tools/smoke.py`): one command that checks every advertised URL on a live domain. Accept: passes against a local server of `site/`, fails on a missing file and a wrong content type.
 - [ ] **Q6 - Stop hand-maintaining the homepage's test and spec counts**: a tool writes them and a test fails when they drift. Accept: `--check` and `--write` modes; suite enforces.
@@ -246,3 +246,4 @@ One line per completed item (newest last).
 - 2026-09-27 - queue and blocked list written; loop started on branch `roadmap-loop-2026-09-27` (nothing pushed).
 - 2026-09-27 - Q1 done (Slice 64): displayed figures round half up; 683 tests.
 - 2026-09-27 - Q2 done (Slice 65): specs/README.md index with marked gaps (14, 35-39); dangling spec citation fixed; 687 tests.
+- 2026-09-27 - Q3 done (Slice 66): verifier checks quote values and operands against citations; differential-tested; 703 tests.

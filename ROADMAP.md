@@ -27,7 +27,7 @@ the session log. Nothing here is pushed until you say so.
 - [x] **Q4 - Live-suite PASS means something** (audit finding 8): assert the expected tier and minimum fact counts, not only "did not raise". Accept: mocked tests prove a fallback fails the check; docs say what PASS means. (No paid run here.)
 - [x] **Q5 - Post-deploy smoke script** (`tools/smoke.py`): one command that checks every advertised URL on a live domain. Accept: passes against a local server of `site/`, fails on a missing file and a wrong content type.
 - [x] **Q6 - Stop hand-maintaining the homepage's test and spec counts**: a tool writes them and a test fails when they drift. Accept: `--check` and `--write` modes; suite enforces.
-- [ ] **Q7 - Model name configurable** (R2 "model-swap"): one setting instead of four hard-coded strings. Accept: default unchanged; env override honoured everywhere the model is named.
+- [x] **Q7 - Model name configurable** (R2 "model-swap"): one setting instead of four hard-coded strings. Accept: default unchanged; env override honoured everywhere the model is named.
 - [ ] **Q8 - Cleanup pass** when the queue is empty: dead code, TODOs, coverage gaps.
 
 ## NOW — the thin slice (Sept 2026)
@@ -250,3 +250,4 @@ One line per completed item (newest last).
 - 2026-09-27 - Q4 done (Slice 67): live-suite runs graded PASS/DEGRADED/FAIL from the trace (no paid run); 712 tests.
 - 2026-09-27 - Q5 done (Slice 68): tools/smoke.py; 54/54 against live analystos.dev; emulated-Vercel tests for broken deployments; 731 tests.
 - 2026-09-27 - Q6 done (Slice 69): tools/site_counts.py generates the homepage's test/spec counts (7 figures); test enforces; 740 tests, 63 specs.
+- 2026-09-27 - Q7 done (Slice 70): ANALYSTOS_MODEL replaces four hard-coded constants; recorded in trace and audit event; 751 tests.

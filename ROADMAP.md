@@ -3,6 +3,33 @@
 Working view. The boardroom version is the "Revision A" dossier; when they
 disagree, **this file wins**. Windows are targets, not commitments.
 
+## Blocked / needs input
+
+Items the loop cannot do without you. Each says what is needed.
+
+- [ ] **Confirm 30E Ventures controls the `analystos` org** - needs you to sign in at app.flashyos.com as that org (a credential only you hold).
+- [ ] **Mint an agent token and declare capabilities (FlashyOS Level 3, the mark)** - needs the org sign-in above; the token is shown once and must be stored by you in a secret manager, never in the repo.
+- [ ] **Publish the seal signing key's public half and set `ANALYSTOS_SEAL_KEY` on Vercel** - needs you to generate the key (`python3 -m analystos.l4.seal keygen`) and set the secret; also `ANALYSTOS_API_KEYS` before the API can be used.
+- [ ] **Latency and cost per document type through the API** - needs your `ANTHROPIC_API_KEY` and real spend (the live suite has a $1.00 ceiling).
+- [ ] **Enforce GAAP / guidance labels against the source** - a decision: checking only the citation text would strip true labels whose evidence sits in a table header, so the rule (drop, downgrade, or flag) needs your call and real failing examples.
+- [ ] **Stance on Gord Holdings' interest in "a piece of everything built on top"** - a business decision (equity/IP).
+- [ ] **Per-key spend caps and a durable rate limiter** - needs a durable store, which the Downloads-only decision deliberately avoids; revisit if the API gets real callers.
+- [ ] **R3+ (KPMG pilot, SOC 2, multi-tenant control plane)** - out of scope for an unattended loop.
+
+## Working queue (unblocked, in priority order)
+
+Each item gets a `specs/slice-N/spec.md` first, tests, a commit, and a line in
+the session log. Nothing here is pushed until you say so.
+
+- [ ] **Q1 - Round half up when displaying figures** (audit finding 11): a source `$1.95B` must not display as `$1.9B`; `12.25%` must not display as `12.2%`. Accept: a table of half-way cases across usd/percent/number formats renders half-up; existing outputs otherwise unchanged; suite OK.
+- [ ] **Q2 - Make the spec record honest** (audit finding 9): `specs/README.md` indexing every slice, naming slices 35-39 (built without a spec) and 14 (empty); fix the code comment that cites a nonexistent spec. Accept: no source file cites a missing spec; a test keeps it that way.
+- [ ] **Q3 - Standalone verifier checks a quote's value against its citation** (closes the biggest gap in `docs/seal.md`): port the number parser, scale words, accounting negatives and document scale. Accept: differential test against the analyzer across a sample; a tampered value is caught even when hashes are rebuilt.
+- [ ] **Q4 - Live-suite PASS means something** (audit finding 8): assert the expected tier and minimum fact counts, not only "did not raise". Accept: mocked tests prove a fallback fails the check; docs say what PASS means. (No paid run here.)
+- [ ] **Q5 - Post-deploy smoke script** (`tools/smoke.py`): one command that checks every advertised URL on a live domain. Accept: passes against a local server of `site/`, fails on a missing file and a wrong content type.
+- [ ] **Q6 - Stop hand-maintaining the homepage's test and spec counts**: a tool writes them and a test fails when they drift. Accept: `--check` and `--write` modes; suite enforces.
+- [ ] **Q7 - Model name configurable** (R2 "model-swap"): one setting instead of four hard-coded strings. Accept: default unchanged; env override honoured everywhere the model is named.
+- [ ] **Q8 - Cleanup pass** when the queue is empty: dead code, TODOs, coverage gaps.
+
 ## NOW — the thin slice (Sept 2026)
 
 Prove the core loop on one real document set, in front of 3–5 real analysts.
@@ -211,3 +238,9 @@ None of this is buildable until R1's mesh steps are done.
 - **Every week:** real users on the real build; update the friction log;
   re-rank the next slices; re-check flashyos.com/aao, /standard, /open.
 - **Every phase:** check the gate number; tag a release; refresh the dossier.
+
+## Session log
+
+One line per completed item (newest last).
+
+- 2026-09-27 - queue and blocked list written; loop started on branch `roadmap-loop-2026-09-27` (nothing pushed).

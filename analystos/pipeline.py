@@ -218,7 +218,7 @@ def build_report(
             # wording (redundant phrasing, inconsistent terminology),
             # which a full regenerate would just as likely trade for a
             # different wording nit as actually fix. See
-            # specs/slice-38/spec.md and specs/slice-40/spec.md.
+            # the Slice 38 entry in docs/decisions.md and specs/slice-40/spec.md.
             passed, issues = proofread_report(report, client=llm_client)
             for _ in range(_MAX_GATE2_REPAIR_ROUNDS):
                 if passed:

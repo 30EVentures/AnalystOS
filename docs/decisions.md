@@ -2,6 +2,19 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-27 - deployment smoke script (Slice 68)
+
+The checks that mattered on deploy day were run by hand with curl. `tools/smoke.py`
+runs them as one command against any deployment: every advertised URL and content type,
+the mesh identity files (charter valid, both paths identical, handshake slug matches),
+every link in `llms.txt` and the sitemap, the API index/OpenAPI agreement, the rewritten
+routes failing closed, an unauthenticated analysis refused, and a junk seal answered
+`ok:false`. It is tested against a local server that emulates Vercel's file-per-route rule
+and `vercel.json`'s rewrites and headers in front of the real Flask app, including
+deliberately broken deployments. That emulation is my model of Vercel, verified against
+the one real deployment we have; the smoke script run against analystos.dev is the
+real check. Sends no document, key or secret.
+
 ## 2026-09-27 - live-suite PASS now means the report was good (Slice 67)
 
 The live suite printed PASS whenever the pipeline did not raise, including when a

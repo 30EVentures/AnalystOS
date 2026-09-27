@@ -56,7 +56,7 @@ Run it on your own document: [`docs/using-analystos.md`](docs/using-analystos.md
 | `specs/` | one folder per slice: goal, scope, "done when" |
 | `tests/` | the automated suite (no network, no cost) |
 | `live_tests/` | a manual suite with real, paid model calls under a $1.00 ceiling |
-| `tools/` | `build_site_machine.py` regenerates the machine files from `docs/` |
+| `tools/` | `build_site_machine.py` regenerates the machine files from `docs/`; `smoke.py` checks a live deployment; `build_specs_index.py` regenerates the spec index |
 | `fixtures/golden/` | the regression set; add cases, never edit existing ones |
 
 ## Working here
@@ -64,4 +64,4 @@ Run it on your own document: [`docs/using-analystos.md`](docs/using-analystos.md
 One slice at a time, a `specs/` folder written before the code, small commits
 on a branch, a pull request, never a commit to `main`. After editing anything in
 `docs/`, run `python3 tools/build_site_machine.py` (the suite fails if the
-generated files are stale). See `CLAUDE.md`.
+generated files are stale). After a deploy, run `python3 tools/smoke.py` (see `docs/mesh-identity.md`). See `CLAUDE.md`.

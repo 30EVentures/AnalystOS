@@ -47,6 +47,17 @@ python3 -m analystos.aao site/.well-known/flashyos-charter.json     # ours (docs
 npx @flashyos/conformance analystos.dev --level 2                   # FlashyOS's
 ```
 
+To check a whole deployment (every advertised URL and content type, the charter,
+the API's rewrites and that it fails closed), run one command:
+
+```
+python3 tools/smoke.py https://analystos.dev           # add --json, or --no-post
+```
+
+If Python reports a certificate error, the machine's Python has no CA bundle (the
+python.org macOS build): use `SSL_CERT_FILE=/etc/ssl/cert.pem python3 tools/smoke.py`.
+Run against analystos.dev on 2026-09-27 it passed 54 of 54 checks.
+
 **Result, 2026-09-26:** the second command was run against the deployed site
 (`@flashyos/conformance` 0.2.3, run with install scripts disabled) and exited 0:
 Level 1 (Discoverable) and Level 2 (Chartered) both passed, every check ticked.

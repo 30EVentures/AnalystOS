@@ -2,7 +2,8 @@
 
 One folder per slice: `specs/slice-N/spec.md` holds the goal, what is and is not
 included, and the "Done when" checks, written before the code. This index lists
-every slice number so a gap is visible rather than silent.
+every slice number so a gap is visible rather than silent. Regenerate it with
+`python3 tools/build_specs_index.py`.
 
 **Known gaps.** Slices 35-39 were built without a spec of their own (the work is
 recorded in git and in `docs/decisions.md`; see their rows). There is no Slice 14.
@@ -76,3 +77,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 63 | reports go to the reader's own Downloads, not to a server | [spec](slice-63/spec.md) |
 | 64 | displayed figures round half up (roadmap Q1) | [spec](slice-64/spec.md) |
 | 65 | an honest spec record (roadmap Q2) | [spec](slice-65/spec.md) |
+| 66 | the standalone verifier checks each quote's value against its citation (roadmap Q3) | [spec](slice-66/spec.md) |

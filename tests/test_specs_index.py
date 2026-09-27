@@ -32,6 +32,20 @@ class IndexTest(unittest.TestCase):
         self.assertEqual(gaps, [14, 35, 36, 37, 38, 39])
 
 
+class GeneratorTest(unittest.TestCase):
+    def test_the_index_is_what_the_tool_generates(self):
+        import sys
+        sys.path.insert(0, str(ROOT / "tools"))
+        import build_specs_index
+        self.assertEqual(build_specs_index.build(), INDEX, "run: python3 tools/build_specs_index.py")
+
+    def test_an_unlisted_gap_would_be_visible(self):
+        import sys
+        sys.path.insert(0, str(ROOT / "tools"))
+        import build_specs_index
+        self.assertEqual(sorted(build_specs_index.GAPS), [14, 35, 36, 37, 38, 39])
+
+
 class NoDanglingCitationsTest(unittest.TestCase):
     def test_no_source_test_or_doc_cites_a_missing_spec(self):
         pattern = re.compile(r"specs/slice-(\d+)/spec\.md")

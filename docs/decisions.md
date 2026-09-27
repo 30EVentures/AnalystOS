@@ -2,6 +2,15 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-27 - cleanup pass (Slice 71)
+
+Removed three unused imports and one dead function; added `tools/refresh.py` (one command,
+right order, `--check` mode) for the three generated artifacts that had each cost a
+stale-test failure this session; and a hygiene test so unused imports and unreferenced
+module-level functions cannot creep back. `solwayholdings.aao.json` (a Slice 7 sample whose
+description claims an org that does not exist) was left alone and logged for the owner: it is
+only a test fixture, and deleting a checked-in root file is not the loop's call.
+
 ## 2026-09-27 - one model setting, recorded per run (Slice 70)
 
 The model name was a constant in four modules. It is now `ANALYSTOS_MODEL` through

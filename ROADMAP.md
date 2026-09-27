@@ -14,6 +14,7 @@ Items the loop cannot do without you. Each says what is needed.
 - [ ] **Enforce GAAP / guidance labels against the source** - a decision: checking only the citation text would strip true labels whose evidence sits in a table header, so the rule (drop, downgrade, or flag) needs your call and real failing examples.
 - [ ] **Stance on Gord Holdings' interest in "a piece of everything built on top"** - a business decision (equity/IP).
 - [ ] **Per-key spend caps and a durable rate limiter** - needs a durable store, which the Downloads-only decision deliberately avoids; revisit if the API gets real callers.
+- [ ] **Decide the fate of `solwayholdings.aao.json`** - a Slice 7 sample manifest for an org that does not exist (its description says otherwise); only `tests/test_aao_validate.py` uses it as a fixture. Delete it, or replace it with the AnalystOS charter?
 - [ ] **R3+ (KPMG pilot, SOC 2, multi-tenant control plane)** - out of scope for an unattended loop.
 
 ## Working queue (unblocked, in priority order)

@@ -82,3 +82,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 68 | a post-deploy smoke script (roadmap Q5) | [spec](slice-68/spec.md) |
 | 69 | the homepage's test and spec counts are generated, not typed (roadmap Q6) | [spec](slice-69/spec.md) |
 | 70 | the model is one setting, and every report says which one made it (roadmap Q7) | [spec](slice-70/spec.md) |
+| 71 | cleanup pass (roadmap Q8) | [spec](slice-71/spec.md) |

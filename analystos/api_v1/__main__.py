@@ -1,7 +1,6 @@
 """``python3 -m analystos.api_v1 newkey <name>`` and ``... measures [audit.jsonl]``."""
 
 import json
-import os
 import sys
 from pathlib import Path
 

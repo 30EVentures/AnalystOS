@@ -481,12 +481,6 @@ def _parse_numbers(text):
     return out
 
 
-def _parse_number(text):
-    """The first real number ``text`` contains, or ``None``."""
-    nums = _parse_numbers(text)
-    return nums[0] if nums else None
-
-
 _SCALE_DECLARATION_RE = re.compile(
     r"\bin\s+(thousands|millions|billions)\b"
     r"|\b(thousands|millions|billions)\s+of\s+(?:u\.?\s?s\.?\s+)?dollars\b",

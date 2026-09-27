@@ -18,7 +18,6 @@ separate, fully deterministic check in ``analystos.l2.narrate`` - this
 gate judges only what a blind read of the prose itself can judge.
 """
 
-import re
 import sys
 
 from analystos.l2.analyze import _create_message, _resolve_client

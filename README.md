@@ -56,13 +56,13 @@ Run it on your own document: [`docs/using-analystos.md`](docs/using-analystos.md
 | `specs/` | one folder per slice: goal, scope, "done when" |
 | `tests/` | the automated suite (no network, no cost) |
 | `live_tests/` | a manual suite with real, paid model calls under a $1.00 ceiling |
-| `tools/` | `build_site_machine.py` regenerates the machine files from `docs/`; `smoke.py` checks a live deployment; `site_counts.py` keeps the homepage's test and spec counts true; `build_specs_index.py` regenerates the spec index |
+| `tools/` | `build_site_machine.py` regenerates the machine files from `docs/`; `refresh.py` regenerates all of these in order; `smoke.py` checks a live deployment; `site_counts.py` keeps the homepage's test and spec counts true; `build_specs_index.py` regenerates the spec index |
 | `fixtures/golden/` | the regression set; add cases, never edit existing ones |
 
 ## Working here
 
 One slice at a time, a `specs/` folder written before the code, small commits
-on a branch, a pull request, never a commit to `main`. After editing anything in
-`docs/`, run `python3 tools/build_site_machine.py`; after adding tests or a spec, run
-`python3 tools/site_counts.py` and `python3 tools/build_specs_index.py` (the suite fails
-if the generated files or the homepage's counts are stale). After a deploy, run `python3 tools/smoke.py` (see `docs/mesh-identity.md`). See `CLAUDE.md`.
+on a branch, a pull request, never a commit to `main`. After editing docs, adding
+tests or adding a spec, run `python3 tools/refresh.py` (it regenerates the site's machine
+files, the spec index and the homepage's counts in the right order; `--check` only
+reports). The suite fails if any of them is stale. After a deploy, run `python3 tools/smoke.py` (see `docs/mesh-identity.md`). See `CLAUDE.md`.

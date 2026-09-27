@@ -2,6 +2,17 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-27 - the standalone verifier checks values against citations (Slice 66)
+
+The seal's biggest stated limit closed: with the extracted text, the verifier now checks
+that each quote's number and each calculation operand equals a number its own citation
+spells (as printed or times the document's declared scale), so a real quote paired with a
+wrong value - with every hash rebuilt - no longer passes. It is a second implementation of
+the analyzer's number reading, differentially tested against it. Deliberately exact on the
+stored canonical value (the analyzer accepts within 1% when *accepting* a fact; what it
+stores is exact). Events and prose carry no numeric value and stay uncovered, stated in
+`docs/seal.md`.
+
 ## 2026-09-27 - displayed figures round half up (Slice 64)
 
 A source figure of `$1.95B` displayed as `$1.9B` (audit finding 11) because Python

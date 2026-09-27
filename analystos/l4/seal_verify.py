@@ -23,9 +23,10 @@ What a pass means, level by level (reported separately, never merged):
                       that was sealed, every citation is in it, and every
                       calculation recomputes from its operands.
 
-Not checked here: that a quote's numeric ``value`` agrees with the number its
-citation spells out (AnalystOS checks that when it accepts the fact, and the
-seal records the outcome). See ``docs/seal.md``.
+With the text, ``values_match_citations`` also checks that each quote's (and each
+calculation operand's) numeric value equals a number its citation spells, as
+printed or times the document's declared scale. Events and prose carry no
+numeric value and are not covered. See ``docs/seal.md``.
 """
 
 import base64
@@ -45,6 +46,22 @@ _PLACEHOLDER_RE = re.compile(r"\{\{(\d+)\}\}")
 _THOUSANDS_SEP_RE = re.compile(r"(?<=\d),(?=\d{3}(?:\D|$))")
 _TRAILING_SCALE_RE = re.compile(r"\s*(?:thousand|million|billion|bn|mm|k|m|b)\s*$", re.IGNORECASE)
 _HEX64_RE = re.compile(r"^[0-9a-f]{64}$")
+_NUMBER_TOKEN_RE = re.compile(
+    r"(\(?-?)\$?\s*(\d[\d,]*\.?\d*|\.\d+)\s*"
+    r"(thousand|million|billion|bn|mm|k|m|b)?(?![a-zA-Z])",
+    re.IGNORECASE,
+)
+_SCALE_WORDS = {
+    "k": 1_000, "thousand": 1_000,
+    "m": 1_000_000, "mm": 1_000_000, "million": 1_000_000,
+    "b": 1_000_000_000, "bn": 1_000_000_000, "billion": 1_000_000_000,
+}
+_SCALE_DECLARATION_RE = re.compile(
+    r"\bin\s+(thousands|millions|billions)\b"
+    r"|\b(thousands|millions|billions)\s+of\s+(?:u\.?\s?s\.?\s+)?dollars\b",
+    re.IGNORECASE,
+)
+_DECLARED_SCALE = {"thousands": 1_000, "millions": 1_000_000, "billions": 1_000_000_000}
 
 
 def normalize(value):
@@ -123,6 +140,34 @@ def citation_in_text(citation, folded_text):
     return bool(stripped) and stripped != key and stripped in folded_text
 
 
+def parse_numbers(text):
+    """Every number ``text`` spells, in order: ``$`` and commas stripped, a
+    trailing scale word applied, a leading ``-`` or ``(`` making it negative."""
+    out = []
+    for match in _NUMBER_TOKEN_RE.finditer(text):
+        sign_part, digits, scale = match.groups()
+        value = float(digits.replace(",", ""))
+        if scale:
+            value *= _SCALE_WORDS[scale.lower()]
+        if "-" in sign_part or "(" in sign_part:
+            value = -value
+        out.append(value)
+    return out
+
+
+def detect_scale(text):
+    """The multiplier a document declares once ("in millions" -> 1_000_000); the
+    largest if several; 1 if none."""
+    found = {_DECLARED_SCALE[(m.group(1) or m.group(2)).lower()] for m in _SCALE_DECLARATION_RE.finditer(text)}
+    return max(found) if found else 1
+
+
+def value_supported(value, citation, doc_scale=1):
+    """True if ``value`` equals a number ``citation`` spells, as printed or times
+    ``doc_scale``. Sign matters: -1050 never matches 1050."""
+    return any(_same(candidate, value) for parsed in parse_numbers(citation) for candidate in (parsed, parsed * doc_scale))
+
+
 def recompute(operation, values, total=None):
     if operation in ("sum",):
         return sum(values)
@@ -195,7 +240,7 @@ def verify_bundle(bundle, public_key=None, source_text=None):
     def result():
         failed = any(c["status"] == "fail" for c in checks)
         by = {c["name"]: c["status"] for c in checks}
-        content_names = ("source_text_hash", "citations_in_text", "calculations")
+        content_names = ("source_text_hash", "citations_in_text", "values_match_citations", "calculations")
         return {
             "ok": not failed,
             "authentic": not failed and by.get("signature") == "pass",
@@ -277,7 +322,7 @@ def verify_bundle(bundle, public_key=None, source_text=None):
                                  "valid under the pinned public key" if pinned else "does not verify under the pinned public key"))
 
     if source_text is None:
-        for name in ("source_text_hash", "citations_in_text", "calculations"):
+        for name in ("source_text_hash", "citations_in_text", "values_match_citations", "calculations"):
             checks.append(_check(name, "skipped", "no extracted text supplied"))
         return result()
 
@@ -308,6 +353,29 @@ def verify_bundle(bundle, public_key=None, source_text=None):
                     bad_calcs.append(f"{fact['key']}: {record['operation']} gives {expected!r}, sealed {claimed!r}")
             except (KeyError, TypeError, ValueError):
                 bad_calcs.append(f"{fact['key']}: malformed calculation")
+    doc_scale = detect_scale(source_text)
+    mismatched, checked_values = [], 0
+    for fact in facts:
+        record = fact["record"]
+        pairs = []
+        try:
+            if record.get("type") == "quote" and record.get("value") is not None and isinstance(record.get("citation"), str):
+                pairs.append((record["value"], record["citation"]))
+            elif record.get("type") == "computed":
+                cites = record.get("citation") or []
+                operands = list(record.get("operands") or [])
+                pairs += list(zip(operands, cites))
+                if record.get("total") is not None and len(cites) > len(operands):
+                    pairs.append((record["total"], cites[len(operands)]))
+            for value, cite in pairs:
+                checked_values += 1
+                if not isinstance(cite, str) or not value_supported(_num(value), cite, doc_scale):
+                    mismatched.append(f"{fact['key']}: {value} vs {cite!r}"[:90])
+        except (TypeError, ValueError):
+            mismatched.append(f"{fact['key']}: malformed value or citation")
+    checks.append(_check("values_match_citations", "fail" if mismatched else "pass",
+                         f"values that no number in their citation supports: {mismatched[:5]}" if mismatched
+                         else f"all {checked_values} values equal a number their citation spells"))
     checks.append(_check("citations_in_text", "fail" if missing_cites else "pass",
                          f"citations not found in the text: {missing_cites[:5]}" if missing_cites
                          else f"all {checked_cites} citations are in the text"))

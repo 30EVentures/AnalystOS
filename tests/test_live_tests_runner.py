@@ -10,7 +10,9 @@ something a mocked test can substitute for.
 import unittest
 from types import SimpleNamespace
 
-from live_tests.run_live_tests import BudgetExceeded, CostTrackingClient, _price
+from live_tests.run_live_tests import (
+    DEGRADED, DOCUMENTS, FAIL, PASS, BudgetExceeded, CostTrackingClient, _price, evaluate, exit_status,
+)
 
 
 def _usage_response(input_tokens, output_tokens):
@@ -76,6 +78,76 @@ class CostTrackingClientTest(unittest.TestCase):
         for _ in range(5):
             client.messages.create(model="claude-sonnet-5")
         self.assertEqual(len(client.calls), 5)
+
+DOC = "Revenue was $498.0 million. Net income was $22.4 million, then $19.6 million."
+SEGS = [
+    {"type": "quote", "label": "Revenue", "value": 498000000.0, "format": "usd", "citation": "$498.0 million"},
+    {"type": "quote", "label": "NI", "value": 22400000.0, "format": "usd", "citation": "$22.4 million"},
+    {"type": "quote", "label": "NI2", "value": 19600000.0, "format": "usd", "citation": "$19.6 million"},
+]
+
+
+def _trace(tier="written", segments=None, verified=None, reason=None, text=DOC):
+    segments = SEGS if segments is None else segments
+    return {"tier": tier, "segments": segments, "report": None if tier == "plain" else {"title": "T", "executive_summary": [{"text": "See {{0}}."}]},
+            "document_text": text, "source_hash": "c" * 64, "fallback_reason": reason,
+            "analysis": {"proposed": len(segments), "verified": len(segments) if verified is None else verified, "dropped": 0}}
+
+
+class EvaluateTest(unittest.TestCase):  # Slice 67
+    WRITTEN = {"tier": "written", "min_verified": 3}
+
+    def test_a_good_written_run_passes(self):
+        outcome, detail = evaluate(self.WRITTEN, _trace())
+        self.assertEqual(outcome, PASS, detail)
+
+    def test_a_fallback_is_degraded_not_a_pass(self):
+        for tier in ("deterministic", "plain"):
+            with self.subTest(tier=tier):
+                outcome, detail = evaluate(self.WRITTEN, _trace(tier=tier, reason="Gate 2 did not pass"))
+                self.assertEqual(outcome, DEGRADED)
+                self.assertIn("Gate 2 did not pass", detail)
+
+    def test_too_few_verified_facts_fails_even_at_the_right_tier(self):
+        outcome, detail = evaluate({"tier": "written", "min_verified": 4}, _trace())
+        self.assertEqual(outcome, FAIL)
+        self.assertIn("3 verified", detail)
+
+    def test_a_seal_that_does_not_verify_fails(self):
+        bad = [dict(SEGS[0], value=999.0)] + SEGS[1:]
+        outcome, detail = evaluate(self.WRITTEN, _trace(segments=bad))
+        self.assertEqual(outcome, FAIL)
+        self.assertIn("values_match_citations", detail)
+
+    def test_a_citation_that_is_not_in_the_document_text_fails(self):
+        outcome, detail = evaluate(self.WRITTEN, _trace(text="Something else entirely."))
+        self.assertEqual(outcome, FAIL)
+        self.assertIn("citations_in_text", detail)
+
+    def test_no_trace_and_no_facts_fail(self):
+        self.assertEqual(evaluate(self.WRITTEN, {})[0], FAIL)
+        self.assertEqual(evaluate({"tier": "written", "min_verified": 0}, _trace(segments=[], verified=0))[0], FAIL)
+
+    def test_the_table_path_expects_the_table_tier_and_no_seal(self):
+        self.assertEqual(evaluate({"tier": "table", "min_verified": 0}, {"tier": "table", "segments": []})[0], PASS)
+        self.assertEqual(evaluate({"tier": "table", "min_verified": 0}, _trace())[0], FAIL)
+
+    def test_every_document_declares_a_gradeable_expectation(self):
+        for doc in DOCUMENTS:
+            with self.subTest(doc=doc["name"]):
+                self.assertIn(doc["expect"]["tier"], ("table", "written"))
+                self.assertGreaterEqual(doc["expect"]["min_verified"], 0)
+        self.assertEqual([d["expect"]["tier"] for d in DOCUMENTS].count("table"), 1)
+
+
+class ExitStatusTest(unittest.TestCase):  # Slice 67
+    def test_exit_codes(self):
+        ok = [("a", PASS)]
+        self.assertEqual(exit_status(ok, False), 0)
+        self.assertEqual(exit_status([("a", PASS), ("b", DEGRADED)], False), 0)
+        self.assertEqual(exit_status([("a", PASS), ("b", DEGRADED)], False, strict=True), 1)
+        self.assertEqual(exit_status([("a", FAIL)], False), 1)
+        self.assertEqual(exit_status(ok, True), 1)
 
 
 if __name__ == "__main__":

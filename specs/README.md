@@ -78,3 +78,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 64 | displayed figures round half up (roadmap Q1) | [spec](slice-64/spec.md) |
 | 65 | an honest spec record (roadmap Q2) | [spec](slice-65/spec.md) |
 | 66 | the standalone verifier checks each quote's value against its citation (roadmap Q3) | [spec](slice-66/spec.md) |
+| 67 | a live-suite PASS means the report was good, not that nothing raised (roadmap Q4) | [spec](slice-67/spec.md) |

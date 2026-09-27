@@ -2,6 +2,19 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-27 - live-suite PASS now means the report was good (Slice 67)
+
+The live suite printed PASS whenever the pipeline did not raise, including when a
+written report failed both gates and quietly fell back to a template. A run that
+degraded looked the same as one that did not, which defeats the suite's purpose.
+Runs are now graded from the pipeline's trace into PASS (expected tier, minimum
+verified facts, and a seal that fully verifies), DEGRADED (worked, but at a lower
+tier) and FAIL. DEGRADED is not a failure by default, because the model is
+non-deterministic and a fallback is designed behaviour, but it is visible, counted
+and fails the run under `--strict`. The minimum-fact thresholds are starting guesses
+to be tuned from the first real run, said so in `live_tests/README.md`. No paid run
+was made; the grading is proved with synthetic traces.
+
 ## 2026-09-27 - the standalone verifier checks values against citations (Slice 66)
 
 The seal's biggest stated limit closed: with the extracted text, the verifier now checks

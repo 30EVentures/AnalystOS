@@ -2,6 +2,15 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-27 - displayed figures round half up (Slice 64)
+
+A source figure of `$1.95B` displayed as `$1.9B` (audit finding 11) because Python
+rounds the float's binary value, not the decimal the reader sees. Displayed figures
+(compact usd, percent, number, donut shares) now round the shortest decimal form half
+away from zero. One existing test had encoded the old behaviour (1,250,000 shown as
+$1.2M) and was corrected. The homepage's sample brief still shows "$1.9B" for the Orion
+guidance; that sample is a hand-condensed run and was left alone rather than guessed at.
+
 ## 2026-09-26 - deployed; FlashyOS Level 2 passes (verification of Slices 55-63)
 
 Merged and deployed. Checked the live site with read-only requests: every new file

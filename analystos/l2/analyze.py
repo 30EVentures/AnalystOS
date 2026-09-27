@@ -77,7 +77,8 @@ from threading import Lock
 
 import anthropic
 
-_MODEL = "claude-sonnet-5"
+from analystos.models import model_name
+
 # A dense filing (four tables, dozens of figures) makes the model want to
 # emit far more segments than a memo does, and the all-required schema
 # makes each one verbose. At 4096 the response was truncated mid-JSON on a
@@ -478,12 +479,6 @@ def _parse_numbers(text):
             value = -value
         out.append(value)
     return out
-
-
-def _parse_number(text):
-    """The first real number ``text`` contains, or ``None``."""
-    nums = _parse_numbers(text)
-    return nums[0] if nums else None
 
 
 _SCALE_DECLARATION_RE = re.compile(
@@ -890,7 +885,7 @@ def _request_report(client, user_content):
     """
     response = _create_message(
         client,
-        model=_MODEL,
+        model=model_name(),
         max_tokens=_MAX_TOKENS,
         system=_SYSTEM_PROMPT,
         tools=[_TOOL],

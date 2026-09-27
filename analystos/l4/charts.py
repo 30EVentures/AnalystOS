@@ -16,7 +16,7 @@ whole chart) is ``analystos.l4.rich_export``'s job, not this module's.
 
 import html
 
-from analystos.l4.export import format_number
+from analystos.l4.export import format_number, round_half_up
 
 _WIDTH = 560
 _HEIGHT = 320
@@ -235,7 +235,7 @@ def donut_chart_svg(title, categories, values, value_format="usd", currency_unit
             f'<text x="{legend_x + 22}" y="{y:.1f}" font-size="13" fill="{_TEXT_COLOR}">'
             f'{_esc(cat)}</text>'
             f'<text x="{legend_x + 22}" y="{y + 16:.1f}" font-size="12" fill="{_LABEL_COLOR}">'
-            f'{_value_label(val, value_format, currency_unit)} ({pct:.0f}%)</text>'
+            f'{_value_label(val, value_format, currency_unit)} ({round_half_up(pct, 0)}%)</text>'
         )
 
     return (

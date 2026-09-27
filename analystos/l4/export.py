@@ -53,6 +53,7 @@ disclosed gap, not an oversight.
 import html
 import io
 import re
+from decimal import ROUND_HALF_UP, Decimal
 from xml.sax.saxutils import escape as xml_escape
 
 from reportlab.lib import colors
@@ -88,6 +89,19 @@ _FORMATS = ("number", "percent", "usd")
 _CURRENCY_UNITS = {"actual": 1, "thousands": 1_000, "millions": 1_000_000}
 
 
+def round_half_up(value, decimals=1):
+    """``value`` rounded half away from zero at ``decimals`` places and
+    formatted with thousands separators.
+
+    Rounds the shortest decimal form of the float (``repr``), so 1.95 is
+    exactly a half-way case and becomes 2.0 - ``format(1.95, ".1f")`` gives
+    "1.9" because the float is stored as 1.9499999999999999556.
+    """
+    exact = Decimal(repr(float(value)))
+    quantum = Decimal(1).scaleb(-decimals)
+    return format(exact.quantize(quantum, rounding=ROUND_HALF_UP), f",.{decimals}f")
+
+
 def _compact_usd(raw_dollars, decimals=1):
     """Render a raw dollar amount as $X.XK / $X.XM / $X.XB, else $X.XX.
 
@@ -97,13 +111,15 @@ def _compact_usd(raw_dollars, decimals=1):
     other operands in the same expression (see ``analystos.l4.rich_export
     ._arithmetic``, Slice 38).
     """
+    # Scale in Decimal so the division cannot itself introduce a float error.
+    exact = Decimal(repr(float(raw_dollars)))
     if raw_dollars >= 1_000_000_000:
-        return f"${raw_dollars / 1_000_000_000:,.{decimals}f}B"
+        return f"${round_half_up(exact / 1_000_000_000, decimals)}B"
     if raw_dollars >= 1_000_000:
-        return f"${raw_dollars / 1_000_000:,.{decimals}f}M"
+        return f"${round_half_up(exact / 1_000_000, decimals)}M"
     if raw_dollars >= 1_000:
-        return f"${raw_dollars / 1_000:,.{decimals}f}K"
-    return f"${raw_dollars:,.2f}"
+        return f"${round_half_up(exact / 1_000, decimals)}K"
+    return f"${round_half_up(exact, 2)}"
 
 
 def format_number(value, spec, currency_unit="actual", decimals=1):
@@ -129,9 +145,9 @@ def format_number(value, spec, currency_unit="actual", decimals=1):
     n = abs(n)
 
     if spec == "percent":
-        body = f"{n:,.1f}%"
+        body = f"{round_half_up(n, 1)}%"
     elif spec == "number":
-        body = f"{n:,.0f}" if n == int(n) else f"{n:,.1f}"
+        body = f"{n:,.0f}" if n == int(n) else round_half_up(n, 1)
     elif spec == "usd":
         if currency_unit not in _CURRENCY_UNITS:
             raise ValueError(

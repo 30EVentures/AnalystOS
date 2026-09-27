@@ -29,6 +29,24 @@ Optional flags:
   `$1.00`). The run stops *before* dispatching any call that would cross
   it - never mid-response, never over.
 - `--log-file path/to/run.log` - also writes the full log to a file.
+- `--strict` - also exit non-zero when a document DEGRADED (see below).
+
+## What PASS means (Slice 67)
+
+Each document declares what a good run looks like (`expect` in
+`run_live_tests.py`: the tier and a minimum number of verified facts), and every
+run is graded from the pipeline's trace:
+
+| Outcome | Meaning |
+|---|---|
+| **PASS** | the expected tier, at least the minimum verified facts, and the sealed report re-verifies end to end with its own text |
+| **DEGRADED** | it worked and every figure is verified, but it fell to a lower tier than expected (the fallback reason is printed) - a written report that failed a gate |
+| **FAIL** | it raised, produced fewer verified facts than the minimum, or its seal does not verify |
+
+Exit status is non-zero on any FAIL or a budget stop (and on DEGRADED with
+`--strict`). The minimum-fact thresholds (3 for the two prose documents, 1 for
+the image exhibit) are conservative starting points: tune them after the first
+real run rather than trusting them blindly.
 
 ## What it costs
 
@@ -46,6 +64,13 @@ spend can overshoot the ceiling by one call's own cost (bounded by that
 call's `max_tokens`, a few cents at most for this pipeline's calls) - it
 can never overshoot by an unbounded amount, and the moment the ceiling is
 reached, every subsequent call is refused before dispatch.
+
+## Changing the model
+
+`ANALYSTOS_MODEL` (default `claude-sonnet-5`) sets the model every stage asks. The
+live suite prices calls from `_PRICE_PER_MTOK`, and **refuses a model with no entry
+there** rather than guessing, so switching models cannot silently defeat the dollar
+ceiling: add the new model's price (and the date you checked it) first.
 
 ## The fixed document set
 

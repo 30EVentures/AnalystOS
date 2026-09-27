@@ -67,6 +67,7 @@ its own id.
 | `ANALYSTOS_REPORT_TTL_DAYS` | retention of stored reports | 30 |
 | `ANALYSTOS_PUBLIC_BASE_URL` | the host used in issued links | derived from the request (`X-Forwarded-*`) |
 | `ANTHROPIC_API_KEY` | the analysis itself | as for `/api/analyze` |
+| `ANALYSTOS_MODEL` | *optional*: which model every stage asks (default `claude-sonnet-5`). Recorded in each audit event | the default |
 
 Make a caller key (shown once, stored nowhere):
 
@@ -97,7 +98,7 @@ python3 -m analystos.api_v1 newkey partner-name
 
 Every analysis, view and link appends one JSON line (`audit.jsonl` in the store,
 else stderr): caller name, report id, tier, fallback reason, proposed / verified /
-dropped counts, whether the seal was signed and re-verified. **No document text and no
+dropped counts, the model used, whether the seal was signed and re-verified. **No document text and no
 filename.** The three measures in the published charter are computed from it:
 
 ```
@@ -147,7 +148,22 @@ each status `pass`, `fail` or `skipped`.
 |---|---|---|
 | `ok` | No check failed: the bundle is internally consistent. | The report is right, or that AnalystOS made it. |
 | `authentic` | `ok`, and the Ed25519 signature verifies under a public key **you supplied**. | A key that came inside the bundle proves nothing: anyone can sign with their own key and include it. |
-| `content_checked` | `ok`, and with the extracted text: it is the sealed text, every citation is in it, every calculation recomputes. | That a quote's number equals the number in its citation, or that the *choice* of figures is good. |
+| `content_checked` | `ok`, and with the extracted text: it is the sealed text, every citation is in it, every number equals a number its citation spells, every calculation recomputes. | That the *choice* of figures is good. |
+
+The `checks` list, in order (each `pass`, `fail` or `skipped`):
+
+| Check | Needs the text? | What it proves |
+|---|---|---|
+| `structure` | no | it is an `analystos-seal/1` bundle with every payload field |
+| `fact_hashes` | no | every fact hashes to its recorded hash; no duplicate keys |
+| `merkle_root` | no | the facts make the signed root; `entries` is right |
+| `report_hash` | no | the report is the one that was sealed (or there is none) |
+| `report_refs` | no | every fact the report cites was sealed |
+| `signature` | no | Ed25519 over the payload; `pass` only under a key you pinned |
+| `source_text_hash` | yes | the supplied text is the sealed text |
+| `citations_in_text` | yes | every citation is in the text |
+| `values_match_citations` | yes | every quote value and calculation operand equals a number its citation spells |
+| `calculations` | yes | every calculation recomputes from its operands |
 
 An unsigned bundle (no `ANALYSTOS_SEAL_KEY` when it was made) is `ok` but never
 `authentic`. AnalystOS never signs with a built-in default key.
@@ -197,15 +213,23 @@ files by.
    `value_fact` / `delta_fact` N, must cite a sealed fact (`N < entries`).
 8. **Signature.** Ed25519 over `canonical(payload)`, base64url without padding.
 9. **Text.** `text_sha256` must equal `sha256(utf8(extracted_text))`.
-10. **Content.** With the text: fold both text and each citation
+10. **Content.** With the text, fold both text and each citation
     (lowercase; `–`, `—`, `−` to `-`; drop `$` and `|`; remove a thousands
     comma between digits; collapse whitespace). A citation passes if the folded
     citation is a substring of the folded text, or is with one trailing scale
-    word (`thousand million billion bn mm k m b`) removed. A `computed` fact
-    passes if its operation recomputes from its `operands`: `sum`; `difference`
-    and `remainder` = first minus the rest; `average`; `ratio` = first / second;
-    `growth_percent` = (second - first) / first x 100 (either operand order);
-    `percent_of_total` = operand / total x 100 — within relative 1e-9.
+    word (`thousand million billion bn mm k m b`) removed. **Values:** read every
+    number a citation spells (optional `(` or `-` makes it negative; optional `$`;
+    digits with commas and a decimal point; an optional scale word `k thousand m mm
+    million b bn billion` multiplies it). The document's *declared scale* is the
+    largest of "in thousands/millions/billions" or "thousands/millions/billions of
+    [U.S.] dollars" found in the text, else 1. A quote's `value`, and each
+    calculation operand's value (`citation[i]` is operand `i`; a `percent_of_total`
+    total is the citation after the operands), must equal one of those numbers as
+    printed or times the declared scale. A `computed` fact then passes if its
+    operation recomputes from its `operands`: `sum`; `difference` and `remainder` =
+    first minus the rest; `average`; `ratio` = first / second; `growth_percent` =
+    (second - first) / first x 100 (either operand order); `percent_of_total` =
+    operand / total x 100 - within relative 1e-9.
 
 ### Worked vector
 
@@ -237,9 +261,8 @@ If your port does not reproduce that root, it is not the same seal.
 - The extracted text is **not** in the bundle (it may be confidential). To
   check content you must supply text whose hash matches; otherwise the hash
   check fails and the content checks still run on what you supplied.
-- The verifier does not check that a quote's numeric `value` matches the number
-  in its citation (scale words, accounting negatives, table scale). AnalystOS
-  checks that when it accepts the fact; the seal records the outcome.
+- Event facts (dates, milestones) and prose carry no numeric value; the checks
+  above do not cover them beyond the citation being in the text.
 - The seal proves the report was built from these facts. It does not prove the
   facts are the important ones, that a relationship between two figures is right
   (Slice 55 checks some), or that the model's GAAP/guidance labels are correct.
@@ -396,6 +419,17 @@ deployed and an agent token exists.
 python3 -m analystos.aao site/.well-known/flashyos-charter.json     # ours (docs/aao.md)
 npx @flashyos/conformance analystos.dev --level 2                   # FlashyOS's
 ```
+
+To check a whole deployment (every advertised URL and content type, the charter,
+the API's rewrites and that it fails closed), run one command:
+
+```
+python3 tools/smoke.py https://analystos.dev           # add --json, or --no-post
+```
+
+If Python reports a certificate error, the machine's Python has no CA bundle (the
+python.org macOS build): use `SSL_CERT_FILE=/etc/ssl/cert.pem python3 tools/smoke.py`.
+Run against analystos.dev on 2026-09-27 it passed 54 of 54 checks.
 
 **Result, 2026-09-26:** the second command was run against the deployed site
 (`@flashyos/conformance` 0.2.3, run with install scripts disabled) and exited 0:

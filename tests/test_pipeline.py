@@ -224,7 +224,9 @@ class PipelineTest(unittest.TestCase):
                    "where": ["period", "FY2024"], "select": "revenue"}],
             evidence_dir=self.tmp / "ev",
         )
-        self.assertIn("Revenue was $1.2M.", out)  # "revenue" guessed as a number
+        # "revenue" guessed as a number. 1,250,000 is exactly half-way between $1.2M and
+        # $1.3M; displayed figures round half up (Slice 64), so $1.3M.
+        self.assertIn("Revenue was $1.3M.", out)
 
     def test_run_job_with_no_schema_or_title_in_job_json(self):
         job = self.tmp / "bare-job"

@@ -73,8 +73,8 @@ from analystos.l2.analyze import (
     coverage_summary,
 )
 from analystos.l4.export import display_value
+from analystos.models import model_name
 
-_MODEL = "claude-sonnet-5"
 _MAX_TOKENS = 8192  # a rich report over a dense document can outgrow 4096 - see analyze.py
 # A single-paragraph repair (write_narrative's first line of defence) is a
 # small, cheap call with a much smaller blast radius than regenerating the
@@ -1152,7 +1152,7 @@ def _repair_paragraph(client, manifest, text, reason):
     """
     response = _create_message(
         client,
-        model=_MODEL,
+        model=model_name(),
         max_tokens=1024,
         system=_REPAIR_SYSTEM_PROMPT,
         tools=[_REPAIR_TOOL],
@@ -1212,7 +1212,7 @@ def write_narrative(segments, title, client=None):
     def _call(extra=""):
         response = _create_message(
             client,
-            model=_MODEL,
+            model=model_name(),
             max_tokens=_MAX_TOKENS,
             system=_SYSTEM_PROMPT,
             tools=[_TOOL],

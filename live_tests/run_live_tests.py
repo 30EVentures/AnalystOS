@@ -22,6 +22,10 @@ two-column PDF (Slice 50's column-aware extraction), and the
 narrated-default path over a PDF with an embedded image (Slice 50's
 image-fact path).
 
+Each run is graded PASS, DEGRADED or FAIL (``evaluate``; Slice 67): PASS means
+the expected tier with enough verified facts and a seal that fully verifies,
+not merely that nothing raised.
+
 Hard-stops the instant the running total would cross the ceiling - the
 call that would have crossed it is never dispatched, and the run exits
 non-zero.
@@ -37,6 +41,8 @@ import anthropic
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # repo root, for `import analystos`
 
+from analystos.l4.seal import build_bundle  # noqa: E402
+from analystos.l4.seal_verify import verify_bundle  # noqa: E402
 from analystos.pipeline import build_report  # noqa: E402
 
 FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures"
@@ -56,26 +62,62 @@ DOCUMENTS = [
         "path": FIXTURES_DIR / "income_statement.csv",
         "path_kind": "schema/template",
         "kwargs": {"template": "income_statement", "title": "Live test - CSV/schema path"},
+        "expect": {"tier": "table", "min_verified": 0},
     },
     {
         "name": "docx-narrated-single-column",
         "path": FIXTURES_DIR / "quarterly_review.docx",
         "path_kind": "narrated-default",
         "kwargs": {"title": "Live test - DOCX narrated path"},
+        "expect": {"tier": "written", "min_verified": 3},
     },
     {
         "name": "pdf-two-column",
         "path": FIXTURES_DIR / "two_column_review.pdf",
         "path_kind": "narrated-default (column-aware extraction)",
         "kwargs": {"title": "Live test - two-column PDF"},
+        "expect": {"tier": "written", "min_verified": 3},
     },
     {
         "name": "pdf-embedded-image",
         "path": FIXTURES_DIR / "chart_exhibit.pdf",
         "path_kind": "narrated-default (image-fact extraction)",
         "kwargs": {"title": "Live test - embedded-image PDF"},
+        "expect": {"tier": "written", "min_verified": 1},
     },
 ]
+
+
+PASS, DEGRADED, FAIL = "PASS", "DEGRADED", "FAIL"
+_TIER_RANK = {"table": 3, "written": 3, "deterministic": 2, "plain": 1}
+
+
+def evaluate(expect, trace):
+    """Grade one finished run (Slice 67). Pure and offline.
+
+    ``expect`` is ``{"tier": ..., "min_verified": n}``; ``trace`` is what
+    ``build_report(..., trace=...)`` recorded. Returns ``(outcome, detail)``
+    with outcome PASS, DEGRADED or FAIL - see specs/slice-67/spec.md.
+    """
+    tier = trace.get("tier")
+    if tier is None:
+        return FAIL, "the run recorded no trace"
+    if expect["tier"] == "table":
+        return (PASS, "table path completed") if tier == "table" else (FAIL, f"expected the table path, got tier {tier!r}")
+    verified = (trace.get("analysis") or {}).get("verified", 0)
+    if verified < expect["min_verified"]:
+        return FAIL, f"only {verified} verified fact(s); expected at least {expect['min_verified']}"
+    try:
+        bundle = build_bundle(trace)
+    except ValueError as exc:
+        return FAIL, f"could not seal the run: {exc}"
+    check = verify_bundle(bundle, source_text=trace.get("document_text") or "")
+    if not check["content_checked"]:
+        failed = [c["name"] for c in check["checks"] if c["status"] != "pass" and c["name"] != "signature"]
+        return FAIL, f"the seal does not fully verify (not passing: {failed})"
+    if _TIER_RANK.get(tier, 0) < _TIER_RANK[expect["tier"]]:
+        return DEGRADED, f"fell back to the {tier} tier ({trace.get('fallback_reason') or 'no reason recorded'}); {verified} verified facts"
+    return PASS, f"{tier} tier, {verified} verified facts, seal verifies"
 
 
 class BudgetExceeded(RuntimeError):
@@ -138,28 +180,38 @@ def _run_one(document, client, log):
     before_cost = client.total_cost
     before_calls = len(client.calls)
     started = time.monotonic()
+    trace = {}
     try:
         build_report(
             document["path"],
             evidence_dir=FIXTURES_DIR / ".evidence",
             llm_client=client,
+            trace=trace,
             **document["kwargs"],
         )
-        ok, detail = True, "ok"
+        outcome, detail = evaluate(document["expect"], trace)
     except BudgetExceeded:
         raise  # propagate - this is the hard-stop, not a per-document failure
     except ValueError as exc:
-        ok, detail = False, f"pipeline error: {exc}"
+        outcome, detail = FAIL, f"pipeline error: {exc}"
     elapsed = time.monotonic() - started
 
     calls_made = client.calls[before_calls:]
     doc_cost = client.total_cost - before_cost
-    log(f"  result: {'PASS' if ok else 'FAIL'} - {detail}")
+    log(f"  result: {outcome} - {detail}")
     log(f"  calls: {len(calls_made)}, elapsed: {elapsed:.1f}s")
     for c in calls_made:
         log(f"    - {c['model']}: {c['input_tokens']} in / {c['output_tokens']} out -> ${c['cost']:.4f}")
     log(f"  document cost: ${doc_cost:.4f}")
-    return ok
+    return outcome
+
+
+def exit_status(results, stopped_early, strict=False):
+    """Non-zero on a budget stop or any FAIL; with ``strict``, also any DEGRADED."""
+    outcomes = {r for _, r in results}
+    if stopped_early or FAIL in outcomes or (strict and DEGRADED in outcomes):
+        return 1
+    return 0
 
 
 def main(argv=None):
@@ -167,6 +219,8 @@ def main(argv=None):
     parser.add_argument("--ceiling", type=float, default=_DEFAULT_CEILING,
                          help=f"hard dollar ceiling for this run (default ${_DEFAULT_CEILING:.2f})")
     parser.add_argument("--log-file", type=Path, default=None)
+    parser.add_argument("--strict", action="store_true",
+                        help="also exit non-zero when a document DEGRADED to a lower tier")
     args = parser.parse_args(argv)
 
     log_lines = []
@@ -192,8 +246,10 @@ def main(argv=None):
             break
 
     log("\n=== summary ===")
-    for name, ok in results:
-        log(f"  {name}: {'PASS' if ok else 'FAIL'}")
+    for name, outcome in results:
+        log(f"  {name}: {outcome}")
+    counts = {o: sum(1 for _, r in results if r == o) for o in (PASS, DEGRADED, FAIL)}
+    log(f"  outcomes: {counts[PASS]} PASS, {counts[DEGRADED]} DEGRADED, {counts[FAIL]} FAIL")
     log(f"  documents completed: {len(results)}/{len(DOCUMENTS)}")
     log(f"  total real API calls: {len(client.calls)}")
     log(f"  total real cost: ${client.total_cost:.4f}")
@@ -204,7 +260,7 @@ def main(argv=None):
         args.log_file.write_text("\n".join(log_lines) + "\n", encoding="utf-8")
         print(f"\n(log written to {args.log_file})")
 
-    return 1 if stopped_early else 0
+    return exit_status(results, stopped_early, args.strict)
 
 
 if __name__ == "__main__":

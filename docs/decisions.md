@@ -2,6 +2,90 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-27 - the evidence store announces the public development key (Slice 72)
+
+Audit finding 4: with no `ANALYSTOS_EVIDENCE_KEY` the store encrypts with a key derived from a
+constant in the source. Kept as the zero-configuration default (never plaintext, existing
+stores stay readable) but it now prints one stderr line per process the first time it is used,
+naming the variable to set. Refusing to run without a key was rejected: it would break the
+command-line tool out of the box for a protection its typical user does not need, and the
+hosted path deletes the upload anyway.
+
+## 2026-09-27 - cleanup pass (Slice 71)
+
+Removed three unused imports and one dead function; added `tools/refresh.py` (one command,
+right order, `--check` mode) for the three generated artifacts that had each cost a
+stale-test failure this session; and a hygiene test so unused imports and unreferenced
+module-level functions cannot creep back. `solwayholdings.aao.json` (a Slice 7 sample whose
+description claims an org that does not exist) was left alone and logged for the owner: it is
+only a test fixture, and deleting a checked-in root file is not the loop's call.
+
+## 2026-09-27 - one model setting, recorded per run (Slice 70)
+
+The model name was a constant in four modules. It is now `ANALYSTOS_MODEL` through
+`analystos/models.py`, read at call time, validated, and recorded in the pipeline trace
+and the API audit event so an audited report can be tied to the model that wrote it. The
+default is unchanged. Deliberately not done: a model per stage or per API caller, and any
+claim that another model is *good* (only the live suite can say). The live suite's price
+table still refuses an unpriced model, which is the guard that keeps a model switch from
+defeating the $1.00 ceiling.
+
+## 2026-09-27 - the homepage's counts are generated (Slice 69)
+
+The homepage's test and spec counts were typed by hand in seven places and were 158 tests
+stale within a day. `tools/site_counts.py` now counts by discovering the suite and the spec
+folders and rewrites the figures through explicit patterns; a pattern that stops matching
+exactly once is an error, so rewording the page cannot quietly freeze a number. A test fails
+when the page is wrong. The cost is one command after adding tests (`python3
+tools/site_counts.py`), accepted deliberately: the alternative is a public number that is
+wrong.
+
+## 2026-09-27 - deployment smoke script (Slice 68)
+
+The checks that mattered on deploy day were run by hand with curl. `tools/smoke.py`
+runs them as one command against any deployment: every advertised URL and content type,
+the mesh identity files (charter valid, both paths identical, handshake slug matches),
+every link in `llms.txt` and the sitemap, the API index/OpenAPI agreement, the rewritten
+routes failing closed, an unauthenticated analysis refused, and a junk seal answered
+`ok:false`. It is tested against a local server that emulates Vercel's file-per-route rule
+and `vercel.json`'s rewrites and headers in front of the real Flask app, including
+deliberately broken deployments. That emulation is my model of Vercel, verified against
+the one real deployment we have; the smoke script run against analystos.dev is the
+real check. Sends no document, key or secret.
+
+## 2026-09-27 - live-suite PASS now means the report was good (Slice 67)
+
+The live suite printed PASS whenever the pipeline did not raise, including when a
+written report failed both gates and quietly fell back to a template. A run that
+degraded looked the same as one that did not, which defeats the suite's purpose.
+Runs are now graded from the pipeline's trace into PASS (expected tier, minimum
+verified facts, and a seal that fully verifies), DEGRADED (worked, but at a lower
+tier) and FAIL. DEGRADED is not a failure by default, because the model is
+non-deterministic and a fallback is designed behaviour, but it is visible, counted
+and fails the run under `--strict`. The minimum-fact thresholds are starting guesses
+to be tuned from the first real run, said so in `live_tests/README.md`. No paid run
+was made; the grading is proved with synthetic traces.
+
+## 2026-09-27 - the standalone verifier checks values against citations (Slice 66)
+
+The seal's biggest stated limit closed: with the extracted text, the verifier now checks
+that each quote's number and each calculation operand equals a number its own citation
+spells (as printed or times the document's declared scale), so a real quote paired with a
+wrong value - with every hash rebuilt - no longer passes. It is a second implementation of
+the analyzer's number reading, differentially tested against it. Deliberately exact on the
+stored canonical value (the analyzer accepts within 1% when *accepting* a fact; what it
+stores is exact). Events and prose carry no numeric value and stay uncovered, stated in
+`docs/seal.md`.
+
+## 2026-09-27 - displayed figures round half up (Slice 64)
+
+A source figure of `$1.95B` displayed as `$1.9B` (audit finding 11) because Python
+rounds the float's binary value, not the decimal the reader sees. Displayed figures
+(compact usd, percent, number, donut shares) now round the shortest decimal form half
+away from zero. One existing test had encoded the old behaviour (1,250,000 shown as
+$1.2M) and was corrected. The homepage's sample brief still shows "$1.9B" for the Orion
+guidance; that sample is a hand-condensed run and was left alone rather than guessed at.
+
 ## 2026-09-26 - deployed; FlashyOS Level 2 passes (verification of Slices 55-63)
 
 Merged and deployed. Checked the live site with read-only requests: every new file

@@ -30,7 +30,6 @@ module for exactly which formats have a genuine structural footnote
 concept to detect at all.
 """
 
-import csv
 
 import pdfplumber
 from docx import Document

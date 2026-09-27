@@ -18,12 +18,11 @@ separate, fully deterministic check in ``analystos.l2.narrate`` - this
 gate judges only what a blind read of the prose itself can judge.
 """
 
-import re
 import sys
 
 from analystos.l2.analyze import _create_message, _resolve_client
+from analystos.models import model_name
 
-_MODEL = "claude-sonnet-5"
 _MAX_TOKENS = 2048
 
 _SYSTEM_PROMPT = """\
@@ -173,7 +172,7 @@ def proofread_report(report, client=None):
 
     response = _create_message(
         client,
-        model=_MODEL,
+        model=model_name(),
         max_tokens=_MAX_TOKENS,
         system=_SYSTEM_PROMPT,
         tools=[_TOOL],

@@ -65,6 +65,7 @@ from analystos.l1.boilerplate import strip_forward_looking_boilerplate
 from analystos.l1.document_text import extract_document_text
 from analystos.l1.image_facts import tag_image_sourced_segments
 from analystos.l4.seal import build_bundle, load_signing_key
+from analystos.models import model_name
 from analystos.l4.deterministic_report import build_deterministic_report
 from analystos.l2.analyze import analyze_document
 from analystos.l2.answer import answer_growth, answer_lookup, answer_ratio
@@ -131,6 +132,7 @@ def _fill_trace(trace, tier, source_hash, segments, report, document_text, analy
     trace.update(
         tier=tier, source_hash=source_hash, segments=segments, report=report,
         document_text=document_text, analysis=dict(analysis), fallback_reason=reason,
+        model=model_name() if tier != "table" else None,
     )
 
 
@@ -218,7 +220,7 @@ def build_report(
             # wording (redundant phrasing, inconsistent terminology),
             # which a full regenerate would just as likely trade for a
             # different wording nit as actually fix. See
-            # specs/slice-38/spec.md and specs/slice-40/spec.md.
+            # the Slice 38 entry in docs/decisions.md and specs/slice-40/spec.md.
             passed, issues = proofread_report(report, client=llm_client)
             for _ in range(_MAX_GATE2_REPAIR_ROUNDS):
                 if passed:

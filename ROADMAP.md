@@ -21,7 +21,7 @@ Items the loop cannot do without you. Each says what is needed.
 Each item gets a `specs/slice-N/spec.md` first, tests, a commit, and a line in
 the session log. Nothing here is pushed until you say so.
 
-- [ ] **Q1 - Round half up when displaying figures** (audit finding 11): a source `$1.95B` must not display as `$1.9B`; `12.25%` must not display as `12.2%`. Accept: a table of half-way cases across usd/percent/number formats renders half-up; existing outputs otherwise unchanged; suite OK.
+- [x] **Q1 - Round half up when displaying figures** (audit finding 11): a source `$1.95B` must not display as `$1.9B`; `12.25%` must not display as `12.2%`. Accept: a table of half-way cases across usd/percent/number formats renders half-up; existing outputs otherwise unchanged; suite OK.
 - [ ] **Q2 - Make the spec record honest** (audit finding 9): `specs/README.md` indexing every slice, naming slices 35-39 (built without a spec) and 14 (empty); fix the code comment that cites a nonexistent spec. Accept: no source file cites a missing spec; a test keeps it that way.
 - [ ] **Q3 - Standalone verifier checks a quote's value against its citation** (closes the biggest gap in `docs/seal.md`): port the number parser, scale words, accounting negatives and document scale. Accept: differential test against the analyzer across a sample; a tampered value is caught even when hashes are rebuilt.
 - [ ] **Q4 - Live-suite PASS means something** (audit finding 8): assert the expected tier and minimum fact counts, not only "did not raise". Accept: mocked tests prove a fallback fails the check; docs say what PASS means. (No paid run here.)
@@ -244,3 +244,4 @@ None of this is buildable until R1's mesh steps are done.
 One line per completed item (newest last).
 
 - 2026-09-27 - queue and blocked list written; loop started on branch `roadmap-loop-2026-09-27` (nothing pushed).
+- 2026-09-27 - Q1 done (Slice 64): displayed figures round half up; 683 tests.

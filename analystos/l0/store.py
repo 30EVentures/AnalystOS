@@ -17,6 +17,7 @@ See specs/slice-43/spec.md.
 
 import hashlib
 import os
+import sys
 import time
 from base64 import urlsafe_b64encode
 from pathlib import Path
@@ -36,6 +37,24 @@ _RETENTION_DAYS_ENV_VAR = "ANALYSTOS_EVIDENCE_RETENTION_DAYS"
 _DEV_FALLBACK_KEY_MATERIAL = b"AnalystOS evidence store dev fallback - set ANALYSTOS_EVIDENCE_KEY in prod"
 
 
+_warned_fallback = False
+
+
+def _warn_once_about_fallback():
+    """One stderr line per process the first time the public development key is
+    used (Slice 72). It is derived from a constant in this file, so it protects
+    against casual reading only; say so rather than looking configured."""
+    global _warned_fallback
+    if not _warned_fallback:
+        _warned_fallback = True
+        print(
+            f"[analystos.l0] evidence store is encrypted with the built-in development key, which is "
+            f"public in the source and protects against casual reading only. Set {_EVIDENCE_KEY_ENV_VAR} "
+            f"to a Fernet key for real protection.",
+            file=sys.stderr,
+        )
+
+
 def _fernet() -> Fernet:
     """The Fernet cipher for this process: ``ANALYSTOS_EVIDENCE_KEY`` if
     set, else a stable local fallback (never a fresh random key per call -
@@ -44,6 +63,7 @@ def _fernet() -> Fernet:
     raw = os.environ.get(_EVIDENCE_KEY_ENV_VAR)
     if raw:
         return Fernet(raw.encode("utf-8"))
+    _warn_once_about_fallback()
     key = urlsafe_b64encode(hashlib.sha256(_DEV_FALLBACK_KEY_MATERIAL).digest())
     return Fernet(key)
 

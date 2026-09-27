@@ -2,6 +2,15 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-27 - the evidence store announces the public development key (Slice 72)
+
+Audit finding 4: with no `ANALYSTOS_EVIDENCE_KEY` the store encrypts with a key derived from a
+constant in the source. Kept as the zero-configuration default (never plaintext, existing
+stores stay readable) but it now prints one stderr line per process the first time it is used,
+naming the variable to set. Refusing to run without a key was rejected: it would break the
+command-line tool out of the box for a protection its typical user does not need, and the
+hosted path deletes the upload anyway.
+
 ## 2026-09-27 - cleanup pass (Slice 71)
 
 Removed three unused imports and one dead function; added `tools/refresh.py` (one command,

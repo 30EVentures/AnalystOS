@@ -80,3 +80,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 66 | the standalone verifier checks each quote's value against its citation (roadmap Q3) | [spec](slice-66/spec.md) |
 | 67 | a live-suite PASS means the report was good, not that nothing raised (roadmap Q4) | [spec](slice-67/spec.md) |
 | 68 | a post-deploy smoke script (roadmap Q5) | [spec](slice-68/spec.md) |
+| 69 | the homepage's test and spec counts are generated, not typed (roadmap Q6) | [spec](slice-69/spec.md) |

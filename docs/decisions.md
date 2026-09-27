@@ -2,6 +2,16 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-27 - the homepage's counts are generated (Slice 69)
+
+The homepage's test and spec counts were typed by hand in seven places and were 158 tests
+stale within a day. `tools/site_counts.py` now counts by discovering the suite and the spec
+folders and rewrites the figures through explicit patterns; a pattern that stops matching
+exactly once is an error, so rewording the page cannot quietly freeze a number. A test fails
+when the page is wrong. The cost is one command after adding tests (`python3
+tools/site_counts.py`), accepted deliberately: the alternative is a public number that is
+wrong.
+
 ## 2026-09-27 - deployment smoke script (Slice 68)
 
 The checks that mattered on deploy day were run by hand with curl. `tools/smoke.py`

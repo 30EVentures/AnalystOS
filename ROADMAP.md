@@ -255,3 +255,4 @@ One line per completed item (newest last).
 - 2026-09-27 - Q7 done (Slice 70): ANALYSTOS_MODEL replaces four hard-coded constants; recorded in trace and audit event; 751 tests.
 - 2026-09-27 - Q8 done (Slice 71): cleanup - 3 unused imports and 1 dead function removed; tools/refresh.py; hygiene test; 756 tests.
 - 2026-09-27 - Q9 done (Slice 72): evidence store warns once per process when using the public development key; 760 tests.
+- 2026-09-27 - loop finished: every unblocked item done (Q1-Q9); remaining work is under "Blocked / needs input" at the top. 760 tests, 21 commits on `roadmap-loop-2026-09-27`, nothing pushed.

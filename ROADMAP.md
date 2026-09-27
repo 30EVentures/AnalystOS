@@ -247,4 +247,4 @@ One line per completed item (newest last).
 - 2026-09-27 - Q1 done (Slice 64): displayed figures round half up; 683 tests.
 - 2026-09-27 - Q2 done (Slice 65): specs/README.md index with marked gaps (14, 35-39); dangling spec citation fixed; 687 tests.
 - 2026-09-27 - Q3 done (Slice 66): verifier checks quote values and operands against citations; differential-tested; 703 tests.
-- 2026-09-27 - Q4 done (Slice 67): live-suite runs graded PASS/DEGRADED/FAIL from the trace (no paid run); 714 tests.
+- 2026-09-27 - Q4 done (Slice 67): live-suite runs graded PASS/DEGRADED/FAIL from the trace (no paid run); 712 tests.

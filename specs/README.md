@@ -84,3 +84,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 70 | the model is one setting, and every report says which one made it (roadmap Q7) | [spec](slice-70/spec.md) |
 | 71 | cleanup pass (roadmap Q8) | [spec](slice-71/spec.md) |
 | 72 | the evidence store says out loud when it uses the public key (roadmap Q9) | [spec](slice-72/spec.md) |
+| 73 | citation matching stops accepting a number inside a bigger one | [spec](slice-73/spec.md) |

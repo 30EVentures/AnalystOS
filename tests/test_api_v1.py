@@ -201,6 +201,79 @@ class ReportAccessTest(ApiTestCase):
         self.assertEqual([(v["via"], v["caller"]) for v in views], [("key", "agent-a")])
 
 
+class ReviewTest(ApiTestCase):
+    """Its own X-Forwarded-For (like VercelDoorsTest's rate-limit test) so these
+    extra requests don't push the shared per-IP counter into other tests' way."""
+
+    IP = "203.0.113.202"
+
+    def h(self, key=None):
+        return {**super().h(key), "X-Forwarded-For": self.IP}
+
+    def get(self, path):
+        return self.client.get(path, headers={"X-Forwarded-For": self.IP})
+
+    def review(self, body, key=None, **payload):
+        return self.client.post(f"/api/v1/reports/{body['id']}/review", json=payload, headers=self.h(key))
+
+    def test_creator_can_review_and_it_shows_up_at_verify(self):
+        body = self.created()
+        r = self.review(body, approved=True)
+        self.assertEqual(r.status_code, 200)
+        reviewed = r.get_json()["reviewed"]
+        self.assertEqual((reviewed["caller"], reviewed["approved"]), ("agent-a", True))
+        meta = self.get(f"/api/v1/verify/{body['id']}").get_json()
+        self.assertEqual(meta["reviewed"], reviewed)
+
+    def test_unreviewed_is_null(self):
+        body = self.created()
+        meta = self.get(f"/api/v1/verify/{body['id']}").get_json()
+        self.assertIsNone(meta["reviewed"])
+
+    def test_reviewing_again_overwrites(self):
+        body = self.created()
+        self.review(body, approved=False)
+        second = self.review(body, approved=True).get_json()["reviewed"]
+        meta = self.get(f"/api/v1/verify/{body['id']}").get_json()
+        self.assertEqual(meta["reviewed"], second)
+        self.assertTrue(second["approved"])
+
+    def test_approved_is_optional_and_defaults_to_null(self):
+        body = self.created()
+        reviewed = self.review(body).get_json()["reviewed"]
+        self.assertIsNone(reviewed["approved"])
+
+    def test_approved_must_be_a_boolean(self):
+        body = self.created()
+        self.assertEqual(self.review(body, approved="yes").status_code, 400)
+
+    def test_only_the_creator_can_review(self):
+        body = self.created()
+        self.assertEqual(self.review(body, key=self.raw_b).status_code, 404)
+        self.assertEqual(self.client.post(f"/api/v1/reports/{body['id']}/review",
+                                           headers={"X-Forwarded-For": self.IP}).status_code, 401)
+
+    def test_unknown_report_is_404(self):
+        self.assertEqual(self.client.post(f"/api/v1/reports/{'a' * 64}/review", headers=self.h()).status_code, 404)
+
+    def test_query_form_used_behind_vercel_rewrites(self):
+        body = self.created()
+        r = self.client.post(f"/api/v1/reports?digest={body['id']}&review=true", json={"approved": True}, headers=self.h())
+        self.assertEqual(r.status_code, 200)
+
+    def test_expired_report_cannot_be_reviewed(self):
+        body = self.created()
+        with patch("analystos.api_v1.blueprint.time.time", return_value=time.time() + 40 * 86400):
+            r = self.review(body)
+        self.assertEqual(r.status_code, 410)
+
+    def test_reviews_are_audited(self):
+        body = self.created()
+        self.review(body, approved=True)
+        reviews = [e for e in self.store.read_audit() if e["type"] == "review"]
+        self.assertEqual([(e["caller"], e["approved"]) for e in reviews], [("agent-a", True)])
+
+
 class LinksTest(ApiTestCase):
     def link(self, body, key=None, **payload):
         payload = {"id": body["id"], **payload}
@@ -403,23 +476,23 @@ class DiscoveryTest(ApiTestCase):
         self.assertEqual(index["openapi"], "/api/v1/openapi.json")
         self.assertEqual(self.client.get(index["openapi"]).status_code, 200)
         self.assertEqual({(e["method"], e["path"]) for e in index["endpoints"]}, {
-            ("POST", "/api/v1/analyses"), ("GET", "/api/v1/reports/{id}"), ("POST", "/api/v1/links"),
-            ("GET", "/api/v1/verify/{id}"), ("POST", "/api/v1/verify")})
+            ("POST", "/api/v1/analyses"), ("GET", "/api/v1/reports/{id}"), ("POST", "/api/v1/reports/{id}/review"),
+            ("POST", "/api/v1/links"), ("GET", "/api/v1/verify/{id}"), ("POST", "/api/v1/verify")})
 
     def test_openapi_covers_every_route_and_method(self):
         spec = build_openapi()
         self.assertTrue(spec["openapi"].startswith("3.1"))
         documented = {(path, method.upper()) for path, item in spec["paths"].items() for method in item}
+        # bare rewrite-landing paths, documented at their pretty ({id}) form instead
+        landing = {("/api/v1/openapi", "GET"), ("/api/v1/reports", "GET"), ("/api/v1/reports", "POST")}
         served = set()
         for rule in app.url_map.iter_rules():
             if not str(rule).startswith("/api/v1"):
                 continue
             path = re.sub(r"<[a-z]+>", "{id}", str(rule))
-            if path in ("/api/v1/openapi", "/api/v1/reports", "/api/v1/verify") and rule.methods & {"GET"} and \
-               path != "/api/v1/verify":
-                continue  # rewrite landing paths, documented at their pretty form
             for method in rule.methods - {"HEAD", "OPTIONS"}:
-                served.add((path, method))
+                if (path, method) not in landing:
+                    served.add((path, method))
         served.discard(("/api/v1/verify", "GET"))
         self.assertEqual(served - documented, set(), "routes with no OpenAPI entry")
         self.assertEqual(documented - served, set(), "OpenAPI entries with no route")
@@ -446,7 +519,7 @@ class VercelDoorsTest(unittest.TestCase):
         for rule in app.url_map.iter_rules():
             path = str(rule)
             if path.startswith("/api/v1"):
-                path = re.sub(r"/<[a-z]+>$", "", path)
+                path = re.sub(r"/<[a-z]+>.*$", "", path)  # a dynamic segment, and anything after it, rewrites onto its bare door
                 base_paths.add(path.replace(".json", ""))
         for path in sorted(base_paths):
             relative = path[len("/api/"):] or ""
@@ -460,6 +533,7 @@ class VercelDoorsTest(unittest.TestCase):
         rewrites = {r["source"]: r["destination"] for r in config["rewrites"]}
         self.assertEqual(rewrites["/api/v1/openapi.json"], "/api/v1/openapi")
         self.assertEqual(rewrites["/api/v1/reports/:digest"], "/api/v1/reports?digest=:digest")
+        self.assertEqual(rewrites["/api/v1/reports/:digest/review"], "/api/v1/reports?digest=:digest&review=true")
         self.assertEqual(rewrites["/api/v1/verify/:digest"], "/api/v1/verify?digest=:digest")
 
     def test_the_old_routes_still_exist(self):

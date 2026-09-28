@@ -16,6 +16,7 @@ index of endpoints: `GET /api/v1`. Errors are always
 | `GET /api/v1/openapi.json` | none | OpenAPI 3.1 |
 | `POST /api/v1/analyses` | API key | upload one document (`multipart`, field `file`, optional `title`); returns the report, its seal and, if storage is configured, links |
 | `GET /api/v1/reports/{id}?format=html\|pdf\|seal` | API key (creator) or signed link | fetch a stored report |
+| `POST /api/v1/reports/{id}/review` | API key (creator) | `{"approved"?: bool}` -> record that a human reviewed this report |
 | `POST /api/v1/links` | API key (creator) | `{"id","format","ttl_seconds"}` -> an expiring signed URL |
 | `GET /api/v1/verify/{id}` | none | seal metadata only (payload, signature info) |
 | `POST /api/v1/verify` | none | `{"bundle", "public_key"?, "text"?}` -> verification result (stateless) |
@@ -94,10 +95,21 @@ python3 -m analystos.api_v1 newkey partner-name
   `read_audit`) for an object store. Until then treat stored reports as
   short-lived.
 
+## Human review
+
+The intended shape: an agent calls `/api/v1/analyses` and gets the report
+back; a human reviews it. `POST /api/v1/reports/{id}/review` (optional body
+`{"approved": true|false}`) records who reviewed a report and when -
+same auth and ownership rule as fetching the report. It does not gate
+anything: a report is deliverable and verifiable whether or not it has been
+reviewed. The recorded review (or `null`) is returned by
+`GET /api/v1/verify/{id}` alongside the seal metadata. Reviewing again
+overwrites who/when/approved.
+
 ## Audit log and the charter's measures
 
-Every analysis, view and link appends one JSON line (`audit.jsonl` in the store,
-else stderr): caller name, report id, tier, fallback reason, proposed / verified /
+Every analysis, view, link and review appends one JSON line (`audit.jsonl` in the
+store, else stderr): caller name, report id, tier, fallback reason, proposed / verified /
 dropped counts, the model used, whether the seal was signed and re-verified. **No document text and no
 filename.** The three measures in the published charter are computed from it:
 

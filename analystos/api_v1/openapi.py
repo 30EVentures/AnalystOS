@@ -61,6 +61,19 @@ def build_openapi():
                     "410": _err("expired"), "503": _err("storage not configured"),
                 },
             }},
+            "/api/v1/reports/{id}/review": {"post": {
+                "operationId": "reviewReport", "summary": "Record that a human reviewed a delivered report", "security": _BEARER,
+                "description": "Same ownership rule as GET /reports/{id}: only the key that created the report may review it. Idempotent - reviewing again overwrites who/when/approved.",
+                "parameters": [_DIGEST],
+                "requestBody": {"required": False, "content": {"application/json": {"schema": {
+                    "type": "object", "properties": {"approved": {"type": ["boolean", "null"]}}}}}},
+                "responses": {
+                    "200": {"description": "Recorded", "content": {"application/json": {"schema": {
+                        "type": "object", "properties": {"id": {"type": "string"}, "reviewed": {"$ref": "#/components/schemas/Review"}}}}}},
+                    "400": _err("approved must be a boolean"), "401": _err("missing or invalid API key"),
+                    "404": _err("not found"), "410": _err("expired"), "503": _err("storage not configured"),
+                },
+            }},
             "/api/v1/links": {"post": {
                 "operationId": "createLink", "summary": "Issue an expiring signed link to one report and one format",
                 "security": _BEARER,
@@ -79,7 +92,7 @@ def build_openapi():
             "/api/v1/verify/{id}": {"get": {
                 "operationId": "getSealMetadata", "summary": "Seal metadata for a stored report (never the report)", "security": [],
                 "parameters": [_DIGEST],
-                "responses": {"200": {"description": "Payload and signature info", "content": {"application/json": {"schema": {"type": "object"}}}},
+                "responses": {"200": {"description": "Payload, signature info and review state", "content": {"application/json": {"schema": {"type": "object"}}}},
                               "404": _err("not found"), "410": _err("expired"), "503": _err("storage not configured")},
             }},
             "/api/v1/verify": {"post": {
@@ -110,6 +123,9 @@ def build_openapi():
                                                           "properties": {"name": {"type": "string"},
                                                                          "status": {"enum": ["pass", "fail", "skipped"]},
                                                                          "detail": {"type": "string"}}}}}},
+                "Review": {"type": ["object", "null"], "description": "null until reviewed", "properties": {
+                    "caller": {"type": "string"}, "at": {"type": "string", "format": "date-time"},
+                    "approved": {"type": ["boolean", "null"]}}},
                 "Analysis": {"type": "object", "required": ["id", "tier", "created", "counts", "signed", "seal", "html", "stored"], "properties": {
                     "id": {"type": "string"}, "tier": {"enum": ["written", "deterministic", "plain"]},
                     "created": {"type": "string"}, "signed": {"type": "boolean"}, "stored": {"type": "boolean"},

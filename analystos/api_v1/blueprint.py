@@ -97,6 +97,7 @@ def index():
         "endpoints": [
             {"method": "POST", "path": "/api/v1/analyses", "auth": "bearer", "summary": "Analyze one uploaded document"},
             {"method": "GET", "path": "/api/v1/reports/{id}", "auth": "bearer or signed link", "summary": "Fetch a stored report (?format=html|pdf|seal)"},
+            {"method": "POST", "path": "/api/v1/reports/{id}/review", "auth": "bearer", "summary": "Record that a human reviewed this report ({\"approved\"?: bool})"},
             {"method": "POST", "path": "/api/v1/links", "auth": "bearer", "summary": "Issue an expiring signed link to a report"},
             {"method": "GET", "path": "/api/v1/verify/{id}", "auth": "none", "summary": "Seal metadata for a stored report"},
             {"method": "POST", "path": "/api/v1/verify", "auth": "none", "summary": "Verify a seal bundle"},
@@ -248,6 +249,47 @@ def get_report_by_query():
     return _report_request(request.args.get("digest", ""))
 
 
+def _review_report(digest):
+    limited = _limited()
+    if limited:
+        return limited
+    if not store_mod.DIGEST_RE.match(digest or ""):
+        return _err(404, "not_found", "no such report")
+    store = _store()
+    if store is None:
+        return _err(503, "store_not_configured", "report storage is not configured on this server")
+    caller, denied = _caller()
+    if denied:
+        return denied
+    meta = store.meta(digest)
+    if meta is not None and meta.get("caller") != caller:
+        meta = None  # someone else's report looks exactly like a missing one
+    if meta is None:
+        return _err(404, "not_found", "no such report")
+    if meta.get("expires_ts", 0) <= time.time():
+        return _err(410, "expired", "this report has expired and been removed")
+    body = request.get_json(silent=True) or {}
+    approved = body.get("approved")
+    if approved is not None and not isinstance(approved, bool):
+        return _err(400, "bad_request", "approved must be a boolean if given")
+    review = {"caller": caller, "at": store_mod.iso(time.time()), "approved": approved}
+    store.mark_reviewed(digest, review)
+    store_mod.emit_audit(store, {"type": "review", "id": digest, "caller": caller, "approved": approved})
+    return jsonify({"id": digest, "reviewed": review})
+
+
+@bp.post("/reports/<digest>/review")
+def review_report(digest):
+    return _review_report(digest)
+
+
+@bp.post("/reports")
+def review_report_by_query():
+    if not request.args.get("review"):
+        return _err(404, "not_found", "no such report")
+    return _review_report(request.args.get("digest", ""))
+
+
 @bp.post("/links")
 def create_link():
     limited = _limited()
@@ -302,7 +344,7 @@ def _verify_meta(digest):
     return jsonify({
         "id": digest, "payload": bundle["payload"],
         "signature": {k: signature[k] for k in ("alg", "key_id", "public_key")} if signature else None,
-        "expires": meta.get("expires"),
+        "expires": meta.get("expires"), "reviewed": meta.get("reviewed"),
         "note": "metadata only: fetch the seal and report with credentials or a signed link",
     })
 

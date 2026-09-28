@@ -71,6 +71,15 @@ class FileStore:
         except (OSError, ValueError):
             return None
 
+    def mark_reviewed(self, digest, review):
+        """Merge ``{"reviewed": review}`` into the stored meta. Raises
+        ``ValueError`` if there is no such report (caller checks first)."""
+        directory = self._dir(digest)
+        meta = self.meta(digest)
+        if meta is None:
+            raise ValueError("no such report")
+        self._write(directory / _KINDS["meta"], json.dumps({**meta, "reviewed": review}).encode("utf-8"))
+
     def read(self, digest, kind):
         try:
             return (self._dir(digest) / _KINDS[kind]).read_bytes()

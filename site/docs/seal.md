@@ -71,7 +71,10 @@ files by.
 1. **Normalize.** In every `record` and in `report`, each JSON number is
    written as a string (`repr` of a float, `str` of an int). Booleans, null,
    strings, arrays and objects stay. This is why no verifier has to agree with
-   another about how to print a float.
+   another about how to print a float. **A verifier rejects a bundle** (a
+   `structure` failure) in which any `record`, the `report`, or any `payload`
+   field other than `version` and `entries` contains a JSON number. Those two
+   are the only numbers in a bundle and must be integers: `1`, not `1.0`.
 2. **Canonical JSON.** Keys sorted at every level, separators `,` and `:` with
    no whitespace, UTF-8, non-ASCII characters not escaped.
 3. **Fact hash.** `sha256(canonical(record))`, lowercase hex.
@@ -89,8 +92,14 @@ files by.
 10. **Content.** With the text, fold both text and each citation
     (lowercase; `–`, `—`, `−` to `-`; drop `$` and `|`; remove a thousands
     comma between digits; collapse whitespace). A citation passes if the folded
-    citation is a substring of the folded text, or is with one trailing scale
-    word (`thousand million billion bn mm k m b`) removed. **Values:** read every
+    citation, or the folded citation with one trailing scale word
+    (`thousand million billion bn mm k m b`) removed, occurs in the folded text
+    **as a whole number**: if it starts with a digit, no ASCII digit, and no `.`
+    or `,` that follows a digit, may come immediately before it; if it ends with
+    a digit, no digit, and no `.` or `,` that is followed by a digit, may come
+    immediately after it. A full stop or comma that merely ends a sentence or
+    separates a list does not count. If one occurrence fails this test, later
+    occurrences are tried. **Values:** read every
     number a citation spells (optional `(` or `-` makes it negative; optional `$`;
     digits with commas and a decimal point; an optional scale word `k thousand m mm
     million b bn billion` multiplies it). The document's *declared scale* is the
@@ -140,3 +149,9 @@ If your port does not reproduce that root, it is not the same seal.
   facts are the important ones, that a relationship between two figures is right
   (Slice 55 checks some), or that the model's GAAP/guidance labels are correct.
 - There is no chain between reports and no transparency log yet.
+- A citation with its scale word stripped (rule 10) matches any standalone
+  occurrence of the bare number, even one the scale was never meant to apply
+  to - `$5 million` is satisfied by a document that only ever says "5" on its
+  own. Rule 10 proves the number is genuinely present as a whole number, not
+  that it is the right one; that is still `values_match_citations`'s job where
+  it applies, and a human's job otherwise.

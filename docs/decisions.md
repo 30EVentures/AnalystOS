@@ -2,6 +2,16 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-29 - the homepage credits the studio, not a person (Slice 79)
+
+The page named its maintainer three times ("Built solo by ...", a first-person "Who built
+it", "Built solo, early stage"). With Slice 78 the site says it is a 30E Ventures product, so
+the copy now says "Built by 30E Ventures" and speaks as "we". Every factual claim in "Who
+built it" is kept (a spec before the code, every real bug recorded with its root cause,
+candour about being early); only the attribution changed. "Solo" was dropped rather than
+carried over, because it was a claim about team size that the studio framing no longer makes.
+Internal documents that mention the maintainer are out of scope for this slice.
+
 ## 2026-09-29 - the studio bar is generated static markup, not a script include or a copied snippet (Slice 78)
 
 analystos.dev now carries a 30E Ventures bar and a footer line so it visibly belongs to the

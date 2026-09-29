@@ -231,7 +231,7 @@ class ContentTest(unittest.TestCase):
 
 
 class CitationBoundaryTest(unittest.TestCase):
-    """Slice 73: a citation must be found as a whole number, not inside a
+    """Slice 75: a citation must be found as a whole number, not inside a
     longer one. Found live while spiking a standalone extraction of this
     file (never published; the spike is dropped, this fix is what's left)."""
 
@@ -285,7 +285,7 @@ class CitationBoundaryTest(unittest.TestCase):
 
 
 class RawNumberTest(unittest.TestCase):
-    """Slice 73: rule 1 (docs/seal.md) says every number in a sealed record,
+    """Slice 75: rule 1 (docs/seal.md) says every number in a sealed record,
     report or payload field (other than version/entries) is a string. Nothing
     enforced it - a bundle with a raw JSON number hashed internally
     consistently and passed, but would hash differently under a verifier

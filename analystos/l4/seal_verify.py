@@ -155,7 +155,7 @@ def _digit_after(text, j):
 
 def found_as_whole(key, folded_text):
     """True if ``key`` occurs in ``folded_text`` without being part of a
-    longer number (Slice 73: a citation used to match as a plain substring,
+    longer number (Slice 75: a citation used to match as a plain substring,
     so "22.4" was found "in" "122.4" or "22.45"). A key that starts with a
     digit must not have a digit, or a '.'/',' joined to a digit, right before
     it; a key that ends with a digit must not have one right after it. A
@@ -283,7 +283,7 @@ def _is_int(value):
 
 def _raw_numbers(node, path, out):
     """Collect the paths of JSON numbers (int or float, not bool) under
-    ``node`` (Slice 73: rule 1 says every number in a sealed record, report or
+    ``node`` (Slice 75: rule 1 says every number in a sealed record, report or
     payload field is a string; nothing enforced it)."""
     if node is None or isinstance(node, (str, bool)):
         return

@@ -442,7 +442,7 @@ def _digit_after(text, j):
 
 def _found_as_whole(key, text):
     """True if ``key`` occurs in ``text`` without being part of a longer
-    number (Slice 73: this used to be a plain substring test, so "22.4" was
+    number (Slice 75: this used to be a plain substring test, so "22.4" was
     found "in" "122.4" or "22.45" - an acceptance-time gap, since this
     function is what decides a model's proposed quote is real in the first
     place). If one occurrence fails the boundary test, later ones are tried."""

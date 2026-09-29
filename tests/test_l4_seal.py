@@ -19,7 +19,8 @@ from analystos.l2 import analyze
 from analystos.l4 import seal, seal_verify
 from analystos.l4.seal import build_bundle, generate_key, load_signing_key
 from analystos.l4.seal_verify import (
-    canonical_bytes, citation_in_text, match_key, normalize, recompute, verify_bundle,
+    canonical_bytes, citation_in_text, fact_hash, leaf_hash, match_key, merkle_root, normalize,
+    recompute, sha256_hex, verify_bundle,
 )
 from analystos.pipeline import build_report
 
@@ -227,6 +228,114 @@ class ContentTest(unittest.TestCase):
         segs[1]["value"] = (22400000.0 - 19600000.0) / 19600000.0 * 100
         out = verify_bundle(build_bundle(trace(segments=segs)), source_text=TEXT)
         self.assertEqual(statuses(out)["calculations"], "pass")
+
+
+class CitationBoundaryTest(unittest.TestCase):
+    """Slice 73: a citation must be found as a whole number, not inside a
+    longer one. Found live while spiking a standalone extraction of this
+    file (never published; the spike is dropped, this fix is what's left)."""
+
+    def found(self, citation, text):
+        return citation_in_text(citation, match_key(text))
+
+    def test_honest_citations_still_match(self):
+        cases = [
+            ("$498.0 million", "Revenue was $498.0 million."),
+            ("$498.0 million", "revenue was $498.0 million, up 3%"),
+            ("$498.0 million", "revenue ($498.0 million)"),
+            ("$22.4 million", "net income was $22.4 million"),
+            ("12.5%", "Margin rose to 12.5%, and"),
+            ("12.5%", "Margin rose to 12.5%."),
+            ("1,234.5", "Sales were 1,234.5 units."),
+            ("22.4", "Net income was 22.4."),
+            ("22.4", "values 22.4, 19.6"),
+            ("(22.4)", "a loss of (22.4) this year"),
+            ("$498.0 million", "In millions: 498.0"),
+            ("revenue was 498.0 million", "Revenue was 498.0 million."),
+        ]
+        for citation, text in cases:
+            with self.subTest(citation=citation, text=text):
+                self.assertTrue(self.found(citation, text))
+
+    def test_a_citation_inside_a_longer_number_does_not_match(self):
+        cases = [
+            ("$22.4 million", "$122.4 million"),  # digit before
+            ("22.4", "122.4"),
+            ("22.4", "22.45"),  # digit after
+            ("2", "1.2"),  # the fractional part of another number
+            ("2", "2.5"),  # the whole part of another number
+            ("5", "1,5"),  # after a comma joined to a digit
+            ("12.5%", "112.5%"),
+            ("234.5", "1,234.5"),  # the tail of a thousands number
+            ("$5 million", "the 2025 plan"),  # stripped of its scale word
+        ]
+        for citation, text in cases:
+            with self.subTest(citation=citation, text=text):
+                self.assertFalse(self.found(citation, text))
+
+    def test_a_later_whole_occurrence_is_found_even_if_an_earlier_one_is_not(self):
+        self.assertTrue(self.found("22.4", "was 122.4 before, then 22.4 after"))
+        self.assertFalse(self.found("22.4", "was 122.4 before, then 22.45 after"))
+
+    def test_the_real_gap_this_fixes(self):
+        # the two cases found by hand: a citation swallowed by a bigger number,
+        # and a scale-stripped citation matching an unrelated digit sequence
+        self.assertFalse(self.found("$22.4 million", "Net income was $122.4 million."))
+        self.assertFalse(self.found("$5 million", "The 2025 plan was approved."))
+
+
+class RawNumberTest(unittest.TestCase):
+    """Slice 73: rule 1 (docs/seal.md) says every number in a sealed record,
+    report or payload field (other than version/entries) is a string. Nothing
+    enforced it - a bundle with a raw JSON number hashed internally
+    consistently and passed, but would hash differently under a verifier
+    whose language prints floats differently than Python's `repr`."""
+
+    def _reseal(self, bundle):
+        for f in bundle["facts"]:
+            f["hash"] = fact_hash(f["record"])
+        bundle["payload"]["root"] = merkle_root([(f["key"], leaf_hash(f["key"], f["hash"])) for f in bundle["facts"]])
+        if bundle["report"] is not None:
+            bundle["payload"]["report_sha256"] = sha256_hex(canonical_bytes(bundle["report"]))
+        bundle["signature"] = None
+        return bundle
+
+    def structure(self, bundle):
+        return next(c for c in verify_bundle(bundle)["checks"] if c["name"] == "structure")
+
+    def test_the_base_bundle_is_accepted(self):
+        self.assertEqual(self.structure(build_bundle(trace()))["status"], "pass")
+
+    def test_a_float_in_a_fact_is_refused(self):
+        b = build_bundle(trace())
+        b["facts"][0]["record"]["value"] = 1.5
+        self.assertEqual(self.structure(self._reseal(b))["status"], "fail")
+
+    def test_an_integer_in_a_fact_is_refused_too(self):
+        b = build_bundle(trace())
+        b["facts"][0]["record"]["value"] = 7
+        out = self.structure(self._reseal(b))
+        self.assertEqual(out["status"], "fail")
+        self.assertIn("facts[0].record.value", out["detail"])
+
+    def test_a_number_nested_in_the_report_is_refused(self):
+        b = build_bundle(trace())
+        b["report"]["sections"][0]["chart"]["series"][0]["fact_index"] = 0
+        out = self.structure(self._reseal(b))
+        self.assertEqual(out["status"], "fail")
+        self.assertIn("report", out["detail"])
+
+    def test_version_must_be_the_integer_one(self):
+        for bad in (1.0, True, "1", 2):
+            with self.subTest(version=bad):
+                b = build_bundle(trace())
+                b["payload"]["version"] = bad
+                self.assertEqual(self.structure(b)["status"], "fail")
+
+    def test_any_other_payload_number_is_refused(self):
+        b = build_bundle(trace())
+        b["payload"]["nonce"] = 5
+        self.assertEqual(self.structure(b)["status"], "fail")
 
 
 class DifferentialAgainstTheAnalyzerTest(unittest.TestCase):

@@ -86,3 +86,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 72 | the evidence store says out loud when it uses the public key (roadmap Q9) | [spec](slice-72/spec.md) |
 | 73 | a human review, recorded (agent-native queue, item 1 of 3) | [spec](slice-73/spec.md) |
 | 74 | async analysis jobs (agent-native queue, item 2 of 3) | [spec](slice-74/spec.md) |
+| 73 | citation matching stops accepting a number inside a bigger one | [spec](slice-73/spec.md) |

@@ -791,6 +791,24 @@ class RealFilingTablesTest(unittest.TestCase):
         # mislabelled number - a false "verified" is never acceptable
         self.assertFalse(_really_in_document("Operating income 1,715.0", mk))
 
+    def test_a_citation_inside_a_longer_number_does_not_locate(self):
+        # Slice 73: a real gap found live while spiking a standalone extraction
+        # of the seal verifier (dropped; this fix is what's left of it) -
+        # _really_in_document decides a model's proposed quote is real in the
+        # first place, so this is an acceptance-time gap, not just a
+        # re-verification one. Same fix as seal_verify.citation_in_text
+        # (test_l4_seal.py::DifferentialAgainstTheAnalyzerTest requires they agree).
+        self.assertFalse(_really_in_document("$22.4 million", _match_key("Net income was $122.4 million.")))
+        self.assertFalse(_really_in_document("$5 million", _match_key("The 2025 plan was approved.")))
+        self.assertFalse(_really_in_document("22.4", _match_key("122.4")))
+        self.assertFalse(_really_in_document("2", _match_key("1.2")))
+        # honest citations next to punctuation, and the mislabelled-pair
+        # cases above, must still work exactly as before
+        self.assertTrue(_really_in_document("22.4", _match_key("values 22.4, 19.6")))
+        self.assertTrue(_really_in_document("$1,842.0", _match_key(self.DOC)))
+        self.assertTrue(_really_in_document("1,842.0 million", _match_key(self.DOC)))
+        self.assertFalse(_really_in_document("9,999.0", _match_key(self.DOC)))
+
     def test_value_matches_text_accepts_the_declared_scale(self):
         # the model gave the actual magnitude for a "1,842.0" cell in millions
         self.assertEqual(_value_matches_text(1_842_000_000.0, "1,842.0", 1_000_000), 1_842_000_000.0)

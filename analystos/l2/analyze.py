@@ -418,16 +418,58 @@ def _match_key(text):
     return " ".join(t.split())
 
 
+_DIGITS = frozenset("0123456789")
+
+
+def _digit_before(text, i):
+    """True if an ASCII digit, or a '.'/',' that itself follows a digit, is
+    immediately before index ``i`` - i.e. ``i`` sits inside a longer number."""
+    if i == 0:
+        return False
+    c = text[i - 1]
+    return c in _DIGITS or (c in ".," and i >= 2 and text[i - 2] in _DIGITS)
+
+
+def _digit_after(text, j):
+    """True if an ASCII digit, or a '.'/',' that is itself followed by a
+    digit, is immediately at index ``j`` - i.e. the match continues past ``j``
+    into a longer number."""
+    if j >= len(text):
+        return False
+    c = text[j]
+    return c in _DIGITS or (c in ".," and j + 1 < len(text) and text[j + 1] in _DIGITS)
+
+
+def _found_as_whole(key, text):
+    """True if ``key`` occurs in ``text`` without being part of a longer
+    number (Slice 73: this used to be a plain substring test, so "22.4" was
+    found "in" "122.4" or "22.45" - an acceptance-time gap, since this
+    function is what decides a model's proposed quote is real in the first
+    place). If one occurrence fails the boundary test, later ones are tried."""
+    start = 0
+    while True:
+        i = text.find(key, start)
+        if i < 0:
+            return False
+        j = i + len(key)
+        starts_inside = key[0] in _DIGITS and _digit_before(text, i)
+        ends_inside = key[-1] in _DIGITS and _digit_after(text, j)
+        if not starts_inside and not ends_inside:
+            return True
+        start = i + 1
+
+
 def _really_in_document(exact_text, match_document):
     """True if ``exact_text`` locates real text in ``match_document`` (which
-    is already ``_match_key``-folded). Two tiers, both incapable of passing
-    a digit sequence the source doesn't contain:
+    is already ``_match_key``-folded), as a whole number, not merely as a
+    substring. Two tiers, both incapable of passing a digit sequence the
+    source doesn't contain:
 
-    1. the folded text is a substring;
-    2. it is a substring with one trailing scale word removed - a model
-       reading a scaled table often re-appends the unit the header declared
-       ("1,842.0" -> "$1,842.0 million"), and stripping a word it added
-       cannot fabricate a match.
+    1. the folded text is a whole-number match;
+    2. it is a whole-number match with one trailing scale word removed - a
+       model reading a scaled table often re-appends the unit the header
+       declared ("1,842.0" -> "$1,842.0 million"), and stripping a word it
+       added cannot fabricate a match.
 
     A model that prepends a row label to a *non-leading* table cell
     ("Diluted earnings per share 0.35", where our pipe-flattened text has
@@ -442,10 +484,10 @@ def _really_in_document(exact_text, match_document):
     key = _match_key(exact_text)
     if not key:
         return False
-    if key in match_document:
+    if _found_as_whole(key, match_document):
         return True
     stripped = _TRAILING_SCALE_RE.sub("", key).strip()
-    return bool(stripped) and stripped != key and stripped in match_document
+    return bool(stripped) and stripped != key and _found_as_whole(stripped, match_document)
 
 
 _NUMBER_TOKEN_RE = re.compile(

@@ -20,7 +20,8 @@ What a pass means, level by level (reported separately, never merged):
 * ``authentic``     - additionally, the signature verifies under a public key
                       *you supplied* (a key inside the bundle proves nothing).
 * ``content_checked`` - additionally, with the extracted text: it is the text
-                      that was sealed, every citation is in it, and every
+                      that was sealed, every citation is in it *as a whole
+                      number, not merely as a substring*, and every
                       calculation recomputes from its operands.
 
 With the text, ``values_match_citations`` also checks that each quote's (and each
@@ -130,14 +131,57 @@ def match_key(text):
     return " ".join(t.split())
 
 
+_DIGITS = frozenset("0123456789")
+
+
+def _digit_before(text, i):
+    """True if an ASCII digit, or a '.'/',' that itself follows a digit, is
+    immediately before index ``i`` - i.e. ``i`` sits inside a longer number."""
+    if i == 0:
+        return False
+    c = text[i - 1]
+    return c in _DIGITS or (c in ".," and i >= 2 and text[i - 2] in _DIGITS)
+
+
+def _digit_after(text, j):
+    """True if an ASCII digit, or a '.'/',' that is itself followed by a
+    digit, is immediately at index ``j`` - i.e. the match continues past ``j``
+    into a longer number."""
+    if j >= len(text):
+        return False
+    c = text[j]
+    return c in _DIGITS or (c in ".," and j + 1 < len(text) and text[j + 1] in _DIGITS)
+
+
+def found_as_whole(key, folded_text):
+    """True if ``key`` occurs in ``folded_text`` without being part of a
+    longer number (Slice 73: a citation used to match as a plain substring,
+    so "22.4" was found "in" "122.4" or "22.45"). A key that starts with a
+    digit must not have a digit, or a '.'/',' joined to a digit, right before
+    it; a key that ends with a digit must not have one right after it. A
+    sentence-ending full stop or a list-separating comma does not count. If
+    one occurrence fails, later occurrences are tried."""
+    start = 0
+    while True:
+        i = folded_text.find(key, start)
+        if i < 0:
+            return False
+        j = i + len(key)
+        starts_inside = key[0] in _DIGITS and _digit_before(folded_text, i)
+        ends_inside = key[-1] in _DIGITS and _digit_after(folded_text, j)
+        if not starts_inside and not ends_inside:
+            return True
+        start = i + 1
+
+
 def citation_in_text(citation, folded_text):
     key = match_key(citation)
     if not key:
         return False
-    if key in folded_text:
+    if found_as_whole(key, folded_text):
         return True
     stripped = _TRAILING_SCALE_RE.sub("", key).strip()
-    return bool(stripped) and stripped != key and stripped in folded_text
+    return bool(stripped) and stripped != key and found_as_whole(stripped, folded_text)
 
 
 def parse_numbers(text):
@@ -233,6 +277,26 @@ def _report_refs(node, out):
         out.update(int(m.group(1)) for m in _PLACEHOLDER_RE.finditer(node))
 
 
+def _is_int(value):
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+def _raw_numbers(node, path, out):
+    """Collect the paths of JSON numbers (int or float, not bool) under
+    ``node`` (Slice 73: rule 1 says every number in a sealed record, report or
+    payload field is a string; nothing enforced it)."""
+    if node is None or isinstance(node, (str, bool)):
+        return
+    if isinstance(node, (int, float)):
+        out.append(path)
+    elif isinstance(node, dict):
+        for key, value in node.items():
+            _raw_numbers(value, f"{path}.{key}", out)
+    elif isinstance(node, (list, tuple)):
+        for i, value in enumerate(node):
+            _raw_numbers(value, f"{path}[{i}]", out)
+
+
 def verify_bundle(bundle, public_key=None, source_text=None):
     """Verify a seal bundle; see the module docstring for what each level means."""
     checks = []
@@ -261,8 +325,24 @@ def verify_bundle(bundle, public_key=None, source_text=None):
     payload, facts = bundle["payload"], bundle["facts"]
     needed = ("version", "org", "entries", "created", "nonce", "root", "source_sha256", "text_sha256", "report_sha256", "tier")
     missing = [k for k in needed if k not in payload]
-    if missing or payload.get("version") != PAYLOAD_VERSION:
-        checks.append(_check("structure", "fail", f"payload missing {missing} or wrong version"))
+    problem = None
+    if missing:
+        problem = f"payload missing {missing}"
+    elif not _is_int(payload["version"]) or payload["version"] != PAYLOAD_VERSION:
+        problem = f"payload.version must be the integer {PAYLOAD_VERSION}"
+    elif not _is_int(payload["entries"]):
+        problem = "payload.entries must be an integer"
+    else:
+        offenders = []
+        _raw_numbers({k: v for k, v in payload.items() if k not in ("version", "entries")}, "payload", offenders)
+        for i, fact in enumerate(facts):
+            if isinstance(fact, dict):
+                _raw_numbers(fact.get("record"), f"facts[{i}].record", offenders)
+        _raw_numbers(bundle.get("report"), "report", offenders)
+        if offenders:
+            problem = f"raw JSON numbers are not allowed (rule 1); first at {offenders[0]}"
+    if problem:
+        checks.append(_check("structure", "fail", problem))
         return result()
     checks.append(_check("structure", "pass", f"{len(facts)} facts, tier {payload['tier']}"))
 

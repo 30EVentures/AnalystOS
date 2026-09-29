@@ -24,7 +24,7 @@ class ValidateManifestTest(unittest.TestCase):
             "name": "Solwayholdings",
             "slug": "solwayholdings",
             "description": "Solwayholdings on the FlashyOS mesh.",
-            "accountableTo": "calebsolway@gmail.com",
+            "accountableTo": "30eventures@gmail.com",
             "roles": [
                 {
                     "name": "integration",
@@ -113,7 +113,7 @@ class PublishedSchemaProbesTest(unittest.TestCase):
         ("tier NONE is not in the spec", _role(humanApprovalAtOrAbove="NONE"), False),
         ("family banana is not in the closed list", _role(family="banana"), False),
         ("family finance is real", _role(family="finance"), True),
-        ("accountableTo must be an email", _with(accountableTo="Caleb Solway"), False),
+        ("accountableTo must be an email", _with(accountableTo="30E Ventures"), False),
         ("accountableTo template placeholder", _with(accountableTo="you@example.com"), False),
         ("unknown top-level key", _with(**{"_comment": "hi"}), False),
         ("x- extension key is allowed", _with(**{"x-comment": "hi"}), True),

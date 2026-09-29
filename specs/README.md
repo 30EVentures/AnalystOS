@@ -91,3 +91,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 77 | a non-Python checker for a seal's facts | [spec](slice-77/spec.md) |
 | 78 | the 30E Ventures studio bar and footer on the public site | [spec](slice-78/spec.md) |
 | 79 | the homepage credits 30E Ventures, not an individual | [spec](slice-79/spec.md) |
+| 80 | one public identity: 30E Ventures, and its own email | [spec](slice-80/spec.md) |

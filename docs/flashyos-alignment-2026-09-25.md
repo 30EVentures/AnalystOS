@@ -51,7 +51,7 @@ Method: I fetched `https://flashyos.com/aao.schema.json`, verified it uses only 
 | `name: "Solwayholdings"` | required, non-blank | ✓ |
 | `slug: "solwayholdings"` | `^[a-z0-9]+(-[a-z0-9]+)*$` | ✓ |
 | `description: "Solwayholdings on the FlashyOS mesh."` | required, non-blank | ✓ structurally — **but factually false today**: no `solwayholdings` org exists on the network (spec notes §8) |
-| `accountableTo: "calebsolway@gmail.com"` | email pattern; not `you@example.com` | ✓ |
+| `accountableTo: "30eventures@gmail.com"` | email pattern; not `you@example.com` | ✓ |
 | `roles[0]` `integration` / `roles[1]` `coordination` | name `^[a-z0-9]+(-[a-z0-9]+)*$`, 3–24 chars, ≤ 3 words | ✓ (11 and 12 chars, one word) |
 | role `family`: `engineering`, `operations` | one of the ten | ✓ |
 | role `capabilities`: `build deploy report` / `propose accept decline` | ≥ 1 action verbs | ✓ |
@@ -74,7 +74,7 @@ The 15 disagreements:
 | 2 | `humanApprovalAtOrAbove: "CRITICAL"` | **valid** | refuses | **missing a real value** |
 | 3 | `humanApprovalAtOrAbove: "NONE"` | invalid | accepts | **made up** — `NONE` is not in the spec; Slice 7's "Done when #7" invented `{NONE,LOW,MEDIUM,HIGH}` |
 | 4 | `family: "banana"` | invalid (closed list of ten) | accepts | **missing** (Slice 7 deferred it: "we just require a lowercase word") |
-| 5 | `accountableTo: "Caleb Solway"` | invalid (must be an email) | accepts | **missing** email check |
+| 5 | `accountableTo: "30E Ventures"` | invalid (must be an email) | accepts | **missing** email check |
 | 6 | `accountableTo: "you@example.com"` | fails conformance (the one placeholder the spec names) | accepts | **missing** |
 | 7 | unknown top-level key `_comment` | invalid (`additionalProperties:false`; only `x-`) | accepts | **missing** — and this exact mistake failed a real estate property (`/conformance`: "`_comment` instead of `x-comment`") |
 | 8 | `aao: "0.2"` | invalid (const `"0.1"`) | accepts | **too loose** (`\d+\.\d+`) |
@@ -122,7 +122,7 @@ Deliberately **no `capabilities`** — advertising a capability AnalystOS cannot
 ```json
 { "aao": "0.1", "name": "AnalystOS", "slug": "analystos",
   "description": "Reads a source document and writes an analytical report in which every figure is a verified quote or an independently recomputed calculation.",
-  "accountableTo": "calebsolway@gmail.com",
+  "accountableTo": "30eventures@gmail.com",
   "roles": [{ "name": "report-generator", "family": "data",
     "purpose": "Produces a cited analytical report from one source document, discarding every figure it cannot verify.",
     "capabilities": ["analyze", "verify", "cite"], "humanApprovalAtOrAbove": "MEDIUM" }],

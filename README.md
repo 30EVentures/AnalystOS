@@ -56,7 +56,7 @@ Run it on your own document: [`docs/using-analystos.md`](docs/using-analystos.md
 | `specs/` | one folder per slice: goal, scope, "done when" |
 | `tests/` | the automated suite (no network, no cost) |
 | `live_tests/` | a manual suite with real, paid model calls under a $1.00 ceiling |
-| `tools/` | `build_site_machine.py` regenerates the machine files from `docs/`; `refresh.py` regenerates all of these in order; `smoke.py` checks a live deployment; `site_counts.py` keeps the homepage's test and spec counts true; `build_specs_index.py` regenerates the spec index |
+| `tools/` | `build_site_machine.py` regenerates the machine files from `docs/`; `refresh.py` regenerates all of these in order; `smoke.py` checks a live deployment; `site_counts.py` keeps the homepage's test and spec counts true; `build_specs_index.py` regenerates the spec index; `studio_chrome.py` keeps the 30E Ventures bar and footer line on the public pages |
 | `fixtures/golden/` | the regression set; add cases, never edit existing ones |
 
 ## Working here

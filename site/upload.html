@@ -111,9 +111,27 @@ textarea{min-height:6rem;resize:vertical;line-height:1.5}
 
 footer{border-top:1px solid var(--hairline);padding:2rem 0 3rem;margin-top:2rem}
 footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);line-height:1.7;max-width:60ch}
+/* studio:css:start */
+.studio-bar{background:#030508;color:#e8f4ff;font:500 13px/1 system-ui,-apple-system,'Segoe UI',sans-serif;border-bottom:1px solid #16202c}
+.studio-in{max-width:1100px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:18px}
+.studio-brand{display:flex;align-items:center;gap:9px;color:#e8f4ff;text-decoration:none;font-weight:700;letter-spacing:.14em}
+.studio-mark{width:16px;height:16px;flex:none}
+.studio-sub{margin-left:.6em;font-weight:400;font-size:.85em;letter-spacing:.3em;color:#7d8fa3}
+.studio-line{color:#7d8fa3}
+.studio-links{margin-left:auto;display:flex;gap:16px}
+.studio-links a{color:#e8f4ff;text-decoration:none;opacity:.85}
+.studio-links a:hover,.studio-links a:focus-visible{opacity:1;text-decoration:underline}
+.studio-foot{margin:14px 0 0;font-size:.85rem;opacity:.9}
+.studio-foot a{color:inherit;text-decoration:underline}
+@media (max-width:640px){.studio-line,.studio-sub{display:none}.studio-in{padding:9px 14px;gap:12px}.studio-links{gap:12px}}
+@media print{.studio-bar{display:none}}
+/* studio:css:end */
 </style>
 </head>
 <body>
+<!-- studio:bar:start -->
+<div class="studio-bar" role="navigation" aria-label="30E Ventures"><div class="studio-in"><a class="studio-brand" href="https://30eventures.com"><svg class="studio-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="3" height="18" fill="#f2f6fa"/><rect x="6" y="3" width="15" height="3" fill="#f2f6fa"/><rect x="6" y="10.5" width="10" height="3" fill="#f2f6fa"/><rect x="6" y="18" width="15" height="3" fill="#2fd4ff"/></svg><span>30E<span class="studio-sub">VENTURES</span></span></a><span class="studio-line">AnalystOS is a 30E Ventures product</span><span class="studio-links"><a href="https://30eventures.com/portfolio">Portfolio</a><a href="https://30eventures.com/about">About</a><a href="https://30eventures.com/press">Press</a></span></div></div>
+<!-- studio:bar:end -->
 
 <header class="top">
   <div class="topbar">
@@ -215,7 +233,10 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
 <footer>
   <div class="wrap">
     <p class="fine">This page is a private preview gated by a shared access code — it isn't meant to withstand a targeted attempt to guess the code, only to keep it off search engines and drive-by visitors. Uploaded files are processed for one request only and never written to persistent storage.</p>
-  </div>
+  <!-- studio:footer:start -->
+<p class="studio-foot">AnalystOS is built by <a href="https://30eventures.com">30E Ventures</a>, a machine-native venture studio in Toronto building the agentic internet. <a href="https://30eventures.com/portfolio">Portfolio</a> &middot; <a href="https://30eventures.com/about">About</a> &middot; <a href="https://30eventures.com/brand">Brand</a> &middot; <a href="https://30eventures.com/press">Press</a> &middot; <a href="https://30eventures.com/contact">Contact</a></p>
+<!-- studio:footer:end -->
+</div>
 </footer>
 
 <script>

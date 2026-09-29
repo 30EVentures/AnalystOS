@@ -1,6 +1,8 @@
 """The OpenAPI 3.1 description of ``/api/v1`` (Slice 61). Written by hand and
 kept honest by a test: every route the blueprint serves must appear here."""
 
+from analystos.l4.seal_schema import SEAL_FACT_SCHEMA
+
 _ERROR_REF = {"$ref": "#/components/schemas/Error"}
 
 
@@ -148,8 +150,9 @@ def build_openapi():
                 "SealBundle": {"type": "object", "description": "analystos-seal/1; specified in https://analystos.dev/docs/seal.md",
                                "required": ["format", "payload", "facts"], "properties": {
                                    "format": {"const": "analystos-seal/1"}, "payload": {"type": "object"},
-                                   "facts": {"type": "array"}, "report": {"type": ["object", "null"]},
+                                   "facts": {"type": "array", "items": {"$ref": "#/components/schemas/SealFact"}}, "report": {"type": ["object", "null"]},
                                    "signature": {"type": ["object", "null"]}}},
+                "SealFact": SEAL_FACT_SCHEMA,
                 "Verification": {"type": "object", "required": ["ok", "authentic", "content_checked", "checks"], "properties": {
                     "ok": {"type": "boolean"}, "authentic": {"type": "boolean"}, "content_checked": {"type": "boolean"},
                     "checks": {"type": "array", "items": {"type": "object", "required": ["name", "status", "detail"],

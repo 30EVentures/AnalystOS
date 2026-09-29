@@ -8,7 +8,7 @@ disagree, **this file wins**. Windows are targets, not commitments.
 Items the loop cannot do without you. Each says what is needed.
 
 - [ ] **Confirm 30E Ventures controls the `analystos` org** - needs you to sign in at app.flashyos.com as that org (a credential only you hold).
-- [ ] **Mint an agent token and declare capabilities (FlashyOS Level 3, the mark)** - needs the org sign-in above; the token is shown once and must be stored by you in a secret manager, never in the repo.
+- [ ] **Declare capabilities (FlashyOS Level 3, the mark)** - the agent `analystos-agent` was minted 2026-09-28 under org `analystos`; capabilities are deliberately not declared yet. A token is shown once and must be stored by you in a secret manager, never in the repo.
 - [ ] **Publish the seal signing key's public half and set `ANALYSTOS_SEAL_KEY` on Vercel** - needs you to generate the key (`python3 -m analystos.l4.seal keygen`) and set the secret; also `ANALYSTOS_API_KEYS` before the API can be used.
 - [ ] **Latency and cost per document type through the API** - needs your `ANTHROPIC_API_KEY` and real spend (the live suite has a $1.00 ceiling).
 - [ ] **Enforce GAAP / guidance labels against the source** - a decision: checking only the citation text would strip true labels whose evidence sits in a table header, so the rule (drop, downgrade, or flag) needs your call and real failing examples.
@@ -51,11 +51,10 @@ it; not written down separately - see the specs for what each item covers).
   queue and worker (new infrastructure) or a much larger, riskier rewrite of
   the pipeline's own internal model calls into resumable steps; neither is
   attempted here. See `specs/slice-74/spec.md` for the full reasoning.
-- [ ] **3. A published JSON Schema for a sealed report's `facts`**: the seal's
-  per-type fact shape (`quote`/`computed`/`event`/`prose`) lives only in
-  `analystos/l4/seal_verify.py` code and one worked example in `docs/seal.md`;
-  a non-Python agent has to reverse-engineer it rather than validate against
-  a spec.
+- [x] **3. A published JSON Schema for a sealed report's `facts`** (Slice 76):
+  `SealFact` (`quote`/`computed`/`event`/`prose`) is published in
+  `openapi.json` and documented in `docs/seal.md`. Shape only - fitting it
+  says nothing about whether the citations or arithmetic hold.
 
 ## NOW — the thin slice (Sept 2026)
 

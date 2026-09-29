@@ -66,6 +66,26 @@ An unsigned bundle (no `ANALYSTOS_SEAL_KEY` when it was made) is `ok` but never
 as a written one. `source_sha256` is the same SHA-256 the evidence store names
 files by.
 
+## Fact records
+
+`facts[].record` is one of four shapes, discriminated by `type`. Numbers are
+already strings (rule 1). The machine-readable definition is the `SealFact`
+schema in `https://analystos.dev/api/v1/openapi.json`
+(`components.schemas.SealFact`, JSON Schema 2020-12 keywords); validate a
+bundle's facts against it before running the ten rules. It checks **shape
+only**: a record can fit it and still fail every content check.
+
+| `type` | Required | Also present |
+|---|---|---|
+| `quote` | `citation` | `value` (numeric string, must equal a number `citation` spells), `sentence` with one `{value}`, `text` when there is no value, `label`, `format`, `display` |
+| `computed` | `operation`, `value`, `operands`, `total`, `citation` (array) | `sentence`, `label`, `format`, `display`. `operation` is one of `sum average ratio growth_percent percent_of_total difference remainder`; `citation[i]` is operand `i`; `total` is null except for `percent_of_total` |
+| `event` | `what`, `citation` (equals `what`) | `date`, `status`, `next_step`, `milestones` (`{date, detail}` list); each part is a substring of the document |
+| `prose` | `text` | none of its own; it carries no figure |
+
+Every type may also carry `horizon` (`reported`, `guidance`, `projected`) and
+`gaap_status` (`gaap`, `non_gaap`, `n/a`). "Required" is what a verifier
+reads; unknown extra properties are allowed and ignored.
+
 ## The ten rules
 
 1. **Normalize.** In every `record` and in `report`, each JSON number is

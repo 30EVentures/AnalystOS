@@ -10,6 +10,8 @@ def _err(description):
 
 _DIGEST = {"name": "id", "in": "path", "required": True, "description": "The 64-hex report id (SHA-256 of the sealed payload).",
            "schema": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+_JOB_ID = {"name": "id", "in": "path", "required": True, "description": "The 32-hex job id.",
+           "schema": {"type": "string", "pattern": "^[0-9a-f]{32}$"}}
 _FORMAT = {"name": "format", "in": "query", "required": False, "schema": {"type": "string", "enum": ["html", "pdf", "seal"], "default": "html"}}
 _BEARER = [{"bearerAuth": []}]
 
@@ -47,6 +49,37 @@ def build_openapi():
                     "503": _err("no API keys configured, or the seal key is malformed"),
                 },
             }},
+            "/api/v1/jobs": {"post": {
+                "operationId": "createJob", "summary": "Submit one document for async analysis", "security": _BEARER,
+                "description": "Returns immediately with a pending job id; no model calls yet. Call POST /jobs/{id}/run to actually run it, then GET /jobs/{id} (or poll it directly) for the result. See https://analystos.dev/docs/api.md#async-jobs for why this is not a background worker.",
+                "requestBody": {"required": True, "content": {"multipart/form-data": {"schema": {
+                    "type": "object", "required": ["file"],
+                    "properties": {"file": {"type": "string", "format": "binary", "description": "csv, xlsx, docx, pptx or pdf; at most 10 MB"},
+                                   "title": {"type": "string"}}}}}},
+                "responses": {
+                    "202": {"description": "Pending", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Job"}}}},
+                    "400": _err("no file"), "401": _err("missing or invalid API key"), "415": _err("unsupported file type"),
+                    "429": _err("rate limited"), "503": _err("no API keys or no job storage configured"),
+                },
+            }},
+            "/api/v1/jobs/{id}/run": {"post": {
+                "operationId": "runJob", "summary": "Run a pending job (idempotent once no longer pending)", "security": _BEARER,
+                "description": "One bounded call, same time ceiling as POST /analyses - not a background worker (see docs/api.md#async-jobs). Calling this again on a running/done/failed job just returns its current status.",
+                "parameters": [_JOB_ID],
+                "responses": {
+                    "200": {"description": "The job's status once this call returns", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Job"}}}},
+                    "401": _err("missing or invalid API key"), "404": _err("not found"), "409": _err("the job's upload is missing"),
+                    "429": _err("rate limited"), "503": _err("no job storage, or the seal key is malformed"),
+                },
+            }},
+            "/api/v1/jobs/{id}": {"get": {
+                "operationId": "getJob", "summary": "Poll a job's status (never executes anything)", "security": _BEARER,
+                "parameters": [_JOB_ID],
+                "responses": {
+                    "200": {"description": "The job's status", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Job"}}}},
+                    "401": _err("missing or invalid API key"), "404": _err("not found"), "503": _err("storage not configured"),
+                },
+            }},
             "/api/v1/reports/{id}": {"get": {
                 "operationId": "getReport", "summary": "Fetch a stored report, its PDF or its seal",
                 "description": "Bearer key of the caller who created it, or a signed link (?exp=&sig=&format=). Somebody else's report is indistinguishable from a missing one.",
@@ -59,6 +92,19 @@ def build_openapi():
                             "application/json": {"schema": {"$ref": "#/components/schemas/SealBundle"}}}},
                     "401": _err("missing or invalid API key"), "403": _err("invalid link"), "404": _err("not found"),
                     "410": _err("expired"), "503": _err("storage not configured"),
+                },
+            }},
+            "/api/v1/reports/{id}/review": {"post": {
+                "operationId": "reviewReport", "summary": "Record that a human reviewed a delivered report", "security": _BEARER,
+                "description": "Same ownership rule as GET /reports/{id}: only the key that created the report may review it. Idempotent - reviewing again overwrites who/when/approved.",
+                "parameters": [_DIGEST],
+                "requestBody": {"required": False, "content": {"application/json": {"schema": {
+                    "type": "object", "properties": {"approved": {"type": ["boolean", "null"]}}}}}},
+                "responses": {
+                    "200": {"description": "Recorded", "content": {"application/json": {"schema": {
+                        "type": "object", "properties": {"id": {"type": "string"}, "reviewed": {"$ref": "#/components/schemas/Review"}}}}}},
+                    "400": _err("approved must be a boolean"), "401": _err("missing or invalid API key"),
+                    "404": _err("not found"), "410": _err("expired"), "503": _err("storage not configured"),
                 },
             }},
             "/api/v1/links": {"post": {
@@ -79,7 +125,7 @@ def build_openapi():
             "/api/v1/verify/{id}": {"get": {
                 "operationId": "getSealMetadata", "summary": "Seal metadata for a stored report (never the report)", "security": [],
                 "parameters": [_DIGEST],
-                "responses": {"200": {"description": "Payload and signature info", "content": {"application/json": {"schema": {"type": "object"}}}},
+                "responses": {"200": {"description": "Payload, signature info and review state", "content": {"application/json": {"schema": {"type": "object"}}}},
                               "404": _err("not found"), "410": _err("expired"), "503": _err("storage not configured")},
             }},
             "/api/v1/verify": {"post": {
@@ -110,6 +156,15 @@ def build_openapi():
                                                           "properties": {"name": {"type": "string"},
                                                                          "status": {"enum": ["pass", "fail", "skipped"]},
                                                                          "detail": {"type": "string"}}}}}},
+                "Review": {"type": ["object", "null"], "description": "null until reviewed", "properties": {
+                    "caller": {"type": "string"}, "at": {"type": "string", "format": "date-time"},
+                    "approved": {"type": ["boolean", "null"]}}},
+                "Job": {"type": "object", "required": ["id", "status", "created"], "properties": {
+                    "id": {"type": "string"}, "status": {"enum": ["pending", "running", "done", "failed"]},
+                    "created": {"type": "string", "format": "date-time"},
+                    "report_id": {"type": "string", "description": "present once status is done"},
+                    "links": {"type": ["object", "null"], "description": "present once status is done"},
+                    "error": {"type": "string", "description": "present once status is failed"}}},
                 "Analysis": {"type": "object", "required": ["id", "tier", "created", "counts", "signed", "seal", "html", "stored"], "properties": {
                     "id": {"type": "string"}, "tier": {"enum": ["written", "deterministic", "plain"]},
                     "created": {"type": "string"}, "signed": {"type": "boolean"}, "stored": {"type": "boolean"},

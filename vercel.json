@@ -136,8 +136,20 @@
       "destination": "/api/v1/reports?digest=:digest"
     },
     {
+      "source": "/api/v1/reports/:digest/review",
+      "destination": "/api/v1/reports?digest=:digest&review=true"
+    },
+    {
       "source": "/api/v1/verify/:digest",
       "destination": "/api/v1/verify?digest=:digest"
+    },
+    {
+      "source": "/api/v1/jobs/:job",
+      "destination": "/api/v1/jobs?id=:job"
+    },
+    {
+      "source": "/api/v1/jobs/:job/run",
+      "destination": "/api/v1/jobs?id=:job&run=true"
     }
   ]
 }

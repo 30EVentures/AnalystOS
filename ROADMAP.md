@@ -32,6 +32,31 @@ the session log. Nothing here is pushed until you say so.
 - [x] **Q9 - Say out loud when the evidence store uses the public development key** (audit finding 4): one stderr line per process; behaviour otherwise unchanged. Accept: warns once on fallback, silent with a key, existing files still decrypt.
 - [x] **Q8 - Cleanup pass** when the queue is empty: dead code, TODOs, coverage gaps.
 
+## Agent-native queue (2026-09-28)
+
+The intended shape going forward: a human prompts an agent, the agent is the
+one that calls AnalystOS, the human's role is oversight. Sequenced from a
+repo survey against that framing (full findings in the session that started
+it; not written down separately - see the specs for what each item covers).
+
+- [x] **1. A human review, recorded** (Slice 73): `POST /api/v1/reports/{id}/review`
+  records who reviewed a delivered report and when, surfaced at
+  `GET /api/v1/verify/{id}`. Not enforced - a report is deliverable whether
+  or not it was reviewed; that's a policy decision for later.
+- [x] **2. Async analysis jobs** (Slice 74): `POST /api/v1/jobs` +
+  `POST /api/v1/jobs/{id}/run` + `GET /api/v1/jobs/{id}` split submit from
+  run from collect, so an agent isn't forced to hold one connection open for
+  the whole pipeline. Does not raise the platform's per-call time ceiling -
+  `/run` is still one bounded call, same as `/analyses` - that needs a real
+  queue and worker (new infrastructure) or a much larger, riskier rewrite of
+  the pipeline's own internal model calls into resumable steps; neither is
+  attempted here. See `specs/slice-74/spec.md` for the full reasoning.
+- [ ] **3. A published JSON Schema for a sealed report's `facts`**: the seal's
+  per-type fact shape (`quote`/`computed`/`event`/`prose`) lives only in
+  `analystos/l4/seal_verify.py` code and one worked example in `docs/seal.md`;
+  a non-Python agent has to reverse-engineer it rather than validate against
+  a spec.
+
 ## NOW — the thin slice (Sept 2026)
 
 Prove the core loop on one real document set, in front of 3–5 real analysts.
@@ -256,3 +281,5 @@ One line per completed item (newest last).
 - 2026-09-27 - Q8 done (Slice 71): cleanup - 3 unused imports and 1 dead function removed; tools/refresh.py; hygiene test; 756 tests.
 - 2026-09-27 - Q9 done (Slice 72): evidence store warns once per process when using the public development key; 760 tests.
 - 2026-09-27 - loop finished: every unblocked item done (Q1-Q9); remaining work is under "Blocked / needs input" at the top. 760 tests, 21 commits on `roadmap-loop-2026-09-27`, nothing pushed.
+- 2026-09-28 - agent-native queue item 1 done (Slice 73): `POST /api/v1/reports/{id}/review` records a human review, surfaced at `GET /api/v1/verify/{id}`; not enforced. 770 tests, pushed on branch `slice-73-report-review` (PR opened).
+- 2026-09-28 - agent-native queue item 2 done (Slice 74): `/api/v1/jobs` (+`/run`, poll) split submit/run/collect for an agent caller; `/run` is still one bounded call, same ceiling as `/analyses` - true background async still needs a queue/worker, not attempted. 783 tests, on branch `slice-74-async-jobs` (stacked on `slice-73-report-review`), nothing pushed.

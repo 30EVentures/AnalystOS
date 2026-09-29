@@ -792,7 +792,7 @@ class RealFilingTablesTest(unittest.TestCase):
         self.assertFalse(_really_in_document("Operating income 1,715.0", mk))
 
     def test_a_citation_inside_a_longer_number_does_not_locate(self):
-        # Slice 73: a real gap found live while spiking a standalone extraction
+        # Slice 75: a real gap found live while spiking a standalone extraction
         # of the seal verifier (dropped; this fix is what's left of it) -
         # _really_in_document decides a model's proposed quote is real in the
         # first place, so this is an acceptance-time gap, not just a

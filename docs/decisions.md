@@ -2,6 +2,17 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-29 - one public identity: the studio, and its own email (Slice 80)
+
+After Slice 79 the retired `site/index.old.html` was still served at `/index.old.html` with a
+personal email in its "Request early access" link, and the sample AAO manifest, its tests and the
+FlashyOS alignment note used a personal email and name as example values. All now use
+`30eventures@gmail.com` and "30E Ventures", and a test scans every served file for a personal name
+or any email other than the studio's, so it cannot come back quietly. Not changed: the
+`solwayholdings` sample-org name (ROADMAP tracks its fate) and unserved research notes that quote
+search terms used at the time. The internal audit and alignment notes were checked and are not
+served under `/docs/`, so they were never a public leak.
+
 ## 2026-09-29 - the homepage credits the studio, not a person (Slice 79)
 
 The page named its maintainer three times ("Built solo by ...", a first-person "Who built
@@ -1922,7 +1933,7 @@ genuinely doesn't do well — reading Excel/Word/PowerPoint/PDF files, and
 running a web server.
 
 - **Hosting: Python + Vercel**, not a separate always-on server (Render/Fly).
-  Keeps everything on one host Caleb already knows. Consequence: Vercel's
+  Keeps everything on one host the studio already uses. Consequence: Vercel's
   Python functions are WSGI, so the web layer will be **Flask**, not FastAPI.
   Free-tier functions time out at 10s — fine for CSV/Excel/Word/PowerPoint
   (sub-second), a real constraint once PDF extraction is in the request path;

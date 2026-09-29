@@ -89,3 +89,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 75 | citation matching stops accepting a number inside a bigger one | [spec](slice-75/spec.md) |
 | 76 | a published schema for a sealed report's facts (agent-native queue, item 3 of 3) | [spec](slice-76/spec.md) |
 | 77 | a non-Python checker for a seal's facts | [spec](slice-77/spec.md) |
+| 78 | the 30E Ventures studio bar and footer on the public site | [spec](slice-78/spec.md) |

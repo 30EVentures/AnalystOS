@@ -2,6 +2,18 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-09-29 - the studio bar is generated static markup, not a script include or a copied snippet (Slice 78)
+
+analystos.dev now carries a 30E Ventures bar and a footer line so it visibly belongs to the
+studio's other sites. The markup lives once, in `tools/studio_chrome.py`, and is written
+between marker comments into each page, with `tools/refresh.py --check` and a test failing
+if a page drifts. Rejected: a shared `<script>` include (an agent that does not run scripts
+would see no studio identity, and it adds an external request and a failure mode to a page
+whose point is that nothing is taken on trust); hand-copying the snippet into each page (it
+would drift the first time a link changed). The bar keeps the studio's own near-black colours
+in both themes, so it reads as the studio's strip rather than restyling AnalystOS. It claims
+only the studio's name, Toronto, and that AnalystOS is one of its products.
+
 ## 2026-09-27 - the evidence store announces the public development key (Slice 72)
 
 Audit finding 4: with no `ANALYSTOS_EVIDENCE_KEY` the store encrypts with a key derived from a

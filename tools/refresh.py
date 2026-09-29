@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-STEPS = ["build_site_machine.py", "build_specs_index.py", "site_counts.py"]
+STEPS = ["build_site_machine.py", "build_specs_index.py", "site_counts.py", "studio_chrome.py"]
 
 
 def main(argv=None):

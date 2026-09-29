@@ -19,6 +19,7 @@ STORE_ENV = "ANALYSTOS_STORE_DIR"
 TTL_ENV = "ANALYSTOS_REPORT_TTL_DAYS"
 DEFAULT_TTL_DAYS = 30
 DIGEST_RE = re.compile(r"^[0-9a-f]{64}$")
+JOB_ID_RE = re.compile(r"^[0-9a-f]{32}$")
 _KINDS = {"html": "report.html", "pdf": "report.pdf", "seal": "seal.json", "meta": "meta.json"}
 
 
@@ -98,6 +99,54 @@ class FileStore:
                 directory.rmdir()
                 removed += 1
         return removed
+
+    def _job_dir(self, job_id):
+        if not JOB_ID_RE.match(job_id or ""):
+            raise ValueError("not a job id")
+        return self.root / "jobs" / job_id
+
+    def create_job(self, job_id, meta, filename, data):
+        """A ``pending`` job: its upload, kept only until ``run`` consumes it,
+        and its meta (caller, status, title, ...)."""
+        directory = self._job_dir(job_id)
+        directory.mkdir(parents=True, exist_ok=True)
+        self._write(directory / "upload.name", filename.encode("utf-8"))
+        self._write(directory / "upload", data)
+        self._write(directory / "meta.json", json.dumps(meta).encode("utf-8"))  # last: its presence means complete
+
+    def job_meta(self, job_id):
+        try:
+            return json.loads((self._job_dir(job_id) / "meta.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return None
+
+    def job_upload(self, job_id):
+        """``(filename, bytes)``, or ``None`` once ``run`` has consumed it."""
+        directory = self._job_dir(job_id)
+        try:
+            return (directory / "upload.name").read_text(encoding="utf-8"), (directory / "upload").read_bytes()
+        except OSError:
+            return None
+
+    def update_job(self, job_id, **fields):
+        """Merge ``fields`` into the job's meta. Raises ``ValueError`` if
+        there is no such job (caller checks first)."""
+        directory = self._job_dir(job_id)
+        meta = self.job_meta(job_id)
+        if meta is None:
+            raise ValueError("no such job")
+        meta = {**meta, **fields}
+        self._write(directory / "meta.json", json.dumps(meta).encode("utf-8"))
+        return meta
+
+    def delete_job_upload(self, job_id):
+        """Drop the uploaded bytes once a job has run - never kept longer
+        than it has to be, same rule as a synchronous analysis."""
+        directory = self._job_dir(job_id)
+        for name in ("upload", "upload.name"):
+            path = directory / name
+            if path.exists():
+                path.unlink()
 
     def append_audit(self, event):
         with open(self.root / "audit.jsonl", "a", encoding="utf-8") as handle:

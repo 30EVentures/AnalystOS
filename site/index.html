@@ -290,7 +290,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
       <div>
         <h1>Every number in the report is proven against your document.</h1>
         <p class="sub">AnalystOS turns a spreadsheet, Word file, PowerPoint, PDF or CSV into a written analytical report. Each figure is either a quote checked against your source or a calculation the software redoes itself. No figure is ever taken on an AI model&rsquo;s word.</p>
-        <p class="note">Built solo by Caleb Solway. Early stage, and this page says exactly where things stand.</p>
+        <p class="note">Built by 30E Ventures. Early stage, and this page says exactly where things stand.</p>
         <div class="row" style="margin-top:18px">
           <a class="btn" href="upload.html">Try it on your document</a>
           <a class="btn ghost" href="#walkthrough">Watch a report get proven</a>
@@ -308,7 +308,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
 
     <div class="stats">
       <div class="stat"><strong>5</strong><span>file formats read: CSV, Excel, Word, PowerPoint, PDF</span></div>
-      <div class="stat"><strong>820</strong><span>automated tests passing</span></div>
+      <div class="stat"><strong>825</strong><span>automated tests passing</span></div>
       <div class="stat"><strong>3</strong><span>report tiers, so a weak AI draft degrades quality, not trust</span></div>
       <div class="stat"><strong>49</strong><span>written specs behind the build</span></div>
     </div>
@@ -481,7 +481,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
     <details>
       <summary><span>Testing <span class="tag t-built">Built</span></span></summary>
       <div class="dbody"><ul>
-        <li>820 automated tests with mocked calls: no network, no cost, passing in about 3 seconds.</li>
+        <li>825 automated tests with mocked calls: no network, no cost, passing in about 3 seconds.</li>
         <li>A separate manual suite makes real, paid model calls against four fixed test documents, under a hard $1.00 spend ceiling.</li>
       </ul></div>
     </details>
@@ -612,9 +612,9 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
     <div class="sh"><h2>Evidence, and what hasn&rsquo;t been measured</h2></div>
     <p class="lede">Only figures found in the project are shown here.</p>
     <div class="grid g3">
-      <div class="card"><b style="font-family:var(--display);font-size:28px">820 / 820</b><p class="note" style="margin:4px 0 0">automated tests passing, run in about 3 seconds</p></div>
+      <div class="card"><b style="font-family:var(--display);font-size:28px">825 / 825</b><p class="note" style="margin:4px 0 0">automated tests passing, run in about 3 seconds</p></div>
       <div class="card"><b style="font-family:var(--display);font-size:28px">4 fixed test documents</b><p class="note" style="margin:4px 0 0">generated for testing, run in a live suite with paid model calls, capped at $1.00 and typically a few cents to a few tens of cents per full run</p></div>
-      <div class="card"><b style="font-family:var(--display);font-size:28px">72 specs</b><p class="note" style="margin:4px 0 0">written before the code they describe, each with a &ldquo;done when&rdquo; check</p></div>
+      <div class="card"><b style="font-family:var(--display);font-size:28px">73 specs</b><p class="note" style="margin:4px 0 0">written before the code they describe, each with a &ldquo;done when&rdquo; check</p></div>
       <div class="card"><b style="font-family:var(--display);font-size:28px">4 fixed test documents</b><p class="note" style="margin:4px 0 0">generated for testing, run in a live suite with paid model calls, capped at $1.00 and typically a few cents to a few tens of cents per full run</p></div>
     </div>
     <div class="card" style="margin-top:16px">
@@ -666,7 +666,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
       <div class="card"><h4>Week 4: readout</h4><p>Compare time and edits against your current process on the same documents. Decide whether to continue, widen, or stop.</p></div>
     </div>
     <div class="grid g2" style="margin-top:16px">
-      <div class="card"><h4 style="margin-bottom:6px">What I need from you</h4><ul class="clean"><li>3 to 5 documents you would normally analyze</li><li>One or two people to review outputs</li><li>A 30-minute check-in each week</li></ul></div>
+      <div class="card"><h4 style="margin-bottom:6px">What we need from you</h4><ul class="clean"><li>3 to 5 documents you would normally analyze</li><li>One or two people to review outputs</li><li>A 30-minute check-in each week</li></ul></div>
       <div class="card"><h4 style="margin-bottom:6px">How success is measured (proposed)</h4><ul class="clean"><li>Share of figures traced to a source</li><li>Reviewer edits needed per report</li><li>Time per report against your current baseline</li></ul></div>
     </div>
     <div class="card no-print" style="margin-top:16px;text-align:center">
@@ -686,7 +686,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
     <details><summary>Which files does it accept?</summary><div class="dbody">CSV, Excel, Word, PowerPoint and PDF. Scanned, image-only PDFs that need OCR are not supported yet.</div></details>
     <details><summary>Can it compare against peers or market data?</summary><div class="dbody">No. It sees one document, by design for now, and has no integration with market data, news or accounting systems.</div></details>
     <details><summary>Is it ready for confidential production data?</summary><div class="dbody">Not yet. Access is a single shared code and there are no per-user accounts, audit log or policy engine, and no SOC 2 or external security review. That is why the pilot starts with non-confidential documents. Those controls are on the roadmap.</div></details>
-    <details><summary>How do you know it works?</summary><div class="dbody">820 automated tests, a live suite of real model calls on four fixed test documents, and a defect log with root causes and proof of each fix. What does not exist yet is an accuracy benchmark on writing quality, which is one of the things a pilot would create.</div></details>
+    <details><summary>How do you know it works?</summary><div class="dbody">825 automated tests, a live suite of real model calls on four fixed test documents, and a defect log with root causes and proof of each fix. What does not exist yet is an accuracy benchmark on writing quality, which is one of the things a pilot would create.</div></details>
   </div>
 </section>
 
@@ -695,8 +695,8 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
   <div class="wrap">
     <div class="sh"><h2>Who built it</h2></div>
     <div class="card" style="max-width:760px">
-      <p style="font-size:18px">I&rsquo;m Caleb Solway. I built AnalystOS on my own, writing a spec before every piece of code and recording every real bug with its root cause. I care about one thing above the rest: a report should never contain a number nobody can defend.</p>
-      <p style="margin:0">It is early, and I would rather show you where it is weak than hide it. That is why this page lists its limits next to its strengths.</p>
+      <p style="font-size:18px">AnalystOS is built by <a href="https://30eventures.com">30E Ventures</a>, a venture studio in Toronto. We write a spec before every piece of code and record every real bug with its root cause. We care about one thing above the rest: a report should never contain a number nobody can defend.</p>
+      <p style="margin:0">It is early, and we would rather show you where it is weak than hide it. That is why this page lists its limits next to its strengths.</p>
     </div>
   </div>
 </section>
@@ -725,7 +725,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
       <h4>Why it is different</h4>
       <p>A model proposes facts, but ordinary code proves each one and discards the rest. The writing step can cite facts by index and cannot type a number. Two independent quality gates and a three-tier fallback mean a weak draft lowers a report&rsquo;s quality, never its trustworthiness.</p>
       <h4>Where it stands</h4>
-      <p>Built solo, early stage. Reading, verification, writing, PDF and HTML delivery and a live upload page work, with 820 automated tests passing. Writing quality is still being tuned. Accounts, audit log, policy engine and SOC 2 are planned, not built.</p>
+      <p>Built by 30E Ventures, early stage. Reading, verification, writing, PDF and HTML delivery and a live upload page work, with 825 automated tests passing. Writing quality is still being tuned. Accounts, audit log, policy engine and SOC 2 are planned, not built.</p>
       <h4>What has not been measured</h4>
       <p>No accuracy benchmark for writing quality, no adoption data, no commercial metrics.</p>
       <h4>Proposed next step</h4>
@@ -946,7 +946,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
     {name:'Provable facts', st:'built', stl:'Built', when:'Working today',
      out:'A set of facts, each a verbatim quote or an independently recomputed calculation, with a footnote to its exact source.',
      build:'Evidence store, readers for five formats, fact extraction and verification, and the zero-model fallback.',
-     meas:'820 mocked tests passing, plus a live suite of real model calls on four fixed test documents under a $1.00 ceiling.',
+     meas:'825 mocked tests passing, plus a live suite of real model calls on four fixed test documents under a $1.00 ceiling.',
      ctl:'PDF tables need a person\u2019s confirmation before citing. Unproven facts are discarded.'},
     {name:'Written like an analyst', st:'prog', stl:'In progress', today:true, when:'Active now. Latest fixes dated 2026-09-12.',
      out:'An executive summary, sectioned analysis, a chart, a disclosure-gap section and a separate outlook block, in prose that connects facts into judgments.',

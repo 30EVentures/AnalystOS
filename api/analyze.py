@@ -187,6 +187,21 @@ def _require_upload():
     return upload, None
 
 
+def _upload_path(upload, tmp_dir):
+    """Where to save ``upload`` inside ``tmp_dir``.
+
+    The client chooses the filename, so it is never joined to a path as sent:
+    ``../../x.csv`` would leave ``tmp_dir`` and an absolute name would replace
+    it. Only the last component is used - the rule ``/api/v1`` already follows,
+    so an ordinary upload keeps the same source name in its report - and the
+    result is checked to sit directly inside ``tmp_dir``."""
+    name = Path(upload.filename).name
+    path = tmp_dir / name
+    if not name or path.resolve().parent != tmp_dir.resolve():
+        raise ValueError("unusable upload filename")
+    return path
+
+
 @app.post("/api/extract")
 def extract():
     limited = _rate_limit_denied()
@@ -202,7 +217,7 @@ def extract():
 
     tmp_dir = Path(tempfile.mkdtemp(prefix="analystos-"))
     try:
-        tmp_path = tmp_dir / upload.filename
+        tmp_path = _upload_path(upload, tmp_dir)
         upload.save(tmp_path)
         schema, rows = extract_any(tmp_path)
     except ValueError as exc:
@@ -240,7 +255,7 @@ def analyze():
         except (json.JSONDecodeError, ValueError):
             return jsonify(error="'schema' form field must be a JSON object"), 400
 
-    title = request.form.get("title") or f"Review of {upload.filename}"
+    title = request.form.get("title") or f"Review of {Path(upload.filename).name}"
     # Omitted entirely -> the new narrated-analysis default (build_report
     # runs analystos.l2.analyze on the document's real text). Given
     # explicitly (still just "income_statement" - the only one that
@@ -254,7 +269,7 @@ def analyze():
     tmp_dir = Path(tempfile.mkdtemp(prefix="analystos-"))
     trace = {}
     try:
-        tmp_path = tmp_dir / upload.filename
+        tmp_path = _upload_path(upload, tmp_dir)
         upload.save(tmp_path)
 
         result = build_report(

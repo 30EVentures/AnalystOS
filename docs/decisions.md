@@ -2,6 +2,21 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-10-01 - an upload's filename never decides where it is saved (Slice 81)
+
+`/api/extract` and `/api/analyze` saved each upload as `tmp_dir / upload.filename`, with the
+filename taken straight from the client. `pathlib` does not confine that: `../../x.csv` left the
+temporary folder and an absolute name replaced it, so a caller holding the access code could write
+a file they controlled, with an allowed extension, anywhere the server could write. Even a harmless
+name with a directory in it (`reports/data.csv`) crashed the route with a 500. Both routes now use
+only the last component of the name and check the result still sits directly inside the temporary
+folder; the `/api/analyze` default title uses the same component. This is the rule `/api/v1` already
+followed, so ordinary uploads keep the same source name in reports, which is why the fix keeps the
+client's last component rather than a random server-chosen name. The regression tests were written
+first and fail on the unfixed code; one pins `/api/v1`'s existing safe behavior so the two surfaces
+cannot drift apart again. Not changed: the access code, rate limits, size limit, or retiring the
+legacy routes.
+
 ## 2026-09-29 - one public identity: the studio, and its own email (Slice 80)
 
 After Slice 79 the retired `site/index.old.html` was still served at `/index.old.html` with a

@@ -1,4 +1,6 @@
-"""``python3 -m analystos.api_v1 newkey <name>`` and ``... measures [audit.jsonl]``."""
+"""``python3 -m analystos.api_v1 newkey <name>``, ``... measures [audit.jsonl]`` and
+``... verify-audit <audit.jsonl> [--public-key B64URL] [--expect-head HASH]``
+(exit 0 no check failed, 1 a check failed, 2 unreadable input)."""
 
 import json
 import sys
@@ -6,6 +8,7 @@ from pathlib import Path
 
 from analystos.api_v1 import auth, store as store_mod
 from analystos.api_v1.audit import measures
+from analystos.api_v1.audit_chain import verify_audit_log
 
 
 def main(argv=None, stdout=None):
@@ -36,7 +39,28 @@ def main(argv=None, stdout=None):
             events = store.read_audit()
         stdout.write(json.dumps(measures(events), indent=2) + "\n")
         return 0
-    print("usage: python3 -m analystos.api_v1 newkey <name> | measures [audit.jsonl]", file=sys.stderr)
+    if argv[:1] == ["verify-audit"]:
+        path = public_key = expected_head = None
+        try:
+            i = 1
+            while i < len(argv):
+                if argv[i] == "--public-key":
+                    public_key, i = argv[i + 1], i + 2
+                elif argv[i] == "--expect-head":
+                    expected_head, i = argv[i + 1], i + 2
+                elif path is None and not argv[i].startswith("--"):
+                    path, i = argv[i], i + 1
+                else:
+                    raise ValueError(f"unexpected argument {argv[i]!r}")
+            if path is None:
+                raise ValueError("give the audit.jsonl path")
+            outcome = verify_audit_log(path, public_key=public_key, expected_head=expected_head)
+        except (OSError, ValueError, IndexError) as exc:
+            stdout.write(json.dumps({"error": str(exc) or "usage: verify-audit <audit.jsonl> [--public-key B64URL] [--expect-head HASH]"}) + "\n")
+            return 2
+        stdout.write(json.dumps(outcome, indent=2) + "\n")
+        return 0 if outcome["ok"] else 1
+    print("usage: python3 -m analystos.api_v1 newkey <name> | measures [audit.jsonl] | verify-audit <audit.jsonl> [--public-key B64URL] [--expect-head HASH]", file=sys.stderr)
     return 2
 
 

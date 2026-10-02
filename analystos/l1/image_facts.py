@@ -32,6 +32,8 @@ digitally-extracted fact. See specs/slice-50/spec.md.
 """
 
 import base64
+import hashlib
+import os
 import re
 import sys
 from io import BytesIO
@@ -42,6 +44,12 @@ from analystos.l2.analyze import _create_message, _resolve_client
 from analystos.models import model_name
 
 _MAX_TOKENS = 1024
+MAX_IMAGES_ENV = "ANALYSTOS_MAX_IMAGES"
+DEFAULT_MAX_IMAGES = 40  # one vision call each: an unbounded count is unbounded cost and time
+_MAX_IMAGES_CEILING = 1000
+# An image placed smaller than half an inch in either direction is a bullet, a rule or a
+# logo, not an exhibit; measured on real documents it is most of the raw count (Slice 85).
+MIN_IMAGE_POINTS = 36
 _RESOLUTION = 150  # DPI used to rasterize the page before cropping
 
 _SYSTEM_PROMPT = """\
@@ -71,6 +79,56 @@ _IMAGE_TAG = "IMAGE"
 _IMAGE_BLOCK_RE = re.compile(
     rf"\[{_IMAGE_TAG} p(\d+)\]\n(.*?)\n\[/{_IMAGE_TAG}\]", re.DOTALL
 )
+
+
+def max_images(environ=None):
+    """The most embedded images one document may have (Slice 85):
+    ``ANALYSTOS_MAX_IMAGES`` if set, else ``DEFAULT_MAX_IMAGES``. Read on
+    every call. A value that is not a whole number from 1 to 1000 is a
+    ``ValueError``, not a silent fall back to some other limit."""
+    raw = ((environ if environ is not None else os.environ).get(MAX_IMAGES_ENV) or "").strip()
+    if not raw:
+        return DEFAULT_MAX_IMAGES
+    if not raw.isascii() or not raw.isdigit() or not 1 <= int(raw) <= _MAX_IMAGES_CEILING:
+        raise ValueError(f"{MAX_IMAGES_ENV} must be a whole number from 1 to {_MAX_IMAGES_CEILING}, got {raw!r}")
+    return int(raw)
+
+
+def _image_identity(image):
+    """A key that is the same for every placement of the same image: a hash of the
+    stream's raw bytes, else its object id. ``None`` (an inline image with neither)
+    means "never treat as a duplicate"."""
+    stream = image.get("stream")
+    raw = getattr(stream, "rawdata", None)
+    if isinstance(raw, (bytes, bytearray)) and raw:
+        return ("bytes", hashlib.sha256(raw).hexdigest())
+    objid = getattr(stream, "objid", None)
+    return ("obj", objid) if objid is not None else None
+
+
+def _is_tiny(image):
+    try:
+        return (image["x1"] - image["x0"]) < MIN_IMAGE_POINTS or (image["bottom"] - image["top"]) < MIN_IMAGE_POINTS
+    except (KeyError, TypeError):
+        return False  # unknown size: keep it rather than silently drop an exhibit
+
+
+def pending_images(pdf):
+    """``[(page_number, page, image), ...]`` for the images worth reading: each distinct
+    image once (its first placement), and none smaller than ``MIN_IMAGE_POINTS`` either way.
+    A logo repeated in every page header is one image, not one per page (Slice 85 follow-up)."""
+    seen, pending = set(), []
+    for page_i, page in enumerate(pdf.pages, start=1):
+        for image in page.images:
+            if _is_tiny(image):
+                continue
+            identity = _image_identity(image)
+            if identity is not None:
+                if identity in seen:
+                    continue
+                seen.add(identity)
+            pending.append((page_i, page, image))
+    return pending
 
 
 def _crop_image_bytes(page, image, resolution=_RESOLUTION):
@@ -128,6 +186,11 @@ def extract_image_transcripts(path, client=None):
     majority) costs nothing extra and never requires ``ANTHROPIC_API_KEY``
     just because this function exists on the extraction path.
 
+    More than ``max_images()`` *distinct, non-tiny* images (``pending_images``)
+    raises ``ValueError`` before any call (Slice 85): the cap is checked after the
+    images are counted and before a client is resolved, so an over-limit document
+    costs zero vision calls. Repeated and tiny images are neither counted nor read.
+
     A single image that fails to crop or transcribe (corrupt image data, a
     transient API error) is skipped, logged to stderr, and never fails the
     rest of the document's extraction - deliberately broad
@@ -136,13 +199,20 @@ def extract_image_transcripts(path, client=None):
     can enumerate the way a malformed table row can be.
     """
     with pdfplumber.open(path) as pdf:
-        pending = [
-            (page_i, page, image)
-            for page_i, page in enumerate(pdf.pages, start=1)
-            for image in page.images
-        ]
+        pending = pending_images(pdf)
         if not pending:
             return []
+
+        # Fail closed BEFORE resolving a client or making any call: reading
+        # only the first N images would silently drop facts from the rest.
+        limit = max_images()
+        if len(pending) > limit:
+            raise ValueError(
+                f"this document has {len(pending)} distinct embedded images (repeats and images under half an "
+                f"inch are not counted), more than the {limit} AnalystOS reads per document (each image is "
+                f"read by a separate model call, and reading only some would silently leave facts out). "
+                f"Remove the images or split the document, then try again."
+            )
 
         client = _resolve_client(client)
         results = []

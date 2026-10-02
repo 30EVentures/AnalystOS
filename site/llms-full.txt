@@ -111,6 +111,7 @@ its own id.
 | `ANALYSTOS_PUBLIC_BASE_URL` | the host used in issued links | derived from the request (`X-Forwarded-*`) |
 | `ANTHROPIC_API_KEY` | the analysis itself | as for `/api/analyze` |
 | `ANALYSTOS_MODEL` | *optional*: which model every stage asks (default `claude-sonnet-5`). Recorded in each audit event | the default |
+| `ANALYSTOS_MAX_IMAGES` | *optional*: the most *distinct* embedded images one PDF may have (each is one model call; a repeated image counts once and an image under half an inch either way is neither counted nor read). More is refused with a clear error, never read in part | 40. A value that is not a whole number from 1 to 1000 is an error |
 
 Make a caller key (shown once, stored nowhere):
 
@@ -173,6 +174,25 @@ Each is `{numerator, denominator, share}` and `share` is `null` on an empty log,
 never a made-up 100%. A test keeps the measure wording identical to the published
 charter.
 
+### The log is a hash chain (Slice 84)
+
+Each line is chained to the one before it (`seq`, `prev_hash`, `entry_hash`) and,
+when `ANALYSTOS_SEAL_KEY` is set, signed (`signature`, `key_id`; Ed25519 over the hash
+with the domain `analystos.audit-entry/1`). With no key, lines are chained and say
+`"log_signing": "none"`. Check a log offline:
+
+```
+python3 -m analystos.api_v1 verify-audit audit.jsonl [--public-key B64URL] [--expect-head HASH]
+```
+
+Exit `0` if no check failed, `1` if one did, `2` for unreadable input. Editing, deleting,
+reordering or inserting a line fails the `chain` check. `authentic` is true only when every
+line is signed and verifies under a public key **you** supplied. Lines written before the
+chain existed are tolerated as a prefix; an empty or legacy-only log fails (nothing to
+verify). Tamper-evident, not tamper-proof: a shortened log is only caught if you pin the
+`head` you saw earlier (`--expect-head`), and a holder of the signing key can re-sign a
+rewritten tail. Event fields are unchanged; the chain fields are added.
+
 ## Vercel routing
 
 Vercel maps one file to one path, so each route has a door in `api/v1/`
@@ -219,7 +239,7 @@ The `checks` list, in order (each `pass`, `fail` or `skipped`):
 
 | Check | Needs the text? | What it proves |
 |---|---|---|
-| `structure` | no | it is an `analystos-seal/1` bundle with every payload field |
+| `structure` | no | it is an `analystos-seal/1` bundle with every required payload field (and any accountability field present is a string or null) |
 | `fact_hashes` | no | every fact hashes to its recorded hash; no duplicate keys |
 | `merkle_root` | no | the facts make the signed root; `entries` is right |
 | `report_hash` | no | the report is the one that was sealed (or there is none) |
@@ -246,7 +266,10 @@ An unsigned bundle (no `ANALYSTOS_SEAL_KEY` when it was made) is `ok` but never
     "source_sha256": "<sha256 of the uploaded file's bytes>",
     "text_sha256": "<sha256 of the UTF-8 extracted text the facts were verified against>",
     "report_sha256": "<sha256 of canonical(report)> or null",
-    "tier": "written | deterministic | plain"
+    "tier": "written | deterministic | plain",
+    "model_id": "<the model the run asked, e.g. claude-sonnet-5> or null",
+    "caller_id": "<the API-key name, \"(cli)\", \"(legacy-access-code)\"> or null",
+    "code_version": "<deployed commit id or version label> or null"
   },
   "facts":  [ { "key": "fact/000000", "record": { ... }, "hash": "<hex>" } ],
   "report": { ... } or null,
@@ -257,6 +280,30 @@ An unsigned bundle (no `ANALYSTOS_SEAL_KEY` when it was made) is `ok` but never
 `nonce` makes every seal's payload (and therefore the report id, `sha256(canonical(payload))`) unique even for identical content in the same second. `tier` is inside the signed payload so a fallback report cannot be relabelled
 as a written one. `source_sha256` is the same SHA-256 the evidence store names
 files by.
+
+`model_id`, `caller_id` and `code_version` (Slice 83) say who and what produced the
+report, inside the signed payload so a signed seal cannot be relabelled after the fact:
+
+- `model_id` is the model id the run asked for (`ANALYSTOS_MODEL`, read when the run
+  finished; the same value the audit log records). It is the *requested* id, not a
+  statement from the model provider.
+- `caller_id` is the `/api/v1` API-key **name** that made the run (an operator-chosen
+  label, never the key). Runs outside `/api/v1` carry `"(cli)"` or
+  `"(legacy-access-code)"`; those contain parentheses, which no key name can, so they
+  never collide with a real caller. `null` means the sealer did not say.
+- `code_version` is the deployed code's commit id or label, taken from the deployment's
+  environment (`ANALYSTOS_CODE_VERSION`, else Vercel's `VERCEL_GIT_COMMIT_SHA`), never
+  looked up at request time. `null` means the deployment does not say.
+
+**Compatibility.** These three fields are an additive change to `analystos-seal/1`, with
+no version bump. They are optional: a seal made before Slice 83 lacks them and still
+verifies, and a verifier that ignores unknown payload fields (as `seal_verify.py` always
+did) verifies a new seal unchanged, because the signature covers the whole payload
+including them. A *strict* port that rejected unknown payload keys would reject new
+seals; ports should ignore unknown payload fields, and may check that each of these
+three, when present, is a non-empty string (at most 128 characters) or `null`. As with
+every field here, a field is only as trustworthy as the key that signed it: unsigned
+seals carry them unauthenticated.
 
 ## Fact records
 

@@ -134,21 +134,21 @@ def _text_from_pptx(path, client=None):
 
 def _text_from_pdf(path, client=None):
     chunks = []
-    table_i = 0  # a global index across the whole document - matches how
-    # extract_pdf._raw_rows numbers tables without a page filter
     with pdfplumber.open(path) as pdf:
         for page_i, page in enumerate(pdf.pages, start=1):
             lines = [f"Page {page_i}:"]
             text = extract_page_text(page)  # column-aware - see analystos.l1.pdf_columns
             if text:
                 lines.append(text.strip())
-            for _ in page.extract_tables():
+            for table in page.extract_tables():
                 try:
-                    headers, rows = extract_pdf._raw_rows(path, table_index=table_i)
+                    # The table this page already gave us goes through the same
+                    # _raw_rows as the schema-driven path, without reopening the
+                    # PDF and re-extracting every page per table (Slice 85).
+                    headers, rows = extract_pdf._raw_rows(path, table=table)
                     lines.append(_render_table(headers, rows))
                 except ValueError:
                     pass  # an empty table - skip it, not fatal to the rest
-                table_i += 1
             if len(lines) > 1:
                 chunks.append("\n".join(lines))
 

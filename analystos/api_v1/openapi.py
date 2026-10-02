@@ -149,7 +149,12 @@ def build_openapi():
                     "properties": {"code": {"type": "string"}, "message": {"type": "string"}}}}},
                 "SealBundle": {"type": "object", "description": "analystos-seal/1; specified in https://analystos.dev/docs/seal.md",
                                "required": ["format", "payload", "facts"], "properties": {
-                                   "format": {"const": "analystos-seal/1"}, "payload": {"type": "object"},
+                                   "format": {"const": "analystos-seal/1"}, "payload": {
+                                       "type": "object", "description": "signed fields; see docs/seal.md. model_id, caller_id and code_version are optional (absent in seals made before Slice 83)",
+                                       "properties": {
+                                           "model_id": {"type": ["string", "null"], "description": "the model the run asked (ANALYSTOS_MODEL)"},
+                                           "caller_id": {"type": ["string", "null"], "description": "the API-key name that made the run; (cli) or (legacy-access-code) outside /api/v1; null if unstated"},
+                                           "code_version": {"type": ["string", "null"], "description": "the deployed code version (ANALYSTOS_CODE_VERSION or the Vercel commit SHA); null if the deployment does not say"}}},
                                    "facts": {"type": "array", "items": {"$ref": "#/components/schemas/SealFact"}}, "report": {"type": ["object", "null"]},
                                    "signature": {"type": ["object", "null"]}}},
                 "SealFact": SEAL_FACT_SCHEMA,

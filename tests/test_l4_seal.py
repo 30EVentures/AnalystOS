@@ -530,7 +530,72 @@ class CliWritesTheSealTest(unittest.TestCase):
             bundle = json.loads((job / "section.seal.json").read_text())
             self.assertTrue(verify_bundle(bundle, source_text=TEXT)["ok"])
             self.assertIsNone(bundle["signature"])
+            self.assertEqual(bundle["payload"]["caller_id"], seal.CALLER_CLI)  # Slice 83
 
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AccountabilityFieldsTest(unittest.TestCase):
+    """Slice 83: model_id, caller_id and code_version are signed payload fields,
+    and seals without them (made before the slice) still verify."""
+
+    def setUp(self):
+        self.seed, self.public = generate_key()
+
+    def _bundle(self, signed=True, **kw):
+        return build_bundle(trace(model="claude-sonnet-5"), signing_key=self.seed if signed else None,
+                            caller_id="partner-a", code_version_override="abc1234", **kw)
+
+    def test_the_payload_carries_the_three_fields(self):
+        p = self._bundle()["payload"]
+        self.assertEqual((p["model_id"], p["caller_id"], p["code_version"]), ("claude-sonnet-5", "partner-a", "abc1234"))
+
+    def test_they_are_covered_by_the_signature(self):
+        for field, forged in (("model_id", "other-model"), ("caller_id", "someone-else"), ("code_version", "deadbeef")):
+            b = self._bundle()
+            self.assertTrue(verify_bundle(b, public_key=self.public)["authentic"])
+            b["payload"][field] = forged
+            self.assertEqual(statuses(verify_bundle(b, public_key=self.public))["signature"], "fail", field)
+
+    def test_a_seal_made_before_the_slice_still_verifies(self):
+        for signed in (True, False):
+            b = self._bundle(signed=signed)
+            for field in ("model_id", "caller_id", "code_version"):
+                del b["payload"][field]
+            if signed:  # re-sign the old-shaped payload, as the old sealer did
+                b["signature"] = seal._sign(b["payload"], self.seed)
+            out = verify_bundle(b, public_key=self.public if signed else None, source_text=TEXT)
+            self.assertTrue(out["ok"], out)
+            self.assertEqual(out["authentic"], signed)
+
+    def test_unknown_extra_payload_fields_are_ignored(self):
+        b = self._bundle(signed=False)
+        b["payload"]["future_field"] = "x"
+        self.assertTrue(verify_bundle(b)["ok"])
+
+    def test_a_field_of_the_wrong_type_is_a_structure_failure(self):
+        for field, bad in (("model_id", 5), ("caller_id", ["a"]), ("code_version", ""), ("model_id", "x" * 129), ("caller_id", True)):
+            b = self._bundle(signed=False)
+            b["payload"][field] = bad
+            self.assertEqual(statuses(verify_bundle(b))["structure"], "fail", (field, bad))
+
+    def test_null_fields_are_valid(self):
+        b = build_bundle(trace())
+        self.assertEqual((b["payload"]["model_id"], b["payload"]["caller_id"]), (None, None))
+        self.assertTrue(verify_bundle(b, source_text=TEXT)["ok"])
+
+    def test_the_cli_and_legacy_constants_cannot_be_a_key_name(self):
+        from analystos.api_v1.auth import new_key
+
+        for const in (seal.CALLER_CLI, seal.CALLER_LEGACY):
+            with self.assertRaises(ValueError):
+                new_key(const)
+
+    def test_code_version_comes_only_from_the_environment(self):
+        self.assertIsNone(seal.code_version({}))
+        self.assertEqual(seal.code_version({"VERCEL_GIT_COMMIT_SHA": "0123abc"}), "0123abc")
+        self.assertEqual(seal.code_version({"ANALYSTOS_CODE_VERSION": "v1.2", "VERCEL_GIT_COMMIT_SHA": "0123abc"}), "v1.2")
+        with self.assertRaises(ValueError):
+            seal.code_version({"ANALYSTOS_CODE_VERSION": "bad value; rm -rf"})

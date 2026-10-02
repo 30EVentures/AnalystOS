@@ -105,6 +105,7 @@ its own id.
 | `ANALYSTOS_PUBLIC_BASE_URL` | the host used in issued links | derived from the request (`X-Forwarded-*`) |
 | `ANTHROPIC_API_KEY` | the analysis itself | as for `/api/analyze` |
 | `ANALYSTOS_MODEL` | *optional*: which model every stage asks (default `claude-sonnet-5`). Recorded in each audit event | the default |
+| `ANALYSTOS_MAX_IMAGES` | *optional*: the most *distinct* embedded images one PDF may have (each is one model call; a repeated image counts once and an image under half an inch either way is neither counted nor read). More is refused with a clear error, never read in part | 40. A value that is not a whole number from 1 to 1000 is an error |
 
 Make a caller key (shown once, stored nowhere):
 
@@ -166,6 +167,25 @@ python3 -m analystos.api_v1 measures [audit.jsonl]
 Each is `{numerator, denominator, share}` and `share` is `null` on an empty log,
 never a made-up 100%. A test keeps the measure wording identical to the published
 charter.
+
+### The log is a hash chain (Slice 84)
+
+Each line is chained to the one before it (`seq`, `prev_hash`, `entry_hash`) and,
+when `ANALYSTOS_SEAL_KEY` is set, signed (`signature`, `key_id`; Ed25519 over the hash
+with the domain `analystos.audit-entry/1`). With no key, lines are chained and say
+`"log_signing": "none"`. Check a log offline:
+
+```
+python3 -m analystos.api_v1 verify-audit audit.jsonl [--public-key B64URL] [--expect-head HASH]
+```
+
+Exit `0` if no check failed, `1` if one did, `2` for unreadable input. Editing, deleting,
+reordering or inserting a line fails the `chain` check. `authentic` is true only when every
+line is signed and verifies under a public key **you** supplied. Lines written before the
+chain existed are tolerated as a prefix; an empty or legacy-only log fails (nothing to
+verify). Tamper-evident, not tamper-proof: a shortened log is only caught if you pin the
+`head` you saw earlier (`--expect-head`), and a holder of the signing key can re-sign a
+rewritten tail. Event fields are unchanged; the chain fields are added.
 
 ## Vercel routing
 

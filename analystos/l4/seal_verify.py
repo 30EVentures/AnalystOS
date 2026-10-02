@@ -39,6 +39,9 @@ import sys
 
 SEAL_FORMAT = "analystos-seal/1"
 PAYLOAD_VERSION = 1
+# Optional payload fields added by Slice 83. Bundles made before it lack them
+# and stay valid; a bundle that carries them has them signed with the rest.
+ACCOUNTABILITY_FIELDS = ("model_id", "caller_id", "code_version")
 LEAF_PREFIX = b"\x00"
 NODE_PREFIX = b"\x01"
 
@@ -332,6 +335,10 @@ def verify_bundle(bundle, public_key=None, source_text=None):
         problem = f"payload.version must be the integer {PAYLOAD_VERSION}"
     elif not _is_int(payload["entries"]):
         problem = "payload.entries must be an integer"
+    elif any(k in payload and payload[k] is not None
+             and (not isinstance(payload[k], str) or not payload[k] or len(payload[k]) > 128)
+             for k in ACCOUNTABILITY_FIELDS):
+        problem = f"payload {'/'.join(ACCOUNTABILITY_FIELDS)} must each be absent, null, or a non-empty string of at most 128 characters"
     else:
         offenders = []
         _raw_numbers({k: v for k, v in payload.items() if k not in ("version", "entries")}, "payload", offenders)

@@ -2,6 +2,16 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-10-02 - review follow-ups on the hardening branch (Slices 82 and 85)
+
+Two changes after reviewing the branch against real data. (1) The image cap counted raw placements, which rejected a normal
+30-page whitepaper (53 placements, 14 distinct images over half an inch) and charged a vision call per repeated logo; it now
+counts and reads distinct images of at least 36 pt, default still 40 (the largest of 12 measured documents is 15). This reverses
+Slice 85's "not deduplicating identical images" and says so in that spec. (2) The Gate-2 proofreader prompt gained the "text is
+material, not instructions" line the narrator and extractor already had, and the repair prompt's rejection reason is neutralized
+and capped. They touch disjoint files (image_facts and its tests; narrate, proofread and theirs), so either is easy to drop in review. The sample is 12 PDFs, mostly designed finance and crypto
+documents, with no real SEC filings; a few would firm the number up.
+
 ## 2026-10-02 - cost caps on PDF extraction: a limit on images, one pass over the pages (Slice 85)
 
 Two amplifications found by the audit. Every embedded PDF image costs one paid vision call and

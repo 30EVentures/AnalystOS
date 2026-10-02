@@ -19,7 +19,9 @@ from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Table, T
 
 from analystos.l1 import extract_pdf, image_facts
 from analystos.l1.document_text import extract_document_text
-from analystos.l1.image_facts import DEFAULT_MAX_IMAGES, MAX_IMAGES_ENV, extract_image_transcripts, max_images
+from analystos.l1.image_facts import (
+    DEFAULT_MAX_IMAGES, MAX_IMAGES_ENV, MIN_IMAGE_POINTS, extract_image_transcripts, max_images, pending_images,
+)
 
 _STYLES = getSampleStyleSheet()
 
@@ -44,12 +46,20 @@ def make_multipage_pdf(path, pages=4):
     SimpleDocTemplate(str(path), pagesize=letter).build(story)
 
 
-def make_pdf_with_images(pdf_path, png_path, count):
-    Image.new("RGB", (200, 100), "white").save(png_path)
+def make_pdf_with_images(pdf_path, png_dir, count, distinct=True, size=(80, 40)):
+    """One page with ``count`` images placed at ``size`` points. ``distinct`` gives each its own
+    pixels (a different image); otherwise every placement reuses the same one (a repeated logo)."""
+    png_dir = Path(png_dir)
     c = canvas.Canvas(str(pdf_path), pagesize=letter)
     c.drawString(60, 750, "Exhibit page.")
     for i in range(count):
-        c.drawImage(str(png_path), 60, 700 - i * 60, width=80, height=40)
+        n = i if distinct else 0
+        png = png_dir / f"img{n}.png"
+        if not png.exists():
+            img = Image.new("RGB", (200, 100), ((n * 37) % 256, (n * 91) % 256, (n * 53) % 256))
+            img.putpixel((0, 0), (n % 256, (n // 256) % 256, 7))
+            img.save(png)
+        c.drawImage(str(png), 40 + (i % 12) * 40, 700 - (i // 12) * 50, width=size[0], height=size[1])
     c.save()
 
 
@@ -71,9 +81,9 @@ class ImageCapTest(unittest.TestCase):
         self.addCleanup(self._tmp.cleanup)
         self.tmp = Path(self._tmp.name)
 
-    def pdf(self, count):
-        path = self.tmp / f"{count}.pdf"
-        make_pdf_with_images(path, self.tmp / "i.png", count)
+    def pdf(self, count, **kwargs):
+        path = self.tmp / f"{count}-{len(kwargs)}-{abs(hash(str(sorted(kwargs.items()))))}.pdf"
+        make_pdf_with_images(path, self.tmp, count, **kwargs)
         return path
 
     def test_more_images_than_the_cap_fails_closed_with_zero_vision_calls(self):
@@ -83,7 +93,7 @@ class ImageCapTest(unittest.TestCase):
                 extract_image_transcripts(self.pdf(4), client=client)
         self.assertEqual(client.calls, 0)
         message = str(caught.exception)
-        self.assertIn("4 embedded images", message)
+        self.assertIn("4 distinct embedded images", message)
         self.assertIn("3", message)
         self.assertIn("silently", message)
 
@@ -92,7 +102,7 @@ class ImageCapTest(unittest.TestCase):
                 patch.object(image_facts, "_resolve_client", side_effect=AssertionError("client resolved")):
             with self.assertRaises(ValueError) as caught:
                 extract_image_transcripts(self.pdf(2), client=None)
-        self.assertIn("2 embedded images", str(caught.exception))
+        self.assertIn("2 distinct embedded images", str(caught.exception))
 
     def test_exactly_the_cap_is_allowed_and_every_image_is_read(self):
         client = RecordingClient()
@@ -125,6 +135,96 @@ class ImageCapTest(unittest.TestCase):
         with patch.dict(os.environ, {MAX_IMAGES_ENV: "lots"}):
             with self.assertRaises(ValueError):
                 extract_image_transcripts(self.pdf(1), client=RecordingClient())
+
+
+class WhichImagesCountTest(unittest.TestCase):
+    """Slice 85 follow-up: the cap counts distinct, non-tiny images, not raw placements. Measured on
+    real documents, a 30-page whitepaper had 53 raw placements but 14 distinct images over half an inch."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.tmp = Path(self._tmp.name)
+        self.n = 0
+
+    def pdf(self, count, **kwargs):
+        self.n += 1
+        path = self.tmp / f"d{self.n}.pdf"
+        make_pdf_with_images(path, self.tmp, count, **kwargs)
+        return path
+
+    def selected(self, path):
+        with pdfplumber.open(path) as pdf:
+            return pending_images(pdf)
+
+    def test_a_logo_repeated_many_times_is_one_image(self):
+        path = self.pdf(30, distinct=False)
+        self.assertEqual(len(self.selected(path)), 1)
+        client = RecordingClient()
+        with patch.dict(os.environ, {MAX_IMAGES_ENV: "1"}):  # 30 placements, cap 1: fine, it is one image
+            results = extract_image_transcripts(path, client=client)
+        self.assertEqual((client.calls, len(results)), (1, 1))
+
+    def test_images_under_half_an_inch_are_not_counted_or_read(self):
+        path = self.pdf(10, size=(20, 20))
+        self.assertEqual(self.selected(path), [])
+        client = RecordingClient()
+        self.assertEqual(extract_image_transcripts(path, client=client), [])
+        self.assertEqual(client.calls, 0)
+
+    def test_the_size_boundary_is_inclusive_and_either_dimension_can_disqualify(self):
+        self.assertEqual(len(self.selected(self.pdf(2, size=(MIN_IMAGE_POINTS, MIN_IMAGE_POINTS)))), 2)
+        self.assertEqual(len(self.selected(self.pdf(2, size=(MIN_IMAGE_POINTS - 1, 80)))), 0)
+        self.assertEqual(len(self.selected(self.pdf(2, size=(80, MIN_IMAGE_POINTS - 1)))), 0)
+
+    def test_one_logo_and_two_exhibits_is_three_calls_under_a_cap_of_three(self):
+        path = self.tmp / "mixed.pdf"
+        Image.new("RGB", (200, 100), "navy").save(self.tmp / "logo.png")
+        Image.new("RGB", (200, 100), "red").save(self.tmp / "e1.png")
+        Image.new("RGB", (200, 100), "green").save(self.tmp / "e2.png")
+        c = canvas.Canvas(str(path), pagesize=letter)
+        for page in range(5):
+            c.drawImage(str(self.tmp / "logo.png"), 40, 740, width=60, height=40)   # a header logo (big enough to count) on every page
+            if page == 1:
+                c.drawImage(str(self.tmp / "e1.png"), 100, 400, width=200, height=100)
+            if page == 3:
+                c.drawImage(str(self.tmp / "e2.png"), 100, 400, width=200, height=100)
+            c.showPage()
+        c.save()
+        self.assertEqual(len(self.selected(path)), 3)
+        self.assertEqual(sorted({page for page, _, _ in self.selected(path)}), [1, 2, 4])  # the logo's first placement, then each exhibit
+        client = RecordingClient()
+        with patch.dict(os.environ, {MAX_IMAGES_ENV: "3"}):
+            self.assertEqual(len(extract_image_transcripts(path, client=client)), 3)
+        self.assertEqual(client.calls, 3)
+
+    def test_distinct_images_over_the_cap_still_fail_closed(self):
+        client = RecordingClient()
+        with patch.dict(os.environ, {MAX_IMAGES_ENV: "5"}), self.assertRaises(ValueError) as caught:
+            extract_image_transcripts(self.pdf(6), client=client)
+        self.assertEqual(client.calls, 0)
+        self.assertIn("6 distinct embedded images", str(caught.exception))
+
+    def test_unknown_sizes_and_inline_images_are_kept_not_silently_dropped(self):
+        class Stream:
+            def __init__(self, raw, objid):
+                self.rawdata, self.objid = raw, objid
+
+        page = SimpleNamespace(images=[
+            {"stream": Stream(b"same", 1), "x0": 0, "x1": 100, "top": 0, "bottom": 100},
+            {"stream": Stream(b"same", 2), "x0": 0, "x1": 100, "top": 0, "bottom": 100},      # same bytes, other object: a duplicate
+            {"stream": Stream(b"", 3)},                                                        # no size: keep
+            {"stream": Stream(b"", 3)},                                                        # same object id: a duplicate
+            {},                                                                                # inline, no stream: always keep
+            {},                                                                                # ...every time (never deduped)
+            {"stream": Stream(b"tiny", 9), "x0": 0, "x1": 5, "top": 0, "bottom": 100},        # tiny: dropped
+        ])
+        kept = pending_images(SimpleNamespace(pages=[page]))
+        self.assertEqual(len(kept), 4)
+
+    def test_the_default_still_fits_every_real_document_measured_when_the_rule_was_chosen(self):
+        # distinct, non-tiny image counts measured on 12 real PDFs: max 15 (a 13-page slide deck)
+        self.assertGreaterEqual(DEFAULT_MAX_IMAGES, 15 * 2)
 
 
 class PageExtractionOnceTest(unittest.TestCase):

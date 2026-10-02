@@ -82,6 +82,7 @@ _MAX_TOKENS = 8192  # a rich report over a dense document can outgrow 4096 - see
 # whole report, so it gets a more generous budget than the full-regenerate
 # fallback below it.
 _MAX_REPAIR_ATTEMPTS = 3
+_MAX_REASON_CHARS = 600  # a rejection reason is one sentence; Gate 2's free text is capped before it reaches a prompt
 # 2, not 1 - two live runs back to back each burned their only retry fixing
 # the reported violation while introducing a different one; see the retry
 # loop in write_narrative and specs/slice-40/spec.md.
@@ -1185,7 +1186,7 @@ def _repair_paragraph(client, manifest, text, reason):
         messages=[{
             "role": "user",
             "content": (
-                f"{manifest}\n\nThis paragraph was rejected: {reason}.\n\n"
+                f"{manifest}\n\nThis paragraph was rejected: {neutralize(reason)[:_MAX_REASON_CHARS]}.\n\n"
                 f"Original paragraph: {text!r}\n\nReturn the corrected paragraph."
             ),
         }],

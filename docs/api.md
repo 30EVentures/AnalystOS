@@ -105,7 +105,7 @@ its own id.
 | `ANALYSTOS_PUBLIC_BASE_URL` | the host used in issued links | derived from the request (`X-Forwarded-*`) |
 | `ANTHROPIC_API_KEY` | the analysis itself | as for `/api/analyze` |
 | `ANALYSTOS_MODEL` | *optional*: which model every stage asks (default `claude-sonnet-5`). Recorded in each audit event | the default |
-| `ANALYSTOS_MAX_IMAGES` | *optional*: the most embedded images one PDF may have (each is one model call). More is refused with a clear error, never read in part | 40. A value that is not a whole number from 1 to 1000 is an error |
+| `ANALYSTOS_MAX_IMAGES` | *optional*: the most *distinct* embedded images one PDF may have (each is one model call; a repeated image counts once and an image under half an inch either way is neither counted nor read). More is refused with a clear error, never read in part | 40. A value that is not a whole number from 1 to 1000 is an error |
 
 Make a caller key (shown once, stored nowhere):
 

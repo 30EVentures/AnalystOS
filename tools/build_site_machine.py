@@ -45,7 +45,11 @@ def generated_files():
               f"- [{GUIDES[0][1]}]({BASE}/docs/{GUIDES[0][0]}): {GUIDES[0][2]}", ""]
     lines += ["## Verifying a report", "",
               f"- [{GUIDES[1][1]}]({BASE}/docs/{GUIDES[1][0]}): {GUIDES[1][2]}",
-              f"- `POST {BASE}/api/v1/verify`: stateless verification of any seal bundle, no account", ""]
+              f"- `POST {BASE}/api/v1/verify`: stateless verification of any seal bundle, no account"]
+    # Only advertised once the file exists: a link to a 404 is worse than no link (Slice 86).
+    if (ROOT / "site" / ".well-known" / "analystos-seal-key.json").is_file():
+        lines.append(f"- [Seal verification key]({BASE}/.well-known/analystos-seal-key.json): the public key seals are signed with (analystos-seal-key/1)")
+    lines.append("")
     lines += ["## Identity and the FlashyOS mesh", "",
               f"- [Handshake]({BASE}/.well-known/flashyos.json): flashyos/1",
               f"- [Charter]({BASE}/.well-known/flashyos-charter.json): AAO 0.1, three roles, each with a measure",

@@ -97,3 +97,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 83 | the signed seal says which model, which caller and which code made the report | [spec](slice-83/spec.md) |
 | 84 | the audit log is a hash chain, signed with the seal key | [spec](slice-84/spec.md) |
 | 85 | a PDF cannot cost unbounded model calls or quadratic extraction time | [spec](slice-85/spec.md) |
+| 86 | a public key a stranger can pin, and the means to publish it safely (hardening plan item A2) | [spec](slice-86/spec.md) |

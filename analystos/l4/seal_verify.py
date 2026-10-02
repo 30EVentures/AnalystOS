@@ -31,6 +31,7 @@ numeric value and are not covered. See ``docs/seal.md``.
 """
 
 import base64
+import datetime
 import hashlib
 import json
 import math
@@ -472,15 +473,162 @@ def verify_bundle(bundle, public_key=None, source_text=None):
     return result()
 
 
+# --- the published public key (Slice 86) -------------------------------------------
+# A key file is how a stranger obtains a key independently of any seal. It is trusted
+# exactly as far as the channel it was fetched over; see docs/seal.md.
+
+KEY_FILE_FORMAT = "analystos-seal-key/1"
+KEY_FILE_PATH = "/.well-known/analystos-seal-key.json"
+KEY_FILE_MAX_KEYS = 16
+KEY_FILE_MAX_BYTES = 64 * 1024
+_KEY_ID_RE = re.compile(r"^[0-9a-f]{16}$")
+_B64U_KEY_RE = re.compile(r"^[A-Za-z0-9_-]{43}$")  # 32 bytes, unpadded base64url
+_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_PRIVATE_FIELD_NAMES = frozenset({"private_key", "privatekey", "seed", "secret", "secret_key", "secretkey", "private"})
+
+
+def _b64u_encode(raw):
+    return base64.urlsafe_b64encode(raw).rstrip(b"=").decode("ascii")
+
+
+def _find_private_fields(node, path="$"):
+    found = []
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if isinstance(key, str) and key.lower() in _PRIVATE_FIELD_NAMES:
+                found.append(f"{path}.{key}")
+            found += _find_private_fields(value, f"{path}.{key}")
+    elif isinstance(node, list):
+        for i, item in enumerate(node):
+            found += _find_private_fields(item, f"{path}[{i}]")
+    return found
+
+
+def validate_key_file(doc):
+    """Problems with a published key file (a list of strings; empty means valid).
+
+    Strict on purpose: canonical unpadded base64url, a key whose ``key_id`` is the
+    first 16 hex characters of the SHA-256 of its public key bytes, unique ids, at
+    least one ``active`` key, and no field that looks like a private key. Unknown
+    extra fields are ignored so the format can grow."""
+    if not isinstance(doc, dict):
+        return ["a key file must be a JSON object"]
+    problems = []
+    if doc.get("format") != KEY_FILE_FORMAT:
+        problems.append(f"format must be {KEY_FILE_FORMAT!r}")
+    if not isinstance(doc.get("org"), str) or not doc["org"]:
+        problems.append("org must be a non-empty string")
+    for where in _find_private_fields(doc):
+        problems.append(f"{where}: a key file must never contain a private key")
+    keys = doc.get("keys")
+    if not isinstance(keys, list) or not keys:
+        problems.append("keys must be a non-empty list")
+        return problems
+    if len(keys) > KEY_FILE_MAX_KEYS:
+        problems.append(f"at most {KEY_FILE_MAX_KEYS} keys")
+    seen, active = set(), 0
+    for i, key in enumerate(keys[:KEY_FILE_MAX_KEYS]):
+        where = f"keys[{i}]"
+        if not isinstance(key, dict):
+            problems.append(f"{where} must be an object")
+            continue
+        if key.get("algorithm") != "ed25519":
+            problems.append(f"{where}.algorithm must be 'ed25519'")
+        key_id, public = key.get("key_id"), key.get("public_key")
+        if not (isinstance(key_id, str) and _KEY_ID_RE.match(key_id)):
+            problems.append(f"{where}.key_id must be 16 lowercase hex characters")
+        elif key_id in seen:
+            problems.append(f"{where}.key_id {key_id} is listed twice")
+        else:
+            seen.add(key_id)
+        if not (isinstance(public, str) and _B64U_KEY_RE.match(public)):
+            problems.append(f"{where}.public_key must be an unpadded base64url encoding of 32 bytes")
+        else:
+            raw = _b64u_decode(public)
+            if len(raw) != 32 or _b64u_encode(raw) != public:
+                problems.append(f"{where}.public_key must be a canonical encoding of exactly 32 bytes")
+            elif isinstance(key_id, str) and hashlib.sha256(raw).hexdigest()[:16] != key_id:
+                problems.append(f"{where}.key_id is not the first 16 hex characters of sha256(public key)")
+        status = key.get("status")
+        if status not in ("active", "retired"):
+            problems.append(f"{where}.status must be 'active' or 'retired'")
+        elif status == "active":
+            active += 1
+        added = key.get("added")
+        if not (isinstance(added, str) and _DATE_RE.match(added)):
+            problems.append(f"{where}.added must be a YYYY-MM-DD date")
+        else:
+            try:
+                datetime.date.fromisoformat(added)
+            except ValueError:
+                problems.append(f"{where}.added is not a real date")
+    if not active:
+        problems.append("at least one key must be active")
+    return problems
+
+
+def pinned_public_key(bundle, key_file):
+    """``(public_key_b64url, None)`` for the key a seal names, taken from the key
+    file, or ``(None, reason)``. Never guesses: an invalid file, an unsigned seal, a
+    seal from another org, or a ``key_id`` the file does not list gives a reason."""
+    problems = validate_key_file(key_file)
+    if problems:
+        return None, "the key file is not valid: " + "; ".join(problems[:3])
+    signature = bundle.get("signature") if isinstance(bundle, dict) else None
+    payload = bundle.get("payload") if isinstance(bundle, dict) else None
+    if not isinstance(signature, dict):
+        return None, "the bundle is unsigned"
+    key_id = signature.get("key_id")
+    if not isinstance(key_id, str):
+        return None, "the bundle's signature names no key_id"
+    org = payload.get("org") if isinstance(payload, dict) else None
+    if org != key_file["org"]:
+        return None, f"the bundle is from org {org!r} but the key file is for {key_file['org']!r}"
+    for key in key_file["keys"]:
+        if key["key_id"] == key_id:
+            return key["public_key"], None
+    return None, f"key_id {key_id} is not in the published key file (a removed key is no longer trusted)"
+
+
+def verify_bundle_with_key_file(bundle, key_file, source_text=None):
+    """``verify_bundle`` with the public key taken from a published key file.
+
+    Adds a first ``key_file`` check. A seal whose key is not listed, from another
+    org, or checked against an invalid file **fails** (``ok`` and ``authentic``
+    false); it is never quietly checked without a pinned key. An unsigned seal
+    cannot be authentic: the check is ``skipped`` and the rest is reported as usual."""
+    public_key, reason = pinned_public_key(bundle, key_file)
+    unsigned = isinstance(bundle, dict) and not bundle.get("signature")
+    outcome = verify_bundle(bundle, public_key=public_key, source_text=source_text)
+    if public_key is not None:
+        check = _check("key_file", "pass", f"key {bundle['signature']['key_id']} is listed in the published key file")
+    elif unsigned:
+        check = _check("key_file", "skipped", reason)
+    else:
+        check = _check("key_file", "fail", reason)
+        outcome["ok"] = outcome["authentic"] = outcome["content_checked"] = False
+    outcome["checks"].insert(0, check)
+    return outcome
+
+
 def main(argv=None, stdout=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     stdout = stdout or sys.stdout
-    public_key = source_text = path = None
+    public_key = source_text = path = key_file = None
+    usage = ("usage: python3 -m analystos.l4.seal_verify bundle.json "
+             "[--public-key B64URL | --key-file analystos-seal-key.json] [--text extracted.txt]")
     try:
         i = 0
         while i < len(argv):
             if argv[i] == "--public-key":
                 public_key = argv[i + 1]
+                i += 2
+            elif argv[i] == "--key-file":
+                with open(argv[i + 1], "rb") as handle:
+                    raw = handle.read(KEY_FILE_MAX_BYTES + 1)
+                if len(raw) > KEY_FILE_MAX_BYTES:
+                    raise ValueError(f"the key file is larger than {KEY_FILE_MAX_BYTES} bytes")
+                key_file = json.loads(raw.decode("utf-8"))
                 i += 2
             elif argv[i] == "--text":
                 with open(argv[i + 1], encoding="utf-8") as handle:
@@ -489,13 +637,18 @@ def main(argv=None, stdout=None):
             else:
                 path, i = argv[i], i + 1
         if path is None:
-            raise ValueError("usage: python3 -m analystos.l4.seal_verify bundle.json [--public-key B64URL] [--text extracted.txt]")
+            raise ValueError(usage)
+        if public_key is not None and key_file is not None:
+            raise ValueError("give --public-key or --key-file, not both")
         with open(path, encoding="utf-8") as handle:
             bundle = json.load(handle)
     except (OSError, ValueError, IndexError) as exc:
         stdout.write(json.dumps({"error": str(exc)}) + "\n")
         return 2
-    outcome = verify_bundle(bundle, public_key=public_key, source_text=source_text)
+    if key_file is not None:
+        outcome = verify_bundle_with_key_file(bundle, key_file, source_text=source_text)
+    else:
+        outcome = verify_bundle(bundle, public_key=public_key, source_text=source_text)
     stdout.write(json.dumps(outcome, indent=2) + "\n")
     return 0 if outcome["ok"] else 1
 

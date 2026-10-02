@@ -2,6 +2,22 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-10-02 - the audit log is a hash chain, signed with the seal key (Slice 84)
+
+`audit.jsonl` was append-only by convention, and the charter's measures are computed from it.
+Each line now carries `seq`, `prev_hash`, `entry_hash` and, when `ANALYSTOS_SEAL_KEY` is set, an
+Ed25519 `signature` over the hash with a domain string (`analystos.audit-entry/1`). This is the
+linear, insertion-order chain DiligenceOS's receipt log uses, chosen over a Merkle proof over
+id-sorted leaves, which treats honest growth as tampering. The signing marker (`log_signing`) and
+`key_id` are inside the hash, so a signature cannot be stripped and the line relabelled unsigned;
+with no key, lines are still chained and say so. A malformed key still writes the line, unsigned,
+rather than losing the audit trail (the analysis routes already refuse a malformed key before
+they run). Appends take a file lock so concurrent workers cannot extend the chain from the same
+head. Old unchained lines are tolerated as a prefix; an empty or legacy-only log fails verification
+rather than passing vacuously. Honest limit: the chain is tamper-evident, not tamper-proof. A
+shortened log is only caught if you pin the head you saw (`--expect-head`), and whoever holds the
+key can re-sign a rewritten tail. No new crypto: the seal's own sign and verify helpers.
+
 ## 2026-10-02 - the signed seal names the model, the caller and the code version (Slice 83)
 
 The audit found that model id, caller identity and code version lived only in the unsigned audit

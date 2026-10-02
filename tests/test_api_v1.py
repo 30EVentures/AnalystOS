@@ -111,6 +111,15 @@ class CreateAnalysisTest(ApiTestCase):
             response = self.analyze()
         self.assertEqual(response.status_code, 503)
 
+    def test_the_audit_log_the_api_writes_is_a_signed_verifiable_chain(self):
+        from analystos.api_v1.audit_chain import verify_audit_log
+
+        self.created()
+        self.created(key=self.raw_b)
+        out = verify_audit_log(self.store.root / "audit.jsonl", public_key=self.seal_pub)
+        self.assertTrue(out["ok"] and out["authentic"], out)
+        self.assertGreaterEqual(out["chained"], 2)
+
     def test_location_header_and_pdf_are_stored(self):
         response = self.analyze()
         body = response.get_json()
@@ -524,8 +533,9 @@ class PrivacyAndRetentionTest(ApiTestCase):
         for forbidden in (SECRET_WORDS, "secret-filename-XYZ", "402000000", "Revenue"):
             self.assertNotIn(forbidden, log)
         event = json.loads(log.splitlines()[0])
-        self.assertEqual(set(event), {"ts", "type", "caller", "id", "tier", "fallback_reason", "proposed", "verified",
-                                      "dropped", "signed", "seal_ok", "extension", "model"})
+        chain_fields = {"seq", "prev_hash", "log_signing", "key_id", "entry_hash", "signature"}  # Slice 84
+        self.assertEqual(set(event) - chain_fields, {"ts", "type", "caller", "id", "tier", "fallback_reason", "proposed",
+                                                     "verified", "dropped", "signed", "seal_ok", "extension", "model"})
 
     def test_reports_expire_and_are_purged(self):
         body = self.created()

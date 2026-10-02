@@ -95,3 +95,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 81 | an upload's filename never decides where it is saved | [spec](slice-81/spec.md) |
 | 82 | text from a document or a caller never reads as an instruction to the narrator | [spec](slice-82/spec.md) |
 | 83 | the signed seal says which model, which caller and which code made the report | [spec](slice-83/spec.md) |
+| 84 | the audit log is a hash chain, signed with the seal key | [spec](slice-84/spec.md) |

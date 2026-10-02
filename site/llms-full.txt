@@ -173,6 +173,25 @@ Each is `{numerator, denominator, share}` and `share` is `null` on an empty log,
 never a made-up 100%. A test keeps the measure wording identical to the published
 charter.
 
+### The log is a hash chain (Slice 84)
+
+Each line is chained to the one before it (`seq`, `prev_hash`, `entry_hash`) and,
+when `ANALYSTOS_SEAL_KEY` is set, signed (`signature`, `key_id`; Ed25519 over the hash
+with the domain `analystos.audit-entry/1`). With no key, lines are chained and say
+`"log_signing": "none"`. Check a log offline:
+
+```
+python3 -m analystos.api_v1 verify-audit audit.jsonl [--public-key B64URL] [--expect-head HASH]
+```
+
+Exit `0` if no check failed, `1` if one did, `2` for unreadable input. Editing, deleting,
+reordering or inserting a line fails the `chain` check. `authentic` is true only when every
+line is signed and verifies under a public key **you** supplied. Lines written before the
+chain existed are tolerated as a prefix; an empty or legacy-only log fails (nothing to
+verify). Tamper-evident, not tamper-proof: a shortened log is only caught if you pin the
+`head` you saw earlier (`--expect-head`), and a holder of the signing key can re-sign a
+rewritten tail. Event fields are unchanged; the chain fields are added.
+
 ## Vercel routing
 
 Vercel maps one file to one path, so each route has a door in `api/v1/`

@@ -1,4 +1,4 @@
-"""Report storage and the append-only audit log (Slice 61).
+"""Report storage and the hash-chained, signed audit log (Slices 61, 84).
 
 ``FileStore`` is the only implementation and is **not durable on Vercel** (its
 filesystem is ephemeral): use a persistent volume, or write an adapter with
@@ -11,9 +11,19 @@ import os
 import re
 import sys
 import tempfile
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+
+from analystos.api_v1 import audit_chain
+from analystos.l4.seal import load_signing_key
+
+try:  # POSIX advisory lock so two processes cannot extend the chain from the same head
+    import fcntl
+except ImportError:  # pragma: no cover - not Windows-tested
+    fcntl = None
+_AUDIT_THREAD_LOCK = threading.Lock()
 
 STORE_ENV = "ANALYSTOS_STORE_DIR"
 TTL_ENV = "ANALYSTOS_REPORT_TTL_DAYS"
@@ -149,8 +159,54 @@ class FileStore:
                 path.unlink()
 
     def append_audit(self, event):
-        with open(self.root / "audit.jsonl", "a", encoding="utf-8") as handle:
-            handle.write(json.dumps(event, sort_keys=True) + "\n")
+        """Append ``event`` as the next line of a hash chain (Slice 84; see
+        ``analystos.api_v1.audit_chain``). Signed with ``ANALYSTOS_SEAL_KEY``
+        when it is set and well formed; otherwise still chained, marked
+        ``"log_signing": "none"``. A malformed key never loses the line."""
+        try:
+            signing_key = load_signing_key()
+        except ValueError:
+            signing_key = None
+        path = self.root / "audit.jsonl"
+        with _AUDIT_THREAD_LOCK, open(path, "a+b") as handle:
+            if fcntl is not None:
+                fcntl.flock(handle, fcntl.LOCK_EX)  # released when the handle closes
+            head = self._chain_head(handle)
+            seq, prev = (0, audit_chain.GENESIS) if head is None else (head[0] + 1, head[1])
+            line = json.dumps(audit_chain.seal_entry(event, seq, prev, signing_key), sort_keys=True) + "\n"
+            handle.seek(0, os.SEEK_END)
+            if handle.tell() and self._last_byte(handle) != b"\n":
+                line = "\n" + line  # never glue onto a line that was cut short
+            handle.write(line.encode("utf-8"))
+            handle.flush()
+            os.fsync(handle.fileno())
+
+    @staticmethod
+    def _last_byte(handle):
+        handle.seek(-1, os.SEEK_END)
+        return handle.read(1)
+
+    @staticmethod
+    def _chain_head(handle):
+        """``(seq, entry_hash)`` of the last chained line, or ``None``. Reads
+        only the tail in the normal case; scans the whole file only when the
+        last line is not chained (a legacy-only log, or damage)."""
+        handle.seek(0, os.SEEK_END)
+        pos = handle.tell()
+        buf = b""
+        while pos > 0:
+            step = min(65536, pos)
+            pos -= step
+            handle.seek(pos)
+            buf = handle.read(step) + buf
+            if b"\n" in buf.rstrip(b"\n"):
+                break
+        tail = buf.rstrip(b"\n").rsplit(b"\n", 1)[-1].decode("utf-8", "replace")
+        found = audit_chain.last_chained([tail])
+        if found is not None or pos == 0 and not buf.strip():
+            return found
+        handle.seek(0)
+        return audit_chain.last_chained(handle.read().decode("utf-8", "replace").splitlines())
 
     def read_audit(self):
         path = self.root / "audit.jsonl"

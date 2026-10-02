@@ -50,6 +50,7 @@ class HostedPageDownloadsTest(unittest.TestCase):
         out = verify_bundle(body["seal"])
         self.assertTrue(out["ok"], out)
         self.assertIsNone(body["seal"]["signature"])  # no key configured -> unsigned, and it says so
+        self.assertEqual(body["seal"]["payload"]["caller_id"], "(legacy-access-code)")  # Slice 83
 
     def test_a_configured_seal_key_signs_it(self):
         priv, pub = generate_key()

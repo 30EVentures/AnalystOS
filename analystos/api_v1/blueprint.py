@@ -18,7 +18,7 @@ from analystos.api_v1 import auth, links, store as store_mod
 from analystos.api_v1.openapi import build_openapi
 from analystos.l1.detect import SUPPORTED_EXTENSIONS
 from analystos.l4.export import render_html
-from analystos.l4.seal import build_bundle, load_signing_key
+from analystos.l4.seal import build_bundle, code_version, load_signing_key
 from analystos.l4.seal_verify import canonical_bytes, sha256_hex, verify_bundle
 from analystos.pipeline import build_report
 
@@ -137,6 +137,7 @@ def create_analysis():
         return _err(415, "unsupported_media", f"unsupported file type {suffix!r}; expected one of {sorted(SUPPORTED_EXTENSIONS)}")
     try:
         signing_key = load_signing_key()
+        code_version()  # a malformed ANALYSTOS_CODE_VERSION fails here (503), before any model call
     except ValueError as exc:
         return _err(503, "unavailable", str(exc))
     store = _store()
@@ -159,7 +160,7 @@ def create_analysis():
 
     html = section if section.lstrip().lower().startswith("<!doctype html") else render_html(section)
     try:
-        bundle = build_bundle(trace, signing_key=signing_key)
+        bundle = build_bundle(trace, signing_key=signing_key, caller_id=caller)
     except ValueError as exc:
         return _err(422, "unprocessable", str(exc))
     digest = sha256_hex(canonical_bytes(bundle["payload"]))
@@ -283,6 +284,7 @@ def _run_job(job_id):
 
     try:
         signing_key = load_signing_key()
+        code_version()  # a malformed ANALYSTOS_CODE_VERSION fails here (503), before any model call
     except ValueError as exc:
         return _fail_job(store, job_id, caller, exc)
     upload = store.job_upload(job_id)
@@ -306,7 +308,7 @@ def _run_job(job_id):
 
     html = section if section.lstrip().lower().startswith("<!doctype html") else render_html(section)
     try:
-        bundle = build_bundle(trace, signing_key=signing_key)
+        bundle = build_bundle(trace, signing_key=signing_key, caller_id=caller)
     except ValueError as exc:
         return _fail_job(store, job_id, caller, exc)
     digest = sha256_hex(canonical_bytes(bundle["payload"]))

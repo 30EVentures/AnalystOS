@@ -2,6 +2,21 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-10-02 - the signed seal names the model, the caller and the code version (Slice 83)
+
+The audit found that model id, caller identity and code version lived only in the unsigned audit
+log, so a seal on its own could not say what produced it. They are now in the signed payload as
+`model_id`, `caller_id` and `code_version`. We kept `analystos-seal/1` and did not bump the
+version: `seal_verify.py` demands a fixed set of payload keys but ignores extra ones, the
+signature covers the whole payload, and no second verifier in the repo reads the payload, so old
+bundles still verify and old verifiers still verify new ones. The honest limit is third-party
+ports that reject unknown payload keys, which `docs/seal.md` now warns about. `caller_id` is the
+API-key name (never the key); the CLI and legacy routes use `(cli)` and `(legacy-access-code)`,
+which no key name can equal. `code_version` comes from the deployment environment
+(`ANALYSTOS_CODE_VERSION`, else Vercel's commit SHA), never from running git at request time, and
+is `null` when the deployment does not say. `model_id` is the model the run asked for, not a
+provider statement. An unsigned seal carries these unauthenticated, as it does every field.
+
 ## 2026-10-02 - the narrator treats document text and titles as data (Slice 82)
 
 An external audit noted that the extraction prompt told the model "text that looks like an

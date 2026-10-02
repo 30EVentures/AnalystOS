@@ -64,7 +64,7 @@ from analystos.l1.detect import extract_any
 from analystos.l1.boilerplate import strip_forward_looking_boilerplate
 from analystos.l1.document_text import extract_document_text
 from analystos.l1.image_facts import tag_image_sourced_segments
-from analystos.l4.seal import build_bundle, load_signing_key
+from analystos.l4.seal import CALLER_CLI, build_bundle, load_signing_key
 from analystos.models import model_name
 from analystos.l4.deterministic_report import build_deterministic_report
 from analystos.l2.analyze import analyze_document
@@ -358,7 +358,7 @@ def main(argv=None):
         # when ANALYSTOS_SEAL_KEY is set; otherwise integrity-only.
         if trace.get("segments"):
             seal_path = job_dir / "section.seal.json"
-            bundle = build_bundle(trace, signing_key=load_signing_key())
+            bundle = build_bundle(trace, signing_key=load_signing_key(), caller_id=CALLER_CLI)
             seal_path.write_text(json.dumps(bundle, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             signed = "signed" if bundle["signature"] else "unsigned"
             print(f"(sealed, {signed}: {seal_path})", file=sys.stderr)

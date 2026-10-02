@@ -80,7 +80,7 @@ if str(_REPO_ROOT) not in sys.path:
 from analystos.api_v1 import register as register_api_v1  # noqa: E402
 from analystos.l1.detect import SUPPORTED_EXTENSIONS, extract_any  # noqa: E402
 from analystos.l4.export import render_html  # noqa: E402
-from analystos.l4.seal import build_bundle, load_signing_key  # noqa: E402
+from analystos.l4.seal import CALLER_LEGACY, build_bundle, load_signing_key  # noqa: E402
 from analystos.pipeline import build_report  # noqa: E402
 
 app = Flask(__name__)
@@ -306,7 +306,7 @@ def _seal_or_none(trace):
     if not trace.get("segments"):
         return None
     try:
-        return build_bundle(trace, signing_key=load_signing_key())
+        return build_bundle(trace, signing_key=load_signing_key(), caller_id=CALLER_LEGACY)
     except ValueError:
         return None
 

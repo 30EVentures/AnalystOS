@@ -16,6 +16,7 @@ built-in default (the evidence store's public fallback key taught why).
 import base64
 import hashlib
 import os
+import re
 import secrets
 import sys
 from datetime import datetime, timezone
@@ -26,7 +27,14 @@ from analystos.l4.seal_verify import (
 )
 
 SEAL_KEY_ENV = "ANALYSTOS_SEAL_KEY"
+CODE_VERSION_ENV = "ANALYSTOS_CODE_VERSION"
+VERCEL_SHA_ENV = "VERCEL_GIT_COMMIT_SHA"  # set by Vercel for a git deployment; nothing here shells out to git
 ORG = "analystos"
+# caller_id for runs with no API-key name. Parentheses are not allowed in a
+# key name (analystos.api_v1.auth), so these can never equal a real caller.
+CALLER_CLI = "(cli)"
+CALLER_LEGACY = "(legacy-access-code)"
+_CODE_VERSION_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+-]{0,63}$")
 _SEALABLE_TIERS = ("written", "deterministic", "plain")
 
 
@@ -60,6 +68,23 @@ def load_signing_key(environ=None):
     return raw
 
 
+def code_version(environ=None):
+    """The deployed code's version for the seal payload (Slice 83), or ``None``
+    when the deployment does not say. Read from ``ANALYSTOS_CODE_VERSION``,
+    else Vercel's ``VERCEL_GIT_COMMIT_SHA``: both are fixed when the code is
+    deployed, so the value is derived from the deployment, not looked up at
+    request time or claimed by the caller. ``None`` means "not stated", never
+    a guess. A malformed explicit value is an error, not a silent downgrade."""
+    env = environ if environ is not None else os.environ
+    for name in (CODE_VERSION_ENV, VERCEL_SHA_ENV):
+        raw = (env.get(name) or "").strip()
+        if raw:
+            if not _CODE_VERSION_RE.match(raw):
+                raise ValueError(f"{name} must be a short version label or commit id (letters, digits, . _ + -), got {raw!r}")
+            return raw
+    return None
+
+
 def _sign(payload, seed_b64):
     from cryptography.hazmat.primitives import serialization
     from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -74,10 +99,17 @@ def _sign(payload, seed_b64):
     }
 
 
-def build_bundle(trace, *, org=ORG, created=None, nonce=None, signing_key=None):
+def build_bundle(trace, *, org=ORG, created=None, nonce=None, signing_key=None,
+                 caller_id=None, code_version_override=None):
     """Seal one run. ``trace`` is the dict ``build_report`` fills. Raises
     ``ValueError`` for a run that cannot be sealed (the table path, or no
-    facts)."""
+    facts).
+
+    Slice 83 adds three accountability fields to the signed payload:
+    ``model_id`` (``trace["model"]``, the model the run asked), ``caller_id``
+    (the API-key name, or ``CALLER_CLI`` / ``CALLER_LEGACY``; ``None`` when the
+    caller does not say) and ``code_version`` (``code_version()``, or
+    ``code_version_override``; ``None`` when the deployment does not say)."""
     tier = trace.get("tier")
     if tier not in _SEALABLE_TIERS:
         raise ValueError(f"a {tier!r} run is not sealed - only narrated runs have verified facts to seal")
@@ -106,6 +138,9 @@ def build_bundle(trace, *, org=ORG, created=None, nonce=None, signing_key=None):
         "text_sha256": sha256_hex(text.encode("utf-8")),
         "report_sha256": sha256_hex(canonical_bytes(report)) if report is not None else None,
         "tier": tier,
+        "model_id": trace.get("model"),
+        "caller_id": caller_id,
+        "code_version": code_version_override if code_version_override is not None else code_version(),
     }
     return {
         "format": SEAL_FORMAT,

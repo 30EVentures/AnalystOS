@@ -94,3 +94,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 80 | one public identity: 30E Ventures, and its own email | [spec](slice-80/spec.md) |
 | 81 | an upload's filename never decides where it is saved | [spec](slice-81/spec.md) |
 | 82 | text from a document or a caller never reads as an instruction to the narrator | [spec](slice-82/spec.md) |
+| 83 | the signed seal says which model, which caller and which code made the report | [spec](slice-83/spec.md) |

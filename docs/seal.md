@@ -27,7 +27,7 @@ The `checks` list, in order (each `pass`, `fail` or `skipped`):
 
 | Check | Needs the text? | What it proves |
 |---|---|---|
-| `structure` | no | it is an `analystos-seal/1` bundle with every payload field |
+| `structure` | no | it is an `analystos-seal/1` bundle with every required payload field (and any accountability field present is a string or null) |
 | `fact_hashes` | no | every fact hashes to its recorded hash; no duplicate keys |
 | `merkle_root` | no | the facts make the signed root; `entries` is right |
 | `report_hash` | no | the report is the one that was sealed (or there is none) |
@@ -54,7 +54,10 @@ An unsigned bundle (no `ANALYSTOS_SEAL_KEY` when it was made) is `ok` but never
     "source_sha256": "<sha256 of the uploaded file's bytes>",
     "text_sha256": "<sha256 of the UTF-8 extracted text the facts were verified against>",
     "report_sha256": "<sha256 of canonical(report)> or null",
-    "tier": "written | deterministic | plain"
+    "tier": "written | deterministic | plain",
+    "model_id": "<the model the run asked, e.g. claude-sonnet-5> or null",
+    "caller_id": "<the API-key name, \"(cli)\", \"(legacy-access-code)\"> or null",
+    "code_version": "<deployed commit id or version label> or null"
   },
   "facts":  [ { "key": "fact/000000", "record": { ... }, "hash": "<hex>" } ],
   "report": { ... } or null,
@@ -65,6 +68,30 @@ An unsigned bundle (no `ANALYSTOS_SEAL_KEY` when it was made) is `ok` but never
 `nonce` makes every seal's payload (and therefore the report id, `sha256(canonical(payload))`) unique even for identical content in the same second. `tier` is inside the signed payload so a fallback report cannot be relabelled
 as a written one. `source_sha256` is the same SHA-256 the evidence store names
 files by.
+
+`model_id`, `caller_id` and `code_version` (Slice 83) say who and what produced the
+report, inside the signed payload so a signed seal cannot be relabelled after the fact:
+
+- `model_id` is the model id the run asked for (`ANALYSTOS_MODEL`, read when the run
+  finished; the same value the audit log records). It is the *requested* id, not a
+  statement from the model provider.
+- `caller_id` is the `/api/v1` API-key **name** that made the run (an operator-chosen
+  label, never the key). Runs outside `/api/v1` carry `"(cli)"` or
+  `"(legacy-access-code)"`; those contain parentheses, which no key name can, so they
+  never collide with a real caller. `null` means the sealer did not say.
+- `code_version` is the deployed code's commit id or label, taken from the deployment's
+  environment (`ANALYSTOS_CODE_VERSION`, else Vercel's `VERCEL_GIT_COMMIT_SHA`), never
+  looked up at request time. `null` means the deployment does not say.
+
+**Compatibility.** These three fields are an additive change to `analystos-seal/1`, with
+no version bump. They are optional: a seal made before Slice 83 lacks them and still
+verifies, and a verifier that ignores unknown payload fields (as `seal_verify.py` always
+did) verifies a new seal unchanged, because the signature covers the whole payload
+including them. A *strict* port that rejected unknown payload keys would reject new
+seals; ports should ignore unknown payload fields, and may check that each of these
+three, when present, is a non-empty string (at most 128 characters) or `null`. As with
+every field here, a field is only as trustworthy as the key that signed it: unsigned
+seals carry them unauthenticated.
 
 ## Fact records
 

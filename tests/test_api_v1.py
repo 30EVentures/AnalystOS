@@ -97,6 +97,20 @@ class CreateAnalysisTest(ApiTestCase):
         out = verify_bundle(body["seal"], public_key=self.seal_pub)
         self.assertTrue(out["ok"] and out["authentic"], out)
 
+    def test_the_signed_payload_names_the_caller_the_model_and_the_code_version(self):
+        with patch.dict(os.environ, {"ANALYSTOS_CODE_VERSION": "v-test-1", "ANALYSTOS_MODEL": "claude-test-model"}):
+            body = self.created(key=self.raw_b)
+        payload = body["seal"]["payload"]
+        self.assertEqual(payload["caller_id"], "agent-b")
+        self.assertEqual(payload["model_id"], "claude-test-model")
+        self.assertEqual(payload["code_version"], "v-test-1")
+        self.assertTrue(verify_bundle(body["seal"], public_key=self.seal_pub)["authentic"])
+
+    def test_a_malformed_code_version_config_is_refused_not_ignored(self):
+        with patch.dict(os.environ, {"ANALYSTOS_CODE_VERSION": "bad value;"}):
+            response = self.analyze()
+        self.assertEqual(response.status_code, 503)
+
     def test_location_header_and_pdf_are_stored(self):
         response = self.analyze()
         body = response.get_json()

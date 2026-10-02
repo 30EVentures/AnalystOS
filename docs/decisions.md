@@ -2,6 +2,25 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-10-02 - a public key a stranger can pin, and the means to publish it safely (Slice 86)
+
+Hardening-plan item A2. Seals can be signed but nothing published a key to check them against, so
+"authentic" had nothing to point at. Built the format (`analystos-seal-key/1`: a `keys` list with
+`key_id`, `public_key`, `status`), a strict validator and a fail-closed `--key-file` path in the
+standalone verifier, `tools/seal_key_file.py` to write the file, and smoke checks - and
+deliberately did **not** generate, print, store or publish a real key, add any file to `site/`, or
+touch the host's environment. Turning it on is a human act (docs/seal.md, "Turning it on").
+Choices worth recording: (1) `keys` is a list from day one because a published format is the one
+thing that cannot be widened later without breaking whoever pinned it; (2) revocation is removal
+(fail closed) rather than a status with dates, which would be a feature nobody has asked for; (3)
+`keygen` prints the private seed and the public key side by side, so the tool derives the public key
+from the operator's own environment (`--from-env`) and refuses a `--public-key` equal to the seed:
+the likeliest way to leak the key is pasting the wrong line; (4) the smoke check that matters is
+`--seal`, which verifies a real production seal against the live file, because the dangerous
+mistake is a host key that does not match the published one and a format check cannot see that;
+(5) a missing key file is reported as "not published yet", not a failure, until `--expect-seal-key`.
+The file is trusted exactly as far as TLS to analystos.dev; the docs say so and say how to pin the
+`key_id` out of band.
 ## 2026-10-02 - review follow-ups on the hardening branch (Slices 82 and 85)
 
 Two changes after reviewing the branch against real data. (1) The image cap counted raw placements, which rejected a normal

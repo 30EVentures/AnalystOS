@@ -100,7 +100,7 @@ its own id.
 | `ANALYSTOS_API_KEYS` | any authenticated call: comma-separated `name:sha256hex` | every authenticated call is a 503 (fails closed) |
 | `ANALYSTOS_STORE_DIR` | *optional*: storing reports, links, `GET /reports`, `GET /verify/{id}`, the audit log file | the default: responses carry the report and seal inline; those routes are 503 `store_not_configured`; audit lines go to stderr |
 | `ANALYSTOS_LINK_SECRET` | `POST /links` and honouring links | 503; no default secret |
-| `ANALYSTOS_SEAL_KEY` | signing seals (`python3 -m analystos.l4.seal keygen`) | unsigned seals (integrity only), and they say so. A *malformed* value is a 503, not a downgrade |
+| `ANALYSTOS_SEAL_KEY` | signing seals (`python3 -m analystos.l4.seal keygen`) | unsigned seals (integrity only), and they say so. A *malformed* value is a 503, not a downgrade. Signed seals can only be authenticated by others once the public key is published (`docs/seal.md`, "The published public key") |
 | `ANALYSTOS_REPORT_TTL_DAYS` | retention of stored reports | 30 |
 | `ANALYSTOS_PUBLIC_BASE_URL` | the host used in issued links | derived from the request (`X-Forwarded-*`) |
 | `ANTHROPIC_API_KEY` | the analysis itself | as for `/api/analyze` |

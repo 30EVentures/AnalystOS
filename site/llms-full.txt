@@ -106,7 +106,7 @@ its own id.
 | `ANALYSTOS_API_KEYS` | any authenticated call: comma-separated `name:sha256hex` | every authenticated call is a 503 (fails closed) |
 | `ANALYSTOS_STORE_DIR` | *optional*: storing reports, links, `GET /reports`, `GET /verify/{id}`, the audit log file | the default: responses carry the report and seal inline; those routes are 503 `store_not_configured`; audit lines go to stderr |
 | `ANALYSTOS_LINK_SECRET` | `POST /links` and honouring links | 503; no default secret |
-| `ANALYSTOS_SEAL_KEY` | signing seals (`python3 -m analystos.l4.seal keygen`) | unsigned seals (integrity only), and they say so. A *malformed* value is a 503, not a downgrade |
+| `ANALYSTOS_SEAL_KEY` | signing seals (`python3 -m analystos.l4.seal keygen`) | unsigned seals (integrity only), and they say so. A *malformed* value is a 503, not a downgrade. Signed seals can only be authenticated by others once the public key is published (`docs/seal.md`, "The published public key") |
 | `ANALYSTOS_REPORT_TTL_DAYS` | retention of stored reports | 30 |
 | `ANALYSTOS_PUBLIC_BASE_URL` | the host used in issued links | derived from the request (`X-Forwarded-*`) |
 | `ANTHROPIC_API_KEY` | the analysis itself | as for `/api/analyze` |
@@ -393,9 +393,87 @@ If your port does not reproduce that root, it is not the same seal.
 - From Python: `build_report(path, ..., trace=t)` then
   `analystos.l4.seal.build_bundle(t, signing_key=...)`.
 - Signing: `python3 -m analystos.l4.seal keygen` prints a new key pair once and
-  stores nothing. Put the secret line in `ANALYSTOS_SEAL_KEY`; publish the
-  public key wherever a verifier can pin it. A malformed key is an error, not a
-  silent downgrade to unsigned.
+  stores nothing. Put the secret line in `ANALYSTOS_SEAL_KEY` and publish the public
+  half as described in "The published public key" below. A malformed key is an
+  error, not a silent downgrade to unsigned.
+
+## The published public key
+
+A signature only counts under a key you obtained **independently of the seal**
+(a key inside the bundle proves nothing). When signing is on, AnalystOS publishes
+its public key at
+
+    https://analystos.dev/.well-known/analystos-seal-key.json
+
+and **until that file exists, seals are unsigned and cannot be authenticated by
+anyone**. (The file is added by an operator, not by the code; see "Turning it on".)
+
+```json
+{
+  "format": "analystos-seal-key/1",
+  "keys": [
+    {"added": "2026-10-02", "algorithm": "ed25519", "key_id": "<16 hex>",
+     "public_key": "<base64url, 43 chars>", "status": "active"}
+  ],
+  "org": "analystos",
+  "seal_spec": "https://analystos.dev/docs/seal.md"
+}
+```
+
+Rules a reader (or a port) should enforce: `format` is exactly `analystos-seal-key/1`;
+`public_key` is the canonical unpadded base64url of 32 bytes; `key_id` is the first
+16 hex characters of `sha256(those 32 bytes)` and equals the `key_id` in a seal's
+`signature` block; ids are unique; at least one key is `active`; the file never
+contains a private key (`validate_key_file` rejects fields named `private_key`,
+`seed`, `secret` and similar). Unknown extra fields are ignored.
+
+Verify a seal against it:
+
+```
+curl -sO https://analystos.dev/.well-known/analystos-seal-key.json
+python3 -m analystos.l4.seal_verify section.seal.json --key-file analystos-seal-key.json [--text extracted.txt]
+```
+
+The key is selected by the seal's `key_id`. A seal whose key is **not in the file**,
+a seal from another `org`, and an invalid file are all **failures** (`key_file` check),
+never a silent check without a pinned key. An unsigned seal cannot be authentic.
+
+**What this does and does not give you.** The file is trusted exactly as far as a TLS
+connection to analystos.dev is: whoever controls the site can publish a different key.
+For more than that, record the `key_id` out of band when you first adopt AnalystOS
+(a contract, a config in your own repository) and compare it before trusting a file.
+**Rotation** adds a new `active` key and marks the old one `retired` (old seals keep
+verifying). **Revocation is removal**: delete a compromised key from the file and its
+seals stop being authentic.
+
+### Turning it on (an operator's steps)
+
+Nothing in the repository does this for you, and nothing here ever needs a private key
+in a file, a chat or git.
+
+1. In your own terminal: `python3 -m analystos.l4.seal keygen`. It prints the **private**
+   seed (`ANALYSTOS_SEAL_KEY=...`) once and stores nothing. Put it straight into your
+   host's secret store (Vercel: Project Settings, Environment Variables, Production,
+   `ANALYSTOS_SEAL_KEY`, sensitive) and a password manager. Never commit it.
+2. In the same terminal, with the seed in the environment, write the **public** file
+   (the seed is never printed or written):
+   `ANALYSTOS_SEAL_KEY=<the seed> python3 tools/seal_key_file.py --from-env`
+   (or `--public-key <the line keygen labels "public key">`; the tool refuses a value
+   equal to the seed in your environment). It creates
+   `site/.well-known/analystos-seal-key.json`. Then close the terminal.
+3. `python3 tools/refresh.py`, run the tests, commit the file (public data only), open
+   the pull request and merge. Redeploy so the new environment variable is live.
+4. Prove the two halves match: run one analysis in production, download its seal, and run
+   `python3 tools/smoke.py --expect-seal-key --seal ~/Downloads/<name>.seal.json`. It
+   must report `a seal from this deployment verifies under the published key`. This is
+   the check for the one dangerous mistake, a signing key in the host that is not the
+   key on the site.
+5. To rotate later: generate a new key, run `tools/seal_key_file.py --from-env --add`
+   (new key active, old one retired), deploy the file, then switch
+   `ANALYSTOS_SEAL_KEY`. `tools/seal_key_file.py --check <file>` validates a file.
+
+Either half alone is safe: the key in the environment without the file means signed
+seals nobody can yet authenticate; the file without the key means unsigned seals.
 
 ## Limits, stated plainly
 

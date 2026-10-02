@@ -1,6 +1,14 @@
 """Smoke-test a deployment of AnalystOS (Slice 68).
 
-    python3 tools/smoke.py [BASE_URL] [--json] [--no-post]
+    python3 tools/smoke.py [BASE_URL] [--json] [--no-post] [--expect-seal-key] [--seal PATH]
+
+``--expect-seal-key`` makes a missing public seal key file (Slice 86) a failure;
+without it the file is checked when present and reported as "not published yet"
+when absent. ``--seal PATH`` (a downloaded ``.seal.json``, or an ``/api/v1/analyses``
+response) is verified against the key file the site publishes: the check that
+catches the one dangerous mistake, the signing key in the host's environment not
+matching the key published on the site. Nothing is sent but GETs, so it never needs
+a key or a document.
 
 Standard library plus this repository's own charter checker. Sends only GET
 requests and (unless --no-post) two POSTs that carry no document, key or secret.
@@ -21,6 +29,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tools"))
 
 from analystos.aao.validate import errors, validate_charter  # noqa: E402
+from analystos.l4.seal_verify import KEY_FILE_PATH, validate_key_file, verify_bundle_with_key_file  # noqa: E402
 
 DEFAULT_BASE = "https://analystos.dev"
 JSON_CT = "application/json"
@@ -85,8 +94,9 @@ def fetch(base, path, method="GET", data=None, headers=None, timeout=30):
 
 
 class Smoke:
-    def __init__(self, base, allow_post=True):
+    def __init__(self, base, allow_post=True, expect_seal_key=False, seal_path=None):
         self.base, self.allow_post, self.results, self.cache = base.rstrip("/"), allow_post, [], {}
+        self.expect_seal_key, self.seal_path = expect_seal_key, seal_path
 
     def get(self, path):
         if path not in self.cache:
@@ -130,6 +140,47 @@ class Smoke:
                         hs.get("mesh") == "flashyos/1" and hs.get("org", {}).get("slug") == ch.get("slug"),
                         f"handshake={hs.get('org')}, charter slug={ch.get('slug')}")
         self.guarded("handshake mesh is flashyos/1 and its slug equals the charter's", slugs)
+
+    def check_seal_key(self):
+        r = self.get(KEY_FILE_PATH)
+        if r.status == 404:
+            if self.expect_seal_key or self.seal_path:
+                self.record(f"GET {KEY_FILE_PATH} -> published", False,
+                            "not published (404): without a key file a stranger cannot authenticate any seal")
+            else:
+                self.record("seal key file: not published yet (skipped; --expect-seal-key requires it)", True)
+            return
+        self.record(f"GET {KEY_FILE_PATH} -> 200 {JSON_CT}",
+                    r.status == 200 and r.content_type.lower().startswith(JSON_CT),
+                    f"got status {r.status}, content-type {r.content_type!r}")
+
+        def valid_and_matching():
+            doc = r.json()
+            problems = validate_key_file(doc)
+            self.record("published seal key file is valid", not problems, "; ".join(problems[:3]))
+            if self.seal_path and not problems:
+                self.check_seal_against(doc)
+        self.guarded("published seal key file is valid", valid_and_matching)
+
+    def check_seal_against(self, key_file):
+        name = "a seal from this deployment verifies under the published key"
+        try:
+            with open(self.seal_path, encoding="utf-8") as handle:
+                bundle = json.load(handle)
+        except (OSError, ValueError) as exc:
+            self.record(name, False, f"cannot read {self.seal_path}: {exc}")
+            return
+        if isinstance(bundle, dict) and "format" not in bundle and isinstance(bundle.get("seal"), dict):
+            bundle = bundle["seal"]  # an /api/v1/analyses response
+        outcome = verify_bundle_with_key_file(bundle, key_file)
+        if outcome["authentic"]:
+            self.record(name, True)
+            return
+        failing = [f"{c['name']}: {c['detail']}" for c in outcome["checks"] if c["status"] != "pass"]
+        unsigned = isinstance(bundle, dict) and not bundle.get("signature")
+        hint = (" The seal is unsigned, so ANALYSTOS_SEAL_KEY is probably not set in this deployment."
+                if unsigned else " If the seal is signed, the key in the host's environment does not match the published key.")
+        self.record(name, False, "; ".join(failing[:3]) + hint)
 
     def check_links(self):
         llms = self.get("/llms.txt").text()
@@ -188,23 +239,47 @@ class Smoke:
         self.guarded("verifying a junk bundle answers ok:false", junk)
 
     def run(self):
-        for fn in (self.check_static, self.check_mesh_identity, self.check_links, self.check_api_discovery,
-                   self.check_rewrites_fail_closed, self.check_posts):
+        for fn in (self.check_static, self.check_mesh_identity, self.check_seal_key, self.check_links,
+                   self.check_api_discovery, self.check_rewrites_fail_closed, self.check_posts):
             self.guarded(fn.__name__, fn)
         return self.results
+
+
+USAGE = "usage: python3 tools/smoke.py [BASE_URL] [--json] [--no-post] [--expect-seal-key] [--seal PATH]\n"
+
+
+def _parse(argv):
+    """``(base_url_or_None, flags, seal_path_or_None)`` or ``None`` for bad usage."""
+    flags, args, seal_path, i = set(), [], None, 0
+    while i < len(argv):
+        arg = argv[i]
+        if arg == "--seal":
+            if i + 1 >= len(argv) or argv[i + 1].startswith("--"):
+                return None
+            seal_path, i = argv[i + 1], i + 2
+        elif arg.startswith("--"):
+            flags.add(arg)
+            i += 1
+        else:
+            args.append(arg)
+            i += 1
+    if flags - {"--json", "--no-post", "--expect-seal-key"} or len(args) > 1:
+        return None
+    return (args[0] if args else None), flags, seal_path
 
 
 def main(argv=None, stdout=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     stdout = stdout or sys.stdout
-    flags = {a for a in argv if a.startswith("--")}
-    args = [a for a in argv if not a.startswith("--")]
-    if flags - {"--json", "--no-post"} or len(args) > 1:
-        stdout.write("usage: python3 tools/smoke.py [BASE_URL] [--json] [--no-post]\n")
+    parsed = _parse(argv)
+    if parsed is None:
+        stdout.write(USAGE)
         return 2
-    base = args[0] if args else DEFAULT_BASE
+    base, flags, seal_path = parsed
+    base = base or DEFAULT_BASE
     try:
-        results = Smoke(base, allow_post="--no-post" not in flags).run()
+        results = Smoke(base, allow_post="--no-post" not in flags, expect_seal_key="--expect-seal-key" in flags,
+                        seal_path=seal_path).run()
     except TlsUnverifiable as exc:
         stdout.write(TLS_HELP + f"(detail: {exc})\n")
         return 2

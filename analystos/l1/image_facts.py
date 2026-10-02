@@ -32,6 +32,7 @@ digitally-extracted fact. See specs/slice-50/spec.md.
 """
 
 import base64
+import os
 import re
 import sys
 from io import BytesIO
@@ -42,6 +43,9 @@ from analystos.l2.analyze import _create_message, _resolve_client
 from analystos.models import model_name
 
 _MAX_TOKENS = 1024
+MAX_IMAGES_ENV = "ANALYSTOS_MAX_IMAGES"
+DEFAULT_MAX_IMAGES = 40  # one vision call each: an unbounded count is unbounded cost and time
+_MAX_IMAGES_CEILING = 1000
 _RESOLUTION = 150  # DPI used to rasterize the page before cropping
 
 _SYSTEM_PROMPT = """\
@@ -71,6 +75,19 @@ _IMAGE_TAG = "IMAGE"
 _IMAGE_BLOCK_RE = re.compile(
     rf"\[{_IMAGE_TAG} p(\d+)\]\n(.*?)\n\[/{_IMAGE_TAG}\]", re.DOTALL
 )
+
+
+def max_images(environ=None):
+    """The most embedded images one document may have (Slice 85):
+    ``ANALYSTOS_MAX_IMAGES`` if set, else ``DEFAULT_MAX_IMAGES``. Read on
+    every call. A value that is not a whole number from 1 to 1000 is a
+    ``ValueError``, not a silent fall back to some other limit."""
+    raw = ((environ if environ is not None else os.environ).get(MAX_IMAGES_ENV) or "").strip()
+    if not raw:
+        return DEFAULT_MAX_IMAGES
+    if not raw.isascii() or not raw.isdigit() or not 1 <= int(raw) <= _MAX_IMAGES_CEILING:
+        raise ValueError(f"{MAX_IMAGES_ENV} must be a whole number from 1 to {_MAX_IMAGES_CEILING}, got {raw!r}")
+    return int(raw)
 
 
 def _crop_image_bytes(page, image, resolution=_RESOLUTION):
@@ -128,6 +145,10 @@ def extract_image_transcripts(path, client=None):
     majority) costs nothing extra and never requires ``ANTHROPIC_API_KEY``
     just because this function exists on the extraction path.
 
+    More than ``max_images()`` images raises ``ValueError`` before any call
+    (Slice 85): the cap is checked after the images are counted and before a
+    client is resolved, so an over-limit document costs zero vision calls.
+
     A single image that fails to crop or transcribe (corrupt image data, a
     transient API error) is skipped, logged to stderr, and never fails the
     rest of the document's extraction - deliberately broad
@@ -143,6 +164,16 @@ def extract_image_transcripts(path, client=None):
         ]
         if not pending:
             return []
+
+        # Fail closed BEFORE resolving a client or making any call: reading
+        # only the first N images would silently drop facts from the rest.
+        limit = max_images()
+        if len(pending) > limit:
+            raise ValueError(
+                f"this document has {len(pending)} embedded images, more than the {limit} AnalystOS reads "
+                f"per document (each image is read by a separate model call, and reading only some would "
+                f"silently leave facts out). Remove the images or split the document, then try again."
+            )
 
         client = _resolve_client(client)
         results = []

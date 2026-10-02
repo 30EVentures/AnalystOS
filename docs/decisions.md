@@ -2,6 +2,23 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-10-02 - cost caps on PDF extraction: a limit on images, one pass over the pages (Slice 85)
+
+Two amplifications found by the audit. Every embedded PDF image costs one paid vision call and
+there was no limit, so one upload could make hundreds. `ANALYSTOS_MAX_IMAGES` (default 40; a
+malformed value is an error, not a silent default) now caps it, and exceeding it **fails closed**
+with a plain `ValueError` that reaches the user: reading only the first N images would silently
+drop facts, which this product exists not to do. The check runs right after the images are counted
+and before a client is resolved, so an over-limit document costs no calls and needs no API key; a
+PDF with no images never reads the setting. The default is a judgement, not a measurement: logos
+and decoration count as images, so a long filing with one per page is the case to watch, and the
+setting is there to be raised. Second, text extraction reopened the PDF and re-extracted every
+page's tables for each table (tables x pages). The document pass now hands each page's tables to
+`_raw_rows(..., table=)`, so each page is extracted once and the parsing code stays the single
+shared `_raw_rows` (a Slice 44 test depends on that); `all_tables` got the same treatment. Output
+is identical (checked on the PDF fixtures and a pinned golden); a test counts `extract_tables`
+calls so the quadratic behaviour cannot return unnoticed.
+
 ## 2026-10-02 - the audit log is a hash chain, signed with the seal key (Slice 84)
 
 `audit.jsonl` was append-only by convention, and the charter's measures are computed from it.

@@ -332,6 +332,10 @@ def verify_bundle(bundle, public_key=None, source_text=None):
     problem = None
     if missing:
         problem = f"payload missing {missing}"
+    elif not facts:
+        problem = "a seal must contain at least one fact (build_bundle never makes an empty one); an empty bundle would verify vacuously"
+    elif bundle.get("signature") is not None and not isinstance(bundle.get("signature"), dict):
+        problem = "signature must be an object or null"
     elif not _is_int(payload["version"]) or payload["version"] != PAYLOAD_VERSION:
         problem = f"payload.version must be the integer {PAYLOAD_VERSION}"
     elif not _is_int(payload["entries"]):
@@ -359,6 +363,9 @@ def verify_bundle(bundle, public_key=None, source_text=None):
     for i, fact in enumerate(facts):
         try:
             key, record, claimed = fact["key"], fact["record"], fact["hash"]
+            if not isinstance(key, str) or not isinstance(record, dict):
+                bad.append(f"#{i}")  # a key must be a string and a record an object; checked before they are used
+                continue
             if not _HEX64_RE.match(claimed) or fact_hash(record) != claimed:
                 bad.append(key)
             keys.append(key)

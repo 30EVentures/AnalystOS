@@ -100,12 +100,6 @@ CASES = []
 # Cases the current code is known to get wrong: the case stays strict (it is never weakened), and the
 # runner requires it to keep failing until the entry is removed here. Each needs a decisions.md note.
 KNOWN_GAPS = {
-    "seal/no-facts-vacuous": "a bundle with zero facts verifies (vacuous pass)",
-    "seal/entry-key-is-a-number": "verify_bundle raises TypeError instead of refusing",
-    "seal/entry-key-is-a-list": "verify_bundle raises TypeError instead of refusing",
-    "seal/signature-is-a-string": "verify_bundle raises AttributeError instead of refusing",
-    "seal/signature-is-a-list": "verify_bundle raises AttributeError instead of refusing",
-    "seal-content/fact-record-is-not-an-object": "verify_bundle raises AttributeError instead of refusing",
     "audit/duplicate-key-in-a-line": "verify_entries keeps the last duplicate key silently",
     "audit/non-finite-number-literal": "verify_entries accepts a NaN literal, which is not JSON",
 }

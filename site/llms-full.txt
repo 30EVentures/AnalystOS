@@ -239,7 +239,7 @@ The `checks` list, in order (each `pass`, `fail` or `skipped`):
 
 | Check | Needs the text? | What it proves |
 |---|---|---|
-| `structure` | no | it is an `analystos-seal/1` bundle with every required payload field (and any accountability field present is a string or null) |
+| `structure` | no | it is an `analystos-seal/1` bundle with at least one fact, every required payload field (any accountability field present is a string or null), no raw JSON numbers, and a `signature` that is an object or null |
 | `fact_hashes` | no | every fact hashes to its recorded hash; no duplicate keys |
 | `merkle_root` | no | the facts make the signed root; `entries` is right |
 | `report_hash` | no | the report is the one that was sealed (or there is none) |

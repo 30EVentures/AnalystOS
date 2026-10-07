@@ -263,6 +263,16 @@ in a file, a chat or git.
 Either half alone is safe: the key in the environment without the file means signed
 seals nobody can yet authenticate; the file without the key means unsigned seals.
 
+## A conformance corpus for porting the verifier
+
+If you write your own verifier, `conformance/seal-1.json` in the repository is a data file of inputs
+and the verdict each must get, most of them things that must be **refused**: tampered facts, roots
+and signatures, a signature under a key you did not pin, duplicate keys, raw JSON numbers, and for the
+audit log edited, deleted, reordered, inserted and signature-stripped lines. It is generated, runs
+over one JSON object per line (`python3 -m analystos.conformance` is our adapter), and is the quickest
+way to find where a port is more lenient than this one. A few cases are marked `known_gap`: places
+where this verifier is itself known to be lenient, kept strict so the gap stays visible.
+
 ## Limits, stated plainly
 
 - The extracted text is **not** in the bundle (it may be confidential). To

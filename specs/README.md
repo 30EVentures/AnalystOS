@@ -99,3 +99,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 85 | a PDF cannot cost unbounded model calls or quadratic extraction time | [spec](slice-85/spec.md) |
 | 86 | a public key a stranger can pin, and the means to publish it safely (hardening plan item A2) | [spec](slice-86/spec.md) |
 | 87 | a refusal-first conformance corpus for seal and audit-log verification (Flashy integration J1) | [spec](slice-87/spec.md) |
+| 88 | a test that the site's machine-readable surface agrees with itself (Flashy integration J2) | [spec](slice-88/spec.md) |

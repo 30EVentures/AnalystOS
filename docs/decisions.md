@@ -2,6 +2,20 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-10-07 - robots.txt no longer contradicts what the site advertises; a test for that class of fault (Slice 88)
+
+Flashy-integration item J2. The audit confirmed `Disallow: /api/` in `robots.txt` against a sitemap, `llms.txt` and
+API catalog that advertise `/api/v1` and `/api/v1/openapi.json`. `tests/test_site_consistency.py` now checks, from the files
+as served, that nothing advertised is disallowed for `*`, that every advertised same-site path and every OpenAPI path is a file,
+a `vercel.json` rewrite or an `api/` function, that in-page anchors and doc links resolve, and that every `.well-known` file has a
+Content-Type/CORS header rule. It failed on exactly the known contradiction before the fix, and only that. Decision: keep
+`Disallow: /api/` (the API is not crawlable content and each call costs money or work) and add **more specific Allow lines for the
+two advertised GET entry points**, `Allow: /api/v1$` and `Allow: /api/v1/openapi.json$`, because robots matching is longest-rule-wins
+and `$` stops `/api/v1` from opening everything beneath it. The alternative, deleting the Disallow, would have invited
+crawlers onto POST-only and key-gated routes. Made in the generator (`tools/build_site_machine.py`) and regenerated. A crawler that
+ignores `$` still treats `/api/v1` as blocked, as before. Judgement call: `POST /api/v1/verify` is advertised in `llms.txt`
+as an instruction to agents, not a link, so it stays under the Disallow and the test checks only that it is routed. **Noted, not changed:** the audit also reported a 405-versus-404 inconsistency for POST-only API routes (not reproduced in this slice); `vercel.json` routing is deliberately untouched here, so that item stays open.
+
 ## 2026-10-07 - what the conformance corpus found, and what was fixed (Slice 87 follow-up)
 
 The corpus's first run against the real code gave eight gaps. **Fixed** in `seal_verify.verify_bundle` (six cases,

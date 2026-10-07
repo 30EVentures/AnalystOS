@@ -2,6 +2,21 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-10-07 - `smoke.py --deployed`: are the live bytes the repository's bytes? (Slice 89)
+
+Flashy-integration item J3. The existing smoke checks prove a deployment serves the advertised surface with the right content
+types, not that it serves *our* files, so a stale CDN copy or a deploy that missed a file looks healthy. `--deployed` GETs the live
+URL of the 16 machine-readable files (every `.well-known` file, root files, the served docs, the two pages; `index.old.html` is left
+out) and compares bytes. Choices: (1) four states that are never merged, because "the server said no" (REFUSED), "we heard nothing"
+(UNREACHABLE) and "it answered with other bytes" (DIFFERS) call for different action; a truncated body is UNREACHABLE, not DIFFERS or SAME;
+(2) a 404 is REFUSED, not DIFFERS: the file is missing, which is not the same as stale; (3) only same-scheme, same-host redirects are
+followed, so a hijacked or misconfigured redirect cannot make another origin's bytes pass as ours; (4) `Accept-Encoding: identity` and a
+refusal of any encoding we did not ask for, so compression never produces a false DIFFERS or a false SAME; (5) zero files checked is a
+failure. **Result against the real site** (read-only GETs to analystos.dev; run with `SSL_CERT_FILE=/etc/ssl/cert.pem`, the script's own
+documented remedy for this machine's Python): `site/` at d346660 against live: **16 SAME, 0 DIFFERS, 0 UNREACHABLE, 0 REFUSED**. This branch's
+`site/` against live: 12 SAME, 4 DIFFERS (`/robots.txt`, `/docs/seal.md`, `/llms-full.txt`, `/`), which is exactly this branch's unmerged
+changes (the robots fix, the seal doc paragraph and its copy in llms-full, the regenerated homepage counts), so the check does what it should.
+
 ## 2026-10-07 - robots.txt no longer contradicts what the site advertises; a test for that class of fault (Slice 88)
 
 Flashy-integration item J2. The audit confirmed `Disallow: /api/` in `robots.txt` against a sitemap, `llms.txt` and

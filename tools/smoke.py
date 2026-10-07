@@ -1,6 +1,7 @@
 """Smoke-test a deployment of AnalystOS (Slice 68).
 
     python3 tools/smoke.py [BASE_URL] [--json] [--no-post] [--expect-seal-key] [--seal PATH]
+    python3 tools/smoke.py [BASE_URL] --deployed [--json]
 
 ``--expect-seal-key`` makes a missing public seal key file (Slice 86) a failure;
 without it the file is checked when present and reported as "not published yet"
@@ -10,17 +11,29 @@ catches the one dangerous mistake, the signing key in the host's environment not
 matching the key published on the site. Nothing is sent but GETs, so it never needs
 a key or a document.
 
+``--deployed`` is a different question: are the bytes the site is serving *right now* the bytes in
+this repository? It GETs the live URL of every machine-readable file under ``site/`` (``.well-known/*``,
+``robots.txt``, ``sitemap.xml``, ``llms*.txt``, the served docs, the homepage and upload page) and compares
+them with the file, reporting each as exactly one of four states, never merged: SAME (200, identical
+bytes), DIFFERS (200, other bytes), UNREACHABLE (no HTTP answer: DNS, connect, timeout), REFUSED (an
+answer that is not a comparable 200: another status, a redirect to a different host or scheme, an
+oversize body, a content-encoding we did not ask for). Anything but SAME is a nonzero exit, and so is
+checking zero files. Only GETs to the URL given, no credentials, bounded time and size.
+
 Standard library plus this repository's own charter checker. Sends only GET
 requests and (unless --no-post) two POSTs that carry no document, key or secret.
 Exit code 0 if every check passes, 1 otherwise, 2 for bad usage or when Python
 cannot verify the server's certificate (see TLS_HELP; verification is never disabled).
 """
 
+import hashlib
+import http.client
 import json
 import re
 import ssl
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -32,6 +45,11 @@ from analystos.aao.validate import errors, validate_charter  # noqa: E402
 from analystos.l4.seal_verify import KEY_FILE_PATH, validate_key_file, verify_bundle_with_key_file  # noqa: E402
 
 DEFAULT_BASE = "https://analystos.dev"
+SITE_DIR = ROOT / "site"
+DEPLOYED_TIMEOUT = 15
+DEPLOYED_MAX_BYTES = 2 * 1024 * 1024  # the largest file in site/ is well under 200 KB
+DEPLOYED_STATES = ("SAME", "DIFFERS", "UNREACHABLE", "REFUSED")
+MAX_REDIRECTS = 3
 JSON_CT = "application/json"
 
 # (path, content-type prefix) - what a deployment must serve
@@ -245,7 +263,98 @@ class Smoke:
         return self.results
 
 
-USAGE = "usage: python3 tools/smoke.py [BASE_URL] [--json] [--no-post] [--expect-seal-key] [--seal PATH]\n"
+# -- --deployed: are the live bytes the repository's bytes? ---------------------------------------
+
+def deployed_files(site=SITE_DIR):
+    """``[(url path, file)]`` for each machine-readable file under ``site``: every ``.well-known`` file,
+    the root-level files, the served docs, and the two pages. Sorted; empty when ``site`` has none."""
+    site = Path(site)
+    out = []
+    for path in sorted(p for p in site.rglob("*") if p.is_file()):
+        rel = path.relative_to(site).as_posix()
+        if rel == "index.old.html" or any(part.startswith(".") and part != ".well-known" for part in rel.split("/")):
+            continue
+        out.append(("/" if rel == "index.html" else "/" + rel, path))
+    return out
+
+
+class _SameHostOnly(urllib.request.HTTPRedirectHandler):
+    """Follow a redirect only to the same scheme and host:port; anything else is refused, not followed."""
+    max_redirections = MAX_REDIRECTS
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        old, new = urllib.parse.urlsplit(req.full_url), urllib.parse.urlsplit(urllib.parse.urljoin(req.full_url, newurl))
+        if (new.scheme, new.netloc) != (old.scheme, old.netloc):
+            return None  # urllib then raises the 3xx as an HTTPError, which we report as REFUSED
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def fetch_live(url, timeout=DEPLOYED_TIMEOUT, max_bytes=DEPLOYED_MAX_BYTES):
+    """``(state, detail, body)`` where state is None if a comparable 200 body came back, else REFUSED /
+    UNREACHABLE. Sends nothing but a GET with ``Accept-Encoding: identity`` (raw bytes) and no credentials."""
+    request = urllib.request.Request(url, method="GET", headers={"Accept-Encoding": "identity", "User-Agent": "analystos-smoke/1"})
+    opener = urllib.request.build_opener(_SameHostOnly)
+    try:
+        with opener.open(request, timeout=timeout) as resp:
+            if resp.status != 200:
+                return "REFUSED", f"HTTP {resp.status}, not 200", b""
+            encoding = (resp.headers.get("Content-Encoding") or "identity").strip().lower()
+            if encoding != "identity":
+                return "REFUSED", f"server sent Content-Encoding {encoding!r} though identity was requested", b""
+            body = resp.read(max_bytes + 1)
+            if len(body) > max_bytes:
+                return "REFUSED", f"body larger than the {max_bytes}-byte cap", b""
+            declared = resp.headers.get("Content-Length")
+            if declared is not None and declared.strip().isdigit() and int(declared) != len(body):
+                return "UNREACHABLE", f"incomplete body: Content-Length {declared}, received {len(body)} bytes", b""
+            return None, "", body
+    except urllib.error.HTTPError as exc:
+        try:
+            location = exc.headers.get("Location")
+        finally:
+            exc.close()
+        if 300 <= exc.code < 400:
+            return "REFUSED", f"HTTP {exc.code} redirect to {location!r} (only same scheme and host are followed, up to {MAX_REDIRECTS})", b""
+        return "REFUSED", f"HTTP {exc.code}", b""
+    except (urllib.error.URLError, OSError, http.client.HTTPException) as exc:
+        if isinstance(getattr(exc, "reason", exc), ssl.SSLCertVerificationError):
+            raise TlsUnverifiable(str(exc)) from exc
+        return "UNREACHABLE", f"{type(getattr(exc, 'reason', exc)).__name__}: {getattr(exc, 'reason', exc)}", b""
+
+
+def check_deployed(base=DEFAULT_BASE, site=SITE_DIR, timeout=DEPLOYED_TIMEOUT, max_bytes=DEPLOYED_MAX_BYTES):
+    """One row per file: ``{"path", "state", "detail"}``, state one of ``DEPLOYED_STATES``."""
+    rows = []
+    for url_path, file in deployed_files(site):
+        state, detail, body = fetch_live(base.rstrip("/") + url_path, timeout=timeout, max_bytes=max_bytes)
+        if state is None:
+            local = file.read_bytes()
+            if body == local:
+                state, detail = "SAME", f"{len(local)} bytes, sha256 {hashlib.sha256(local).hexdigest()[:12]}"
+            else:
+                state = "DIFFERS"
+                detail = f"live {len(body)} bytes sha256 {hashlib.sha256(body).hexdigest()[:12]}, repo {len(local)} bytes sha256 {hashlib.sha256(local).hexdigest()[:12]}"
+        rows.append({"path": url_path, "state": state, "detail": detail})
+    return rows
+
+
+def run_deployed(base, as_json, stdout, site=SITE_DIR, timeout=DEPLOYED_TIMEOUT, max_bytes=DEPLOYED_MAX_BYTES):
+    rows = check_deployed(base, site=site, timeout=timeout, max_bytes=max_bytes)
+    counts = {state: sum(r["state"] == state for r in rows) for state in DEPLOYED_STATES}
+    ok = bool(rows) and counts["SAME"] == len(rows)
+    if as_json:
+        stdout.write(json.dumps({"base": base, "checked": len(rows), "counts": counts, "ok": ok, "results": rows}, indent=2) + "\n")
+    else:
+        for r in rows:
+            stdout.write(f"{r['state']:<11} {r['path']}" + ("" if r["state"] == "SAME" else f"\n            {r['detail']}") + "\n")
+        if not rows:
+            stdout.write("FAIL: no files to check under site/; --deployed that checks nothing proves nothing\n")
+        stdout.write("\n" + ", ".join(f"{counts[s]} {s}" for s in DEPLOYED_STATES) + f" of {len(rows)} against {base}\n")
+    return 0 if ok else 1
+
+
+USAGE = ("usage: python3 tools/smoke.py [BASE_URL] [--json] [--no-post] [--expect-seal-key] [--seal PATH]\n"
+         "       python3 tools/smoke.py [BASE_URL] --deployed [--json]\n")
 
 
 def _parse(argv):
@@ -263,7 +372,7 @@ def _parse(argv):
         else:
             args.append(arg)
             i += 1
-    if flags - {"--json", "--no-post", "--expect-seal-key"} or len(args) > 1:
+    if flags - {"--json", "--no-post", "--expect-seal-key", "--deployed"} or len(args) > 1:
         return None
     return (args[0] if args else None), flags, seal_path
 
@@ -277,6 +386,15 @@ def main(argv=None, stdout=None):
         return 2
     base, flags, seal_path = parsed
     base = base or DEFAULT_BASE
+    if "--deployed" in flags:
+        if flags - {"--deployed", "--json"} or seal_path:
+            stdout.write(USAGE)
+            return 2
+        try:
+            return run_deployed(base, "--json" in flags, stdout, site=SITE_DIR, timeout=DEPLOYED_TIMEOUT)
+        except TlsUnverifiable as exc:
+            stdout.write(TLS_HELP + f"(detail: {exc})\n")
+            return 2
     try:
         results = Smoke(base, allow_post="--no-post" not in flags, expect_seal_key="--expect-seal-key" in flags,
                         seal_path=seal_path).run()

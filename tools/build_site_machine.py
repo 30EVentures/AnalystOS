@@ -77,7 +77,12 @@ def generated_files():
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
         + "".join(f"  <url><loc>{u}</loc></url>\n" for u in urls) + "</urlset>\n"
     )
-    out["robots.txt"] = f"User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: {BASE}/sitemap.xml\n"
+    # The API is not crawlable content, but its two machine-readable entry points are advertised in the
+    # sitemap, llms.txt and the api-catalog, so they are allowed by a longer (more specific) rule: the
+    # longest match wins (RFC 9309), and '$' keeps "/api/v1" from opening everything below it.
+    out["robots.txt"] = ("User-agent: *\nAllow: /\n"
+                         "Allow: /api/v1$\nAllow: /api/v1/openapi.json$\n"
+                         f"Disallow: /api/\n\nSitemap: {BASE}/sitemap.xml\n")
     out[".well-known/api-catalog"] = json.dumps({"linkset": [{
         "anchor": f"{BASE}/api/v1",
         "service-desc": [{"href": f"{BASE}/api/v1/openapi.json", "type": "application/vnd.oai.openapi+json"}],

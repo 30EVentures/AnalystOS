@@ -2,6 +2,74 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-10-07 - `smoke.py --deployed`: are the live bytes the repository's bytes? (Slice 89)
+
+Flashy-integration item J3. The existing smoke checks prove a deployment serves the advertised surface with the right content
+types, not that it serves *our* files, so a stale CDN copy or a deploy that missed a file looks healthy. `--deployed` GETs the live
+URL of the 16 machine-readable files (every `.well-known` file, root files, the served docs, the two pages; `index.old.html` is left
+out) and compares bytes. Choices: (1) four states that are never merged, because "the server said no" (REFUSED), "we heard nothing"
+(UNREACHABLE) and "it answered with other bytes" (DIFFERS) call for different action; a truncated body is UNREACHABLE, not DIFFERS or SAME;
+(2) a 404 is REFUSED, not DIFFERS: the file is missing, which is not the same as stale; (3) only same-scheme, same-host redirects are
+followed, so a hijacked or misconfigured redirect cannot make another origin's bytes pass as ours; (4) `Accept-Encoding: identity` and a
+refusal of any encoding we did not ask for, so compression never produces a false DIFFERS or a false SAME; (5) zero files checked is a
+failure. **Result against the real site** (read-only GETs to analystos.dev; run with `SSL_CERT_FILE=/etc/ssl/cert.pem`, the script's own
+documented remedy for this machine's Python): `site/` at d346660 against live: **16 SAME, 0 DIFFERS, 0 UNREACHABLE, 0 REFUSED**. This branch's
+`site/` against live: 12 SAME, 4 DIFFERS (`/robots.txt`, `/docs/seal.md`, `/llms-full.txt`, `/`), which is exactly this branch's unmerged
+changes (the robots fix, the seal doc paragraph and its copy in llms-full, the regenerated homepage counts), so the check does what it should.
+
+## 2026-10-07 - robots.txt no longer contradicts what the site advertises; a test for that class of fault (Slice 88)
+
+Flashy-integration item J2. The audit confirmed `Disallow: /api/` in `robots.txt` against a sitemap, `llms.txt` and
+API catalog that advertise `/api/v1` and `/api/v1/openapi.json`. `tests/test_site_consistency.py` now checks, from the files
+as served, that nothing advertised is disallowed for `*`, that every advertised same-site path and every OpenAPI path is a file,
+a `vercel.json` rewrite or an `api/` function, that in-page anchors and doc links resolve, and that every `.well-known` file has a
+Content-Type/CORS header rule. It failed on exactly the known contradiction before the fix, and only that. Decision: keep
+`Disallow: /api/` (the API is not crawlable content and each call costs money or work) and add **more specific Allow lines for the
+two advertised GET entry points**, `Allow: /api/v1$` and `Allow: /api/v1/openapi.json$`, because robots matching is longest-rule-wins
+and `$` stops `/api/v1` from opening everything beneath it. The alternative, deleting the Disallow, would have invited
+crawlers onto POST-only and key-gated routes. Made in the generator (`tools/build_site_machine.py`) and regenerated. A crawler that
+ignores `$` still treats `/api/v1` as blocked, as before. Judgement call: `POST /api/v1/verify` is advertised in `llms.txt`
+as an instruction to agents, not a link, so it stays under the Disallow and the test checks only that it is routed. **Noted, not changed:** the audit also reported a 405-versus-404 inconsistency for POST-only API routes (not reproduced in this slice); `vercel.json` routing is deliberately untouched here, so that item stays open.
+
+## 2026-10-07 - what the conformance corpus found, and what was fixed (Slice 87 follow-up)
+
+The corpus's first run against the real code gave eight gaps. **Fixed** in `seal_verify.verify_bundle` (six cases,
+regression tests in `tests/test_seal_verify_hostile.py`, which fail on the old code): (1) a bundle with zero facts, a null
+root and `entries: 0` **verified** (a vacuous pass; `build_bundle` refuses to make one), now a `structure` failure; (2) a
+fact `key` that is a number, list or object raised `TypeError`; (3) a `signature` that is a string, list or number raised
+`AttributeError`; (4) a fact `record` that is not an object raised `AttributeError` once text was supplied. (2) to (4) are
+reachable by anyone through the public, unauthenticated `POST /api/v1/verify`, which would have returned a 500 instead of a
+verdict; it now answers `ok: false`. No security bypass beyond (1): the crashes failed closed by exception, but a verifier that
+dies on hostile input is not one a stranger can run against it. A falsy non-object signature (`""`, `[]`) used to count as
+unsigned and now fails `structure`; `null`/absent is still unsigned and `{}` still counts as unsigned (integrity only, never
+authentic). **Not fixed, recorded as expected failures** (the cases stay strict and carry `known_gap`): (5) an audit-log line with a
+**duplicate JSON key** is read as last-wins, so two implementations can disagree about what the line says; (6) a **`NaN` literal**
+in an audit line is accepted though it is not JSON, so a strict parser elsewhere cannot read the chain. Both want
+`verify_entries` to parse strictly, but the writer (`FileStore.append_audit`, `json.dumps` with default `allow_nan`) would then
+need to refuse the same input or a log could fail its own verifier; that is a change to the tested audit kernel and the store
+together, so it is left for a deliberate slice. Separately noted, not a bug: dropping the tail of an audit log is invisible
+without a pinned `expected_head` (documented in the module); the corpus has a case that states that limit.
+Re-run of the external kit after the fixes: see the report for this slice.
+
+## 2026-10-07 - a refusal-first conformance corpus for the seal and the audit log (Slice 87)
+
+Flashy-integration item J1. Added `conformance/seal-1.json` (generated by `tools/build_conformance_corpus.py`),
+the adapter `python -m analystos.conformance` and an in-process runner in the suite. Choices: (1) the corpus is
+**ours**, with the line protocol of Flashy's conformance-kit borrowed and none of its code or format name copied
+(the `contract` is `analystos-conformance/1`); (2) expectations are hand-written in the generator, never computed by
+the verifier under test, because a corpus derived from the code agrees with it by construction; (3) refusals are the
+substance, about four in five cases; (4) a verifier **crash is "unanswered"**, not a verdict, because a crash on a
+hostile bundle is a different finding from a wrong answer and the public `POST /api/v1/verify` endpoint is exactly where
+a stranger sends one; (5) the strict set is separate from the lenient: `seal` is "internally consistent", `seal-authentic`
+needs a key you pinned, `seal-content` needs the text, so the corpus cannot let `ok` stand in for `authentic`; (6) a
+case the code gets wrong is never weakened: it carries a `known_gap` and the suite requires it to keep failing until the
+annotation goes with the fix. Written, then run against the code: the corpus found eight gaps on its first run. One
+case records a **documented limitation** rather than a bug (a tail-dropped audit log with no pinned head still verifies,
+as the module says) so the limit is explicit. External cross-check, by hand and not in the suite:
+`node <conformance-kit clone>/src/cli.mjs conformance/seal-1.json -- python -m analystos.conformance` (direct invocation,
+not `npx` or a symlinked bin, which the audit found can exit 0 without running; cases confirmed executed).
+Known remaining gaps and what was done about each are in the fix entry below.
+
 ## 2026-10-02 - a public key a stranger can pin, and the means to publish it safely (Slice 86)
 
 Hardening-plan item A2. Seals can be signed but nothing published a key to check them against, so

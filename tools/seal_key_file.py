@@ -1,14 +1,18 @@
 """Write or check the public seal-verification key file (Slice 86).
 
-    ANALYSTOS_SEAL_KEY=... python3 tools/seal_key_file.py --from-env     # write the file
+    python3 tools/seal_key_file.py --from-prompt                        # write the file (recommended)
+    ANALYSTOS_SEAL_KEY=... python3 tools/seal_key_file.py --from-env     # same, seed from the environment
     python3 tools/seal_key_file.py --public-key B64URL                  # or give the public half
     python3 tools/seal_key_file.py --from-env --add                     # rotate: new key active, old retired
     python3 tools/seal_key_file.py --check site/.well-known/analystos-seal-key.json
 
 The file goes to ``site/.well-known/analystos-seal-key.json`` unless ``--out`` says
-otherwise. It holds **only public keys**. ``--from-env`` derives the public key from
-``ANALYSTOS_SEAL_KEY`` in your own shell, so no key is ever pasted, printed or stored
-by this tool; ``--public-key`` refuses a value equal to the private seed in the
+otherwise. It holds **only public keys**. ``--from-prompt`` (Slice 90) asks for the seed
+with a hidden prompt: it is never on a command line, in the environment, in shell
+history or on screen, and it needs a real terminal. ``--from-env`` derives the public key
+from ``ANALYSTOS_SEAL_KEY`` in your own shell (typing that assignment on a command line
+leaves the seed in your shell history, so prefer ``--from-prompt``); either way no key is
+ever printed or stored by this tool; ``--public-key`` refuses a value equal to the private seed in the
 environment (``keygen`` prints both halves next to each other and pasting the wrong
 line would publish the secret). It refuses to overwrite an existing file: rotate with
 ``--add``. Exit code 0 on success, 1 when ``--check`` finds a problem, 2 for bad input.
@@ -49,7 +53,7 @@ def public_key_from_seed(seed_b64url):
             raise ValueError("not 32 bytes")
         key = Ed25519PrivateKey.from_private_bytes(raw)
     except ValueError as exc:
-        raise Refusal(f"{SEAL_KEY_ENV} must be the base64url of a 32-byte Ed25519 seed ({exc})") from exc
+        raise Refusal(f"the signing seed must be the base64url of a 32-byte Ed25519 seed ({exc})") from exc
     return _b64u_encode(key.public_key().public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw))
 
 
@@ -130,7 +134,7 @@ def _parse(argv):
                 raise Refusal(f"{arg} needs a value")
             values[arg] = argv[i + 1]
             i += 2
-        elif arg in ("--from-env", "--add"):
+        elif arg in ("--from-env", "--from-prompt", "--add"):
             flags.add(arg)
             i += 1
         else:
@@ -138,7 +142,30 @@ def _parse(argv):
     return flags, values
 
 
-def main(argv=None, stdout=None, environ=None):
+PROMPT = "Paste the signing seed (nothing will be shown), then press Enter: "
+
+
+def read_seed_from_prompt(getpass_fn=None, isatty_fn=None):
+    """The seed typed or pasted at a hidden prompt. Refuses without a terminal (a pipe would
+    be read with echo and could land in a script or a log), on an empty entry, and on an
+    interrupted prompt. The value is returned and never printed or put in an error message."""
+    if getpass_fn is None:
+        if not (isatty_fn or sys.stdin.isatty)():
+            raise Refusal("--from-prompt needs an interactive terminal (it reads the seed without showing it). "
+                          "Nothing was written.")
+        import getpass
+        getpass_fn = getpass.getpass
+    try:
+        entered = getpass_fn(PROMPT)
+    except (EOFError, KeyboardInterrupt):
+        raise Refusal("no seed was entered. Nothing was written.") from None
+    entered = (entered or "").strip()
+    if not entered:
+        raise Refusal("nothing was entered. Nothing was written.")
+    return entered
+
+
+def main(argv=None, stdout=None, environ=None, getpass_fn=None, isatty_fn=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     stdout = stdout or sys.stdout
     env = os.environ if environ is None else environ
@@ -155,11 +182,13 @@ def main(argv=None, stdout=None, environ=None):
             problems = validate_key_file(doc)
             stdout.write(json.dumps({"valid": not problems, "problems": problems}, indent=2) + "\n")
             return 0 if not problems else 1
-        from_env, given = "--from-env" in flags, values.get("--public-key")
-        if from_env == (given is not None):
-            raise Refusal("give exactly one of --from-env or --public-key")
+        from_env, from_prompt, given = "--from-env" in flags, "--from-prompt" in flags, values.get("--public-key")
+        if sum([from_env, from_prompt, given is not None]) != 1:
+            raise Refusal("give exactly one of --from-prompt, --from-env or --public-key")
         seed = (env.get(SEAL_KEY_ENV) or "").strip()
-        if from_env:
+        if from_prompt:
+            public_key = public_key_from_seed(read_seed_from_prompt(getpass_fn, isatty_fn))
+        elif from_env:
             if not seed:
                 raise Refusal(f"{SEAL_KEY_ENV} is not set in this shell")
             public_key = public_key_from_seed(seed)
@@ -168,7 +197,7 @@ def main(argv=None, stdout=None, environ=None):
             if seed and public_key == seed:
                 raise Refusal(
                     f"that value is your PRIVATE signing key ({SEAL_KEY_ENV}), not the public key. "
-                    "Nothing was written. Use --from-env, or the line keygen labels 'public key'."
+                    "Nothing was written. Use --from-prompt, or the line keygen labels 'public key'."
                 )
         out = Path(values.get("--out", DEFAULT_OUT))
         doc = write_key_file(public_key, out, add="--add" in flags, added=values.get("--added"))

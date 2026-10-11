@@ -2,6 +2,32 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-10-11 - pin the key out of band, never see the seed, never mistake "no check failed" for "authentic" (Slice 90)
+
+A review of the seal-key rollout found three places where the safe path was easy to get wrong, all in code that already
+existed, none changing what a seal contains (so the conformance corpus and every existing seal stay valid).
+
+(1) The runbook had the operator type the signing seed on a command line (`ANALYSTOS_SEAL_KEY=<seed> python3 tools/seal_key_file.py
+--from-env`), which leaves it in shell history. `tools/seal_key_file.py --from-prompt` reads it with a hidden `getpass` prompt instead
+and refuses without a real terminal rather than read a pipe. It cannot tell the seed from the public key (both are 32 bytes), so
+pasting the wrong half silently derives a different public key; rather than pretend otherwise the runbook says to compare the printed
+`public_key` with the line `keygen` labelled "public key", and `smoke.py --seal` would catch it after deploy anyway.
+
+(2) `seal_verify` exits 0 when no check failed, which is not "authentic": an unsigned seal, a seal with no pinned key, and a run without
+the `cryptography` package all exit 0 with `authentic` false. Changing the default exit status would break existing callers (and the
+conformance adapter's expectations), so `--require-authentic` is opt-in, changes only the exit status (the JSON is byte-identical), and
+the docs and the module docstring now say which to use.
+
+(3) `--key-file` trusted whatever the file listed, which is only as trustworthy as the connection that fetched it. `--expect-key-id ID`
+adds the pin a relying party recorded out of band. It compares against the seal's own `key_id`, which is not signed, so naming the
+pinned id proves nothing; that is safe because the key the file lists under that id must then verify the signature, and `validate_key_file`
+already forces `key_id = sha256(public key)[:16]`, so a file cannot list a different key under the pinned id. Tests cover a forged seal that
+names the pinned id, a rotated two-key file, and an id the file does not list. The docs ask for the id to be taken from at least two
+channels that do not share a host.
+
+Not done: generating or publishing any key; separate keys for seals and the audit log; a revocation date in the key file; `--expect-key-id`
+on `smoke.py`. Revocation is still removal, which makes the removed key's old seals non-authentic; that trade-off is the owner's to accept.
+
 ## 2026-10-07 - `smoke.py --deployed`: are the live bytes the repository's bytes? (Slice 89)
 
 Flashy-integration item J3. The existing smoke checks prove a deployment serves the advertised surface with the right content

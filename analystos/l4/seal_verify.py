@@ -7,9 +7,14 @@ so checking a report does not require trusting, or even installing, the
 thing that wrote it. Ed25519 checking needs the ``cryptography`` package; if
 it is missing the signature check says so instead of passing.
 
-    python3 -m analystos.l4.seal_verify bundle.json [--public-key B64URL] [--text extracted.txt]
+    python3 -m analystos.l4.seal_verify bundle.json [--public-key B64URL | --key-file F [--expect-key-id ID]]
+                                         [--text extracted.txt] [--require-authentic]
 
-Exit code: 0 no check failed, 1 a check failed, 2 unreadable input.
+Exit code: 0 no check failed, 1 a check failed (or, with ``--require-authentic``,
+the seal is not authentic), 2 unreadable or invalid input. **0 does not mean
+authentic**: an unsigned seal, a seal with no pinned key, and a run without the
+``cryptography`` package all exit 0 with ``authentic`` false. Read ``authentic``
+in the JSON, or pass ``--require-authentic`` when a script depends on it.
 
 What a pass means, level by level (reported separately, never merged):
 
@@ -574,10 +579,21 @@ def validate_key_file(doc):
     return problems
 
 
-def pinned_public_key(bundle, key_file):
+def _check_expected_key_id(expect_key_id):
+    if expect_key_id is not None and not (isinstance(expect_key_id, str) and _KEY_ID_RE.match(expect_key_id)):
+        raise ValueError("expect_key_id must be 16 lowercase hex characters (the key_id you pinned)")
+
+
+def pinned_public_key(bundle, key_file, expect_key_id=None):
     """``(public_key_b64url, None)`` for the key a seal names, taken from the key
     file, or ``(None, reason)``. Never guesses: an invalid file, an unsigned seal, a
-    seal from another org, or a ``key_id`` the file does not list gives a reason."""
+    seal from another org, or a ``key_id`` the file does not list gives a reason.
+
+    ``expect_key_id`` is a key id the caller recorded *out of band* (Slice 90): the
+    seal must name exactly that key, or there is no key and a reason. The seal's own
+    ``key_id`` field is not signed, so naming the pinned id proves nothing by itself;
+    what matters is that the listed key with that id then has to verify the signature."""
+    _check_expected_key_id(expect_key_id)
     problems = validate_key_file(key_file)
     if problems:
         return None, "the key file is not valid: " + "; ".join(problems[:3])
@@ -591,20 +607,26 @@ def pinned_public_key(bundle, key_file):
     org = payload.get("org") if isinstance(payload, dict) else None
     if org != key_file["org"]:
         return None, f"the bundle is from org {org!r} but the key file is for {key_file['org']!r}"
+    if expect_key_id is not None and key_id != expect_key_id:
+        return None, f"the seal is signed by key {key_id}, but you pinned key {expect_key_id}"
     for key in key_file["keys"]:
         if key["key_id"] == key_id:
             return key["public_key"], None
     return None, f"key_id {key_id} is not in the published key file (a removed key is no longer trusted)"
 
 
-def verify_bundle_with_key_file(bundle, key_file, source_text=None):
+def verify_bundle_with_key_file(bundle, key_file, source_text=None, expect_key_id=None):
     """``verify_bundle`` with the public key taken from a published key file.
 
     Adds a first ``key_file`` check. A seal whose key is not listed, from another
     org, or checked against an invalid file **fails** (``ok`` and ``authentic``
     false); it is never quietly checked without a pinned key. An unsigned seal
-    cannot be authentic: the check is ``skipped`` and the rest is reported as usual."""
-    public_key, reason = pinned_public_key(bundle, key_file)
+    cannot be authentic: the check is ``skipped`` and the rest is reported as usual.
+
+    ``expect_key_id`` pins the key id you recorded out of band (see ``pinned_public_key``);
+    a seal signed by any other key fails the ``key_file`` check. A malformed id is a
+    ``ValueError``, not a verdict."""
+    public_key, reason = pinned_public_key(bundle, key_file, expect_key_id=expect_key_id)
     unsigned = isinstance(bundle, dict) and not bundle.get("signature")
     outcome = verify_bundle(bundle, public_key=public_key, source_text=source_text)
     if public_key is not None:
@@ -621,9 +643,11 @@ def verify_bundle_with_key_file(bundle, key_file, source_text=None):
 def main(argv=None, stdout=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     stdout = stdout or sys.stdout
-    public_key = source_text = path = key_file = None
+    public_key = source_text = path = key_file = expect_key_id = None
+    require_authentic = False
     usage = ("usage: python3 -m analystos.l4.seal_verify bundle.json "
-             "[--public-key B64URL | --key-file analystos-seal-key.json] [--text extracted.txt]")
+             "[--public-key B64URL | --key-file analystos-seal-key.json [--expect-key-id KEY_ID]] "
+             "[--text extracted.txt] [--require-authentic]")
     try:
         i = 0
         while i < len(argv):
@@ -637,6 +661,12 @@ def main(argv=None, stdout=None):
                     raise ValueError(f"the key file is larger than {KEY_FILE_MAX_BYTES} bytes")
                 key_file = json.loads(raw.decode("utf-8"))
                 i += 2
+            elif argv[i] == "--expect-key-id":
+                expect_key_id = argv[i + 1]
+                i += 2
+            elif argv[i] == "--require-authentic":
+                require_authentic = True
+                i += 1
             elif argv[i] == "--text":
                 with open(argv[i + 1], encoding="utf-8") as handle:
                     source_text = handle.read()
@@ -647,17 +677,25 @@ def main(argv=None, stdout=None):
             raise ValueError(usage)
         if public_key is not None and key_file is not None:
             raise ValueError("give --public-key or --key-file, not both")
+        if expect_key_id is not None and key_file is None:
+            raise ValueError("--expect-key-id pins a key id within a key file: use it with --key-file")
+        _check_expected_key_id(expect_key_id)
         with open(path, encoding="utf-8") as handle:
             bundle = json.load(handle)
     except (OSError, ValueError, IndexError) as exc:
         stdout.write(json.dumps({"error": str(exc)}) + "\n")
         return 2
     if key_file is not None:
-        outcome = verify_bundle_with_key_file(bundle, key_file, source_text=source_text)
+        outcome = verify_bundle_with_key_file(bundle, key_file, source_text=source_text, expect_key_id=expect_key_id)
     else:
         outcome = verify_bundle(bundle, public_key=public_key, source_text=source_text)
     stdout.write(json.dumps(outcome, indent=2) + "\n")
-    return 0 if outcome["ok"] else 1
+    # Exit 0 means "no check failed". That is NOT "authentic": a seal with no pinned key, an unsigned
+    # seal, or a missing `cryptography` package all exit 0 with authentic=false. A script that needs
+    # authenticity must pass --require-authentic (Slice 90).
+    if not outcome["ok"] or (require_authentic and not outcome["authentic"]):
+        return 1
+    return 0
 
 
 if __name__ == "__main__":

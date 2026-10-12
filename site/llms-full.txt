@@ -431,17 +431,32 @@ Verify a seal against it:
 
 ```
 curl -sO https://analystos.dev/.well-known/analystos-seal-key.json
-python3 -m analystos.l4.seal_verify section.seal.json --key-file analystos-seal-key.json [--text extracted.txt]
+python3 -m analystos.l4.seal_verify section.seal.json --key-file analystos-seal-key.json \
+    --expect-key-id <the key_id you recorded out of band> --require-authentic [--text extracted.txt]
 ```
 
 The key is selected by the seal's `key_id`. A seal whose key is **not in the file**,
 a seal from another `org`, and an invalid file are all **failures** (`key_file` check),
 never a silent check without a pinned key. An unsigned seal cannot be authentic.
 
+- `--expect-key-id ID` (16 lowercase hex characters, only with `--key-file`) is the pin you
+  recorded out of band: the seal must be signed by exactly that key and the file must list
+  it, or the `key_file` check fails. A seal can *name* any `key_id` (the field is not signed),
+  so naming the pinned id proves nothing by itself; the listed key with that id still has to
+  verify the signature. A malformed id is a usage error (exit 2).
+- `--require-authentic` makes the exit status non-zero unless the seal is authentic.
+  **Exit status 0 does not mean authentic**: it means no check failed. An unsigned seal, a seal
+  with no pinned key, and a run where the `cryptography` package is missing all exit 0 with
+  `authentic` false. Read `authentic` in the JSON, or pass this flag in any script that depends on it.
+
 **What this does and does not give you.** The file is trusted exactly as far as a TLS
 connection to analystos.dev is: whoever controls the site can publish a different key.
-For more than that, record the `key_id` out of band when you first adopt AnalystOS
-(a contract, a config in your own repository) and compare it before trusting a file.
+For more than that, record the `key_id` out of band when you first adopt AnalystOS and
+pass it as `--expect-key-id`. Get it through at least two channels that do not share a host
+(for example a message from the owner, a signed git tag in the repository, and a page on a
+different website) and proceed only if they agree. Pin the full public key with `--public-key`
+for the strongest check; the key file's advantage is that rotation does not need a new pin
+distributed, only a new `key_id`.
 **Rotation** adds a new `active` key and marks the old one `retired` (old seals keep
 verifying). **Revocation is removal**: delete a compromised key from the file and its
 seals stop being authentic.
@@ -451,16 +466,24 @@ seals stop being authentic.
 Nothing in the repository does this for you, and nothing here ever needs a private key
 in a file, a chat or git.
 
-1. In your own terminal: `python3 -m analystos.l4.seal keygen`. It prints the **private**
-   seed (`ANALYSTOS_SEAL_KEY=...`) once and stores nothing. Put it straight into your
-   host's secret store (Vercel: Project Settings, Environment Variables, Production,
-   `ANALYSTOS_SEAL_KEY`, sensitive) and a password manager. Never commit it.
-2. In the same terminal, with the seed in the environment, write the **public** file
-   (the seed is never printed or written):
-   `ANALYSTOS_SEAL_KEY=<the seed> python3 tools/seal_key_file.py --from-env`
-   (or `--public-key <the line keygen labels "public key">`; the tool refuses a value
-   equal to the seed in your environment). It creates
-   `site/.well-known/analystos-seal-key.json`. Then close the terminal.
+1. In a terminal window of your own: `python3 -m analystos.l4.seal keygen`. Do **not** do this in a
+   terminal an AI assistant can read (for instance the Claude app's built-in terminal panel), under
+   screen sharing or recording, or in a session that is being logged. `keygen` prints the **private**
+   seed (`ANALYSTOS_SEAL_KEY=...`) once and stores nothing. Put it straight into your host's secret
+   store (Vercel: Project Settings, Environment Variables, **Production only** and marked sensitive,
+   `ANALYSTOS_SEAL_KEY`; not Preview, because preview deployments run branch code) and a password
+   manager. Never commit it. Keep this window open for step 2, then clear the scrollback and close it.
+2. In the same window write the **public** file. The recommended way asks for the seed with a hidden
+   prompt, so it is never on a command line, in the environment, in your shell history or on screen:
+   `python3 tools/seal_key_file.py --from-prompt`
+   Paste the seed when asked. The tool prints a `public_key` and `key_id`; **compare that `public_key`
+   with the line `keygen` labelled "public key"**. They must be identical. (The seed and the public key
+   are both 32 bytes, so the tool cannot tell if you pasted the wrong half; a mismatch here is how you
+   find out.) It creates `site/.well-known/analystos-seal-key.json`. Alternatives:
+   `ANALYSTOS_SEAL_KEY=<the seed> python3 tools/seal_key_file.py --from-env` works but leaves the seed in
+   your shell history (run `unset HISTFILE` first, or delete that history line), and
+   `--public-key <the line keygen labels "public key">` never touches the seed (the tool refuses a value
+   equal to the seed in your environment).
 3. `python3 tools/refresh.py`, run the tests, commit the file (public data only), open
    the pull request and merge. Redeploy so the new environment variable is live.
 4. Prove the two halves match: run one analysis in production, download its seal, and run
@@ -468,9 +491,11 @@ in a file, a chat or git.
    must report `a seal from this deployment verifies under the published key`. This is
    the check for the one dangerous mistake, a signing key in the host that is not the
    key on the site.
-5. To rotate later: generate a new key, run `tools/seal_key_file.py --from-env --add`
-   (new key active, old one retired), deploy the file, then switch
-   `ANALYSTOS_SEAL_KEY`. `tools/seal_key_file.py --check <file>` validates a file.
+5. Record the `key_id` the tool printed in at least two channels that do not share a host, and give it
+   to anyone who will verify your seals so they can pass it as `--expect-key-id`.
+6. To rotate later: generate a new key, run `tools/seal_key_file.py --from-prompt --add` (new key
+   active, old one retired), deploy the file, then switch `ANALYSTOS_SEAL_KEY`, then record the new
+   `key_id` as in step 5. `tools/seal_key_file.py --check <file>` validates a file.
 
 Either half alone is safe: the key in the environment without the file means signed
 seals nobody can yet authenticate; the file without the key means unsigned seals.

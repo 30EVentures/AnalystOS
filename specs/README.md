@@ -101,3 +101,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 87 | a refusal-first conformance corpus for seal and audit-log verification (Flashy integration J1) | [spec](slice-87/spec.md) |
 | 88 | a test that the site's machine-readable surface agrees with itself (Flashy integration J2) | [spec](slice-88/spec.md) |
 | 89 | a deployed-bytes check: are the live files the repository's files? (Flashy integration J3) | [spec](slice-89/spec.md) |
+| 90 | pin the key out of band, never see the seed, and never mistake "no check failed" for "authentic" | [spec](slice-90/spec.md) |

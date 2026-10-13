@@ -291,6 +291,9 @@ def _run_job_inner(job_id):
         return _err(404, "not_found", "no such job")
     if meta["status"] != "pending":
         return jsonify(_job_body(job_id, meta))  # idempotent: never re-runs
+    if not store.claim_job(job_id):
+        # another worker passed the status check at the same moment and holds the right to run it
+        return jsonify(_job_body(job_id, store.job_meta(job_id) or meta))
 
     try:
         signing_key = load_signing_key()
@@ -454,7 +457,11 @@ def _review_report(digest):
         return _err(404, "not_found", "no such report")
     if meta.get("expires_ts", 0) <= time.time():
         return _err(410, "expired", "this report has expired and been removed")
-    body = request.get_json(silent=True) or {}
+    body = request.get_json(silent=True)
+    if body is None:
+        body = {}  # no body is fine: an unqualified "a human looked at this"
+    elif not isinstance(body, dict):
+        return _err(400, "bad_request", "send a JSON object, e.g. {\"approved\": true}, or no body")
     approved = body.get("approved")
     if approved is not None and not isinstance(approved, bool):
         return _err(400, "bad_request", "approved must be a boolean if given")

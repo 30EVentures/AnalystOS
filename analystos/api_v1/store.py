@@ -98,6 +98,9 @@ class FileStore:
             return None
 
     def purge_expired(self, now=None):
+        """Remove expired reports, and jobs older than the retention period (``ttl_days``):
+        a job submitted and never run would otherwise keep its uploaded document, and a
+        finished job its record, for ever. Returns the number of reports removed."""
         now = time.time() if now is None else now
         removed = 0
         base = self.root / "reports"
@@ -108,7 +111,27 @@ class FileStore:
                     path.unlink()
                 directory.rmdir()
                 removed += 1
+        self._purge_old_jobs(now)
         return removed
+
+    def _purge_old_jobs(self, now):
+        base = self.root / "jobs"
+        cutoff = now - ttl_days() * 86400
+        for directory in base.iterdir() if base.exists() else []:
+            if not JOB_ID_RE.match(directory.name) or not directory.is_dir():
+                continue
+            meta = self.job_meta(directory.name)
+            try:
+                created = datetime.strptime(meta["created"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp()
+            except (TypeError, KeyError, ValueError):
+                try:  # no readable record (a half-written job): fall back to when the folder last changed
+                    created = directory.stat().st_mtime
+                except OSError:
+                    continue
+            if created <= cutoff:
+                for path in directory.iterdir():
+                    path.unlink()
+                directory.rmdir()
 
     def _job_dir(self, job_id):
         if not JOB_ID_RE.match(job_id or ""):
@@ -137,6 +160,18 @@ class FileStore:
             return (directory / "upload.name").read_text(encoding="utf-8"), (directory / "upload").read_bytes()
         except OSError:
             return None
+
+    def claim_job(self, job_id):
+        """``True`` for exactly one caller per job, ever: the right to run it. Creating the
+        marker file is atomic (``O_EXCL``), so two workers that both saw ``pending`` cannot
+        both go on to run the pipeline (and spend the model calls) twice."""
+        directory = self._job_dir(job_id)
+        try:
+            fd = os.open(directory / "claimed", os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        except FileExistsError:
+            return False
+        os.close(fd)
+        return True
 
     def update_job(self, job_id, **fields):
         """Merge ``fields`` into the job's meta. Raises ``ValueError`` if

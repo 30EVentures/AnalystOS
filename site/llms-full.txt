@@ -90,8 +90,10 @@ returns the current status.
 The uploaded file is kept only between `POST /jobs` and `POST /jobs/{id}/run`
 (deleted the moment `/run` finishes, success or failure) - the same "nothing
 kept longer than it has to be" rule as `/analyses`, just delayed by one
-extra request. A `pending` job that is never run is not purged automatically
-(see `ROADMAP.md`).
+extra request. A `pending` job that is never run is deleted, upload included, once it is
+older than the report retention period (`ANALYSTOS_REPORT_TTL_DAYS`, 30 days by default); the
+sweep runs whenever a request creates a job or an analysis, so it is not instant. A finished
+job's record goes on the same schedule.
 
 ## The `id`
 

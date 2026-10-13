@@ -73,6 +73,12 @@ class MalformedSegmentTest(unittest.TestCase):
                 self.assertEqual([s["label"] for s in verified], ["Revenue"])
                 self.assertEqual((stats["proposed"], stats["verified"], stats["dropped"]), (2, 1, 1))
 
+    def test_when_every_segment_is_malformed_the_answer_is_a_valueerror_not_a_crash(self):
+        for name, bad in MALFORMED_SEGMENTS.items():
+            with self.subTest(case=name), quiet():
+                with self.assertRaises(ValueError):
+                    analyze_document(DOC, "T", client=client_returning({"segments": [bad]}))
+
     def test_a_segments_value_that_is_not_a_list_is_an_empty_report_not_a_crash(self):
         for value in ({"a": 1}, "text", 5, True):
             with self.subTest(segments=value), quiet():

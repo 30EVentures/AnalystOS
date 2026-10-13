@@ -63,7 +63,9 @@ class LegacyRoutesTest(unittest.TestCase):
                 self.assertEqual(response.status_code, 400, response.get_data(as_text=True)[:200])
 
     def test_the_error_does_not_name_server_paths_or_libraries(self):
-        text = self.post("/api/extract", "report.xlsx", _JUNK).get_data(as_text=True)
+        response = self.post("/api/extract", "report.xlsx", _JUNK)
+        self.assertEqual(response.status_code, 400)  # not a 500 page, which would also name nothing
+        text = response.get_data(as_text=True)
         for leak in ("zipfile", "BadZipFile", "Traceback", "/var/", "analystos-", "openpyxl"):
             self.assertNotIn(leak, text)
 
@@ -107,6 +109,7 @@ class V1RoutesTest(ApiTestCase):
         job = self.submitted("report.xlsx", _JUNK)
         failed = self.run_job(job).get_json()
         self.assertEqual(failed["status"], "failed", failed)
+        self.assertIn("damaged or not really", failed["error"])  # the guard's message, not the catch-all's
         self.assertIsNone(self.store.job_upload(job["id"]))
 
     def test_an_unexpected_error_fails_the_job_instead_of_leaving_it_running(self):

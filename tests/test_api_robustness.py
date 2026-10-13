@@ -24,7 +24,7 @@ from unittest.mock import patch
 
 from analystos.api_v1 import links, store as store_mod
 from api import analyze as legacy
-from tests.test_api_v1 import ApiTestCase
+from tests.test_api_v1 import CSV, ApiTestCase
 
 
 class SignatureComparisonTest(unittest.TestCase):
@@ -144,6 +144,78 @@ class JobRetentionTest(unittest.TestCase):
         self.store.put(digest, {"expires_ts": 5.0}, "<html></html>", None, {"x": 1})
         self.assertEqual(self.store.purge_expired(now=10.0), 1)
         self.assertIsNone(self.store.meta(digest))
+
+
+class JobClaimRecoveryTest(ApiTestCase):
+    """Reviewer findings on the claim: it must never strand a job."""
+
+    def submitted(self):
+        response = self.client.post("/api/v1/jobs", headers=self.h(), content_type="multipart/form-data",
+                                    data={"file": (io.BytesIO(CSV.encode()), "report.csv")})
+        return response.get_json()["id"]
+
+    def run_job(self, job_id):
+        with contextlib.redirect_stderr(io.StringIO()):
+            return self.client.post(f"/api/v1/jobs/{job_id}/run", headers=self.h())
+
+    def test_a_run_that_fails_before_the_job_is_marked_running_can_be_retried(self):
+        job_id = self.submitted()
+        real_update = store_mod.FileStore.update_job
+        calls = {"n": 0}
+
+        def failing_once(store, jid, **fields):
+            calls["n"] += 1
+            if calls["n"] == 1:
+                raise OSError("disk full")
+            return real_update(store, jid, **fields)
+
+        with patch.object(store_mod.FileStore, "update_job", failing_once):
+            self.assertEqual(self.run_job(job_id).status_code, 500)
+        retry = self.run_job(job_id)
+        self.assertEqual(retry.status_code, 200, retry.get_data(as_text=True)[:200])
+        self.assertEqual(retry.get_json()["status"], "done", retry.get_json())
+
+    def test_a_stale_claim_from_a_dead_worker_is_taken_over(self):
+        job_id = self.submitted()
+        self.assertTrue(self.store.claim_job(job_id))
+        marker = self.store._job_dir(job_id) / "claimed"
+        old = time.time() - store_mod.CLAIM_STALE_SECONDS - 60
+        os.utime(marker, (old, old))
+        self.assertTrue(self.store.claim_job(job_id))
+        self.assertFalse(self.store.claim_job(job_id))  # and the new claim is fresh
+
+    def test_a_fresh_claim_is_not_taken_over(self):
+        job_id = self.submitted()
+        self.assertTrue(self.store.claim_job(job_id))
+        self.assertFalse(self.store.claim_job(job_id))
+
+    def test_the_sweep_does_not_remove_a_job_that_is_being_run(self):
+        job_id = "f" * 32
+        long_ago = time.time() - 40 * 86400  # older than the retention period, but a run started just now
+        self.store.create_job(job_id, {"caller": "agent-a", "status": "pending", "created": store_mod.iso(long_ago)},
+                              "report.csv", b"a,b\n1,2\n")
+        self.assertTrue(self.store.claim_job(job_id))
+        self.store.purge_expired()
+        self.assertIsNotNone(self.store.job_meta(job_id))
+        self.store.release_claim(job_id)
+        self.store.purge_expired()
+        self.assertIsNone(self.store.job_meta(job_id))  # without a live run it is swept as usual
+
+    def test_the_sweep_survives_a_directory_that_vanishes_underneath_it(self):
+        job_id = self.submitted()
+        directory = self.store._job_dir(job_id)
+        real_iterdir = Path.iterdir
+
+        def racing(path):
+            if path == directory:
+                for child in list(real_iterdir(path)):
+                    child.unlink()
+                    yield child  # already gone by the time the sweep unlinks it
+                return
+            yield from real_iterdir(path)
+
+        with patch.object(Path, "iterdir", racing):
+            self.store.purge_expired(now=time.time() + 400 * 86400)  # must not raise
 
 
 class JobClaimTest(ApiTestCase):

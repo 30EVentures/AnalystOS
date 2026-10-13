@@ -18,6 +18,7 @@ An upload is untrusted bytes. Three things the readers used to leave to chance:
 """
 
 import contextlib
+import sys
 import zipfile
 from pathlib import Path
 
@@ -67,7 +68,8 @@ def unreadable_is_value_error(path):
     try:
         check_archive(path)
         yield
-    except ValueError:
-        raise
+    except (ValueError, MemoryError):
+        raise  # a ValueError is already the readers' own refusal; running out of memory is not "a damaged file"
     except Exception as exc:
+        print(f"[analystos.l1] could not read a {suffix} file: {type(exc).__name__}", file=sys.stderr)  # type only, never content
         raise ValueError(f"could not read this file as {suffix}: it is damaged or not really a {suffix} file") from exc

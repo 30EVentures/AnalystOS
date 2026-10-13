@@ -106,6 +106,16 @@ class StandaloneVerifierNonFiniteTest(unittest.TestCase):
                                         "citation": ["$" + self.HUGE, "$5"], "horizon": "reported"})
                 self.assertFalse(outcome["content_checked"], outcome["checks"])
 
+    def test_a_non_finite_calculation_does_not_recompute(self):
+        for operation, operands, value in (("sum", ["inf", "1"], "inf"), ("sum", ["-inf", "inf"], "nan"),
+                                           ("difference", ["inf", "1"], "inf")):
+            with self.subTest(operation=operation, operands=operands):
+                outcome = self.verdict({"type": "computed", "label": "x", "operation": operation, "value": value,
+                                        "format": "usd", "operands": operands, "total": None,
+                                        "citation": ["$5", "$7"], "horizon": "reported"})
+                status = {c["name"]: c["status"] for c in outcome["checks"]}
+                self.assertEqual(status["calculations"], "fail", outcome["checks"])
+
     def test_a_digit_run_too_long_for_a_float_is_not_a_number_here_either(self):
         self.assertEqual(parse_numbers("9" * 400), [])
         self.assertEqual(parse_numbers("$5 and $7"), [5.0, 7.0])

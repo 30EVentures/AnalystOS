@@ -302,6 +302,7 @@ def _run_job_inner(job_id):
         return _fail_job(store, job_id, caller, exc)
     upload = store.job_upload(job_id)
     if upload is None:
+        store.release_claim(job_id)
         return _err(409, "conflict", "this job's upload is missing")
     filename, data = upload
     store.update_job(job_id, status="running")
@@ -353,6 +354,8 @@ def _run_job(job_id):
     except Exception as exc:
         store = _store()
         meta = store.job_meta(job_id) if store is not None else None
+        if meta is not None and meta.get("status") == "pending":
+            store.release_claim(job_id)  # failed before it was marked running: let the caller retry
         if meta is None or meta.get("status") != "running":
             raise
         print(f"job {job_id} failed unexpectedly: {type(exc).__name__}", file=sys.stderr)

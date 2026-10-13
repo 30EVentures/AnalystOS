@@ -964,6 +964,17 @@ def _request_report(client, user_content):
     return (segments if isinstance(segments, list) else []), truncated  # anything else is "no segments"
 
 
+def _describe_dropped(seg):
+    """``type:'first 80 chars of what it cited'`` for the failure log. The segment is whatever the
+    model sent, so this accepts any shape (it used to assume a dict of strings and crashed the
+    run it was only meant to describe)."""
+    if not isinstance(seg, dict):
+        return f"<{type(seg).__name__}>"
+    event = seg.get("event")
+    cited = seg.get("exact_text") or seg.get("text") or (event.get("what") if isinstance(event, dict) else "") or ""
+    return f"{str(seg.get('type') or '?')[:20]}:{str(cited)[:80]!r}"
+
+
 def analyze_document(document_text, title, client=None, stats=None):
     """Analyze ``document_text`` with Claude; return a list of *verified*
     segments (see module docstring for the three kinds).
@@ -1049,10 +1060,7 @@ def analyze_document(document_text, title, client=None, stats=None):
         # cause on the very next failed request: doc size, detected scale,
         # truncation, how many segments the model sent, the first few it
         # sent (type + the text it tried to cite), and why each was dropped.
-        head = [
-            f"{(s.get('type') or '?')}:{(s.get('exact_text') or s.get('text') or (s.get('event') or {}).get('what') or '')[:80]!r}"
-            for s in raw_segments[:5]
-        ]
+        head = [_describe_dropped(s) for s in raw_segments[:5]]
         print(
             f"[analystos.l2.analyze] NO VERIFIABLE CONTENT. "
             f"doc={len(document_text)} chars, scale={doc_scale}, "

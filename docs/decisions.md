@@ -2172,3 +2172,11 @@ Chosen over TypeScript / Node for the first slices.
 No third-party packages and no virtual environment until a slice explicitly
 needs one (expected at Slice 4, document parsing). Keeps the skeleton trivial
 to run and to review.
+
+## 2026-10-13 — Slice 91: the homepage's machine links are absolute
+
+The homepage is also proxied at `https://www.30eventures.com/analystos/`. Its root-relative `rel="api-catalog"`
+and `llms.txt` links resolved to the studio's own site there: the catalog was a 404 and `/llms.txt` was the
+studio's file, not AnalystOS's. Both are now `https://analystos.dev/...`. Chosen over publishing a
+`/.well-known/api-catalog` on the studio domain, which would claim AnalystOS's catalog as the studio's.
+Effect only after deploy; the proxy serves the page from analystos.dev, so no change is needed on the studio side.

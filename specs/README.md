@@ -102,3 +102,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 88 | a test that the site's machine-readable surface agrees with itself (Flashy integration J2) | [spec](slice-88/spec.md) |
 | 89 | a deployed-bytes check: are the live files the repository's files? (Flashy integration J3) | [spec](slice-89/spec.md) |
 | 90 | pin the key out of band, never see the seed, and never mistake "no check failed" for "authentic" | [spec](slice-90/spec.md) |
+| 91 | the homepage's machine-discovery links work from every domain that serves it | [spec](slice-91/spec.md) |

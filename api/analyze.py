@@ -79,6 +79,7 @@ if str(_REPO_ROOT) not in sys.path:
 
 from analystos.api_v1 import register as register_api_v1  # noqa: E402
 from analystos.l1.detect import SUPPORTED_EXTENSIONS, extract_any  # noqa: E402
+from analystos.l1.guard import upload_name  # noqa: E402
 from analystos.l4.export import render_html  # noqa: E402
 from analystos.l4.seal import CALLER_LEGACY, build_bundle, load_signing_key  # noqa: E402
 from analystos.pipeline import build_report  # noqa: E402
@@ -175,6 +176,11 @@ def _require_upload():
     if upload is None or not upload.filename:
         return None, (jsonify(error="no file uploaded (form field name must be 'file')"), 400)
 
+    try:
+        upload_name(upload.filename)
+    except ValueError as exc:
+        return None, (jsonify(error=str(exc)), 400)
+
     suffix = Path(upload.filename).suffix.lower()
     if suffix not in SUPPORTED_EXTENSIONS:
         return None, (
@@ -195,9 +201,9 @@ def _upload_path(upload, tmp_dir):
     it. Only the last component is used - the rule ``/api/v1`` already follows,
     so an ordinary upload keeps the same source name in its report - and the
     result is checked to sit directly inside ``tmp_dir``."""
-    name = Path(upload.filename).name
+    name = upload_name(upload.filename)
     path = tmp_dir / name
-    if not name or path.resolve().parent != tmp_dir.resolve():
+    if path.resolve().parent != tmp_dir.resolve():
         raise ValueError("unusable upload filename")
     return path
 

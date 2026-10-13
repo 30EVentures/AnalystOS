@@ -10,6 +10,7 @@ was. See ``specs/slice-25/spec.md``.
 """
 
 from analystos.l1 import extract, extract_docx, extract_pdf, extract_pptx, extract_xlsx
+from analystos.l1.guard import unreadable_is_value_error
 from analystos.l1.schema import apply_schema, guess_schema
 
 _RAW_EXTRACTORS = {
@@ -49,7 +50,8 @@ def extract_any(source_path, schema=None, extract_options=None):
             f"expected one of {sorted(SUPPORTED_EXTENSIONS)}"
         )
 
-    headers, numbered = _RAW_EXTRACTORS[suffix](source_path, extract_options or {})
+    with unreadable_is_value_error(source_path):
+        headers, numbered = _RAW_EXTRACTORS[suffix](source_path, extract_options or {})
     resolved_schema = schema if schema is not None else guess_schema(numbered, headers)
     rows = apply_schema(numbered, headers, resolved_schema)
     return resolved_schema, rows

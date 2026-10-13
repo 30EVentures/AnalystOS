@@ -1,12 +1,48 @@
-# Overnight run STATE (branch overnight/analystos-bugs, from origin/main 68e38ed)
+# Overnight run STATE - branch overnight/analystos-bugs
 
-Baseline: 1051 tests OK [RAN].
+Started from origin/main 68e38ed. Tests: **1051 before -> 1122 after, all OK**; also OK reversed and under 6 random orders. `tools/refresh.py --check` clean. Nothing merged, nothing deployed, no PR opened, `main` and your local checkout untouched; only this branch was pushed (plain pushes).
 
-## BLOCKED
-(none yet)
+## SUMMARY (bad news first)
 
-## Rounds
+### My mistakes (all found by the fresh-context review at the end, all fixed with a test that failed first)
+1. Round 3's "malformed model output is dropped" fix still crashed when *every* segment was malformed (the failure log line assumed well-formed segments). 8 of 20 shapes.
+2. Round 5's atomic job claim could strand a job as `pending` for good if the first run died before marking it running; and my new job sweep could raise on a concurrent sweep, 500-ing an unrelated request.
+3. Round 4's month sorting read "June 30" as the year 2030 (a regression: an old figure outranked a new one).
+4. Weak tests of mine: three that passed without the fix they were meant to guard, tightened. One mutation I ran myself printed blank output the first time (my shell pipeline), so I re-ran it properly.
+5. A stray `cat > /tmp/x` in one of my own commands hung and left an empty `/tmp/x`; removed.
+6. I hit the usage limit once mid-run; resumed from the branch state with nothing lost (all work was committed per round).
 
+### Bugs found and NOT fixed
+- Audit-line duplicate JSON key last-wins and `NaN` accepted: left as you told me earlier.
+- A bare scaled-table number the model leaves unscaled is stored unscaled ("1,842.0" under "in millions" renders `$1.8K`, not `$1.8B`). decisions.md/slice-33 says "stored as-is" on purpose, but the function's docstring says the opposite. Needs your decision (see PROPOSALS).
+- Failed-job audit lines persist `str(exc)`, which for an extractor error can contain a cell from the uploaded document, so a fragment outlives the upload; `title` has no length cap.
+- No cap on document text sent to the model (a paid call the API then refuses; the one empty-result retry resends it all). `NO VERIFIABLE CONTENT` logs 80-char quoted fragments to host logs.
+- Quarter / month / half-year sort keys share a numeric space (mixed series would mis-sort).
+- The verifier's catch-all wrapper reports an internal verifier bug as "malformed bundle" with no log (fails closed).
+
+### BLOCKED
+Nothing needed a decision or a permission I lacked. (No network, no keys, no live API used; `live_tests/` untouched; nothing under `~/.claude` edited, so the project memory was NOT updated this run - update it when you read this.)
+
+### Fixes (each with its proving test; counts are failures on the unfixed code)
+| Round | Fix | Test file |
+|---|---|---|
+| 1 | Damaged/mislabelled xlsx, docx, pptx, pdf upload was an HTTP 500 on `/api/extract`, `/api/analyze`, `/api/v1/analyses`; now 400/400/422. Filename > 255 bytes was a 500; now 400. A job hitting an unexpected error stayed `running` with its upload on disk; now failed + upload dropped. Zip-expansion cap (250 MB declared, 10,000 entries) for Office files | `tests/test_upload_robustness.py` (27 failing before) |
+| 2 | `verify_bundle` raised (TypeError / ValueError / RecursionError) on hostile shapes; the unauthenticated `POST /api/v1/verify` answered 500. A too-deeply-nested key file crashed `validate_key_file` and the CLI. Now always a failing verdict | `tests/test_verifier_totality.py` (39+ before) |
+| 3 | A wrong-shaped model segment/narrative aborted the whole run (14 of 18 shapes; 26 narrator positions). Gate 2 treated the string "false" as a pass (`bool("false")`). Now dropped / rejected / fails closed | `tests/test_l2_malformed_model_output.py` |
+| 4 | `$999,999` printed `$1,000.0K`; ~1e30 and inf/nan crashed the renderer; a 400-digit number parsed as inf and matched a sealed "inf" in the standalone verifier (`content_checked: true` on a forged bundle); half-year and month periods were never sorted, so a newest-first rising series read "has declined" | `tests/test_l4_number_edges.py`, `tests/test_l4_period_order.py` (35 before) |
+| 5 | Non-ASCII `sig=` on a signed-link URL (unauthenticated) and non-ASCII `X-Access-Code` were 500s; non-object review body was a 500; rate-limit table grew without bound; never-run pending jobs kept their upload forever (docs said so: now purged at the retention period, docs updated); two concurrent `run` calls could both run the pipeline (now atomic claim) | `tests/test_api_robustness.py` (18 before) |
+| 6 | Ten legacy-route test classes only passed in alphabetical order (shared rate-limit counters; 5-10 failures when reversed/shuffled); homepage said the suite runs "in about 3 seconds" (it takes ~18 s) | `tests/isolation.py`, `tests/test_site_claims.py` |
+
+### PROPOSALS (ranked; none done, all need your say)
+1. **Decide the unscaled-table-number rule** (above). Either store the scaled value when the document declares a scale and the quote is a bare number, or fix the docstring. Highest value: it changes the number a reader sees.
+2. **Cap and report document size before the paid call** (e.g. refuse over N characters with a clear message instead of a model error), and log fewer document fragments once confidential documents are supported.
+3. **Add conformance-corpus cases** for sealed `inf`/`nan` and a 400-digit citation (changes the corpus Flashy's kit runs, so I did not).
+4. **Expire or redact `job_failed` audit text** that can quote the upload; cap `title` length.
+5. **Make the verifier's catch-all log the exception type** (stderr) so a verifier bug is distinguishable from a hostile bundle.
+6. **A shared `tests` conftest-style hook for rate-limit isolation** so new route tests cannot reintroduce order dependence (today each class calls `reset_rate_limits`).
+7. Agent-native: `/api/v1` job status could carry a machine-readable `retry_after`/`stale_claim` field now that claims have a lifetime; and the key-pinning flags from Slice 90 (`--expect-key-id`) are not yet available on `smoke.py`.
+
+## Raw round notes
 ### Round 1 - upload and file handling (1051 -> 1063 tests, all OK)
 - FIXED [RAN] a damaged/mislabelled .xlsx/.docx/.pptx/.pdf upload returned HTTP 500 (an HTML page) from `/api/extract`, `/api/analyze` (both paths) and `/api/v1/analyses` (BadZipFile / pdfminer error escaped). Now 400 / 400 / 422 with the normal JSON error and a message naming no library or path. `analystos/l1/guard.py::unreadable_is_value_error`, used in `detect.extract_any` and `document_text.extract_document_text` (the model-calling PDF image step is deliberately outside the guard).
 - FIXED [RAN] a filename over 255 bytes made `upload.save` raise OSError -> 500 on all routes. `guard.upload_name` now refuses it up front (400), at job submission too.
@@ -67,3 +103,8 @@ Method: ran every test module alone (0 failures), then the whole suite reversed 
 - Round 1 guard (reviewer A, VERIFIED by reading): `unreadable_is_value_error` caught MemoryError and logged nothing. MemoryError now propagates and the exception type (never content) is logged to stderr.
 - Test quality (reviewers A and B): two of my tests were weaker than they looked (the "no library names in the error" test also passed on a 500 page; the damaged-job test passed via the catch-all). Both tightened. Reviewer B said the non-finite guards could be reverted with every test green: I mutated each myself [RAN]: the two `parse_numbers` guards ARE covered (tests fail without them); the `_num` guard was NOT, so I added a calculations test (fails without the guard).
 - Not changed (judgement): the verifier's catch-all `verify_bundle` wrapper reports an internal verifier bug as "malformed bundle" without logging (fails closed; reviewer B low). Rate-limit eviction sorts the table per over-cap request (only above 10,000 clients). The 250 MB archive cap is large for in-memory parsers (reviewer A, speculation).
+
+### Review pass 2 (reviewer C) - fixed
+- MY MISTAKE (round 4, reviewer C, confirmed [RAN] old vs new): the month sort I added read a *day of the month* as a two-digit year ("as of June 30" gives the token "June 30" = year 2030), so an older figure outranked a real "Q4 2025" one as the headline KPI. It also gave "margin 2025", "Market 2025" a month. Now a month needs a real month name plus a four-digit year or an apostrophe'd two-digit one. Tests added (failed first).
+- Reviewer C test gaps closed: the `isfinite(amount)` unit-overflow guard now has a test; `format_number(10**400, "usd")` (OverflowError, also on main) now returns text.
+- Not changed: quarter, month and half-year keys share a numeric space ((2025,1) is Q1, Jan and H1), so a series *mixing* those would mis-sort; no document in the fixtures does. "Mar 25" (bare two-digit year after a month) stays unsorted on purpose: it cannot be told from a day.

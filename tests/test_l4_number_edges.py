@@ -60,6 +60,12 @@ class ExtremeValuesTest(unittest.TestCase):
                 with self.subTest(value=value, spec=spec):
                     self.assertEqual(format_number(value, spec), str(value))
 
+    def test_a_unit_scaling_that_overflows_a_float_is_shown_as_text(self):
+        self.assertEqual(format_number(1.7e308, "usd", "thousands"), "1.7e+308")
+
+    def test_an_integer_too_large_for_a_float_is_shown_as_text(self):
+        self.assertEqual(format_number(10 ** 400, "usd"), str(10 ** 400))
+
     def test_ordinary_values_are_unchanged(self):
         self.assertEqual(format_number(12.25, "percent"), "12.3%")
         self.assertEqual(format_number(1234, "number"), "1,234")

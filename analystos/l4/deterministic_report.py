@@ -88,9 +88,15 @@ _YEAR_RE = re.compile(r"^(\d{4})$")
 # Half-years ("H1 2025", "2H 2025") and months ("Mar 2025", "September '25") are period tokens
 # too (see _PERIOD_TOKEN_RE); without a sort key they all tied at (0, 0) and kept document order.
 _HALF_RE = re.compile(r"^(?:H([12])|([12])H)\s*'?\s*(\d{2,4})$", re.IGNORECASE)
-_MONTH_RE = re.compile(r"^([A-Za-z]{3})[a-z]*\.?\s*'?\s*(\d{2,4})$")
-_MONTH_NUMBER = {m: n for n, m in enumerate(
-    ("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"), start=1)}
+# A month token needs a real month name (not a word that merely starts with one: "margin", "Market")
+# and a four-digit year or an apostrophe'd two-digit one. A bare two-digit number after a month is
+# a day of the month ("as of June 30"), not a year.
+_MONTH_RE = re.compile(r"^([A-Za-z]+)\.?\s*(?:(\d{4})|'\s*(\d{2}))$")
+_MONTH_NAMES = {
+    "jan": 1, "january": 1, "feb": 2, "february": 2, "mar": 3, "march": 3, "apr": 4, "april": 4, "may": 5,
+    "jun": 6, "june": 6, "jul": 7, "july": 7, "aug": 8, "august": 8, "sep": 9, "sept": 9, "september": 9,
+    "oct": 10, "october": 10, "nov": 11, "november": 11, "dec": 12, "december": 12,
+}
 
 
 def _full_year(raw):
@@ -117,8 +123,8 @@ def _period_sort_key(token):
     if m:
         return (_full_year(m.group(3)), int(m.group(1) or m.group(2)))
     m = _MONTH_RE.match(token)
-    if m and m.group(1).lower() in _MONTH_NUMBER:
-        return (_full_year(m.group(2)), _MONTH_NUMBER[m.group(1).lower()])
+    if m and m.group(1).lower() in _MONTH_NAMES:
+        return (_full_year(m.group(2) or m.group(3)), _MONTH_NAMES[m.group(1).lower()])
     return (0, 0)
 
 

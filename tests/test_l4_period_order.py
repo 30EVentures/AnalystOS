@@ -38,6 +38,21 @@ class PeriodSortKeyTest(unittest.TestCase):
         self.assertAscending("Sept. 2025", "Oct 2025")
         self.assertAscending("Dec '24", "Jan '25")
 
+    def test_a_day_of_the_month_is_not_a_year(self):
+        # "as of June 30, 2024" yields the token "June 30"; reading "30" as the year 2030 made an
+        # older figure look like the newest one
+        for token in ("June 30", "Dec 31", "March 15", "Sep 30"):
+            with self.subTest(token=token):
+                self.assertEqual(_period_sort_key(token), (0, 0))
+
+    def test_words_that_merely_start_with_a_month_name_are_not_months(self):
+        for token in ("margin 2025", "Market 2025", "mary 2025", "Mayfair 2025", "Octane 2025"):
+            with self.subTest(token=token):
+                self.assertEqual(_period_sort_key(token), (0, 0))
+
+    def test_month_names_match_in_any_case(self):
+        self.assertAscending("MARCH 2025", "SEPT 2025", "DEC 2025")
+
     def test_the_existing_forms_are_unchanged(self):
         self.assertEqual(_period_sort_key("Q3 2026"), (2026, 3))
         self.assertEqual(_period_sort_key("Q3 FY2026"), (2026, 3))
@@ -61,6 +76,11 @@ class SeriesOrderTest(unittest.TestCase):
             text = _trend_sentences(segments)[0]["text"]
             self.assertIn("grown", text)
             self.assertNotIn("declined", text)
+
+    def test_an_as_of_date_does_not_outrank_a_real_period(self):
+        segments = [_quote("Q4 2025 Revenue", 500.0, "usd", "cite-a"),
+                    _quote("Revenue as of June 30", 300.0, "usd", "cite-b")]
+        self.assertEqual(_select_kpis(segments)[0]["value_fact"], 0)
 
     def test_the_headline_kpi_is_the_latest_period_not_the_first_listed(self):
         for segments, latest in ((self.NEWEST_FIRST, 0), (self.OLDEST_FIRST, 2), (self.HALVES_NEWEST_FIRST, 0)):

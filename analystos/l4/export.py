@@ -157,7 +157,7 @@ def format_number(value, spec, currency_unit="actual", decimals=1):
         return str(value)
     try:
         n = float(value)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):  # OverflowError: an int too large for a float
         return str(value)
 
     if not math.isfinite(n):

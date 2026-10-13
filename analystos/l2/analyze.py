@@ -809,16 +809,24 @@ def _verify_segment(seg, match_document, doc_scale):
     failure is diagnosable instead of just "it failed" (the same gap
     Slice 27 closed for the narrative pass).
     """
+    # The model's output is untrusted input, wrong *shapes* included: a segment that is a
+    # string, a ``text`` that is a number, an ``operands`` entry that is not an object. One
+    # such segment is dropped like any other that fails verification; it must not abort
+    # the whole analysis with an AttributeError/TypeError out of the pipeline.
+    if not isinstance(seg, dict):
+        return None, f"segment is not an object: {type(seg).__name__}"
     kind = seg.get("type")
-    if kind == "quote":
-        return _verify_quote(seg, match_document, doc_scale)
-    if kind == "computed":
-        return _verify_computed(seg, match_document, doc_scale)
-    if kind == "event":
-        return _verify_event(seg, match_document)
-    if kind == "prose":
-        return _verify_prose(seg)
-    return None, f"unknown segment type: {kind!r}"
+    verifiers = {"quote": lambda: _verify_quote(seg, match_document, doc_scale),
+                 "computed": lambda: _verify_computed(seg, match_document, doc_scale),
+                 "event": lambda: _verify_event(seg, match_document),
+                 "prose": lambda: _verify_prose(seg)}
+    verify = verifiers.get(kind) if isinstance(kind, str) else None
+    if verify is None:
+        return None, f"unknown segment type: {str(kind)[:40]!r}"
+    try:
+        return verify()
+    except (AttributeError, TypeError, KeyError, IndexError, ValueError, OverflowError) as exc:
+        return None, f"malformed {kind} segment ({type(exc).__name__})"
 
 
 def _resolve_client(client):
@@ -950,7 +958,8 @@ def _request_report(client, user_content):
         )
         return None, truncated
     tool_input = tool_use.input if isinstance(tool_use.input, dict) else {}
-    return (tool_input.get("segments") or []), truncated
+    segments = tool_input.get("segments")
+    return (segments if isinstance(segments, list) else []), truncated  # anything else is "no segments"
 
 
 def analyze_document(document_text, title, client=None, stats=None):

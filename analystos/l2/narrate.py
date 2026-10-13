@@ -1114,7 +1114,22 @@ def _resolve_kpis(raw_kpis, segments):
     return out
 
 
+_MALFORMED = (AttributeError, TypeError, KeyError, IndexError, ValueError)
+
+
 def _assemble_report(report, segments, title):
+    """``_assemble_report_unchecked`` that really never raises: the narrator's output is
+    untrusted input, so a paragraph that is ``null``, a ``text`` that is a number or a
+    ``sections`` that is a string is a rejection with a reason (which the repair and
+    retry loop then handles like any other), not an AttributeError/TypeError out of the
+    pipeline."""
+    try:
+        return _assemble_report_unchecked(report, segments, title)
+    except _MALFORMED as exc:
+        return None, f"the narrative's structure is malformed ({type(exc).__name__})"
+
+
+def _assemble_report_unchecked(report, segments, title):
     """Validate one ``write_narrative`` tool response, already unwrapped to
     its plain dict (``None`` if the model's response had no usable
     tool_use block), into a render-ready report dict. Returns
@@ -1272,7 +1287,10 @@ def write_narrative(segments, title, client=None):
     for repair_attempt in range(1, _MAX_REPAIR_ATTEMPTS + 1):
         if report is not None or raw_report is None:
             break
-        problem = _locate_problem(raw_report, segments)
+        try:
+            problem = _locate_problem(raw_report, segments)
+        except _MALFORMED:
+            problem = None  # malformed beyond locating one paragraph: fall through to the full retry
         if problem is None or problem[0] == "structural":
             break  # nothing a single-paragraph fix can do - fall through
         get, set_text, para_reason = problem

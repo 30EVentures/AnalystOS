@@ -197,7 +197,7 @@ def proofread_report(report, client=None):
         return False, [{"location": "", "problem": "proofreading call returned no result"}]
 
     result = tool_use.input if isinstance(tool_use.input, dict) else {}
-    passed = bool(result.get("passed"))
+    passed = result.get("passed") is True  # not bool(): the string "false" is truthy, and this gate must fail closed
     issues = [
         i for i in (result.get("issues") or [])
         if isinstance(i, dict) and i.get("problem")

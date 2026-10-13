@@ -85,6 +85,12 @@ _PERIOD_TOKEN_RE = re.compile(
 _QUARTER_RE = re.compile(r"^Q([1-4])\s*'?\s*(?:FY\s*'?\s*)?(\d{2,4})$", re.IGNORECASE)
 _FY_RE = re.compile(r"^FY\s*'?\s*(\d{2,4})$", re.IGNORECASE)
 _YEAR_RE = re.compile(r"^(\d{4})$")
+# Half-years ("H1 2025", "2H 2025") and months ("Mar 2025", "September '25") are period tokens
+# too (see _PERIOD_TOKEN_RE); without a sort key they all tied at (0, 0) and kept document order.
+_HALF_RE = re.compile(r"^(?:H([12])|([12])H)\s*'?\s*(\d{2,4})$", re.IGNORECASE)
+_MONTH_RE = re.compile(r"^([A-Za-z]{3})[a-z]*\.?\s*'?\s*(\d{2,4})$")
+_MONTH_NUMBER = {m: n for n, m in enumerate(
+    ("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"), start=1)}
 
 
 def _full_year(raw):
@@ -107,6 +113,12 @@ def _period_sort_key(token):
     m = _YEAR_RE.match(token)
     if m:
         return (int(m.group(1)), 0)
+    m = _HALF_RE.match(token)
+    if m:
+        return (_full_year(m.group(3)), int(m.group(1) or m.group(2)))
+    m = _MONTH_RE.match(token)
+    if m and m.group(1).lower() in _MONTH_NUMBER:
+        return (_full_year(m.group(2)), _MONTH_NUMBER[m.group(1).lower()])
     return (0, 0)
 
 

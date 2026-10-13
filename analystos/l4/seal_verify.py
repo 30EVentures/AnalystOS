@@ -204,6 +204,8 @@ def parse_numbers(text):
         value = float(digits.replace(",", ""))
         if scale:
             value *= _SCALE_WORDS[scale.lower()]
+        if not math.isfinite(value):
+            continue  # a digit run too long for a float is "inf", not a number: it supports no value
         if "-" in sign_part or "(" in sign_part:
             value = -value
         out.append(value)
@@ -240,7 +242,13 @@ def recompute(operation, values, total=None):
 
 
 def _num(text):
-    return float(text)
+    """A sealed number string as a float. NaN and infinity are not amounts: ``float("inf")``
+    accepts the text and ``isclose(inf, inf)`` is true, so a sealed "inf" would agree with a
+    citation that is a run of hundreds of digits."""
+    value = float(text)
+    if not math.isfinite(value):
+        raise ValueError(f"not a finite number: {text!r}"[:60])
+    return value
 
 
 def _same(a, b):

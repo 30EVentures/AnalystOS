@@ -519,6 +519,8 @@ def _parse_numbers(text):
         value = float(digits.replace(",", ""))
         if scale:
             value *= _SCALE_WORDS[scale.lower()]
+        if not math.isfinite(value):
+            continue  # a digit run too long for a float is "inf", not a number: it must match nothing
         if "-" in sign_part or "(" in sign_part:
             value = -value
         out.append(value)

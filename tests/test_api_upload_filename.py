@@ -23,6 +23,7 @@ from unittest.mock import patch
 
 from api.analyze import _ACCESS_CODE_ENV_VAR, app
 from tests.test_api_v1 import CSV as V1_CSV, ApiTestCase
+from tests.isolation import reset_rate_limits
 
 _CODE = "test-access-code"
 _CSV = "period,revenue\nFY2023,26974\nFY2024,60922\n"
@@ -72,6 +73,7 @@ class Sandbox:
 
 class LegacyRoutesTest(unittest.TestCase):
     def setUp(self):
+        reset_rate_limits(self)
         self.client = app.test_client()
         os.environ[_ACCESS_CODE_ENV_VAR] = _CODE
         self.addCleanup(os.environ.pop, _ACCESS_CODE_ENV_VAR, None)

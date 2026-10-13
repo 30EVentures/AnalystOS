@@ -9,6 +9,7 @@ import os
 import unittest
 
 from api.analyze import _ACCESS_CODE_ENV_VAR, app
+from tests.isolation import reset_rate_limits
 
 _REAL_CODE = "correct-code"
 
@@ -26,6 +27,7 @@ def _valid_form():
 
 class AccessGatingTest(unittest.TestCase):
     def setUp(self):
+        reset_rate_limits(self)
         self.client = app.test_client()
         self._had_env = _ACCESS_CODE_ENV_VAR in os.environ
         self._prior_value = os.environ.get(_ACCESS_CODE_ENV_VAR)

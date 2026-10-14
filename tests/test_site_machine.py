@@ -16,6 +16,7 @@ SITE = ROOT / "site"
 BASE = "https://analystos.dev"
 sys.path.insert(0, str(ROOT / "tools"))
 import build_site_machine as build  # noqa: E402
+from tests.isolation import reset_rate_limits
 
 
 def local_path(url):
@@ -55,6 +56,9 @@ class GeneratedFilesTest(unittest.TestCase):
 class LlmsTxtTest(unittest.TestCase):
     TEXT = (SITE / "llms.txt").read_text(encoding="utf-8")
 
+    def setUp(self):
+        reset_rate_limits(self)
+
     def test_follows_the_llms_txt_shape(self):
         lines = self.TEXT.splitlines()
         self.assertEqual(lines[0], "# AnalystOS")
@@ -86,6 +90,9 @@ class LlmsTxtTest(unittest.TestCase):
 
 
 class CatalogSitemapRobotsTest(unittest.TestCase):
+    def setUp(self):
+        reset_rate_limits(self)
+
     def test_api_catalog_is_a_valid_linkset_pointing_at_real_things(self):
         catalog = json.loads((SITE / ".well-known" / "api-catalog").read_text())
         (entry,) = catalog["linkset"]
@@ -111,6 +118,9 @@ class CatalogSitemapRobotsTest(unittest.TestCase):
 
 
 class WiringTest(unittest.TestCase):
+    def setUp(self):
+        reset_rate_limits(self)
+
     def test_homepage_head_advertises_the_machine_entry_points(self):
         head = (SITE / "index.html").read_text(encoding="utf-8").split("</head>")[0]
         self.assertIn('rel="api-catalog" href="/.well-known/api-catalog"', head)

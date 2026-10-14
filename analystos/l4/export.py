@@ -52,8 +52,9 @@ disclosed gap, not an oversight.
 
 import html
 import io
+import math
 import re
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_HALF_UP, Decimal, localcontext
 from xml.sax.saxutils import escape as xml_escape
 
 from reportlab.lib import colors
@@ -96,10 +97,20 @@ def round_half_up(value, decimals=1):
     Rounds the shortest decimal form of the float (``repr``), so 1.95 is
     exactly a half-way case and becomes 2.0 - ``format(1.95, ".1f")`` gives
     "1.9" because the float is stored as 1.9499999999999999556.
+
+    Runs in a decimal context wide enough for any finite float (about 310
+    digits): the default 28-digit context raised ``InvalidOperation`` for a
+    value of ~1e30 or more.
     """
-    exact = Decimal(repr(float(value)))
-    quantum = Decimal(1).scaleb(-decimals)
-    return format(exact.quantize(quantum, rounding=ROUND_HALF_UP), f",.{decimals}f")
+    with localcontext() as context:
+        context.prec = _DECIMAL_PRECISION
+        exact = Decimal(repr(float(value)))
+        quantum = Decimal(1).scaleb(-decimals)
+        return format(exact.quantize(quantum, rounding=ROUND_HALF_UP), f",.{decimals}f")
+
+
+_COMPACT_UNITS = ((1_000, "K"), (1_000_000, "M"), (1_000_000_000, "B"))
+_DECIMAL_PRECISION = 400  # > the ~310 digits of the largest finite float plus any sane number of decimals
 
 
 def _compact_usd(raw_dollars, decimals=1):
@@ -110,16 +121,24 @@ def _compact_usd(raw_dollars, decimals=1):
     compacted to 1 decimal is "$1.9B", which no longer adds up against the
     other operands in the same expression (see ``analystos.l4.rich_export
     ._arithmetic``, Slice 38).
+
+    A value that rounds up to 1,000 of its unit moves to the next unit
+    ($999,999 is "$1.0M", not "$1,000.0K"); the largest unit, B, has none above it.
     """
-    # Scale in Decimal so the division cannot itself introduce a float error.
-    exact = Decimal(repr(float(raw_dollars)))
-    if raw_dollars >= 1_000_000_000:
-        return f"${round_half_up(exact / 1_000_000_000, decimals)}B"
-    if raw_dollars >= 1_000_000:
-        return f"${round_half_up(exact / 1_000_000, decimals)}M"
-    if raw_dollars >= 1_000:
-        return f"${round_half_up(exact / 1_000, decimals)}K"
-    return f"${round_half_up(exact, 2)}"
+    with localcontext() as context:
+        context.prec = _DECIMAL_PRECISION
+        # Scale in Decimal so the division cannot itself introduce a float error.
+        exact = Decimal(repr(float(raw_dollars)))
+        index = max((i for i, (size, _) in enumerate(_COMPACT_UNITS) if raw_dollars >= size), default=None)
+        if index is None:
+            return f"${round_half_up(exact, 2)}"
+        while True:
+            size, suffix = _COMPACT_UNITS[index]
+            scaled = round_half_up(exact / size, decimals)
+            if Decimal(scaled.replace(",", "")) >= 1000 and index + 1 < len(_COMPACT_UNITS):
+                index += 1
+                continue
+            return f"${scaled}{suffix}"
 
 
 def format_number(value, spec, currency_unit="actual", decimals=1):
@@ -138,8 +157,11 @@ def format_number(value, spec, currency_unit="actual", decimals=1):
         return str(value)
     try:
         n = float(value)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):  # OverflowError: an int too large for a float
         return str(value)
+
+    if not math.isfinite(n):
+        return str(value)  # inf / nan are not amounts: show them as the text they are rather than format or raise
 
     negative = n < 0
     n = abs(n)
@@ -154,7 +176,10 @@ def format_number(value, spec, currency_unit="actual", decimals=1):
                 f"unknown currency_unit {currency_unit!r}; "
                 f"expected one of {tuple(_CURRENCY_UNITS)}"
             )
-        body = _compact_usd(n * _CURRENCY_UNITS[currency_unit], decimals)
+        amount = n * _CURRENCY_UNITS[currency_unit]
+        if not math.isfinite(amount):
+            return str(value)  # the unit scaling overflowed a float
+        body = _compact_usd(amount, decimals)
     else:
         raise ValueError(f"unknown format {spec!r}; expected one of {_FORMATS}")
 

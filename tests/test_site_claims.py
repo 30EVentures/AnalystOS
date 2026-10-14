@@ -20,6 +20,7 @@ class RetiredClaimsTest(unittest.TestCase):
             "a real server-generated PDF with bundled",
             "four real documents",
             "and a retrospective",
+            "about 3 seconds",  # the suite takes ~18 s now (1100+ tests); the figure dated from ~500 tests
         ):
             with self.subTest(phrase=phrase):
                 self.assertNotIn(phrase, INDEX)

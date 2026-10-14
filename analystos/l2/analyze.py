@@ -519,6 +519,8 @@ def _parse_numbers(text):
         value = float(digits.replace(",", ""))
         if scale:
             value *= _SCALE_WORDS[scale.lower()]
+        if not math.isfinite(value):
+            continue  # a digit run too long for a float is "inf", not a number: it must match nothing
         if "-" in sign_part or "(" in sign_part:
             value = -value
         out.append(value)
@@ -809,16 +811,24 @@ def _verify_segment(seg, match_document, doc_scale):
     failure is diagnosable instead of just "it failed" (the same gap
     Slice 27 closed for the narrative pass).
     """
+    # The model's output is untrusted input, wrong *shapes* included: a segment that is a
+    # string, a ``text`` that is a number, an ``operands`` entry that is not an object. One
+    # such segment is dropped like any other that fails verification; it must not abort
+    # the whole analysis with an AttributeError/TypeError out of the pipeline.
+    if not isinstance(seg, dict):
+        return None, f"segment is not an object: {type(seg).__name__}"
     kind = seg.get("type")
-    if kind == "quote":
-        return _verify_quote(seg, match_document, doc_scale)
-    if kind == "computed":
-        return _verify_computed(seg, match_document, doc_scale)
-    if kind == "event":
-        return _verify_event(seg, match_document)
-    if kind == "prose":
-        return _verify_prose(seg)
-    return None, f"unknown segment type: {kind!r}"
+    verifiers = {"quote": lambda: _verify_quote(seg, match_document, doc_scale),
+                 "computed": lambda: _verify_computed(seg, match_document, doc_scale),
+                 "event": lambda: _verify_event(seg, match_document),
+                 "prose": lambda: _verify_prose(seg)}
+    verify = verifiers.get(kind) if isinstance(kind, str) else None
+    if verify is None:
+        return None, f"unknown segment type: {str(kind)[:40]!r}"
+    try:
+        return verify()
+    except (AttributeError, TypeError, KeyError, IndexError, ValueError, OverflowError) as exc:
+        return None, f"malformed {kind} segment ({type(exc).__name__})"
 
 
 def _resolve_client(client):
@@ -950,7 +960,19 @@ def _request_report(client, user_content):
         )
         return None, truncated
     tool_input = tool_use.input if isinstance(tool_use.input, dict) else {}
-    return (tool_input.get("segments") or []), truncated
+    segments = tool_input.get("segments")
+    return (segments if isinstance(segments, list) else []), truncated  # anything else is "no segments"
+
+
+def _describe_dropped(seg):
+    """``type:'first 80 chars of what it cited'`` for the failure log. The segment is whatever the
+    model sent, so this accepts any shape (it used to assume a dict of strings and crashed the
+    run it was only meant to describe)."""
+    if not isinstance(seg, dict):
+        return f"<{type(seg).__name__}>"
+    event = seg.get("event")
+    cited = seg.get("exact_text") or seg.get("text") or (event.get("what") if isinstance(event, dict) else "") or ""
+    return f"{str(seg.get('type') or '?')[:20]}:{str(cited)[:80]!r}"
 
 
 def analyze_document(document_text, title, client=None, stats=None):
@@ -1038,10 +1060,7 @@ def analyze_document(document_text, title, client=None, stats=None):
         # cause on the very next failed request: doc size, detected scale,
         # truncation, how many segments the model sent, the first few it
         # sent (type + the text it tried to cite), and why each was dropped.
-        head = [
-            f"{(s.get('type') or '?')}:{(s.get('exact_text') or s.get('text') or (s.get('event') or {}).get('what') or '')[:80]!r}"
-            for s in raw_segments[:5]
-        ]
+        head = [_describe_dropped(s) for s in raw_segments[:5]]
         print(
             f"[analystos.l2.analyze] NO VERIFIABLE CONTENT. "
             f"doc={len(document_text)} chars, scale={doc_scale}, "

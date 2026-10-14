@@ -30,6 +30,7 @@ TTL_ENV = "ANALYSTOS_REPORT_TTL_DAYS"
 DEFAULT_TTL_DAYS = 30
 DIGEST_RE = re.compile(r"^[0-9a-f]{64}$")
 JOB_ID_RE = re.compile(r"^[0-9a-f]{32}$")
+CLAIM_STALE_SECONDS = 15 * 60  # a claim older than this belongs to a worker that died (a request cannot run this long)
 _KINDS = {"html": "report.html", "pdf": "report.pdf", "seal": "seal.json", "meta": "meta.json"}
 
 
@@ -97,18 +98,59 @@ class FileStore:
         except (OSError, ValueError, KeyError):
             return None
 
+    @staticmethod
+    def _remove_dir(directory):
+        """Delete a folder of plain files. Another request can be sweeping the same folder at the
+        same moment, so a file or folder that is already gone is not an error."""
+        try:
+            for path in list(directory.iterdir()):
+                try:
+                    path.unlink()
+                except FileNotFoundError:
+                    pass
+            directory.rmdir()
+        except (FileNotFoundError, OSError):
+            pass  # gone already, or something else is still writing into it: the next sweep retries
+
     def purge_expired(self, now=None):
+        """Remove expired reports, and jobs older than the retention period (``ttl_days``):
+        a job submitted and never run would otherwise keep its uploaded document, and a
+        finished job its record, for ever. Returns the number of reports removed."""
         now = time.time() if now is None else now
         removed = 0
         base = self.root / "reports"
         for directory in base.iterdir() if base.exists() else []:
             meta = self.meta(directory.name)
             if meta is not None and meta.get("expires_ts", now + 1) <= now:
-                for path in directory.iterdir():
-                    path.unlink()
-                directory.rmdir()
+                self._remove_dir(directory)
                 removed += 1
+        self._purge_old_jobs(now)
         return removed
+
+    def _purge_old_jobs(self, now):
+        base = self.root / "jobs"
+        cutoff = now - ttl_days() * 86400
+        for directory in base.iterdir() if base.exists() else []:
+            if not JOB_ID_RE.match(directory.name) or not directory.is_dir():
+                continue
+            meta = self.job_meta(directory.name)
+            try:
+                created = datetime.strptime(meta["created"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp()
+            except (TypeError, KeyError, ValueError):
+                try:  # no readable record (a half-written job): fall back to when the folder last changed
+                    created = directory.stat().st_mtime
+                except OSError:
+                    continue
+            if created <= cutoff and not self._claim_is_live(directory, now):
+                self._remove_dir(directory)
+
+    @staticmethod
+    def _claim_is_live(directory, now):
+        """A run is in progress (or was a moment ago): its folder is not swept from under it."""
+        try:
+            return now - (directory / "claimed").stat().st_mtime < CLAIM_STALE_SECONDS
+        except OSError:
+            return False
 
     def _job_dir(self, job_id):
         if not JOB_ID_RE.match(job_id or ""):
@@ -137,6 +179,36 @@ class FileStore:
             return (directory / "upload.name").read_text(encoding="utf-8"), (directory / "upload").read_bytes()
         except OSError:
             return None
+
+    def claim_job(self, job_id):
+        """``True`` for exactly one caller at a time: the right to run the job. Creating the marker
+        file is atomic (``O_EXCL``), so two workers that both saw ``pending`` cannot both go on to
+        run the pipeline (and spend the model calls) twice.
+
+        A claim older than ``CLAIM_STALE_SECONDS`` belongs to a worker that died before it marked
+        the job running (no request lives that long), so it is taken over rather than leaving the
+        job ``pending`` for ever. Taking over is not atomic against another taker in the same
+        instant; that window needs two workers to reach a dead claim within the same moment."""
+        marker = self._job_dir(job_id) / "claimed"
+        for attempt in range(2):
+            try:
+                os.close(os.open(marker, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600))
+                return True
+            except FileExistsError:
+                try:
+                    if time.time() - marker.stat().st_mtime < CLAIM_STALE_SECONDS:
+                        return False
+                    marker.unlink()
+                except FileNotFoundError:
+                    pass
+        return False
+
+    def release_claim(self, job_id):
+        """Give the right to run back (the run failed before the job was marked running)."""
+        try:
+            (self._job_dir(job_id) / "claimed").unlink()
+        except FileNotFoundError:
+            pass
 
     def update_job(self, job_id, **fields):
         """Merge ``fields`` into the job's meta. Raises ``ValueError`` if

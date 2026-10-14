@@ -8,6 +8,7 @@ import json
 import os
 import secrets
 import shutil
+import sys
 import tempfile
 import time
 from pathlib import Path
@@ -17,6 +18,7 @@ from flask import Blueprint, Response, jsonify, request
 from analystos.api_v1 import auth, links, store as store_mod
 from analystos.api_v1.openapi import build_openapi
 from analystos.l1.detect import SUPPORTED_EXTENSIONS
+from analystos.l1.guard import upload_name
 from analystos.l4.export import render_html
 from analystos.l4.seal import build_bundle, code_version, load_signing_key
 from analystos.l4.seal_verify import canonical_bytes, sha256_hex, verify_bundle
@@ -132,6 +134,10 @@ def create_analysis():
     upload = request.files.get("file")
     if upload is None or not upload.filename:
         return _err(400, "bad_request", "no file uploaded (multipart field name must be 'file')")
+    try:
+        upload_name(upload.filename)
+    except ValueError as exc:
+        return _err(400, "bad_request", str(exc))
     suffix = Path(upload.filename).suffix.lower()
     if suffix not in SUPPORTED_EXTENSIONS:
         return _err(415, "unsupported_media", f"unsupported file type {suffix!r}; expected one of {sorted(SUPPORTED_EXTENSIONS)}")
@@ -148,7 +154,7 @@ def create_analysis():
     trace = {}
     tmp_dir = Path(tempfile.mkdtemp(prefix="analystos-"))
     try:
-        tmp_path = tmp_dir / Path(upload.filename).name
+        tmp_path = tmp_dir / upload_name(upload.filename)
         upload.save(tmp_path)
         section, pdf = build_report(
             tmp_path, None, title, evidence_dir=tmp_dir / "evidence", want_pdf=True, trace=trace,
@@ -217,6 +223,10 @@ def _create_job():
     upload = request.files.get("file")
     if upload is None or not upload.filename:
         return _err(400, "bad_request", "no file uploaded (multipart field name must be 'file')")
+    try:
+        upload_name(upload.filename)
+    except ValueError as exc:
+        return _err(400, "bad_request", str(exc))
     suffix = Path(upload.filename).suffix.lower()
     if suffix not in SUPPORTED_EXTENSIONS:
         return _err(415, "unsupported_media", f"unsupported file type {suffix!r}; expected one of {sorted(SUPPORTED_EXTENSIONS)}")
@@ -259,7 +269,7 @@ def _fail_job(store, job_id, caller, exc):
     return jsonify(_job_body(job_id, meta))
 
 
-def _run_job(job_id):
+def _run_job_inner(job_id):
     """Runs the same, unmodified pipeline ``/analyses`` uses - see
     specs/slice-74/spec.md for why this is one bounded call, same ceiling as
     a synchronous analysis, not a background worker."""
@@ -281,6 +291,9 @@ def _run_job(job_id):
         return _err(404, "not_found", "no such job")
     if meta["status"] != "pending":
         return jsonify(_job_body(job_id, meta))  # idempotent: never re-runs
+    if not store.claim_job(job_id):
+        # another worker passed the status check at the same moment and holds the right to run it
+        return jsonify(_job_body(job_id, store.job_meta(job_id) or meta))
 
     try:
         signing_key = load_signing_key()
@@ -289,6 +302,7 @@ def _run_job(job_id):
         return _fail_job(store, job_id, caller, exc)
     upload = store.job_upload(job_id)
     if upload is None:
+        store.release_claim(job_id)
         return _err(409, "conflict", "this job's upload is missing")
     filename, data = upload
     store.update_job(job_id, status="running")
@@ -296,7 +310,7 @@ def _run_job(job_id):
     trace = {}
     tmp_dir = Path(tempfile.mkdtemp(prefix="analystos-job-"))
     try:
-        tmp_path = tmp_dir / Path(filename).name
+        tmp_path = tmp_dir / upload_name(filename)
         tmp_path.write_bytes(data)
         section, pdf = build_report(
             tmp_path, None, meta.get("title"), evidence_dir=tmp_dir / "evidence", want_pdf=True, trace=trace,
@@ -328,6 +342,24 @@ def _run_job(job_id):
     meta = store.update_job(job_id, status="done", report_id=digest)
     store.delete_job_upload(job_id)
     return jsonify(_job_body(job_id, meta))
+
+
+def _run_job(job_id):
+    """``_run_job_inner`` with one guarantee added: a job this call moved to
+    ``running`` never stays there. Any error not already mapped to a failed job
+    (a full disk, a library bug) marks it ``failed`` with a fixed message, drops the
+    upload, and leaves the details out of the response and the audit line."""
+    try:
+        return _run_job_inner(job_id)
+    except Exception as exc:
+        store = _store()
+        meta = store.job_meta(job_id) if store is not None else None
+        if meta is not None and meta.get("status") == "pending":
+            store.release_claim(job_id)  # failed before it was marked running: let the caller retry
+        if meta is None or meta.get("status") != "running":
+            raise
+        print(f"job {job_id} failed unexpectedly: {type(exc).__name__}", file=sys.stderr)
+        return _fail_job(store, job_id, meta.get("caller"), ValueError("the analysis failed unexpectedly; submit the document again"))
 
 
 @bp.post("/jobs")
@@ -428,7 +460,11 @@ def _review_report(digest):
         return _err(404, "not_found", "no such report")
     if meta.get("expires_ts", 0) <= time.time():
         return _err(410, "expired", "this report has expired and been removed")
-    body = request.get_json(silent=True) or {}
+    body = request.get_json(silent=True)
+    if body is None:
+        body = {}  # no body is fine: an unqualified "a human looked at this"
+    elif not isinstance(body, dict):
+        return _err(400, "bad_request", "send a JSON object, e.g. {\"approved\": true}, or no body")
     approved = body.get("approved")
     if approved is not None and not isinstance(approved, bool):
         return _err(400, "bad_request", "approved must be a boolean if given")

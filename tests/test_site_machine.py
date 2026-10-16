@@ -123,8 +123,16 @@ class WiringTest(unittest.TestCase):
 
     def test_homepage_head_advertises_the_machine_entry_points(self):
         head = (SITE / "index.html").read_text(encoding="utf-8").split("</head>")[0]
-        self.assertIn('rel="api-catalog" href="/.well-known/api-catalog"', head)
-        self.assertIn('href="/llms.txt"', head)
+        self.assertIn(f'rel="api-catalog" href="{BASE}/.well-known/api-catalog"', head)
+        self.assertIn(f'href="{BASE}/llms.txt"', head)
+
+    def test_machine_links_in_the_head_are_absolute_because_the_page_is_proxied_from_other_domains(self):
+        # The page is also served at https://www.30eventures.com/analystos/, where a root-relative link names the
+        # studio's files (a 404 for the catalog, the wrong llms.txt) instead of AnalystOS's.
+        head = (SITE / "index.html").read_text(encoding="utf-8").split("</head>")[0]
+        for tag in re.findall(r"<link\b[^>]*>", head):
+            if 'rel="api-catalog"' in tag or "llms.txt" in tag:
+                self.assertRegex(tag, r'href="https://', tag)
 
     def test_vercel_serves_each_new_type_with_the_right_content_type(self):
         config = json.loads((ROOT / "vercel.json").read_text())

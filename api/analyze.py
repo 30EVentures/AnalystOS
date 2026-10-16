@@ -79,6 +79,7 @@ if str(_REPO_ROOT) not in sys.path:
 
 from analystos.api_v1 import register as register_api_v1  # noqa: E402
 from analystos.l1.detect import SUPPORTED_EXTENSIONS, extract_any  # noqa: E402
+from analystos.l1.guard import upload_name  # noqa: E402
 from analystos.l4.export import render_html  # noqa: E402
 from analystos.l4.seal import CALLER_LEGACY, build_bundle, load_signing_key  # noqa: E402
 from analystos.pipeline import build_report  # noqa: E402
@@ -104,6 +105,7 @@ _DEFAULT_RATE_LIMIT_MAX = 30
 _DEFAULT_RATE_LIMIT_WINDOW_SECONDS = 60
 _rate_limit_lock = Lock()
 _rate_limit_buckets = {}  # client key -> (window_start, count in this window)
+_MAX_RATE_LIMIT_CLIENTS = 10_000  # the table is pruned past this, so it cannot grow without bound
 
 
 def _rate_limit_config():
@@ -132,6 +134,18 @@ def _client_key():
     return request.remote_addr or "unknown"
 
 
+def _prune_rate_limit_buckets(now, window_seconds):
+    """Called with the lock held, only when the table is over its cap. Windows that have
+    expired no longer limit anyone, so they go first; if the table is still over the cap
+    (a flood of distinct clients inside one window), the oldest windows go until it fits."""
+    for client in [c for c, (start, _count) in _rate_limit_buckets.items() if now - start >= window_seconds]:
+        del _rate_limit_buckets[client]
+    excess = len(_rate_limit_buckets) - _MAX_RATE_LIMIT_CLIENTS
+    if excess > 0:
+        for client, _ in sorted(_rate_limit_buckets.items(), key=lambda item: item[1][0])[:excess]:
+            del _rate_limit_buckets[client]
+
+
 def _rate_limit_denied():
     """Return a ``429`` response if this request's client has exceeded its
     budget for the current fixed window; ``None`` if not. Records this
@@ -150,6 +164,8 @@ def _rate_limit_denied():
         count += 1
         _rate_limit_buckets[key] = (window_start, count)
         over_limit = count > max_requests
+        if len(_rate_limit_buckets) > _MAX_RATE_LIMIT_CLIENTS:
+            _prune_rate_limit_buckets(now, window_seconds)
     if over_limit:
         return jsonify(error="too many requests - please slow down and try again shortly"), 429
     return None
@@ -164,7 +180,9 @@ def _access_denied():
         return jsonify(error="access gating is not configured on this server"), 500
 
     supplied_code = request.headers.get("X-Access-Code", "")
-    if not hmac.compare_digest(supplied_code, configured_code):
+    # Bytes, not str: compare_digest raises TypeError (an HTTP 500) for a non-ASCII str, and the
+    # header is whatever the caller sent.
+    if not hmac.compare_digest(supplied_code.encode("utf-8"), configured_code.encode("utf-8")):
         return jsonify(error="missing or invalid access code"), 401
     return None
 
@@ -174,6 +192,11 @@ def _require_upload():
     upload = request.files.get("file")
     if upload is None or not upload.filename:
         return None, (jsonify(error="no file uploaded (form field name must be 'file')"), 400)
+
+    try:
+        upload_name(upload.filename)
+    except ValueError as exc:
+        return None, (jsonify(error=str(exc)), 400)
 
     suffix = Path(upload.filename).suffix.lower()
     if suffix not in SUPPORTED_EXTENSIONS:
@@ -195,9 +218,9 @@ def _upload_path(upload, tmp_dir):
     it. Only the last component is used - the rule ``/api/v1`` already follows,
     so an ordinary upload keeps the same source name in its report - and the
     result is checked to sit directly inside ``tmp_dir``."""
-    name = Path(upload.filename).name
+    name = upload_name(upload.filename)
     path = tmp_dir / name
-    if not name or path.resolve().parent != tmp_dir.resolve():
+    if path.resolve().parent != tmp_dir.resolve():
         raise ValueError("unusable upload filename")
     return path
 

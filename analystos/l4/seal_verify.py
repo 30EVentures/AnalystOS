@@ -52,6 +52,8 @@ LEAF_PREFIX = b"\x00"
 NODE_PREFIX = b"\x01"
 
 _REF_KEYS = ("fact_index", "value_fact", "delta_fact")
+_MAX_REF_DIGITS = 18
+_PAST_ANY_FACT = 10 ** 18
 _PLACEHOLDER_RE = re.compile(r"\{\{(\d+)\}\}")
 _THOUSANDS_SEP_RE = re.compile(r"(?<=\d),(?=\d{3}(?:\D|$))")
 _TRAILING_SCALE_RE = re.compile(r"\s*(?:thousand|million|billion|bn|mm|k|m|b)\s*$", re.IGNORECASE)
@@ -202,6 +204,8 @@ def parse_numbers(text):
         value = float(digits.replace(",", ""))
         if scale:
             value *= _SCALE_WORDS[scale.lower()]
+        if not math.isfinite(value):
+            continue  # a digit run too long for a float is "inf", not a number: it supports no value
         if "-" in sign_part or "(" in sign_part:
             value = -value
         out.append(value)
@@ -238,7 +242,13 @@ def recompute(operation, values, total=None):
 
 
 def _num(text):
-    return float(text)
+    """A sealed number string as a float. NaN and infinity are not amounts: ``float("inf")``
+    accepts the text and ``isclose(inf, inf)`` is true, so a sealed "inf" would agree with a
+    citation that is a run of hundreds of digits."""
+    value = float(text)
+    if not math.isfinite(value):
+        raise ValueError(f"not a finite number: {text!r}"[:60])
+    return value
 
 
 def _same(a, b):
@@ -275,7 +285,12 @@ def _report_refs(node, out):
     if isinstance(node, dict):
         for key, value in node.items():
             if key in _REF_KEYS and isinstance(value, str) and re.fullmatch(r"-?\d+", value):
-                if int(value) >= 0:
+                # int() refuses a string of more than 4300 digits (ValueError). No bundle has that
+                # many facts, so a non-negative reference that long is simply one past the last fact.
+                if len(value.lstrip("-")) > _MAX_REF_DIGITS:
+                    if not value.startswith("-"):
+                        out.add(_PAST_ANY_FACT)
+                elif int(value) >= 0:
                     out.add(int(value))
             else:
                 _report_refs(value, out)
@@ -307,7 +322,24 @@ def _raw_numbers(node, path, out):
 
 
 def verify_bundle(bundle, public_key=None, source_text=None):
-    """Verify a seal bundle; see the module docstring for what each level means."""
+    """Verify a seal bundle; see the module docstring for what each level means.
+
+    Always returns a verdict, never raises: whatever a hostile bundle makes the checks
+    trip over (a value of the wrong type, JSON nested past the recursion limit, an
+    absurdly long number) is a failing ``structure`` check, not an exception. A verifier
+    that crashes is only failing closed for a caller that happens to treat a crash as a
+    refusal; ``POST /api/v1/verify`` is unauthenticated and would have answered 500."""
+    try:
+        return _verify_bundle(bundle, public_key=public_key, source_text=source_text)
+    except Exception as exc:  # noqa: BLE001 - the point is to cover every way a hostile input can break a check
+        return {
+            "ok": False, "authentic": False, "content_checked": False,
+            "checks": [_check("structure", "fail",
+                              f"the bundle could not be verified: it is malformed or nested too deeply ({type(exc).__name__})")],
+        }
+
+
+def _verify_bundle(bundle, public_key=None, source_text=None):
     checks = []
 
     def result():
@@ -408,11 +440,13 @@ def verify_bundle(bundle, public_key=None, source_text=None):
         checks.append(_check("signature", "skipped", "unsigned: integrity only, no claim about who made it"))
     else:
         message = payload_bytes(payload)
-        embedded = _ed25519_verify(sig.get("public_key", ""), sig.get("sig", ""), message)
+        malformed = not (isinstance(sig.get("public_key", ""), str) and isinstance(sig.get("sig", ""), str))
+        embedded = False if malformed else _ed25519_verify(sig.get("public_key", ""), sig.get("sig", ""), message)
         if embedded is None:
             checks.append(_check("signature", "skipped", "install `cryptography` to check the ed25519 signature"))
         elif embedded is False:
-            checks.append(_check("signature", "fail", "the signature does not verify under the key in the bundle"))
+            checks.append(_check("signature", "fail", "the signature fields must be strings" if malformed
+                                 else "the signature does not verify under the key in the bundle"))
         elif public_key is None:
             checks.append(_check("signature", "skipped",
                                  "valid under the key inside the bundle, but no pinned key was supplied, so authenticity is not established"))
@@ -530,8 +564,11 @@ def validate_key_file(doc):
         problems.append(f"format must be {KEY_FILE_FORMAT!r}")
     if not isinstance(doc.get("org"), str) or not doc["org"]:
         problems.append("org must be a non-empty string")
-    for where in _find_private_fields(doc):
-        problems.append(f"{where}: a key file must never contain a private key")
+    try:
+        for where in _find_private_fields(doc):
+            problems.append(f"{where}: a key file must never contain a private key")
+    except RecursionError:  # nested so deep that "no private key anywhere in it" cannot be established
+        problems.append("a key file must not be nested this deeply, so it cannot be checked for a private key")
     keys = doc.get("keys")
     if not isinstance(keys, list) or not keys:
         problems.append("keys must be a non-empty list")
@@ -682,7 +719,7 @@ def main(argv=None, stdout=None):
         _check_expected_key_id(expect_key_id)
         with open(path, encoding="utf-8") as handle:
             bundle = json.load(handle)
-    except (OSError, ValueError, IndexError) as exc:
+    except (OSError, ValueError, IndexError, RecursionError) as exc:
         stdout.write(json.dumps({"error": str(exc)}) + "\n")
         return 2
     if key_file is not None:

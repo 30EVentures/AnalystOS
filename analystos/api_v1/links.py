@@ -38,6 +38,8 @@ def check(key, digest, fmt, exp, sig, now=None):
         exp = int(exp)
     except (TypeError, ValueError):
         return "invalid"
-    if not isinstance(sig, str) or not hmac.compare_digest(sig, _mac(key, digest, fmt, exp)):
+    # Compare bytes: hmac.compare_digest raises TypeError for a str that is not pure ASCII, and
+    # the signature is whatever the caller put in the URL.
+    if not isinstance(sig, str) or not hmac.compare_digest(sig.encode("utf-8"), _mac(key, digest, fmt, exp).encode("ascii")):
         return "invalid"
     return "expired" if (time.time() if now is None else now) >= exp else "ok"

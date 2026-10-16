@@ -23,6 +23,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 
 from api.analyze import _ACCESS_CODE_ENV_VAR, app
+from tests.isolation import reset_rate_limits
 
 _TEST_ACCESS_CODE = "test-access-code"
 
@@ -48,6 +49,7 @@ class AnalyzeEndpointTest(unittest.TestCase):
     Slice 20 pipeline behavior the gating check now sits in front of."""
 
     def setUp(self):
+        reset_rate_limits(self)
         self.client = app.test_client()
         os.environ[_ACCESS_CODE_ENV_VAR] = _TEST_ACCESS_CODE
 

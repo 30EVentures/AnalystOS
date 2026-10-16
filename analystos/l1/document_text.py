@@ -38,6 +38,7 @@ from pptx import Presentation
 
 from analystos.l1 import extract, extract_docx, extract_pdf, extract_pptx, extract_xlsx
 from analystos.l1.footnotes import extract_footnotes_docx
+from analystos.l1.guard import unreadable_is_value_error
 from analystos.l1.image_facts import extract_image_transcripts, render_image_blocks
 from analystos.l1.pdf_columns import extract_page_text
 
@@ -134,23 +135,24 @@ def _text_from_pptx(path, client=None):
 
 def _text_from_pdf(path, client=None):
     chunks = []
-    with pdfplumber.open(path) as pdf:
-        for page_i, page in enumerate(pdf.pages, start=1):
-            lines = [f"Page {page_i}:"]
-            text = extract_page_text(page)  # column-aware - see analystos.l1.pdf_columns
-            if text:
-                lines.append(text.strip())
-            for table in page.extract_tables():
-                try:
-                    # The table this page already gave us goes through the same
-                    # _raw_rows as the schema-driven path, without reopening the
-                    # PDF and re-extracting every page per table (Slice 85).
-                    headers, rows = extract_pdf._raw_rows(path, table=table)
-                    lines.append(_render_table(headers, rows))
-                except ValueError:
-                    pass  # an empty table - skip it, not fatal to the rest
-            if len(lines) > 1:
-                chunks.append("\n".join(lines))
+    with unreadable_is_value_error(path):
+        with pdfplumber.open(path) as pdf:
+            for page_i, page in enumerate(pdf.pages, start=1):
+                lines = [f"Page {page_i}:"]
+                text = extract_page_text(page)  # column-aware - see analystos.l1.pdf_columns
+                if text:
+                    lines.append(text.strip())
+                for table in page.extract_tables():
+                    try:
+                        # The table this page already gave us goes through the same
+                        # _raw_rows as the schema-driven path, without reopening the
+                        # PDF and re-extracting every page per table (Slice 85).
+                        headers, rows = extract_pdf._raw_rows(path, table=table)
+                        lines.append(_render_table(headers, rows))
+                    except ValueError:
+                        pass  # an empty table - skip it, not fatal to the rest
+                if len(lines) > 1:
+                    chunks.append("\n".join(lines))
 
     # Embedded images (charts, scanned exhibits) transcribed via a real
     # vision call - a no-op, no-cost, no-client-required return of []
@@ -193,7 +195,11 @@ def extract_document_text(path, client=None):
             f"unsupported source file type {suffix!r}; "
             f"expected one of {sorted(SUPPORTED_EXTENSIONS)}"
         )
-    text = _EXTRACTORS[suffix](path, client=client).strip()
+    if suffix == ".pdf":
+        text = _EXTRACTORS[suffix](path, client=client).strip()  # parses and calls the model: guarded inside
+    else:
+        with unreadable_is_value_error(path):
+            text = _EXTRACTORS[suffix](path, client=client).strip()
     if not text:
         raise ValueError("document has no readable text")
     return text

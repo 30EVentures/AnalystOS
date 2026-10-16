@@ -24,6 +24,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from api.analyze import app
+from tests.isolation import reset_rate_limits
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
@@ -303,6 +304,9 @@ class AdvertisedPathsExistTest(unittest.TestCase):
 
 
 class OpenApiPathsAreRoutedTest(unittest.TestCase):
+    def setUp(self):
+        reset_rate_limits(self)
+
     def test_every_path_in_the_openapi_document_is_routed(self):
         spec = json.loads(app.test_client().get("/api/v1/openapi.json").get_data())
         paths = sorted(spec["paths"])

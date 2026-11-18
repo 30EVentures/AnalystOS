@@ -2194,3 +2194,24 @@ sees) and refused with 400 above it, rather than silently truncated. (3) `verify
 closed and returns the same verdict, but writes one stderr line naming the exception class (never the message).
 Not done, still the owner's call: the unscaled-table-number rule, audit-line duplicate-key and `NaN` handling, and
 new conformance-corpus cases for a sealed `inf`/`nan`.
+
+## 2026-11-18 — Slice 93: audit lines are strict JSON; corpus cases for non-finite numbers
+
+Closes the two gaps Slice 87 recorded as `known_gap` (above) and that you told the overnight run to leave until a deliberate
+slice. `verify_entries` now parses with `audit_chain.strict_loads`, which refuses a duplicate key at any depth (even two
+equal values: Python keeps the last, another parser the first or fails), the literals `NaN`, `Infinity` and `-Infinity`,
+and a float that overflows to infinity (`1e999`, which is valid JSON text but reads as a different number in a double).
+The writer changed in the same slice, as the 2026-10-07 entry required: `FileStore.append_audit` checks the event with
+`allow_nan=False` and, if it holds a non-finite number, writes an `audit_event_refused` line (original type, fixed reason)
+and a stderr line instead, so the chain keeps growing and a log cannot fail its own verifier. Chosen over raising, which
+would have turned a bad counter into a 500 on a request. `FileStore.read_audit` and `last_chained` still read leniently on
+purpose: a damaged log can still be appended to, and the verifier is the gate. Dedicated tests are in
+`tests/test_slice_93_strict_audit.py`.
+
+Corpus (`conformance/seal-1.json`, 143 to 152 cases): both annotations removed; five new audit cases and four new
+seal-content cases (sealed `inf`, `nan`, `-inf`, and a finite value citing a 400-digit number). Measured: on the code from
+before this slice the seven audit cases (the two old ones and five new) disagree. The seal-content cases pass on today's
+code and are regression pins, and a mutation run showed how much they pin: with the citation parser's finite check and
+`seal_verify._num`'s removed, only the sealed-`inf` / 400-digit case disagrees; with either removed alone, none does (the two
+guards back each other up), and the `nan` and `-inf` cases never disagree under those mutations because other logic
+refuses them. The file changes what a strict runner of this corpus sees; it was not sent to anyone.

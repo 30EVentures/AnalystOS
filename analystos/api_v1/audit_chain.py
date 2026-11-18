@@ -31,6 +31,39 @@ import json
 from analystos.l4 import seal as seal_mod
 from analystos.l4.seal_verify import _b64u_decode, _ed25519_verify, canonical_bytes, sha256_hex
 
+class StrictJSONError(ValueError):
+    """A line that is JSON to Python but not strict JSON (RFC 8259) to every parser."""
+
+
+def _reject_duplicate_keys(pairs):
+    seen = set()
+    for key, _ in pairs:
+        if key in seen:
+            raise StrictJSONError("a key appears twice, so the line means different things to different parsers")
+        seen.add(key)
+    return dict(pairs)
+
+
+def _reject_constant(name):
+    raise StrictJSONError(f"{name} is not a JSON value")
+
+
+def _finite_float(text):
+    value = float(text)
+    if value in (float("inf"), float("-inf")):
+        raise StrictJSONError("a number too large for a double is not portable")
+    return value
+
+
+def strict_loads(raw):
+    """``json.loads`` that refuses what Python quietly accepts and other parsers do not: a duplicate
+    key (Python keeps the last, another parser the first or fails), the literals ``NaN``,
+    ``Infinity`` and ``-Infinity`` (not JSON), and a float that overflows to infinity. Raises
+    ``ValueError`` (``StrictJSONError`` for the portability cases). Slice 93."""
+    return json.loads(raw, object_pairs_hook=_reject_duplicate_keys, parse_constant=_reject_constant,
+                      parse_float=_finite_float)
+
+
 GENESIS = "sha256:" + "0" * 64
 ENTRY_DOMAIN = "analystos.audit-entry/1"
 _UNHASHED = ("entry_hash", "signature")
@@ -94,7 +127,10 @@ def verify_entries(raw_lines, public_key=None, expected_head=None):
         if not raw.strip():
             continue
         try:
-            entry = json.loads(raw)
+            entry = strict_loads(raw)
+        except StrictJSONError as exc:
+            errors.append(f"line {number} is not strict JSON: {exc}")
+            break
         except ValueError:
             errors.append(f"line {number} is not valid JSON")
             break

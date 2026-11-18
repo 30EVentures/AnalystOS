@@ -239,13 +239,14 @@ class FileStore:
             signing_key = load_signing_key()
         except ValueError:
             signing_key = None
+        event = _portable_event(event)
         path = self.root / "audit.jsonl"
         with _AUDIT_THREAD_LOCK, open(path, "a+b") as handle:
             if fcntl is not None:
                 fcntl.flock(handle, fcntl.LOCK_EX)  # released when the handle closes
             head = self._chain_head(handle)
             seq, prev = (0, audit_chain.GENESIS) if head is None else (head[0] + 1, head[1])
-            line = json.dumps(audit_chain.seal_entry(event, seq, prev, signing_key), sort_keys=True) + "\n"
+            line = json.dumps(audit_chain.seal_entry(event, seq, prev, signing_key), sort_keys=True, allow_nan=False) + "\n"
             handle.seek(0, os.SEEK_END)
             if handle.tell() and self._last_byte(handle) != b"\n":
                 line = "\n" + line  # never glue onto a line that was cut short
@@ -285,6 +286,21 @@ class FileStore:
         if not path.exists():
             return []
         return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def _portable_event(event):
+    """``event`` if it is strict JSON, else a marker line that says so. The verifier refuses a
+    ``NaN`` literal (``audit_chain.strict_loads``), so the writer must never produce one: a log
+    that fails its own verifier is worse than a line that says an event was refused. The marker
+    keeps the chain growing, so the event is neither lost silently nor allowed to break the log."""
+    try:
+        json.dumps(event, allow_nan=False)
+        return event
+    except ValueError:
+        kind = event.get("type") if isinstance(event, dict) else None
+        print("[analystos.api_v1.store] an audit event held a non-finite number and was refused", file=sys.stderr)
+        return {"type": "audit_event_refused", "original_type": str(kind)[:40],
+                "reason": "the event held a value that is not valid JSON (not-a-number or infinity)"}
 
 
 def emit_audit(store, event):

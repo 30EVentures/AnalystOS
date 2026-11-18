@@ -332,6 +332,9 @@ def verify_bundle(bundle, public_key=None, source_text=None):
     try:
         return _verify_bundle(bundle, public_key=public_key, source_text=source_text)
     except Exception as exc:  # noqa: BLE001 - the point is to cover every way a hostile input can break a check
+        # The class name only (never the message, which can quote the bundle), so a bug in the
+        # verifier is distinguishable from a hostile bundle in the host's logs. Still fails closed.
+        print(f"[analystos.l4.seal_verify] verify_bundle fault: {type(exc).__name__}", file=sys.stderr)
         return {
             "ok": False, "authentic": False, "content_checked": False,
             "checks": [_check("structure", "fail",

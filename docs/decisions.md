@@ -2180,3 +2180,17 @@ and `llms.txt` links resolved to the studio's own site there: the catalog was a 
 studio's file, not AnalystOS's. Both are now `https://analystos.dev/...`. Chosen over publishing a
 `/.well-known/api-catalog` on the studio domain, which would claim AnalystOS's catalog as the studio's.
 Effect only after deploy; the proxy serves the page from analystos.dev, so no change is needed on the studio side.
+
+## 2026-11-17 — Slice 92: a size cap before the paid call, no upload text in the audit log, a logged verifier fault
+
+Three gaps the overnight hardening run found and left. (1) `analyze_document` refuses over 600,000 characters
+before resolving the client or calling the model: the API would refuse such a request after a paid call, and the
+empty-result retry would resend it. 600,000 is an estimate (about 150k tokens at 4 characters a token), not a
+measured limit of any one model; the refusal names the count and the limit, never text. (2) A job that fails on the
+document no longer writes `str(exc)` to the audit log, because an extractor error can quote a cell and the log has
+no expiry; the line carries a fixed sentence and the exception class. The job record and response keep the message
+(the caller's own upload; purged with the job). `title` is capped at 200 characters (the length the model already
+sees) and refused with 400 above it, rather than silently truncated. (3) `verify_bundle`'s catch-all still fails
+closed and returns the same verdict, but writes one stderr line naming the exception class (never the message).
+Not done, still the owner's call: the unscaled-table-number rule, audit-line duplicate-key and `NaN` handling, and
+new conformance-corpus cases for a sealed `inf`/`nan`.

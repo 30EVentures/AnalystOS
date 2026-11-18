@@ -975,6 +975,12 @@ def _describe_dropped(seg):
     return f"{str(seg.get('type') or '?')[:20]}:{str(cited)[:80]!r}"
 
 
+# About 150k tokens of text at ~4 characters a token: inside the model's context with room for the
+# prompt, the tool schema and the reply (specs/slice-92/spec.md). The figure is an estimate, not a
+# measured limit of any one model.
+MAX_DOCUMENT_CHARS = 600_000
+
+
 def analyze_document(document_text, title, client=None, stats=None):
     """Analyze ``document_text`` with Claude; return a list of *verified*
     segments (see module docstring for the three kinds).
@@ -992,6 +998,14 @@ def analyze_document(document_text, title, client=None, stats=None):
     the model returned), ``verified`` and ``dropped`` counts - the numbers
     behind the charter's ``verification`` measure. Nothing else changes.
     """
+    if len(document_text) > MAX_DOCUMENT_CHARS:
+        # Refused before the client is resolved and before any model call: the API would
+        # refuse it anyway, but only after a paid request, and the empty-result retry below
+        # would send the whole document again. The message carries a count, never text.
+        raise ValueError(
+            f"the document is too long to analyze ({len(document_text):,} characters; "
+            f"the limit is {MAX_DOCUMENT_CHARS:,}) - split it and analyze the parts"
+        )
     client = _resolve_client(client)
     match_document = _match_key(document_text)
     doc_scale = _detect_scale(document_text)

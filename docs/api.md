@@ -8,7 +8,7 @@ index of endpoints: `GET /api/v1`. Errors are always
 |---|---|---|
 | `GET /api/v1` | none | index: version, endpoints, limits |
 | `GET /api/v1/openapi.json` | none | OpenAPI 3.1 |
-| `POST /api/v1/analyses` | API key | upload one document (`multipart`, field `file`, optional `title`); returns the report, its seal and, if storage is configured, links |
+| `POST /api/v1/analyses` | API key | upload one document (`multipart`, field `file`, optional `title` of at most 200 characters, else `400`); returns the report, its seal and, if storage is configured, links |
 | `POST /api/v1/jobs` | API key | same upload; returns immediately, `202 {"id","status":"pending"}` - no model calls yet |
 | `POST /api/v1/jobs/{id}/run` | API key (creator) | run a pending job (idempotent once no longer pending) |
 | `GET /api/v1/jobs/{id}` | API key (creator) | poll a job's status; never executes anything |
@@ -158,8 +158,9 @@ in the store, else stderr): caller name, report id, tier, fallback reason,
 proposed / verified / dropped counts, the model used, whether the seal was
 signed and re-verified. A job run's `analysis` event is identical to
 `/analyses`'s, plus `"via": "job"`, so it counts toward the measures below the
-same way; `job_created` and `job_failed` are separate event types. **No
-document text and no filename.** The three measures in the published charter
+same way; `job_created` and `job_failed` are separate event types (a
+`job_failed` line carries a fixed sentence and the exception class, never the
+error text, which can quote the upload). **No document text and no filename.** The three measures in the published charter
 are computed from it:
 
 ```

@@ -19,6 +19,7 @@ from analystos.api_v1 import auth, links, store as store_mod
 from analystos.api_v1.openapi import build_openapi
 from analystos.l1.detect import SUPPORTED_EXTENSIONS
 from analystos.l1.guard import upload_name
+from analystos.l2.prompt_safety import MAX_TITLE_CHARS
 from analystos.l4.export import render_html
 from analystos.l4.seal import build_bundle, code_version, load_signing_key
 from analystos.l4.seal_verify import canonical_bytes, sha256_hex, verify_bundle
@@ -138,6 +139,9 @@ def create_analysis():
         upload_name(upload.filename)
     except ValueError as exc:
         return _err(400, "bad_request", str(exc))
+    too_long = _title_problem()
+    if too_long:
+        return too_long
     suffix = Path(upload.filename).suffix.lower()
     if suffix not in SUPPORTED_EXTENSIONS:
         return _err(415, "unsupported_media", f"unsupported file type {suffix!r}; expected one of {sorted(SUPPORTED_EXTENSIONS)}")
@@ -227,6 +231,9 @@ def _create_job():
         upload_name(upload.filename)
     except ValueError as exc:
         return _err(400, "bad_request", str(exc))
+    too_long = _title_problem()
+    if too_long:
+        return too_long
     suffix = Path(upload.filename).suffix.lower()
     if suffix not in SUPPORTED_EXTENSIONS:
         return _err(415, "unsupported_media", f"unsupported file type {suffix!r}; expected one of {sorted(SUPPORTED_EXTENSIONS)}")
@@ -262,10 +269,28 @@ def _get_job(job_id):
     return jsonify(_job_body(job_id, meta))
 
 
-def _fail_job(store, job_id, caller, exc):
+def _title_problem():
+    """A ``400`` response when the optional ``title`` form field is over the length the
+    model sees (``MAX_TITLE_CHARS``), else ``None``. It is stored in the job record and
+    printed on the report, so it is bounded up front like the filename."""
+    title = request.form.get("title") or ""
+    if len(title) > MAX_TITLE_CHARS:
+        return _err(400, "bad_request", f"title is too long ({len(title)} characters; the limit is {MAX_TITLE_CHARS})")
+    return None
+
+
+def _fail_job(store, job_id, caller, exc, from_document=False):
+    """Fail a job. ``from_document`` marks an error that can quote the upload (an extractor
+    names the offending cell): the job record and response keep the message, since it is the
+    caller's own upload and goes with the job, but the audit log has no expiry, so its line
+    carries a fixed sentence and the exception class only."""
+    audit_error = (
+        "the document could not be processed (detail withheld: it can quote the upload)" if from_document else str(exc)
+    )
     meta = store.update_job(job_id, status="failed", error=str(exc))
     store.delete_job_upload(job_id)
-    store_mod.emit_audit(store, {"type": "job_failed", "id": job_id, "caller": caller, "error": str(exc)})
+    store_mod.emit_audit(store, {"type": "job_failed", "id": job_id, "caller": caller,
+                                 "error": audit_error, "error_type": type(exc).__name__})
     return jsonify(_job_body(job_id, meta))
 
 
@@ -316,7 +341,7 @@ def _run_job_inner(job_id):
             tmp_path, None, meta.get("title"), evidence_dir=tmp_dir / "evidence", want_pdf=True, trace=trace,
         )
     except ValueError as exc:
-        return _fail_job(store, job_id, caller, exc)
+        return _fail_job(store, job_id, caller, exc, from_document=True)
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)  # never keep the upload
 

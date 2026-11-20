@@ -12,6 +12,7 @@
 
 - [Seal specification](https://analystos.dev/docs/seal.md): How a report is sealed and how anyone re-verifies it offline; includes a worked test vector
 - `POST https://analystos.dev/api/v1/verify`: stateless verification of any seal bundle, no account
+- [Seal verification key](https://analystos.dev/.well-known/analystos-seal-key.json): the public key seals are signed with (analystos-seal-key/1)
 
 ## Identity and the FlashyOS mesh
 

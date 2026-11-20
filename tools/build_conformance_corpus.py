@@ -99,10 +99,7 @@ CASES = []
 
 # Cases the current code is known to get wrong: the case stays strict (it is never weakened), and the
 # runner requires it to keep failing until the entry is removed here. Each needs a decisions.md note.
-KNOWN_GAPS = {
-    "audit/duplicate-key-in-a-line": "verify_entries keeps the last duplicate key silently",
-    "audit/non-finite-number-literal": "verify_entries accepts a NaN literal, which is not JSON",
-}
+KNOWN_GAPS = {}
 
 
 def add(set_, id_, input_, valid, codes=None, note=""):
@@ -265,6 +262,25 @@ add(C, "calculation-does-not-recompute",
     sealcase(make(segments=[SEGMENTS[0], dict(SEGMENTS[1], value=-50.0)], report=None, tier="plain", key=None), source_text=TEXT), False, ["calculations"])
 add(C, "calculation-with-no-operands",
     sealcase(make(segments=[SEGMENTS[0], dict(SEGMENTS[1], operands=[], citation=[])], report=None, tier="plain", key=None), source_text=TEXT), False, ["calculations"])
+BIG = "9" * 400  # a digit run no float holds: float(BIG) is inf
+def sealed_value(value_text, citation=None, text=None):
+    """A bundle whose first fact's sealed value is the string ``value_text``, rebuilt so it is internally consistent
+    (``build_bundle`` itself refuses to seal a NaN or infinity; an attacker who rebuilds the bundle does not)."""
+    text = TEXT if text is None else text
+    bundle = make(segments=[dict(SEGMENTS[0], citation=citation or SEGMENTS[0]["citation"])], report=None, tier="plain", text=text, key=None)
+    bundle = edit(bundle, lambda b: b["facts"][0]["record"].update(value=value_text))
+    return sealcase(rehash_facts(bundle, key=None) | {"signature": None}, source_text=text)
+
+
+add(C, "sealed-infinity-citing-a-400-digit-number", sealed_value("inf", citation=BIG, text=f"Revenue was {BIG}."), False, ["values_match_citations"],
+    "inf is not an amount, and float() reads a 400-digit run as inf, so the two must not be allowed to agree")
+add(C, "sealed-nan-value", sealed_value("nan"), False, ["values_match_citations"],
+    "NaN is not an amount and equals nothing, itself included")
+add(C, "sealed-negative-infinity-value", sealed_value("-inf"), False, ["values_match_citations"], "no sign makes infinity an amount")
+add(C, "finite-value-citing-a-400-digit-number",
+    sealcase(make(segments=[dict(SEGMENTS[0], citation=BIG)], report=None, tier="plain", text=f"Revenue was {BIG}.", key=None),
+             source_text=f"Revenue was {BIG}."), False, ["values_match_citations"],
+    "a 498,000,000 value is not supported by a citation that is not a representable number")
 add(C, "fact-record-is-not-an-object", sealcase(rehash_facts(edit(UNSIGNED, lambda b: b["facts"][2].update(record="just a string")), key=None) | {"signature": None},
     source_text=TEXT), False, note="must be refused, not crash")
 
@@ -363,6 +379,21 @@ add(L, "duplicate-key-in-a-line",
 add(L, "non-finite-number-literal",
     acase([json.dumps(audit_chain.seal_entry(ev(0, proposed=float("nan")), 0, audit_chain.GENESIS, None), sort_keys=True)]), False,
     note="NaN is not valid JSON; a strict parser in another language cannot read the line, so the chain is not portable")
+add(L, "duplicate-key-with-identical-values",
+    acase([UNSIG[0].replace('"seq": 0', '"seq": 0, "seq": 0', 1)] + UNSIG[1:]), False, ["chain"],
+    "both copies agree, so a last-wins parser sees an intact line; it is still refused, because the next parser may not")
+add(L, "duplicate-key-in-a-nested-object",
+    acase(dump(chain(n=1, key=None, events={0: ev(0, detail={"a": 1})})) and [dump(chain(n=1, key=None, events={0: ev(0, detail={"a": 1})}))[0].replace('{"a": 1}', '{"a": 1, "a": 1}', 1)]), False, ["chain"],
+    "the rule applies at every depth")
+add(L, "infinity-literal",
+    acase([json.dumps(audit_chain.seal_entry(ev(0, proposed=float("inf")), 0, audit_chain.GENESIS, None), sort_keys=True)]), False, ["chain"],
+    "Infinity is not valid JSON")
+add(L, "negative-infinity-literal",
+    acase([json.dumps(audit_chain.seal_entry(ev(0, proposed=float("-inf")), 0, audit_chain.GENESIS, None), sort_keys=True)]), False, ["chain"],
+    "-Infinity is not valid JSON")
+add(L, "float-that-overflows-to-infinity",
+    acase([json.dumps(audit_chain.seal_entry(ev(0, proposed=float("inf")), 0, audit_chain.GENESIS, None), sort_keys=True).replace("Infinity", "1e999")]), False, ["chain"],
+    "1e999 is valid JSON text, but it reads as infinity in a double and is not portable")
 
 # --- audit-authentic: valid = authentic ------------------------------------------------------------------
 LA = "audit-authentic"

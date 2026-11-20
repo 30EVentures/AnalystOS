@@ -1,0 +1,14 @@
+{
+  "format": "analystos-seal-key/1",
+  "keys": [
+    {
+      "added": "2026-11-20",
+      "algorithm": "ed25519",
+      "key_id": "5d31bfc65a326e3c",
+      "public_key": "zi3iGW_Xh9XxNjXNlMuxNPXW_4C3sDcYljFPRo6FILA",
+      "status": "active"
+    }
+  ],
+  "org": "analystos",
+  "seal_spec": "https://analystos.dev/docs/seal.md"
+}

@@ -425,6 +425,16 @@ class SmokeSealKeyTest(unittest.TestCase):
         shutil.copytree(ROOT / "site", self.site)
         self.priv, self.pub = new_pair()
         self.key_path = self.site / ".well-known" / "analystos-seal-key.json"
+        # Start every test from "nothing published", whether or not the real repository has published
+        # its key file: these tests pose the not-yet-published case and publish their own test key.
+        self.key_path.unlink(missing_ok=True)
+        # The generated llms.txt links the key file once it is published; drop that link from this copy too.
+        llms = self.site / "llms.txt"
+        llms.write_text(
+            "".join(line for line in llms.read_text(encoding="utf-8").splitlines(keepends=True)
+                    if "analystos-seal-key.json" not in line),
+            encoding="utf-8",
+        )
 
     def publish(self, doc=None):
         self.key_path.write_text(json.dumps(doc if doc is not None else key_file(self.pub)))

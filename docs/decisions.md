@@ -2245,3 +2245,23 @@ and offers on the *live* FlashyOS org (needs the re-minted join-grant token, Fla
 side as of 2026-11-21); switching the live charter from three roles to the seven-role
 team draft (`site/.well-known/flashyos-charter.team.json`, also validated level 2, not
 served - see `ROADMAP.md`); domain verification (explicitly Flashy's, not started).
+
+## 2026-11-21 — Slice 95: a draft seven-role team charter, kept out of site/
+
+Drafted `drafts/flashyos-charter.team.json` (coordination, research, analysis,
+verification, synthesis, evidence, client-delivery) from Flashy's 18/21 Nov
+integration documents and validated it for real against `@flashyos/aao@0.4.2` and
+`@flashyos/conformance@0.2.3`: zero validator errors, all five static conformance
+checks pass, and `auditProperty` returns level 2 with zero issues when every role
+name and discovery slug is declared.
+
+Put it in `drafts/`, not `site/.well-known/`, on purpose: a file under `site/` is
+served the moment a deploy ships it, whether or not anything links to it, so an
+ordinary merge-and-deploy could not accidentally publish a charter nobody decided to
+publish. `tests/test_seven_role_charter.py::DraftLocationTest` holds that boundary.
+
+Not switched live, and not something a loop should decide on its own: a served
+charter is a public governance claim, and declaring four new roles with no agent
+behind them and four discovery slugs with no endpoint behind them would be exactly
+the gamed metric `docs/mesh-identity.md` exists to refuse. `drafts/README.md` records
+what switching would actually need. Recorded as an owner decision in `ROADMAP.md`.

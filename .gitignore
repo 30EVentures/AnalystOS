@@ -31,3 +31,7 @@ jobs/
 # Node tooling used only to run the real FlashyOS validators in tests (Slice 94)
 node_modules/
 tools/flashyos-check/package-lock.json
+
+# AnalystOS's own MCP server (Slice 100): real npm deps, not committed
+mcp-server/node_modules/
+mcp-server/package-lock.json

@@ -2409,3 +2409,29 @@ entry's `by` field or in `.shiplog/config.json`.
 Not done, the owner's call: flipping `visibility` to `"public"`, and handing the
 served URL to Flashy's fan-in (one commit on their side once there is a real URL -
 there is not yet, since nothing here is deployed). Recorded in `ROADMAP.md`.
+
+## 2026-11-21 — Slice 100: AnalystOS's own MCP server, with fenced untrusted text
+
+Flashy's 21 Nov reply answered this directly: build your own server rather than
+route through `@flashyos/mcp`, which was still 0.6.0 (the F-01 fence unpublished)
+when checked, and importing a third party's unfixed injection surface into a
+document-analysis product's own tools would be the wrong trade regardless.
+
+`mcp-server/server.mjs` runs on the real, published `@modelcontextprotocol/sdk@1.32.2`
+and exposes two tools, `verify_report` and `check_acceptance`, both thin wrappers
+over `mcp-server/analystos_bridge.py`, which calls the real, already-tested
+`verify_bundle` and `document_analysis_acceptance` - no verification logic is
+duplicated in JavaScript, continuing the rule this session already learned the hard
+way in Slice 96.
+
+`mcp-server/untrusted.mjs::fence()` mirrors Flashy's own F-01 fix rather than
+inventing a different approach: any caller-supplied free text is wrapped in
+delimiters keyed to a fresh random nonce per call, so a forged closing marker
+inside the untrusted text cannot close the fence early. `mcp-server/test.mjs`
+proves this for real, over actual stdio with the official SDK's `Client` and
+`StdioServerTransport` (not a mock): a genuine prompt-injection string asking the
+server to report `ok: true` regardless of the real result is sent as
+`counterparty_note`, shown to change nothing about the structured verdict, and
+shown to still be returned verbatim inside its fence - a human or a model reading
+the response can see exactly what was said without executing it. `tests/test_mcp_server.py`
+wires the real Node suite into `python3 -m unittest discover`.

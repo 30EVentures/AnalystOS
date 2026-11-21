@@ -62,3 +62,16 @@ per Slice 84, so every value is correctly `null`). It is a draft only because Fl
 format - propose it to them before publishing, not because the numbers need guarding.
 
 To recompute against a real store directory: `python3 tools/build_measures.py --store-dir PATH`.
+
+## `playbook-document-analysis.json`
+
+A `playbook/1` document for AnalystOS's one real offer, validated against the real
+`@flashyos/playbook@0.2.0` and proven against this repo's own running Flask app and
+seal verifier (`tests/test_playbook.py`; see `docs/decisions.md`, Slice 97). Not
+served, for the same reason as the other drafts: there is no live joint-initiative
+infrastructure on either side to instantiate it against yet, and Flashy's own
+`recipeKey` discovery path is not confirmed.
+
+The acceptance check it references, `analystos/l4/acceptance.py::document_analysis_acceptance`,
+is real product code (not a draft) - a client can run it today against any bundle
+AnalystOS hands over, independent of anything in this file.

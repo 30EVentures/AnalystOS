@@ -108,3 +108,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 94 | the handshake declares the charter's role names | [spec](slice-94/spec.md) |
 | 95 | draft and validate the seven-role team charter | [spec](slice-95/spec.md) |
 | 96 | a measures/1 document, computed from the real audit log | [spec](slice-96/spec.md) |
+| 97 | a playbook for the document-analysis offer, and acceptance as a check | [spec](slice-97/spec.md) |

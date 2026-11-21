@@ -2296,3 +2296,40 @@ live production run would correctly show every value as `null`, because Slice 84
 recorded the audit log as dormant until a persistent volume exists. Publishing it is
 still left as a decision, not because the content is risky, but because the path
 itself is not yet agreed with Flashy.
+
+## 2026-11-21 — Slice 97: a playbook for document-analysis, acceptance as a check
+
+The Engageable Workforce document's two remaining asks for the purchase layer -
+a `playbook/1` per sellable engagement, and acceptance criteria written as a test -
+both exist now, built on code this repo already has.
+
+`@flashyos/playbook@0.2.0` turned out to be richer than the integration documents'
+description suggested: a closed, 13-key catalogue of inter-organisation
+collaboration *types* (data-pilot, joint-research, integration, ...), each with
+roles, steps, dependencies (`after`) and one of four evidence kinds (`url`,
+`sealed`, `endpoint`, `attested`), plus `checkClaim`/`verifyEvidence` functions a
+caller supplies real verifiers to. A hand-authored document outside that catalogue
+still validates (`isPlaybook`/`validate` do not require a known key), so
+`drafts/playbook-document-analysis.json` maps AnalystOS's one real offer onto the
+real shape: `coordination` accepts scope, `research` gathers sources (closing on
+the client's attestation, never a published URL - the same reasoning the built-in
+`data-pilot` playbook states for its own step), `analysis` and `verification` both
+close against the real, unauthenticated `POST /api/v1/verify` endpoint (one checks
+it answers at all, the other checks its body actually says `content_checked`),
+`evidence` closes on `sealed` evidence (a future shipped/1 entry; honestly
+`unverified` today, since Track C does not exist yet - checked for real with
+`verifyEvidence` and no verifier supplied, not merely asserted), and
+`client-delivery` closes on the real signed-link URL shape.
+
+`analystos/l4/acceptance.py::document_analysis_acceptance` is the acceptance check:
+built entirely on `verify_bundle`, requires the source text (treats its absence as
+a failure - a client holds its own document and should supply it, and accepting a
+check that was never run would be the exact gamed metric this is meant to prevent),
+and never raises on a hostile bundle. Its `CRITERIA` constant is the same text used
+in the playbook's `seal-the-report` step brief, so the two documents cannot
+silently disagree about what "accepted" means.
+
+Both the playbook and the acceptance check are proven against this repo's own
+running Flask app and real seal verifier (`tests/test_playbook.py`), not only
+validated as shapes - including a negative case (self-attestation refused) proving
+the real validator's checks are not vacuous.

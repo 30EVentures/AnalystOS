@@ -1,0 +1,56 @@
+{
+  "playbook": "1",
+  "id": "playbook/analystos/document-analysis-engagement",
+  "title": "Document analysis engagement",
+  "summary": "AnalystOS analyzes a counterparty's source documents and delivers a sealed report in which every figure is a verified quote or an independently recomputed calculation. Every step closes with real evidence - never a claim either side merely asserts.",
+  "roles": ["coordination", "research", "analysis", "verification", "evidence", "client-delivery"],
+  "steps": [
+    {
+      "id": "accept-engagement-scope",
+      "role": "coordination",
+      "title": "Accept the engagement scope and its acceptance criteria",
+      "brief": "Agree the question, the source documents in scope, and the acceptance criteria this delivery will be judged against (see analystos/l4/acceptance.py::CRITERIA, agreed before any work starts, not after). Closes on the client's attestation that the scope and criteria are what they asked for.",
+      "evidence": "attested"
+    },
+    {
+      "id": "gather-and-record-sources",
+      "role": "research",
+      "title": "Gather the source documents and record where each came from",
+      "brief": "Collect the documents the engagement needs and record their provenance. Never publishes the documents themselves - closes on the client's attestation that the sources used are the ones they provided, not on a URL (the data-pilot playbook's own reasoning: a manifest, never the raw data).",
+      "evidence": "attested",
+      "after": ["accept-engagement-scope"]
+    },
+    {
+      "id": "draft-the-cited-report",
+      "role": "analysis",
+      "title": "Draft a cited report from verified facts only",
+      "brief": "Every figure is either a quote checked against the source or a calculation the software redoes itself; anything unproven is dropped before a reader sees it. Closes by actually calling the unauthenticated POST /api/v1/verify endpoint with the sealed bundle and getting a 200 back - proving the bundle is well-formed and processable, not merely that a report-shaped file exists.",
+      "evidence": "endpoint",
+      "after": ["gather-and-record-sources"]
+    },
+    {
+      "id": "recompute-and-refuse",
+      "role": "verification",
+      "title": "Recompute every calculation and refuse any figure that fails",
+      "brief": "The same POST /api/v1/verify call as the previous step, but this time the response body itself is the evidence: it must contain \"content_checked\":true, which is only true when verify_bundle actually re-checked every citation and calculation against the source text and found none of them unproven.",
+      "evidence": "endpoint",
+      "after": ["draft-the-cited-report"]
+    },
+    {
+      "id": "seal-the-report",
+      "role": "evidence",
+      "title": "Seal the report so a stranger can re-verify it offline",
+      "brief": "The delivered bundle's own digest, recorded as a shipped/1 entry once this repo's record plane (drafts/README.md, Track C) is live, so that sealing this specific delivery is itself a checkable, dated event - not only the seal inside the bundle.",
+      "evidence": "sealed",
+      "after": ["recompute-and-refuse"]
+    },
+    {
+      "id": "deliver-and-answer-questions",
+      "role": "client-delivery",
+      "title": "Hand over the report and log every question it raises",
+      "brief": "Deliver the sealed report through a signed, expiring link (POST /api/v1/links) and log every client question against it. Closes with that link as the evidence - a real https:// URL the client can open.",
+      "evidence": "url",
+      "after": ["seal-the-report"]
+    }
+  ]
+}

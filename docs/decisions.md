@@ -2265,3 +2265,32 @@ charter is a public governance claim, and declaring four new roles with no agent
 behind them and four discovery slugs with no endpoint behind them would be exactly
 the gamed metric `docs/mesh-identity.md` exists to refuse. `drafts/README.md` records
 what switching would actually need. Recorded as an owner decision in `ROADMAP.md`.
+
+## 2026-11-21 — Slice 96: measures/1, computed from the real audit log
+
+Flashy's 21 Nov reply committed to *pull* a measures document from AnalystOS rather
+than have it push one, and named neither the path nor the format. Proposed both,
+backed by a real computation rather than placeholder numbers: `analystos/api_v1/measures.py`
+answers each live role's measure from fields `analystos/api_v1/store.py` already
+writes on every analysis (`tier`, `proposed`, `dropped`, `seal_ok`) - no new
+instrumentation. `tier == "written"` is only reached in `analystos/pipeline.py`
+after both Gate 1 and Gate 2 pass, so it is exactly the `analysis` role's measure;
+`dropped`/`proposed` are exactly the `verification` role's; `seal_ok` is the result
+of actually re-running `verify_bundle` at delivery time, which is exactly the
+`evidence` role's.
+
+`tests/test_measures.py` writes real events through `FileStore.append_audit` and
+checks the numbers against the real chained log, not a mock. An empty denominator
+is `null`, never a fake 0% or 100%; the measure sentence is always copied from the
+charter, never retyped; the window is always stated, never derived from the clock
+at read time. `tools/build_measures.py --check` replays the same window and store
+and compares the result, rather than diffing against a moving "now" (which could
+never pass twice by construction).
+
+In `drafts/`, not `site/.well-known/`, for the same reason as the Slice 95 charter
+draft: Flashy has not confirmed a path or format, so this is a proposal. Unlike the
+charter draft, nothing here could assert something false if served as-is today - a
+live production run would correctly show every value as `null`, because Slice 84
+recorded the audit log as dormant until a persistent volume exists. Publishing it is
+still left as a decision, not because the content is risky, but because the path
+itself is not yet agreed with Flashy.

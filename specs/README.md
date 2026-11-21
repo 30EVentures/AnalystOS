@@ -107,3 +107,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 93 | audit lines are strict JSON, and the conformance corpus covers non-finite numbers | [spec](slice-93/spec.md) |
 | 94 | the handshake declares the charter's role names | [spec](slice-94/spec.md) |
 | 95 | draft and validate the seven-role team charter | [spec](slice-95/spec.md) |
+| 96 | a measures/1 document, computed from the real audit log | [spec](slice-96/spec.md) |

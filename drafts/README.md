@@ -49,3 +49,15 @@ six agents exist: copy this file over `site/.well-known/flashyos-charter.json` a
 `site/flashyos.roles.json` (keep them byte-identical, per `tests/test_mesh_identity.py`),
 run `python3 tools/refresh.py`, and run the full suite. Do this on a branch and open a
 PR; nothing in this repository's tooling does it for you, by design.
+
+## `measures.json`
+
+A `measures/1` document, computed from the real audit log by `analystos/api_v1/measures.py`
+and built by `tools/build_measures.py` (see `docs/decisions.md`, Slice 96, and
+`tests/test_measures.py`). Unlike the charter draft above, this one asserts nothing
+false even in its current, honestly-empty state (production's audit log is dormant
+per Slice 84, so every value is correctly `null`). It is a draft only because Flashy's
+21 Nov reply committed to pull a measures document but has not confirmed a path or a
+format - propose it to them before publishing, not because the numbers need guarding.
+
+To recompute against a real store directory: `python3 tools/build_measures.py --store-dir PATH`.

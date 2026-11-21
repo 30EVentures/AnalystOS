@@ -2376,3 +2376,36 @@ Recorded as an owner decision in `ROADMAP.md`, not acted on unilaterally: nothin
 using "decision-grade" is served anywhere (`drafts/defined-analystos.json` is the
 only place it appears, and it is in `drafts/`, unserved). Get real trademark advice
 before publishing it or using it anywhere public, including in a pitch or a page.
+
+## 2026-11-21 — Slice 99: shipped/1 and devlog/1, adopted for real
+
+Of every record plane drafted this session, this is the one Flashy's own 21 Nov
+reply said is real and already large (25,014 leaves, 23 sources) and pays off at
+N=1 - it needs no counterparty. Unlike the charter, measures, playbook and defined
+drafts, "adopt it now" is itself correct, because the tool's first-run default is
+`visibility: "private"`: adopting publishes nothing.
+
+Deepened the checkout (it had been cloned shallow at depth 1) to get real git
+history, then ran the actual `@flashyos/shiplog@0.2.0` CLI: `flashy-shiplog adopt`
+(writing `.shiplog/config.json` and `vendor-shiplog.mjs`, `--no-workflow` so it
+does not add a CI job on its own authority) and `node vendor-shiplog.mjs emit`
+(producing `shiplog.fragment.json`, `devlog.fragment.json`, and the served public
+projection at `drafts/devlog.fragment.json`, kept in `drafts/` per every other
+draft's rule rather than `site/`). `flashy-shiplog check` reports every seal
+recomputed, and is shown to actually refuse a tampered copy in
+`tests/test_shiplog.py`, not merely asserted to.
+
+The tool correctly auto-detected a real `prBase` from this repository's GitHub
+remote, avoiding the opaque-ref silent failure the 18 Nov document warned about.
+
+Privacy note: the real run reported two unmapped commit-author emails, one of them
+the repository owner's personal address. Neither is written into any committed
+file - both already fall back to the safe `defaultAuthor` node id, which is the
+correct behaviour and needed no change; adding an explicit mapping would only have
+meant typing a personal email into a tracked file for no behavioural gain, so this
+was deliberately not done. `tests/test_shiplog.py` proves no email appears in any
+entry's `by` field or in `.shiplog/config.json`.
+
+Not done, the owner's call: flipping `visibility` to `"public"`, and handing the
+served URL to Flashy's fan-in (one commit on their side once there is a real URL -
+there is not yet, since nothing here is deployed). Recorded in `ROADMAP.md`.

@@ -110,3 +110,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 96 | a measures/1 document, computed from the real audit log | [spec](slice-96/spec.md) |
 | 97 | a playbook for the document-analysis offer, and acceptance as a check | [spec](slice-97/spec.md) |
 | 98 | a defined/1 vocabulary fragment for AnalystOS's own terms | [spec](slice-98/spec.md) |
+| 99 | adopt shipped/1 and devlog/1 for real, with @flashyos/shiplog@0.2.0 | [spec](slice-99/spec.md) |

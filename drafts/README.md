@@ -90,3 +90,13 @@ moment one is added without this note being updated). The 18 Nov integration
 document named exactly this - a fragment whose basis pages 404 - as the mistake to
 avoid. Build the pages, or decide to publish with 404 links anyway and say why,
 before serving this anywhere; see `ROADMAP.md`.
+
+## `devlog.fragment.json` (the served projection)
+
+The public projection of this repository's real `shipped/1`/`devlog/1` record
+(root `shiplog.fragment.json` and `devlog.fragment.json` are the full, private
+source - see `docs/decisions.md`, Slice 99). Currently has zero entries, matching
+`.shiplog/config.json`'s `visibility: "private"`. Unlike every other file in this
+directory, the *record itself* is real and already committed at the repo root;
+only this served copy, and the decision to flip visibility and hand the URL to
+Flashy's fan-in, remain open - see `ROADMAP.md`.

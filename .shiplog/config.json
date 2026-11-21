@@ -1,0 +1,13 @@
+{
+  "source": "repo/analystos",
+  "org": "org/analystos",
+  "assertedBy": "agent/analystos-ci",
+  "defaultAuthor": "person/accountable-human",
+  "authors": {
+    "noreply@anthropic.com": "agent/claude"
+  },
+  "visibility": "private",
+  "lexicon": "imperative",
+  "prBase": "https://github.com/30EVentures/analystos/pull/",
+  "serve": "drafts/devlog.fragment.json"
+}

@@ -75,3 +75,18 @@ infrastructure on either side to instantiate it against yet, and Flashy's own
 The acceptance check it references, `analystos/l4/acceptance.py::document_analysis_acceptance`,
 is real product code (not a draft) - a client can run it today against any bundle
 AnalystOS hands over, independent of anything in this file.
+
+## `defined-analystos.json`
+
+A `defined/1` fragment for the three terms AnalystOS can own outright (analyst
+agent, decision-grade output, deliverable acceptance criteria; see
+`docs/decisions.md`, Slice 98). `@flashyos/defined` is unpublished, so
+`tools/defined_proxy_validator.py` checks only the *documented* rules - it says so
+in its own docstring and is never a substitute for Flashy's real checker.
+
+**Known, checked-for gap:** every entry's `basis` URL points at a `/defined/<slug>`
+page that does not exist in `site/` yet (`tests/test_defined_fragment.py` fails the
+moment one is added without this note being updated). The 18 Nov integration
+document named exactly this - a fragment whose basis pages 404 - as the mistake to
+avoid. Build the pages, or decide to publish with 404 links anyway and say why,
+before serving this anywhere; see `ROADMAP.md`.

@@ -2333,3 +2333,29 @@ Both the playbook and the acceptance check are proven against this repo's own
 running Flask app and real seal verifier (`tests/test_playbook.py`), not only
 validated as shapes - including a negative case (self-attestation refused) proving
 the real validator's checks are not vacuous.
+
+## 2026-11-21 — Slice 98: a defined/1 fragment for AnalystOS's own terms
+
+Drafted `drafts/defined-analystos.json` for the three terms the 18 Nov integration
+document found AnalystOS can own outright - analyst agent, decision-grade output,
+deliverable acceptance criteria - none used anywhere in the estate's term map or
+AUTHORITY register. `deliverable-acceptance-criteria` links `decision-grade-output`
+via `seeAlso` rather than restating it, matching the estate's own one-owner-per-term
+rule even though nothing here enforces it.
+
+`@flashyos/defined` is not on the npm registry (404, checked 2026-11-21) and has no
+publicly readable source, unlike every other format checked in `tools/flashyos-check/`.
+`tools/defined_proxy_validator.py` checks the *documented* rules instead - says so
+plainly in its own module docstring, so nobody mistakes a pass here for the real
+checker's verdict. Every rule (definition length, expiry-not-derived, https basis,
+the fourteen forbidden entry keys, the seven forbidden citation keys) is proven to
+actually fire against a constructed violation in `tests/test_defined_fragment.py`,
+not only asserted against the one real fragment.
+
+Known gap, checked for rather than assumed away: the fragment's `basis` URLs point
+at `/defined/<slug>` pages that do not exist in `site/` yet - exactly the mistake
+the 18 Nov document named (mlgblockchain's six dead `/defined/<slug>` links) as "the
+mistake not to repeat". `tests/test_defined_fragment.py` fails if a page under that
+path is ever added without updating the test, so the gap cannot be silently closed
+by accident. `ROADMAP.md` records it as open: write the three basis pages, or decide
+to publish with 404 links and say why, before serving this fragment anywhere.

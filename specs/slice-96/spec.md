@@ -10,10 +10,12 @@ the proposal with a real computation, not placeholder numbers.
 
 ## Done when
 
-1. `analystos/api_v1/measures.py` computes each of the three live roles' measure
-   from fields `analystos/api_v1/store.py` already writes to the audit log
-   (`tier`, `proposed`, `dropped`, `seal_ok`) - no new instrumentation added.
-2. An empty denominator is `null`, never 0% or 100%.
+1. `tools/build_measures.py` wraps the existing, already-tested `analystos.api_v1.audit.measures()`
+   (Slice 61) in a measures/1 envelope - it does not recompute the arithmetic itself.
+   (First draft of this slice duplicated the arithmetic as a new module before this
+   was noticed; see `docs/decisions.md` for the correction.)
+2. An empty denominator is `null`, never 0% or 100% (already true of `audit.measures()`;
+   this slice does not change that property, only wraps it).
 3. The measure sentence in the output is copied from the charter, never retyped,
    so the two can never disagree.
 4. The window (`since`/`until`) is always stated explicitly in the output, never
@@ -34,7 +36,7 @@ the proposal with a real computation, not placeholder numbers.
   and then the owner's decision to publish, same as every other draft here.
 - New instrumentation for a role that is not yet measurable (there are none among
   the three live roles today, but the seven-role draft's four new roles have no
-  measure formula here, and `measures.py` says so honestly rather than guessing).
+  entry in `audit.measures()`, and the envelope says so honestly rather than guessing).
 - Wiring this against the *live* production audit log, which Slice 84 recorded as
   dormant until `ANALYSTOS_STORE_DIR` is a persistent volume - until then, a real
   run against production would honestly show every value as `null`, which this

@@ -52,8 +52,9 @@ PR; nothing in this repository's tooling does it for you, by design.
 
 ## `measures.json`
 
-A `measures/1` document, computed from the real audit log by `analystos/api_v1/measures.py`
-and built by `tools/build_measures.py` (see `docs/decisions.md`, Slice 96, and
+A `measures/1` document, wrapping the existing `analystos.api_v1.audit.measures()`
+(Slice 61) in a window/charter-URL envelope, built by `tools/build_measures.py`
+(see `docs/decisions.md`, Slice 96, and
 `tests/test_measures.py`). Unlike the charter draft above, this one asserts nothing
 false even in its current, honestly-empty state (production's audit log is dormant
 per Slice 84, so every value is correctly `null`). It is a draft only because Flashy's

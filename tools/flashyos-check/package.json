@@ -1,9 +1,10 @@
 {
   "name": "analystos-flashyos-check",
   "private": true,
-  "description": "Pinned FlashyOS conformance tooling, used only by tests/test_build_flashyos_handshake.py and tests/test_seven_role_charter.py to validate this repo's served charter and handshake against the real, published validators. Not part of the deployed site.",
+  "description": "Pinned FlashyOS conformance tooling, used only by this repo's tests to validate served/drafted files against the real, published validators. Not part of the deployed site.",
   "dependencies": {
     "@flashyos/aao": "0.4.2",
-    "@flashyos/conformance": "0.2.3"
+    "@flashyos/conformance": "0.2.3",
+    "@flashyos/playbook": "0.2.0"
   }
 }

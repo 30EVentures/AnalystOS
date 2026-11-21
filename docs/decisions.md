@@ -2266,26 +2266,28 @@ behind them and four discovery slugs with no endpoint behind them would be exact
 the gamed metric `docs/mesh-identity.md` exists to refuse. `drafts/README.md` records
 what switching would actually need. Recorded as an owner decision in `ROADMAP.md`.
 
-## 2026-11-21 — Slice 96: measures/1, computed from the real audit log
+## 2026-11-21 — Slice 96: measures/1, an envelope around the existing audit.measures()
 
 Flashy's 21 Nov reply committed to *pull* a measures document from AnalystOS rather
-than have it push one, and named neither the path nor the format. Proposed both,
-backed by a real computation rather than placeholder numbers: `analystos/api_v1/measures.py`
-answers each live role's measure from fields `analystos/api_v1/store.py` already
-writes on every analysis (`tier`, `proposed`, `dropped`, `seal_ok`) - no new
-instrumentation. `tier == "written"` is only reached in `analystos/pipeline.py`
-after both Gate 1 and Gate 2 pass, so it is exactly the `analysis` role's measure;
-`dropped`/`proposed` are exactly the `verification` role's; `seal_ok` is the result
-of actually re-running `verify_bundle` at delivery time, which is exactly the
-`evidence` role's.
+than have it push one, and named neither the path nor the format. First draft of
+this slice duplicated the arithmetic as a new `analystos/api_v1/measures.py` before
+noticing `analystos.api_v1.audit.measures()` (Slice 61) already computes exactly
+these three numbers from the audit log - `tier == "written"` for the `analysis`
+role, `dropped`/`proposed` for `verification`, `seal_ok` for `evidence` - and is
+already called by `python3 -m analystos.api_v1 measures`, already tested
+(`tests/test_api_v1.py::MeasuresTest`). The duplicate file was deleted; what this
+slice actually adds is the envelope that function never had: a stated window
+(never derived from the clock at read time), the charter's own measure sentence
+copied in rather than retyped a second time, and a path. `tools/build_measures.py`
+calls `audit.measures()` directly - see its module docstring.
 
-`tests/test_measures.py` writes real events through `FileStore.append_audit` and
-checks the numbers against the real chained log, not a mock. An empty denominator
-is `null`, never a fake 0% or 100%; the measure sentence is always copied from the
-charter, never retyped; the window is always stated, never derived from the clock
-at read time. `tools/build_measures.py --check` replays the same window and store
-and compares the result, rather than diffing against a moving "now" (which could
-never pass twice by construction).
+`tests/test_measures.py` tests only what is new (the envelope, the CLI, honest
+handling of a role `audit.measures()` does not know about) and a belt-and-braces
+check that the envelope's numbers agree with that function called directly on the
+same log; the arithmetic itself keeps its existing coverage in `test_api_v1.py`
+rather than being re-tested under a different name. `tools/build_measures.py --check`
+replays the same window and store and compares the result, rather than diffing
+against a moving "now" (which could never pass twice by construction).
 
 In `drafts/`, not `site/.well-known/`, for the same reason as the Slice 95 charter
 draft: Flashy has not confirmed a path or format, so this is a proposal. Unlike the

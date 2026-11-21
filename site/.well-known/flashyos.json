@@ -4,5 +4,14 @@
     "slug": "analystos",
     "name": "AnalystOS",
     "profile": "https://analystos.dev"
-  }
+  },
+  "capabilities": [
+    "analysis",
+    "client-delivery",
+    "coordination",
+    "evidence",
+    "research",
+    "synthesis",
+    "verification"
+  ]
 }

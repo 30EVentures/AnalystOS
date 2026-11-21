@@ -2,6 +2,94 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-21 — "decision-grade output" renamed to "action-ready output" (owner's decision)
+
+The 2026-11-21 trademark check (recorded separately, same date, below) found a live
+USPTO filing on DECISION-GRADE in AnalystOS's own services class, plus Beroe Inc.'s
+existing "Decision Grade Intelligence" branding in an adjacent category - stronger
+risk than a plain web search for "no trademark found" would suggest. Owner's
+decision: drop the term rather than wait on counsel, since nothing public depended
+on it yet.
+
+`drafts/defined-analystos.json`'s entry renamed: id `defined/analystos/decision-grade-output`
+-> `defined/analystos/action-ready-output`, term "Decision-grade output" -> "Action-ready
+output", same definition and dates. `deliverable-acceptance-criteria`'s `seeAlso`
+reference updated to match. `tests/test_defined_fragment.py` updated (the two tests
+asserting the old term's exact string); `drafts/README.md` and `ROADMAP.md` updated.
+Nothing in `shiplog.fragment.json`/`devlog.fragment.json` was touched - those are a
+hash-chained historical record of the trademark check itself being run, not a live
+assertion of the term, and rewriting a committed shiplog entry would break its own
+verification.
+
+## 2026-11-21 — seven-role charter switched live (owner's decision, builds on Slice 95)
+
+Owner's decision on the ROADMAP item carried since Slice 95: serve the seven-role
+team charter (coordination, research, analysis, verification, synthesis, evidence,
+client-delivery) rather than keep the original three. `drafts/flashyos-charter.team.json`
+(validated zero-errors against the real `@flashyos/aao@0.4.2`, level 2 under
+`auditProperty`) is now copied byte-identical to `site/.well-known/flashyos-charter.json`
+and `site/flashyos.roles.json`; `tools/build_flashyos_handshake.py` regenerated
+`flashyos.json`'s `capabilities` to all seven role names.
+
+What this does **not** do, by design (drafts/README.md's former "why it is not the
+live charter" risks #2 and #3, now moved to ROADMAP.md's Blocked list): no agent was
+minted for the four new roles, and none of their `x-capability` discovery slugs
+(`engagement-coordination`, `source-research`, `cross-document-synthesis`,
+`analyst-briefing`) were declared anywhere - the handshake derives only role *names*
+(Slice 94's already-established rule: a role name restates a governance fact the
+charter already publishes; a discovery slug claims something is callable). Minting
+the agents needs the re-minted join-grant token; declaring the slugs needs four
+endpoints that do not exist in this codebase yet.
+
+Two tests had to change to stay honest rather than to make this pass by weakening a
+real check: `tests/test_mesh_identity.py::CharterTest::test_no_role_claims_a_capability_the_product_lacks`
+now asserts the original three roles' capabilities are unchanged *and* names exactly
+the new roles' declared (not yet code-backed) capabilities, instead of silently
+accepting whatever the charter says. `tests/test_api_v1.py::MeasuresTest::test_measure_text_matches_the_published_charter`
+now checks `measures()`'s output is a subset of the charter's roles with matching
+text, not an exact match - `measures()` (Slice 61/96) was already honest about
+computing a share only for roles with a real audit-log event type, and the exact-match
+version of the test would have forced either a fabricated number for the four new
+roles or a weaker `measures()`; neither was the right fix.
+
+## 2026-11-21 — Slice 103: a bare scaled-table number is stored at its real size, not as-is
+
+Owner's decision on the PROPOSALS item carried since the 2026-10-14 overnight run
+(slice-33): **scale it**, not "fix the docstring to admit the bug." The old
+`_value_matches_text` tried the bare candidate before the scaled one and
+returned the first match, so a model that left a table cell unscaled (document
+"in millions", cell "1,842.0", model proposes 1842.0) got that figure stored and
+rendered at the wrong, 1,000,000x-too-small size - even though its own docstring
+already claimed the opposite.
+
+Fixed by making "has its own scale word" (`$1.2 million`) a precondition for
+`doc_scale` *not* applying, and `doc_scale` the only candidate tried for a bare
+citation when one is declared: `_value_matches_text(1_842.0, "1,842.0", 1_000_000)`
+now returns `None`, not `1842.0`. With no declared scale (`doc_scale == 1`)
+nothing changes.
+
+`analystos/l4/seal_verify.py::value_supported` carries its own, independent
+re-implementation of this match for the offline verifier - by design, so a
+stranger re-checking a seal is not trusting the same code that sealed it. Fixed
+the same way there (`_has_own_scale_word` added, `doc_scale` applied only to a
+bare citation), confirmed by the differential test
+(`tests/test_l4_seal_values.py::DifferentialAgainstTheAnalyzerTest`) that the two
+independent implementations still agree.
+
+Two existing tests encoded the old, now-rejected behaviour as their stated goal
+and were rewritten rather than deleted: `test_value_matches_text_accepts_the_declared_scale`
+now asserts the bare-vs-bare case is refused, and
+`test_growth_on_scaled_table_operands_verifies_even_if_left_unscaled` is split into
+`..._verifies_when_scaled` (passes) and `..._is_dropped_if_left_unscaled` (now
+correctly raises, proving the fix - a model that leaves a figure unscaled gets
+nothing stored for it, rather than something wrong).
+
+Not in this slice (documented as a known limitation in `_has_own_scale_word`'s
+docstring, not solved): a quoted string citing several numbers where some carry
+their own scale word and some are bare in the same string. Treated as a property
+of the whole string; the conservative choice never double-scales, at the cost of
+not perfectly handling that rare mixed case.
+
 ## 2026-10-11 - pin the key out of band, never see the seed, never mistake "no check failed" for "authentic" (Slice 90)
 
 A review of the seal-key rollout found three places where the safe path was easy to get wrong, all in code that already
@@ -2215,3 +2303,282 @@ code and are regression pins, and a mutation run showed how much they pin: with 
 `seal_verify._num`'s removed, only the sealed-`inf` / 400-digit case disagrees; with either removed alone, none does (the two
 guards back each other up), and the `nan` and `-inf` cases never disagree under those mutations because other logic
 refuses them. The file changes what a strict runner of this corpus sees; it was not sent to anyone.
+
+## 2026-11-21 — Slice 94: the handshake declares the charter's role names
+
+Resolves an open question from Slice 59 (`docs/mesh-identity.md`), using the Flashy
+estate's own 21 Nov 2026 reply to the owner's integration plan as the authority rather
+than guessing: their `auditProperty` grades a handshake with no `capabilities` at
+level 1 ("declares nothing it can do"), and their reply distinguishes a role name
+(restates the charter, claims nothing callable) from a discovery slug (claims an
+endpoint). `tools/build_flashyos_handshake.py` now derives `flashyos.json`'s
+`capabilities` from the charter's role names only, wired into `tools/refresh.py`.
+
+Checked against the real packages, not a local guess at their rules: added
+`tools/flashyos-check/` (a pinned `@flashyos/aao@0.4.2` + `@flashyos/conformance@0.2.3`
+install, gitignored `node_modules/`, like the Python venv). `tests/test_build_flashyos_handshake.py`
+runs `validateCharterDocument` (zero errors) and `auditProperty` (`{ok: true, issues: [],
+level: 2}`) against the served files, and separately proves that removing `capabilities`
+drops the real validator's verdict back to level 1 - the exact finding Flashy's reply
+described, reproduced here rather than taken on their word. Those two tests skip
+themselves with a clear instruction when `node_modules` is absent (CI without the npm
+step, or no network at setup time); they do not fail the suite silently.
+
+The discovery slugs (`document-analysis`, `figure-verification`, `sealed-report`) are
+still not declared - that claim needs a deployed endpoint and a minted token, per
+`docs/mesh-identity.md`'s existing rule, which this slice does not touch.
+
+Not done, not attempted here, both the owner's or Flashy's call: declaring capabilities
+and offers on the *live* FlashyOS org (needs the re-minted join-grant token, Flashy's
+side as of 2026-11-21); switching the live charter from three roles to the seven-role
+team draft (`site/.well-known/flashyos-charter.team.json`, also validated level 2, not
+served - see `ROADMAP.md`); domain verification (explicitly Flashy's, not started).
+
+## 2026-11-21 — Slice 95: a draft seven-role team charter, kept out of site/
+
+Drafted `drafts/flashyos-charter.team.json` (coordination, research, analysis,
+verification, synthesis, evidence, client-delivery) from Flashy's 18/21 Nov
+integration documents and validated it for real against `@flashyos/aao@0.4.2` and
+`@flashyos/conformance@0.2.3`: zero validator errors, all five static conformance
+checks pass, and `auditProperty` returns level 2 with zero issues when every role
+name and discovery slug is declared.
+
+Put it in `drafts/`, not `site/.well-known/`, on purpose: a file under `site/` is
+served the moment a deploy ships it, whether or not anything links to it, so an
+ordinary merge-and-deploy could not accidentally publish a charter nobody decided to
+publish. `tests/test_seven_role_charter.py::DraftLocationTest` holds that boundary.
+
+Not switched live, and not something a loop should decide on its own: a served
+charter is a public governance claim, and declaring four new roles with no agent
+behind them and four discovery slugs with no endpoint behind them would be exactly
+the gamed metric `docs/mesh-identity.md` exists to refuse. `drafts/README.md` records
+what switching would actually need. Recorded as an owner decision in `ROADMAP.md`.
+
+## 2026-11-21 — Slice 96: measures/1, an envelope around the existing audit.measures()
+
+Flashy's 21 Nov reply committed to *pull* a measures document from AnalystOS rather
+than have it push one, and named neither the path nor the format. First draft of
+this slice duplicated the arithmetic as a new `analystos/api_v1/measures.py` before
+noticing `analystos.api_v1.audit.measures()` (Slice 61) already computes exactly
+these three numbers from the audit log - `tier == "written"` for the `analysis`
+role, `dropped`/`proposed` for `verification`, `seal_ok` for `evidence` - and is
+already called by `python3 -m analystos.api_v1 measures`, already tested
+(`tests/test_api_v1.py::MeasuresTest`). The duplicate file was deleted; what this
+slice actually adds is the envelope that function never had: a stated window
+(never derived from the clock at read time), the charter's own measure sentence
+copied in rather than retyped a second time, and a path. `tools/build_measures.py`
+calls `audit.measures()` directly - see its module docstring.
+
+`tests/test_measures.py` tests only what is new (the envelope, the CLI, honest
+handling of a role `audit.measures()` does not know about) and a belt-and-braces
+check that the envelope's numbers agree with that function called directly on the
+same log; the arithmetic itself keeps its existing coverage in `test_api_v1.py`
+rather than being re-tested under a different name. `tools/build_measures.py --check`
+replays the same window and store and compares the result, rather than diffing
+against a moving "now" (which could never pass twice by construction).
+
+In `drafts/`, not `site/.well-known/`, for the same reason as the Slice 95 charter
+draft: Flashy has not confirmed a path or format, so this is a proposal. Unlike the
+charter draft, nothing here could assert something false if served as-is today - a
+live production run would correctly show every value as `null`, because Slice 84
+recorded the audit log as dormant until a persistent volume exists. Publishing it is
+still left as a decision, not because the content is risky, but because the path
+itself is not yet agreed with Flashy.
+
+## 2026-11-21 — Slice 97: a playbook for document-analysis, acceptance as a check
+
+The Engageable Workforce document's two remaining asks for the purchase layer -
+a `playbook/1` per sellable engagement, and acceptance criteria written as a test -
+both exist now, built on code this repo already has.
+
+`@flashyos/playbook@0.2.0` turned out to be richer than the integration documents'
+description suggested: a closed, 13-key catalogue of inter-organisation
+collaboration *types* (data-pilot, joint-research, integration, ...), each with
+roles, steps, dependencies (`after`) and one of four evidence kinds (`url`,
+`sealed`, `endpoint`, `attested`), plus `checkClaim`/`verifyEvidence` functions a
+caller supplies real verifiers to. A hand-authored document outside that catalogue
+still validates (`isPlaybook`/`validate` do not require a known key), so
+`drafts/playbook-document-analysis.json` maps AnalystOS's one real offer onto the
+real shape: `coordination` accepts scope, `research` gathers sources (closing on
+the client's attestation, never a published URL - the same reasoning the built-in
+`data-pilot` playbook states for its own step), `analysis` and `verification` both
+close against the real, unauthenticated `POST /api/v1/verify` endpoint (one checks
+it answers at all, the other checks its body actually says `content_checked`),
+`evidence` closes on `sealed` evidence (a future shipped/1 entry; honestly
+`unverified` today, since Track C does not exist yet - checked for real with
+`verifyEvidence` and no verifier supplied, not merely asserted), and
+`client-delivery` closes on the real signed-link URL shape.
+
+`analystos/l4/acceptance.py::document_analysis_acceptance` is the acceptance check:
+built entirely on `verify_bundle`, requires the source text (treats its absence as
+a failure - a client holds its own document and should supply it, and accepting a
+check that was never run would be the exact gamed metric this is meant to prevent),
+and never raises on a hostile bundle. Its `CRITERIA` constant is the same text used
+in the playbook's `seal-the-report` step brief, so the two documents cannot
+silently disagree about what "accepted" means.
+
+Both the playbook and the acceptance check are proven against this repo's own
+running Flask app and real seal verifier (`tests/test_playbook.py`), not only
+validated as shapes - including a negative case (self-attestation refused) proving
+the real validator's checks are not vacuous.
+
+## 2026-11-21 — Slice 98: a defined/1 fragment for AnalystOS's own terms
+
+Drafted `drafts/defined-analystos.json` for the three terms the 18 Nov integration
+document found AnalystOS can own outright - analyst agent, decision-grade output,
+deliverable acceptance criteria - none used anywhere in the estate's term map or
+AUTHORITY register. `deliverable-acceptance-criteria` links `decision-grade-output`
+via `seeAlso` rather than restating it, matching the estate's own one-owner-per-term
+rule even though nothing here enforces it.
+
+`@flashyos/defined` is not on the npm registry (404, checked 2026-11-21) and has no
+publicly readable source, unlike every other format checked in `tools/flashyos-check/`.
+`tools/defined_proxy_validator.py` checks the *documented* rules instead - says so
+plainly in its own module docstring, so nobody mistakes a pass here for the real
+checker's verdict. Every rule (definition length, expiry-not-derived, https basis,
+the fourteen forbidden entry keys, the seven forbidden citation keys) is proven to
+actually fire against a constructed violation in `tests/test_defined_fragment.py`,
+not only asserted against the one real fragment.
+
+Known gap, checked for rather than assumed away: the fragment's `basis` URLs point
+at `/defined/<slug>` pages that do not exist in `site/` yet - exactly the mistake
+the 18 Nov document named (mlgblockchain's six dead `/defined/<slug>` links) as "the
+mistake not to repeat". `tests/test_defined_fragment.py` fails if a page under that
+path is ever added without updating the test, so the gap cannot be silently closed
+by accident. `ROADMAP.md` records it as open: write the three basis pages, or decide
+to publish with 404 links and say why, before serving this fragment anywhere.
+
+## 2026-11-21 — trademark check on "decision-grade" (no new slice; a finding)
+
+Checked before anything using this term is published, per the 18 Nov integration
+document's own instruction. Web search found two things worth more than "no
+trademark found": USPTO serial 87896620 is a live application (status suspended,
+not dead or abandoned) filed 2018 for the standard-character mark DECISION-GRADE
+in Class 042 (analytics services - AnalystOS's own category); its owner is not
+confirmed from public search snippets, and this session has no USPTO TESS/TSDR
+access to confirm further. Separately, Beroe Inc. uses "Decision Grade Intelligence"
+as core, heavy branding (homepage headline, product copy, a 2026 article title) in
+procurement analytics - an adjacent category, not AnalystOS's own.
+
+Recorded as an owner decision in `ROADMAP.md`, not acted on unilaterally: nothing
+using "decision-grade" is served anywhere (`drafts/defined-analystos.json` is the
+only place it appears, and it is in `drafts/`, unserved). Get real trademark advice
+before publishing it or using it anywhere public, including in a pitch or a page.
+
+## 2026-11-21 — Slice 99: shipped/1 and devlog/1, adopted for real
+
+Of every record plane drafted this session, this is the one Flashy's own 21 Nov
+reply said is real and already large (25,014 leaves, 23 sources) and pays off at
+N=1 - it needs no counterparty. Unlike the charter, measures, playbook and defined
+drafts, "adopt it now" is itself correct, because the tool's first-run default is
+`visibility: "private"`: adopting publishes nothing.
+
+Deepened the checkout (it had been cloned shallow at depth 1) to get real git
+history, then ran the actual `@flashyos/shiplog@0.2.0` CLI: `flashy-shiplog adopt`
+(writing `.shiplog/config.json` and `vendor-shiplog.mjs`, `--no-workflow` so it
+does not add a CI job on its own authority) and `node vendor-shiplog.mjs emit`
+(producing `shiplog.fragment.json`, `devlog.fragment.json`, and the served public
+projection at `drafts/devlog.fragment.json`, kept in `drafts/` per every other
+draft's rule rather than `site/`). `flashy-shiplog check` reports every seal
+recomputed, and is shown to actually refuse a tampered copy in
+`tests/test_shiplog.py`, not merely asserted to.
+
+The tool correctly auto-detected a real `prBase` from this repository's GitHub
+remote, avoiding the opaque-ref silent failure the 18 Nov document warned about.
+
+Privacy note: the real run reported two unmapped commit-author emails, one of them
+the repository owner's personal address. Neither is written into any committed
+file - both already fall back to the safe `defaultAuthor` node id, which is the
+correct behaviour and needed no change; adding an explicit mapping would only have
+meant typing a personal email into a tracked file for no behavioural gain, so this
+was deliberately not done. `tests/test_shiplog.py` proves no email appears in any
+entry's `by` field or in `.shiplog/config.json`.
+
+Not done, the owner's call: flipping `visibility` to `"public"`, and handing the
+served URL to Flashy's fan-in (one commit on their side once there is a real URL -
+there is not yet, since nothing here is deployed). Recorded in `ROADMAP.md`.
+
+## 2026-11-21 — Slice 100: AnalystOS's own MCP server, with fenced untrusted text
+
+Flashy's 21 Nov reply answered this directly: build your own server rather than
+route through `@flashyos/mcp`, which was still 0.6.0 (the F-01 fence unpublished)
+when checked, and importing a third party's unfixed injection surface into a
+document-analysis product's own tools would be the wrong trade regardless.
+
+`mcp-server/server.mjs` runs on the real, published `@modelcontextprotocol/sdk@1.32.2`
+and exposes two tools, `verify_report` and `check_acceptance`, both thin wrappers
+over `mcp-server/analystos_bridge.py`, which calls the real, already-tested
+`verify_bundle` and `document_analysis_acceptance` - no verification logic is
+duplicated in JavaScript, continuing the rule this session already learned the hard
+way in Slice 96.
+
+`mcp-server/untrusted.mjs::fence()` mirrors Flashy's own F-01 fix rather than
+inventing a different approach: any caller-supplied free text is wrapped in
+delimiters keyed to a fresh random nonce per call, so a forged closing marker
+inside the untrusted text cannot close the fence early. `mcp-server/test.mjs`
+proves this for real, over actual stdio with the official SDK's `Client` and
+`StdioServerTransport` (not a mock): a genuine prompt-injection string asking the
+server to report `ok: true` regardless of the real result is sent as
+`counterparty_note`, shown to change nothing about the structured verdict, and
+shown to still be returned verbatim inside its fence - a human or a model reading
+the response can see exactly what was said without executing it. `tests/test_mcp_server.py`
+wires the real Node suite into `python3 -m unittest discover`.
+
+## 2026-11-21 — Slice 101: a findings-register schema, without real finding content
+
+Both the owner's 18 Nov plan and Flashy's 21 Nov reply agreed on one discipline:
+30E Ventures publishes each finding at a stable URL with a discovery date before
+Flashy's fix cites it, so a stranger can check the order held. Built the
+machinery - `findings/schema.json`, `findings/validate.py` (hand-rolled, this
+repo's own convention for a schema this small - see Slice 76/77), `findings/build_findings.py`
+- without inventing the 24 real findings' content, which lives in the owner's
+local `flashy-audit` material and was not reachable from this session. A
+plausible-sounding security finding that was never actually verified would be
+worse than publishing nothing.
+
+`registry.json` holds exactly one entry, `F-00`, explicitly `status: "template"`.
+`tests/test_findings.py::RegistryContentTest` fails the moment any entry's status
+is not `"template"` - a deliberate tripwire so a real finding cannot be added
+without the person doing it reading `findings/README.md`'s publishing section
+first.
+
+Caught in review before committing: the generator's first draft ran every field
+through `html.escape()`, which is correct for HTML output and wrong for the
+Markdown this actually produces - it left literal `&lt;` in rendered pages
+instead of `<`. Fixed, and a regression test (`test_a_page_never_html_escapes_markdown_content`)
+pins it so it cannot silently return; table cells still neutralise a bare `|` or
+newline, since those really would break a markdown table row.
+
+Output lands in `findings/pages/`, not `site/`, for the same structural reason as
+every other draft this session built. Not added to `tools/refresh.py`'s automatic
+chain, which assumes every step lives directly under `tools/` - changing that
+assumption for one still-template-only directory was judged not worth the risk;
+run `python3 findings/build_findings.py --check` by hand.
+
+## 2026-11-21 — Slice 102: prepared live-API scripts, never executed
+
+Three ROADMAP items need a credential this session does not have and are
+outward actions regardless: declaring capabilities and offers, rotating the
+never-expiring agent token, auditable decision records. Prepared what can
+honestly be prepared without presenting a guess at an unconfirmed API surface
+as fact.
+
+`ops/flashy_declare.py` builds the exact, confirmed request from Flashy's 21
+Nov reply for the capabilities endpoint, prints it, and stops - `--execute`
+is required to actually send it, and even then there is no real token to send.
+The token is never printed; `build_request()` only ever carries a redacted
+placeholder. The `offers` variant is clearly labelled as this script's own
+guess at the path (Flashy named the scope, never the endpoint), with the
+warning printed before the request is even built.
+
+Token rotation and decision records got a written runbook (`ops/README.md`),
+deliberately not a script: neither document gave a confirmed endpoint for
+either, and a confidently wrong request looks identical to a correct one until
+it runs. The runbook says exactly what to find out first, including the real
+open question of whether "decision records" is AnalystOS's own API's job
+(the existing audit log in `analystos/api_v1/store` being the natural place).
+
+Testing discipline carried over from every other slice this session: no test
+makes a real call to `api.flashyos.com`. `tests/test_flashy_declare.py` proves
+`--execute` reaches the network-touching function with that function mocked,
+in-process (`unittest.mock.patch`), never a live request.

@@ -1,0 +1,11 @@
+{
+  "name": "analystos-flashyos-check",
+  "private": true,
+  "description": "Pinned FlashyOS conformance tooling, used only by this repo's tests to validate served/drafted files against the real, published validators. Not part of the deployed site.",
+  "dependencies": {
+    "@flashyos/aao": "0.4.2",
+    "@flashyos/conformance": "0.2.3",
+    "@flashyos/playbook": "0.2.0",
+    "@flashyos/shiplog": "0.2.0"
+  }
+}

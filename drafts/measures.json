@@ -1,0 +1,36 @@
+{
+  "measures": "1",
+  "org": "analystos",
+  "charter": "https://analystos.dev/.well-known/flashyos-charter.json",
+  "computed": "2026-11-21T17:38:24Z",
+  "window": "a/b",
+  "roles": [
+    {
+      "role": "analysis",
+      "measure": "Reports delivered at the written tier, with both quality gates passed, as a share of reports delivered",
+      "window": "a/b",
+      "numerator": 0,
+      "denominator": 0,
+      "value": null,
+      "instrumented": true
+    },
+    {
+      "role": "verification",
+      "measure": "Facts refused for failing verification, as a share of facts proposed",
+      "window": "a/b",
+      "numerator": 0,
+      "denominator": 0,
+      "value": null,
+      "instrumented": true
+    },
+    {
+      "role": "evidence",
+      "measure": "Delivered reports whose seal re-verifies offline, as a share of reports delivered",
+      "window": "a/b",
+      "numerator": 0,
+      "denominator": 0,
+      "value": null,
+      "instrumented": true
+    }
+  ]
+}

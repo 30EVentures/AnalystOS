@@ -105,3 +105,13 @@ spec folder must appear below, and every slice without one must be marked.
 | 91 | the homepage's machine-discovery links work from every domain that serves it | [spec](slice-91/spec.md) |
 | 92 | hardening: a size cap before the paid call, no upload text in the audit log, a logged verifier fault | [spec](slice-92/spec.md) |
 | 93 | audit lines are strict JSON, and the conformance corpus covers non-finite numbers | [spec](slice-93/spec.md) |
+| 94 | the handshake declares the charter's role names | [spec](slice-94/spec.md) |
+| 95 | draft and validate the seven-role team charter | [spec](slice-95/spec.md) |
+| 96 | a measures/1 document, computed from the real audit log | [spec](slice-96/spec.md) |
+| 97 | a playbook for the document-analysis offer, and acceptance as a check | [spec](slice-97/spec.md) |
+| 98 | a defined/1 vocabulary fragment for AnalystOS's own terms | [spec](slice-98/spec.md) |
+| 99 | adopt shipped/1 and devlog/1 for real, with @flashyos/shiplog@0.2.0 | [spec](slice-99/spec.md) |
+| 100 | AnalystOS's own MCP server, with fenced untrusted text | [spec](slice-100/spec.md) |
+| 101 | the findings-register schema, validator and generator | [spec](slice-101/spec.md) |
+| 102 | prepared live-API scripts, never executed | [spec](slice-102/spec.md) |
+| 103 | a bare scaled-table number is stored at its real size, not as-is | [spec](slice-103/spec.md) |

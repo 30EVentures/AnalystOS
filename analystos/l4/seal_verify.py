@@ -219,10 +219,29 @@ def detect_scale(text):
     return max(found) if found else 1
 
 
+def _has_own_scale_word(text):
+    """True if ``text`` spells its own scale word anywhere ("$1.2 million"), as
+    opposed to being a bare number a document-wide scale declaration applies to
+    ("1,842.0"). Mirrors ``analystos.l2.analyze._has_own_scale_word`` (Slice 103)
+    so this independent verifier reaches the same verdict as the analyzer."""
+    for match in _NUMBER_TOKEN_RE.finditer(text):
+        if match.group(3):
+            return True
+    return False
+
+
 def value_supported(value, citation, doc_scale=1):
-    """True if ``value`` equals a number ``citation`` spells, as printed or times
-    ``doc_scale``. Sign matters: -1050 never matches 1050."""
-    return any(_same(candidate, value) for parsed in parse_numbers(citation) for candidate in (parsed, parsed * doc_scale))
+    """True if ``value`` equals a number ``citation`` spells, as printed (if
+    ``citation`` carries its own scale word) or times ``doc_scale`` (if it is
+    bare under a document-wide declared scale). Sign matters: -1050 never
+    matches 1050.
+
+    Slice 103: for a bare citation under a declared scale, only the scaled
+    value is supported - the unscaled literal is refused, even though it also
+    appears in the text, matching ``analystos.l2.analyze._value_matches_text``
+    so the offline verifier never disagrees with the analyzer."""
+    scale = 1 if _has_own_scale_word(citation) else doc_scale
+    return any(_same(parsed * scale, value) for parsed in parse_numbers(citation))
 
 
 def recompute(operation, values, total=None):

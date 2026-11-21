@@ -669,18 +669,33 @@ measure must be computable from what the API's audit log records
 
 ```json
 { "mesh": "flashyos/1",
-  "org": { "slug": "analystos", "name": "AnalystOS", "profile": "https://analystos.dev" } }
+  "org": { "slug": "analystos", "name": "AnalystOS", "profile": "https://analystos.dev" },
+  "capabilities": ["analysis", "evidence", "verification"] }
 ```
 
-No `capabilities`: a capability is a claim that something is callable. Add
-`"capabilities": ["document-analysis"]` only after `docs/api.md`'s endpoints are
-deployed and an agent token exists.
+**Two different claims, not one** (Slice 94, 2026-11-21; see `docs/decisions.md`).
+A **role name** restates a governance fact the charter above already publishes and
+claims nothing callable - FlashyOS's own `auditProperty` checker reads it that way,
+taking a handshake from level 1 ("declares nothing it can do") to level 2 with zero
+issues. A **discovery slug** (`document-analysis`, `figure-verification`,
+`sealed-report`) claims an endpoint can actually be called, and the old rule still
+applies to those: add one only after `docs/api.md`'s matching endpoint is deployed
+and an agent token exists. Never hand-type this array - `tools/build_flashyos_handshake.py`
+derives it from the charter's role names, `tools/refresh.py --check` catches drift.
 
 ## Check it
 
 ```
 python3 -m analystos.aao site/.well-known/flashyos-charter.json     # ours (docs/aao.md)
 npx @flashyos/conformance analystos.dev --level 2                   # FlashyOS's
+```
+
+Against the local files, offline and before any deploy, with the real packages pinned
+in `tools/flashyos-check/` (set up once, like the Python venv: `cd tools/flashyos-check
+&& npm install --ignore-scripts`):
+
+```
+python3 -m unittest tests.test_build_flashyos_handshake -v
 ```
 
 To check a whole deployment (every advertised URL and content type, the charter,

@@ -551,6 +551,21 @@ def _detect_scale(document_text):
     return max(found) if found else 1
 
 
+def _has_own_scale_word(text):
+    """True if ``text`` spells its own scale word anywhere ("$1.2 million"),
+    as opposed to being a bare number a document-wide scale declaration
+    applies to ("1,842.0"). Treated as a property of the whole quoted
+    string, not of each number in it separately (Slice 103): a quote
+    citing several numbers, some with their own word and some bare in the
+    same string, is a rare case this does not try to split - the choice
+    never double-scales, at the cost of not perfectly handling that mix.
+    """
+    for match in _NUMBER_TOKEN_RE.finditer(text):
+        if match.group(3):
+            return True
+    return False
+
+
 def _value_matches_text(value, exact_text, doc_scale=1):
     """The canonical numeric value ``exact_text`` supports for ``value``,
     or ``None`` if it supports none.
@@ -560,21 +575,32 @@ def _value_matches_text(value, exact_text, doc_scale=1):
     a model can cite a real quote and pair an arbitrary value with it
     (found live: "net additions" as sum([1240, -1050]) - "1,050" is really
     in the document, silently negated). ``exact_text`` may carry its own
-    scale word ("$1.2 million" -> 1_200_000) or be bare as a scaled table
-    prints it ("1,842.0", document declared "in millions" -> 1.842e9).
+    scale word ("$1.2 million" -> 1_200_000, and ``doc_scale`` is never
+    applied on top of that - it is already the real size) or be bare as a
+    scaled table prints it ("1,842.0", document declared "in millions").
+
+    Slice 103 (owner's decision on the slice-33 PROPOSAL item, 2026-11-21):
+    for a **bare** number under a document-wide scale, the *only* canonical
+    value this will match is the **scaled** one - the bare literal is
+    refused outright, even when the model's own proposed ``value`` is also
+    the unscaled number. Before this, the bare candidate was tried first
+    and returned the moment it matched, so a model that left a figure
+    unscaled got it stored - and rendered - at the wrong, smaller size; the
+    docstring claimed the opposite of what the code did. With no
+    document-wide scale declared (``doc_scale == 1``) nothing changes: the
+    bare literal already is the real size.
+
     ``value`` matches *any* number the text spells out (a model often cites
-    a whole table row for one cell), as-is *or* times the document's
-    declared scale; the matched magnitude is returned, so a figure the
-    model left unscaled is still stored - and rendered - at its real size.
-    Sign is preserved, so the Slice-29 sign-flip guard holds (-1050 never
-    matches 1050).
+    a whole table row for one cell). Sign is preserved, so the Slice-29
+    sign-flip guard holds (-1050 never matches 1050).
     """
     if value is None:
         return None
+    scale = 1 if _has_own_scale_word(exact_text) else doc_scale
     for parsed in _parse_numbers(exact_text):
-        for candidate in (parsed, parsed * doc_scale):
-            if _close_enough(candidate, value):
-                return candidate
+        candidate = parsed * scale
+        if _close_enough(candidate, value):
+            return candidate
     return None
 
 

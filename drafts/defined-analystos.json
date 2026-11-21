@@ -1,0 +1,44 @@
+{
+  "contract": "defined/1",
+  "authority": "org/analystos",
+  "generated": "2026-11-21T00:00:00Z",
+  "entries": [
+    {
+      "id": "defined/analystos/analyst-agent",
+      "term": "Analyst agent",
+      "definition": "An agent sold as a complete unit of research and advisory analysis, not security triage. It is complete only when it carries four things: a declared scope, the sources it may read, the acceptance criteria its output is judged against, and a named human who accepts or refuses that output.",
+      "authority": "org/analystos",
+      "assertedBy": "person/accountable-human",
+      "asserted": "2026-11-21",
+      "expires": "2027-11-21",
+      "rev": 1,
+      "also": ["analyst agents"],
+      "basis": "https://analystos.dev/defined/analyst-agent"
+    },
+    {
+      "id": "defined/analystos/action-ready-output",
+      "term": "Action-ready output",
+      "definition": "Analyst output a named decision-maker can act on without rework. Every material claim links to the source it rests on, its assumptions and limits are written down, and it has passed the acceptance criteria agreed for that deliverable before the work began.",
+      "authority": "org/analystos",
+      "assertedBy": "person/accountable-human",
+      "asserted": "2026-11-21",
+      "expires": "2027-11-21",
+      "rev": 1,
+      "also": ["action ready"],
+      "basis": "https://analystos.dev/defined/action-ready-output"
+    },
+    {
+      "id": "defined/analystos/deliverable-acceptance-criteria",
+      "term": "Deliverable acceptance criteria",
+      "definition": "The per-deliverable test a buyer and an analyst agent's operator agree before work starts. It states what the output must contain, which evidence it must cite and what counts as failure, and acceptance and any outcome-based fee are settled against it.",
+      "authority": "org/analystos",
+      "assertedBy": "person/accountable-human",
+      "asserted": "2026-11-21",
+      "expires": "2027-11-21",
+      "rev": 1,
+      "seeAlso": ["defined/analystos/action-ready-output"],
+      "basis": "https://analystos.dev/defined/deliverable-acceptance-criteria"
+    }
+  ],
+  "citations": []
+}

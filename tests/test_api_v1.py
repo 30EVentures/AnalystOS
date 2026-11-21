@@ -588,10 +588,20 @@ class MeasuresTest(unittest.TestCase):
         self.assertTrue(all(v["share"] is None for v in measures([]).values()))
 
     def test_measure_text_matches_the_published_charter(self):
+        # Slice 103's charter switch (2026-11-21) added four roles - coordination,
+        # research, synthesis, client-delivery - with no audit-log event type of
+        # their own yet (their endpoints do not exist: specs/slice-95/spec.md #5).
+        # measures() stays honest about that: it computes only for the roles it
+        # really has instrumentation for, a subset of the charter's roles, never
+        # a made-up measure for one it cannot compute. tools/build_measures.py
+        # already carries the uninstrumented roles through with
+        # instrumented: False rather than fabricating a number for them.
         charter = json.loads((REPO / "site" / ".well-known" / "flashyos-charter.json").read_text())
         published = {r["name"]: r["measure"] for r in charter["roles"]}
         computed = {k: v["measure"] for k, v in measures([]).items()}
-        self.assertEqual(published, computed)
+        self.assertTrue(set(computed) <= set(published))
+        for name, text in computed.items():
+            self.assertEqual(published[name], text)
 
     def test_cli(self):
         out = io.StringIO()

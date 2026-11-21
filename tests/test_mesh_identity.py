@@ -37,8 +37,25 @@ class CharterTest(unittest.TestCase):
                 self.assertRegex(role["measure"], r" as a share of ")
 
     def test_no_role_claims_a_capability_the_product_lacks(self):
+        # Slice 103 (owner's decision, 2026-11-21): switched the live charter to
+        # the seven-role team charter drafted in Slice 95. The three original
+        # roles' capabilities are unchanged (spec-95 #4); the four new roles'
+        # capabilities are governance permissions for a team this codebase does
+        # not yet run as live agents - drafts/README.md's former "why it is not
+        # the live charter" section documented this plainly before the switch,
+        # and ROADMAP.md's Blocked list now carries what making them real needs
+        # (re-minted join-grant token, six live agents, four new endpoints). This
+        # test's job is only to catch a role quietly claiming something beyond
+        # that known, disclosed set - not to force the charter back to three.
         claimed = {c for role in CHARTER["roles"] for c in role["capabilities"]}
-        self.assertEqual(claimed, {"extract", "analyze", "cite", "verify", "refuse", "seal", "publish", "reverify"})
+        original = {"extract", "analyze", "cite", "verify", "refuse", "seal", "publish", "reverify"}
+        self.assertLessEqual(original, claimed)
+        self.assertEqual(claimed, original | {
+            "accept", "assign", "schedule", "escalate",   # coordination
+            "gather", "catalogue", "provenance",            # research
+            "compare", "synthesise", "draft",               # synthesis
+            "deliver", "brief", "answer",                   # client-delivery
+        })
 
     def test_escalation_names_a_real_role(self):
         self.assertIn(CHARTER["escalation"], [r["name"] for r in CHARTER["roles"]])
@@ -46,7 +63,20 @@ class CharterTest(unittest.TestCase):
 
 class HandshakeTest(unittest.TestCase):
     """The documented flashyos/1 shape: required mesh + org{slug,name<=120,
-    profile?}; optional capabilities (<=32 kebab-case), wants, api, join."""
+    profile?}; optional capabilities (<=32 kebab-case), wants, api, join.
+
+    Slice 94 (2026-11-21): the Flashy estate's 21 Nov reply resolved the open
+    question that used to sit here. A charter *role name* restates a
+    governance fact the charter already publishes and claims nothing
+    callable; declaring it took their own auditProperty from level 1
+    ("declares nothing it can do") to level 2 with zero issues when they ran
+    it. So the handshake now declares exactly the charter's role names - and
+    only those, never the x-capability discovery slugs (document-analysis,
+    figure-verification, ...), which still wait on docs/mesh-identity.md's
+    rule: an endpoint deployed and a token minted. tools/build_flashyos_handshake.py
+    is the only thing that writes this array; test_build_flashyos_handshake.py
+    checks nobody hand-edits it out of step with the charter.
+    """
 
     def test_required_fields(self):
         self.assertEqual(HANDSHAKE["mesh"], "flashyos/1")
@@ -55,15 +85,20 @@ class HandshakeTest(unittest.TestCase):
         self.assertTrue(0 < len(org["name"]) <= 120)
         self.assertTrue(org["profile"].startswith("https://"))
 
-    def test_it_declares_no_capabilities_until_something_is_callable(self):
-        self.assertNotIn("capabilities", HANDSHAKE)
+    def test_capabilities_are_exactly_the_charter_role_names(self):
+        self.assertIn("capabilities", HANDSHAKE)
+        self.assertEqual(set(HANDSHAKE["capabilities"]), {r["name"] for r in CHARTER["roles"]})
+
+    def test_capabilities_carry_no_discovery_slug_not_yet_callable(self):
+        slugs = {c for role in CHARTER["roles"] for c in role.get("x-capability", [])}
+        self.assertEqual(set(HANDSHAKE["capabilities"]) & slugs, set())
 
     def test_any_url_it_carries_is_https(self):
         for key in ("api", "join", "wants"):
             if key in HANDSHAKE:
                 self.assertTrue(str(HANDSHAKE[key]).startswith("https://"))
 
-    def test_capabilities_if_ever_added_would_be_kebab_case(self):
+    def test_capabilities_are_kebab_case_and_within_the_count_limit(self):
         for cap in HANDSHAKE.get("capabilities", []):
             self.assertRegex(cap, r"^[a-z0-9]+(-[a-z0-9]+)*$")
         self.assertLessEqual(len(HANDSHAKE.get("capabilities", [])), 32)

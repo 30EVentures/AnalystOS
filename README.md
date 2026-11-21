@@ -56,8 +56,14 @@ Run it on your own document: [`docs/using-analystos.md`](docs/using-analystos.md
 | `specs/` | one folder per slice: goal, scope, "done when" |
 | `tests/` | the automated suite (no network, no cost) |
 | `live_tests/` | a manual suite with real, paid model calls under a $1.00 ceiling |
-| `tools/` | `build_site_machine.py` regenerates the machine files from `docs/`; `refresh.py` regenerates all of these in order; `smoke.py` checks a live deployment; `site_counts.py` keeps the homepage's test and spec counts true; `build_specs_index.py` regenerates the spec index; `studio_chrome.py` keeps the 30E Ventures bar and footer line on the public pages |
+| `tools/` | `build_site_machine.py` regenerates the machine files from `docs/`; `refresh.py` regenerates all of these in order; `smoke.py` checks a live deployment; `site_counts.py` keeps the homepage's test and spec counts true; `build_specs_index.py` regenerates the spec index; `studio_chrome.py` keeps the 30E Ventures bar and footer line on the public pages; `build_flashyos_handshake.py` derives the handshake's capabilities from the charter; `build_measures.py` builds a measures/1 document; `defined_proxy_validator.py` checks `drafts/defined-analystos.json` against the documented (unpublished) defined/1 rules |
+| `tools/flashyos-check/` | pinned, gitignored `node_modules/` for the real `@flashyos/*` packages some tests validate against (`npm install --ignore-scripts` once per checkout, like the Python venv) |
 | `fixtures/golden/` | the regression set; add cases, never edit existing ones |
+| `drafts/` | files validated against a real or documented FlashyOS format but not yet served - never under `site/`, so a deploy can't publish one by accident; see `drafts/README.md` |
+| `mcp-server/` | AnalystOS's own MCP server (Slice 100) - not routed through `@flashyos/mcp`, not deployed; `npm install --ignore-scripts` once, then `node --test test.mjs` |
+| `findings/` | the 30E Ventures findings register (Slice 101): schema, validator, generator. `registry.json` holds one template entry only - the real findings are not in this repository; see `findings/README.md` |
+| `ops/` | live-API scripts prepared but never executed (Slice 102) - dry run by default, needs `--execute` and a real credential nobody has given it; see `ops/README.md` |
+| `.shiplog/config.json`, `vendor-shiplog.mjs`, `shiplog.fragment.json`, `devlog.fragment.json`, `DEVLOG.md` | this repository's own shipped/1 and devlog/1 record, adopted with `@flashyos/shiplog` (Slice 99); committed and private, never served - `drafts/devlog.fragment.json` is the public projection, currently empty on purpose |
 
 ## Working here
 

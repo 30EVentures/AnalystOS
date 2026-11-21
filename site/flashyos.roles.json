@@ -2,52 +2,91 @@
   "aao": "0.1",
   "name": "AnalystOS",
   "slug": "analystos",
-  "description": "Reads a source document and returns a report in which every figure is a verified quote or an independently recomputed calculation.",
+  "description": "An analyst team that takes a question and its source documents and returns a sealed report in which every figure is a verified quote or an independently recomputed calculation.",
   "accountableTo": "30eventures@gmail.com",
-  "escalation": "verification",
+  "repositories": [
+    {
+      "name": "analystos",
+      "url": "https://analystos.dev",
+      "holds": ["engagements", "sources", "reports", "verification", "seals", "deliverables"],
+      "default": true
+    }
+  ],
   "roles": [
+    {
+      "name": "coordination",
+      "family": "operations",
+      "purpose": "Accepts each engagement, assigns its work to a role, and is where every role escalates.",
+      "measure": "Engagements delivered by the date agreed at acceptance, as a share of engagements accepted",
+      "capabilities": ["accept", "assign", "schedule", "escalate"],
+      "humanApprovalAtOrAbove": "MEDIUM",
+      "worksIn": ["analystos"],
+      "x-capability": ["engagement-coordination"]
+    },
+    {
+      "name": "research",
+      "family": "data",
+      "purpose": "Gathers the source documents an engagement needs and records where each one came from.",
+      "measure": "Sources in a delivered report with a recorded origin, as a share of sources used",
+      "capabilities": ["gather", "catalogue", "provenance"],
+      "humanApprovalAtOrAbove": "HIGH",
+      "worksIn": ["analystos"],
+      "x-capability": ["source-research"]
+    },
     {
       "name": "analysis",
       "family": "data",
       "purpose": "Reads one source document and drafts a cited report from verified facts only.",
       "measure": "Reports delivered at the written tier, with both quality gates passed, as a share of reports delivered",
-      "capabilities": [
-        "extract",
-        "analyze",
-        "cite"
-      ],
-      "humanApprovalAtOrAbove": "MEDIUM"
+      "capabilities": ["extract", "analyze", "cite"],
+      "humanApprovalAtOrAbove": "MEDIUM",
+      "worksIn": ["analystos"],
+      "x-capability": ["document-analysis", "analytics"]
     },
     {
       "name": "verification",
       "family": "risk",
       "purpose": "Recomputes every calculation and refuses any figure it cannot prove against the source.",
       "measure": "Facts refused for failing verification, as a share of facts proposed",
-      "capabilities": [
-        "verify",
-        "refuse"
-      ],
-      "humanApprovalAtOrAbove": "HIGH"
+      "capabilities": ["verify", "refuse"],
+      "humanApprovalAtOrAbove": "HIGH",
+      "worksIn": ["analystos"],
+      "x-capability": ["figure-verification"]
+    },
+    {
+      "name": "synthesis",
+      "family": "data",
+      "purpose": "Combines verified single-document reports into cross-document findings without adding an unverified figure.",
+      "measure": "Findings in a delivered synthesis traceable to a verified fact, as a share of findings stated",
+      "capabilities": ["compare", "synthesise", "draft"],
+      "humanApprovalAtOrAbove": "MEDIUM",
+      "worksIn": ["analystos"],
+      "x-capability": ["cross-document-synthesis"]
     },
     {
       "name": "evidence",
       "family": "governance",
       "purpose": "Seals each delivered report so a stranger can re-verify it offline.",
       "measure": "Delivered reports whose seal re-verifies offline, as a share of reports delivered",
-      "capabilities": [
-        "seal",
-        "publish",
-        "reverify"
-      ],
-      "humanApprovalAtOrAbove": "HIGH"
+      "capabilities": ["seal", "publish", "reverify"],
+      "humanApprovalAtOrAbove": "HIGH",
+      "worksIn": ["analystos"],
+      "x-capability": ["sealed-report"]
+    },
+    {
+      "name": "client-delivery",
+      "family": "support",
+      "purpose": "Hands the sealed report to the client, walks them through it, and logs every question it raises.",
+      "measure": "Client questions answered from the sealed report without a reissue, as a share of questions asked",
+      "capabilities": ["deliver", "brief", "answer"],
+      "humanApprovalAtOrAbove": "LOW",
+      "worksIn": ["analystos"],
+      "x-capability": ["analyst-briefing"]
     }
   ],
+  "escalation": "coordination",
   "network": {
-    "offers": [
-      "document-analysis"
-    ],
-    "wants": [
-      "design-partner-documents"
-    ]
+    "offers": ["document-analysis", "cross-document-synthesis", "analyst-briefing"],
+    "wants": ["design-partner-documents"]
   }
 }

@@ -1,0 +1,10 @@
+{
+  "name": "analystos-mcp",
+  "private": true,
+  "version": "0.1.0",
+  "description": "AnalystOS's own MCP server (Slice 100). Not routed through Flashy's @flashyos/mcp - see docs/decisions.md.",
+  "type": "module",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2"
+  }
+}

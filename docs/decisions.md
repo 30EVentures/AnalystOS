@@ -2435,3 +2435,34 @@ server to report `ok: true` regardless of the real result is sent as
 shown to still be returned verbatim inside its fence - a human or a model reading
 the response can see exactly what was said without executing it. `tests/test_mcp_server.py`
 wires the real Node suite into `python3 -m unittest discover`.
+
+## 2026-11-21 — Slice 101: a findings-register schema, without real finding content
+
+Both the owner's 18 Nov plan and Flashy's 21 Nov reply agreed on one discipline:
+30E Ventures publishes each finding at a stable URL with a discovery date before
+Flashy's fix cites it, so a stranger can check the order held. Built the
+machinery - `findings/schema.json`, `findings/validate.py` (hand-rolled, this
+repo's own convention for a schema this small - see Slice 76/77), `findings/build_findings.py`
+- without inventing the 24 real findings' content, which lives in the owner's
+local `flashy-audit` material and was not reachable from this session. A
+plausible-sounding security finding that was never actually verified would be
+worse than publishing nothing.
+
+`registry.json` holds exactly one entry, `F-00`, explicitly `status: "template"`.
+`tests/test_findings.py::RegistryContentTest` fails the moment any entry's status
+is not `"template"` - a deliberate tripwire so a real finding cannot be added
+without the person doing it reading `findings/README.md`'s publishing section
+first.
+
+Caught in review before committing: the generator's first draft ran every field
+through `html.escape()`, which is correct for HTML output and wrong for the
+Markdown this actually produces - it left literal `&lt;` in rendered pages
+instead of `<`. Fixed, and a regression test (`test_a_page_never_html_escapes_markdown_content`)
+pins it so it cannot silently return; table cells still neutralise a bare `|` or
+newline, since those really would break a markdown table row.
+
+Output lands in `findings/pages/`, not `site/`, for the same structural reason as
+every other draft this session built. Not added to `tools/refresh.py`'s automatic
+chain, which assumes every step lives directly under `tools/` - changing that
+assumption for one still-template-only directory was judged not worth the risk;
+run `python3 findings/build_findings.py --check` by hand.

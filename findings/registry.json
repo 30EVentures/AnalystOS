@@ -1,0 +1,15 @@
+[
+  {
+    "id": "F-00",
+    "title": "<one-line description of the defect, no exploit detail>",
+    "discovered": "2026-01-01",
+    "published": null,
+    "status": "template",
+    "severity": "not-rated",
+    "affected": {"package": "@flashyos/<package>", "version": "<exact version checked>"},
+    "summary": "This entry is a TEMPLATE, not a real finding - it exists so findings/build_findings.py has something to render and test against, and so the shape of a real entry is obvious when one is added. Delete the 'status': 'template' marker and this note when filling in a real finding; see findings/README.md for where the real content comes from (it is not in this repository).",
+    "reproducer_exists": false,
+    "fix_commit_url": null,
+    "note": "Template entry. Not a real finding. See findings/README.md."
+  }
+]

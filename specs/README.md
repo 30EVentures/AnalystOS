@@ -112,3 +112,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 98 | a defined/1 vocabulary fragment for AnalystOS's own terms | [spec](slice-98/spec.md) |
 | 99 | adopt shipped/1 and devlog/1 for real, with @flashyos/shiplog@0.2.0 | [spec](slice-99/spec.md) |
 | 100 | AnalystOS's own MCP server, with fenced untrusted text | [spec](slice-100/spec.md) |
+| 101 | the findings-register schema, validator and generator | [spec](slice-101/spec.md) |

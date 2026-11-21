@@ -61,6 +61,7 @@ Run it on your own document: [`docs/using-analystos.md`](docs/using-analystos.md
 | `fixtures/golden/` | the regression set; add cases, never edit existing ones |
 | `drafts/` | files validated against a real or documented FlashyOS format but not yet served - never under `site/`, so a deploy can't publish one by accident; see `drafts/README.md` |
 | `mcp-server/` | AnalystOS's own MCP server (Slice 100) - not routed through `@flashyos/mcp`, not deployed; `npm install --ignore-scripts` once, then `node --test test.mjs` |
+| `findings/` | the 30E Ventures findings register (Slice 101): schema, validator, generator. `registry.json` holds one template entry only - the real findings are not in this repository; see `findings/README.md` |
 | `.shiplog/config.json`, `vendor-shiplog.mjs`, `shiplog.fragment.json`, `devlog.fragment.json`, `DEVLOG.md` | this repository's own shipped/1 and devlog/1 record, adopted with `@flashyos/shiplog` (Slice 99); committed and private, never served - `drafts/devlog.fragment.json` is the public projection, currently empty on purpose |
 
 ## Working here

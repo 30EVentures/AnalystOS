@@ -2466,3 +2466,31 @@ every other draft this session built. Not added to `tools/refresh.py`'s automati
 chain, which assumes every step lives directly under `tools/` - changing that
 assumption for one still-template-only directory was judged not worth the risk;
 run `python3 findings/build_findings.py --check` by hand.
+
+## 2026-11-21 — Slice 102: prepared live-API scripts, never executed
+
+Three ROADMAP items need a credential this session does not have and are
+outward actions regardless: declaring capabilities and offers, rotating the
+never-expiring agent token, auditable decision records. Prepared what can
+honestly be prepared without presenting a guess at an unconfirmed API surface
+as fact.
+
+`ops/flashy_declare.py` builds the exact, confirmed request from Flashy's 21
+Nov reply for the capabilities endpoint, prints it, and stops - `--execute`
+is required to actually send it, and even then there is no real token to send.
+The token is never printed; `build_request()` only ever carries a redacted
+placeholder. The `offers` variant is clearly labelled as this script's own
+guess at the path (Flashy named the scope, never the endpoint), with the
+warning printed before the request is even built.
+
+Token rotation and decision records got a written runbook (`ops/README.md`),
+deliberately not a script: neither document gave a confirmed endpoint for
+either, and a confidently wrong request looks identical to a correct one until
+it runs. The runbook says exactly what to find out first, including the real
+open question of whether "decision records" is AnalystOS's own API's job
+(the existing audit log in `analystos/api_v1/store` being the natural place).
+
+Testing discipline carried over from every other slice this session: no test
+makes a real call to `api.flashyos.com`. `tests/test_flashy_declare.py` proves
+`--execute` reaches the network-touching function with that function mocked,
+in-process (`unittest.mock.patch`), never a live request.

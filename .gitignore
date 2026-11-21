@@ -27,3 +27,7 @@ live_tests/*.log
 
 # Ad-hoc job folders (real data stays off GitHub); fixtures/golden/ is committed
 jobs/
+
+# Node tooling used only to run the real FlashyOS validators in tests (Slice 94)
+node_modules/
+tools/flashyos-check/package-lock.json

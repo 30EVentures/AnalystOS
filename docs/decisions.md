@@ -2215,3 +2215,33 @@ code and are regression pins, and a mutation run showed how much they pin: with 
 `seal_verify._num`'s removed, only the sealed-`inf` / 400-digit case disagrees; with either removed alone, none does (the two
 guards back each other up), and the `nan` and `-inf` cases never disagree under those mutations because other logic
 refuses them. The file changes what a strict runner of this corpus sees; it was not sent to anyone.
+
+## 2026-11-21 — Slice 94: the handshake declares the charter's role names
+
+Resolves an open question from Slice 59 (`docs/mesh-identity.md`), using the Flashy
+estate's own 21 Nov 2026 reply to the owner's integration plan as the authority rather
+than guessing: their `auditProperty` grades a handshake with no `capabilities` at
+level 1 ("declares nothing it can do"), and their reply distinguishes a role name
+(restates the charter, claims nothing callable) from a discovery slug (claims an
+endpoint). `tools/build_flashyos_handshake.py` now derives `flashyos.json`'s
+`capabilities` from the charter's role names only, wired into `tools/refresh.py`.
+
+Checked against the real packages, not a local guess at their rules: added
+`tools/flashyos-check/` (a pinned `@flashyos/aao@0.4.2` + `@flashyos/conformance@0.2.3`
+install, gitignored `node_modules/`, like the Python venv). `tests/test_build_flashyos_handshake.py`
+runs `validateCharterDocument` (zero errors) and `auditProperty` (`{ok: true, issues: [],
+level: 2}`) against the served files, and separately proves that removing `capabilities`
+drops the real validator's verdict back to level 1 - the exact finding Flashy's reply
+described, reproduced here rather than taken on their word. Those two tests skip
+themselves with a clear instruction when `node_modules` is absent (CI without the npm
+step, or no network at setup time); they do not fail the suite silently.
+
+The discovery slugs (`document-analysis`, `figure-verification`, `sealed-report`) are
+still not declared - that claim needs a deployed endpoint and a minted token, per
+`docs/mesh-identity.md`'s existing rule, which this slice does not touch.
+
+Not done, not attempted here, both the owner's or Flashy's call: declaring capabilities
+and offers on the *live* FlashyOS org (needs the re-minted join-grant token, Flashy's
+side as of 2026-11-21); switching the live charter from three roles to the seven-role
+team draft (`site/.well-known/flashyos-charter.team.json`, also validated level 2, not
+served - see `ROADMAP.md`); domain verification (explicitly Flashy's, not started).

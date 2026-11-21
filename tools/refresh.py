@@ -3,9 +3,10 @@
     python3 tools/refresh.py           # regenerate
     python3 tools/refresh.py --check   # exit 1 if anything is stale, change nothing
 
-Order matters: the docs copy and machine files first, then the spec index, then the
-homepage counts (which count the specs and discover the tests). The suite fails when
-any of these is stale; this is the one command that fixes them.
+Order matters: the FlashyOS handshake first (it derives from the charter, and the docs
+copy below describes the charter), then the docs copy and machine files, then the spec
+index, then the homepage counts (which count the specs and discover the tests). The
+suite fails when any of these is stale; this is the one command that fixes them.
 """
 
 import subprocess
@@ -13,7 +14,13 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-STEPS = ["build_site_machine.py", "build_specs_index.py", "site_counts.py", "studio_chrome.py"]
+STEPS = [
+    "build_flashyos_handshake.py",
+    "build_site_machine.py",
+    "build_specs_index.py",
+    "site_counts.py",
+    "studio_chrome.py",
+]
 
 
 def main(argv=None):

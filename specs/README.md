@@ -105,3 +105,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 91 | the homepage's machine-discovery links work from every domain that serves it | [spec](slice-91/spec.md) |
 | 92 | hardening: a size cap before the paid call, no upload text in the audit log, a logged verifier fault | [spec](slice-92/spec.md) |
 | 93 | audit lines are strict JSON, and the conformance corpus covers non-finite numbers | [spec](slice-93/spec.md) |
+| 94 | the handshake declares the charter's role names | [spec](slice-94/spec.md) |

@@ -2359,3 +2359,20 @@ mistake not to repeat". `tests/test_defined_fragment.py` fails if a page under t
 path is ever added without updating the test, so the gap cannot be silently closed
 by accident. `ROADMAP.md` records it as open: write the three basis pages, or decide
 to publish with 404 links and say why, before serving this fragment anywhere.
+
+## 2026-11-21 — trademark check on "decision-grade" (no new slice; a finding)
+
+Checked before anything using this term is published, per the 18 Nov integration
+document's own instruction. Web search found two things worth more than "no
+trademark found": USPTO serial 87896620 is a live application (status suspended,
+not dead or abandoned) filed 2018 for the standard-character mark DECISION-GRADE
+in Class 042 (analytics services - AnalystOS's own category); its owner is not
+confirmed from public search snippets, and this session has no USPTO TESS/TSDR
+access to confirm further. Separately, Beroe Inc. uses "Decision Grade Intelligence"
+as core, heavy branding (homepage headline, product copy, a 2026 article title) in
+procurement analytics - an adjacent category, not AnalystOS's own.
+
+Recorded as an owner decision in `ROADMAP.md`, not acted on unilaterally: nothing
+using "decision-grade" is served anywhere (`drafts/defined-analystos.json` is the
+only place it appears, and it is in `drafts/`, unserved). Get real trademark advice
+before publishing it or using it anywhere public, including in a pitch or a page.

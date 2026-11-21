@@ -2,6 +2,44 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-21 — Slice 103: a bare scaled-table number is stored at its real size, not as-is
+
+Owner's decision on the PROPOSALS item carried since the 2026-10-14 overnight run
+(slice-33): **scale it**, not "fix the docstring to admit the bug." The old
+`_value_matches_text` tried the bare candidate before the scaled one and
+returned the first match, so a model that left a table cell unscaled (document
+"in millions", cell "1,842.0", model proposes 1842.0) got that figure stored and
+rendered at the wrong, 1,000,000x-too-small size - even though its own docstring
+already claimed the opposite.
+
+Fixed by making "has its own scale word" (`$1.2 million`) a precondition for
+`doc_scale` *not* applying, and `doc_scale` the only candidate tried for a bare
+citation when one is declared: `_value_matches_text(1_842.0, "1,842.0", 1_000_000)`
+now returns `None`, not `1842.0`. With no declared scale (`doc_scale == 1`)
+nothing changes.
+
+`analystos/l4/seal_verify.py::value_supported` carries its own, independent
+re-implementation of this match for the offline verifier - by design, so a
+stranger re-checking a seal is not trusting the same code that sealed it. Fixed
+the same way there (`_has_own_scale_word` added, `doc_scale` applied only to a
+bare citation), confirmed by the differential test
+(`tests/test_l4_seal_values.py::DifferentialAgainstTheAnalyzerTest`) that the two
+independent implementations still agree.
+
+Two existing tests encoded the old, now-rejected behaviour as their stated goal
+and were rewritten rather than deleted: `test_value_matches_text_accepts_the_declared_scale`
+now asserts the bare-vs-bare case is refused, and
+`test_growth_on_scaled_table_operands_verifies_even_if_left_unscaled` is split into
+`..._verifies_when_scaled` (passes) and `..._is_dropped_if_left_unscaled` (now
+correctly raises, proving the fix - a model that leaves a figure unscaled gets
+nothing stored for it, rather than something wrong).
+
+Not in this slice (documented as a known limitation in `_has_own_scale_word`'s
+docstring, not solved): a quoted string citing several numbers where some carry
+their own scale word and some are bare in the same string. Treated as a property
+of the whole string; the conservative choice never double-scales, at the cost of
+not perfectly handling that rare mixed case.
+
 ## 2026-10-11 - pin the key out of band, never see the seed, never mistake "no check failed" for "authentic" (Slice 90)
 
 A review of the seal-key rollout found three places where the safe path was easy to get wrong, all in code that already

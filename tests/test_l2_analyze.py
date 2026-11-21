@@ -812,12 +812,19 @@ class RealFilingTablesTest(unittest.TestCase):
     def test_value_matches_text_accepts_the_declared_scale(self):
         # the model gave the actual magnitude for a "1,842.0" cell in millions
         self.assertEqual(_value_matches_text(1_842_000_000.0, "1,842.0", 1_000_000), 1_842_000_000.0)
-        # the model left it unscaled - still matches (stored as-is), not dropped
-        self.assertEqual(_value_matches_text(1_842.0, "1,842.0", 1_000_000), 1_842.0)
+        # Slice 103 (owner's decision, 2026-11-21): a bare citation under a
+        # declared scale matches ONLY the scaled value - leaving it unscaled
+        # is now refused outright, not silently stored at the wrong, smaller
+        # size.
+        self.assertIsNone(_value_matches_text(1_842.0, "1,842.0", 1_000_000))
         # a fabricated magnitude matches neither scale
         self.assertIsNone(_value_matches_text(9_999_000_000.0, "1,842.0", 1_000_000))
         # sign flip still rejected (Slice 29 guard holds)
         self.assertIsNone(_value_matches_text(-1_050.0, "1,050", 1_000_000))
+        # a citation that spells its own scale word is never multiplied by
+        # doc_scale on top - it already is the real size
+        self.assertEqual(_value_matches_text(1_900_000_000.0, "$1.9 billion", 1_000), 1_900_000_000.0)
+        self.assertIsNone(_value_matches_text(1_900_000_000_000.0, "$1.9 billion", 1_000))
 
     def test_a_scaled_table_quote_verifies_and_is_stored_at_real_size(self):
         segs = [{
@@ -837,11 +844,30 @@ class RealFilingTablesTest(unittest.TestCase):
         out = analyze_document(self.DOC, TITLE, client=_fake_client(segs))
         self.assertEqual(out[0]["value"], 1_842_000_000.0)
 
-    def test_growth_on_scaled_table_operands_verifies_even_if_left_unscaled(self):
+    def test_growth_on_scaled_table_operands_verifies_when_scaled(self):
         # bare-cell citations (what the prompt now tells the model to use
-        # for a non-leading table column), left at the table's printed
-        # scale - the growth % is scale-invariant, and both operands are
-        # canonicalised to real size before the recompute either way.
+        # for a non-leading table column), the operand values given at the
+        # document's real, scaled size - the growth % is scale-invariant.
+        segs = [{
+            "type": "computed", "display": "inline", "label": "Revenue growth",
+            "operation": "growth_percent",
+            "operands": [
+                {"exact_text": "1,715.0", "value": 1_715_000_000.0},
+                {"exact_text": "1,842.0", "value": 1_842_000_000.0},
+            ],
+            "has_total": False, "total_exact_text": "", "total_value": 0,
+            "result": 7.4,
+            "sentence": "Revenue grew {value} year over year.", "format": "percent",
+        }]
+        out = analyze_document(self.DOC, TITLE, client=_fake_client(segs))
+        self.assertAlmostEqual(out[0]["value"], (1842 - 1715) / 1715 * 100, places=1)
+
+    def test_growth_on_scaled_table_operands_is_dropped_if_left_unscaled(self):
+        # Slice 103 (owner's decision, 2026-11-21): the same bare-cell
+        # citations, but with the operand values left at the table's
+        # printed (unscaled) size - now refused rather than silently
+        # accepted at the wrong magnitude, so no verifiable content
+        # survives at all.
         segs = [{
             "type": "computed", "display": "inline", "label": "Revenue growth",
             "operation": "growth_percent",
@@ -853,8 +879,8 @@ class RealFilingTablesTest(unittest.TestCase):
             "result": 7.4,
             "sentence": "Revenue grew {value} year over year.", "format": "percent",
         }]
-        out = analyze_document(self.DOC, TITLE, client=_fake_client(segs))
-        self.assertAlmostEqual(out[0]["value"], (1842 - 1715) / 1715 * 100, places=1)
+        with self.assertRaises(ValueError):
+            analyze_document(self.DOC, TITLE, client=_fake_client(segs))
 
     def test_total_verification_failure_is_logged_with_reasons(self):
         segs = [

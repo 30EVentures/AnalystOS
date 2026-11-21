@@ -2,6 +2,25 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-21 — "decision-grade output" renamed to "action-ready output" (owner's decision)
+
+The 2026-11-21 trademark check (recorded separately, same date, below) found a live
+USPTO filing on DECISION-GRADE in AnalystOS's own services class, plus Beroe Inc.'s
+existing "Decision Grade Intelligence" branding in an adjacent category - stronger
+risk than a plain web search for "no trademark found" would suggest. Owner's
+decision: drop the term rather than wait on counsel, since nothing public depended
+on it yet.
+
+`drafts/defined-analystos.json`'s entry renamed: id `defined/analystos/decision-grade-output`
+-> `defined/analystos/action-ready-output`, term "Decision-grade output" -> "Action-ready
+output", same definition and dates. `deliverable-acceptance-criteria`'s `seeAlso`
+reference updated to match. `tests/test_defined_fragment.py` updated (the two tests
+asserting the old term's exact string); `drafts/README.md` and `ROADMAP.md` updated.
+Nothing in `shiplog.fragment.json`/`devlog.fragment.json` was touched - those are a
+hash-chained historical record of the trademark check itself being run, not a live
+assertion of the term, and rewriting a committed shiplog entry would break its own
+verification.
+
 ## 2026-11-21 — seven-role charter switched live (owner's decision, builds on Slice 95)
 
 Owner's decision on the ROADMAP item carried since Slice 95: serve the seven-role

@@ -29,7 +29,7 @@ class RealFragmentTest(unittest.TestCase):
 
     def test_exactly_three_owned_terms(self):
         terms = {e["term"] for e in FRAGMENT["entries"]}
-        self.assertEqual(terms, {"Analyst agent", "Decision-grade output", "Deliverable acceptance criteria"})
+        self.assertEqual(terms, {"Analyst agent", "Action-ready output", "Deliverable acceptance criteria"})
 
     def test_every_entry_is_owned_by_analystos(self):
         for entry in FRAGMENT["entries"]:
@@ -40,9 +40,9 @@ class RealFragmentTest(unittest.TestCase):
         ids = [e["id"] for e in FRAGMENT["entries"]]
         self.assertEqual(len(ids), len(set(ids)))
 
-    def test_deliverable_acceptance_criteria_links_decision_grade_rather_than_restating_it(self):
+    def test_deliverable_acceptance_criteria_links_action_ready_rather_than_restating_it(self):
         entry = next(e for e in FRAGMENT["entries"] if e["term"] == "Deliverable acceptance criteria")
-        self.assertIn("defined/analystos/decision-grade-output", entry.get("seeAlso", []))
+        self.assertIn("defined/analystos/action-ready-output", entry.get("seeAlso", []))
 
     def test_the_basis_urls_do_not_resolve_yet_and_this_is_known(self):
         # The honest gap this fragment has not solved: the 18 Nov integration

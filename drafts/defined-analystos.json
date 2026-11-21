@@ -16,16 +16,16 @@
       "basis": "https://analystos.dev/defined/analyst-agent"
     },
     {
-      "id": "defined/analystos/decision-grade-output",
-      "term": "Decision-grade output",
+      "id": "defined/analystos/action-ready-output",
+      "term": "Action-ready output",
       "definition": "Analyst output a named decision-maker can act on without rework. Every material claim links to the source it rests on, its assumptions and limits are written down, and it has passed the acceptance criteria agreed for that deliverable before the work began.",
       "authority": "org/analystos",
       "assertedBy": "person/accountable-human",
       "asserted": "2026-11-21",
       "expires": "2027-11-21",
       "rev": 1,
-      "also": ["decision grade"],
-      "basis": "https://analystos.dev/defined/decision-grade-output"
+      "also": ["action ready"],
+      "basis": "https://analystos.dev/defined/action-ready-output"
     },
     {
       "id": "defined/analystos/deliverable-acceptance-criteria",
@@ -36,7 +36,7 @@
       "asserted": "2026-11-21",
       "expires": "2027-11-21",
       "rev": 1,
-      "seeAlso": ["defined/analystos/decision-grade-output"],
+      "seeAlso": ["defined/analystos/action-ready-output"],
       "basis": "https://analystos.dev/defined/deliverable-acceptance-criteria"
     }
   ],

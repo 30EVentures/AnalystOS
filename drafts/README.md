@@ -74,10 +74,17 @@ AnalystOS hands over, independent of anything in this file.
 ## `defined-analystos.json`
 
 A `defined/1` fragment for the three terms AnalystOS can own outright (analyst
-agent, decision-grade output, deliverable acceptance criteria; see
-`docs/decisions.md`, Slice 98). `@flashyos/defined` is unpublished, so
-`tools/defined_proxy_validator.py` checks only the *documented* rules - it says so
-in its own docstring and is never a substitute for Flashy's real checker.
+agent, action-ready output, deliverable acceptance criteria; see
+`docs/decisions.md`, Slice 98 and the 2026-11-21 rename below). `@flashyos/defined`
+is unpublished, so `tools/defined_proxy_validator.py` checks only the *documented*
+rules - it says so in its own docstring and is never a substitute for Flashy's real
+checker.
+
+**Renamed from "decision-grade output" 2026-11-21 (owner's decision)**, after a
+trademark check found a live USPTO filing on DECISION-GRADE in AnalystOS's own
+services class, plus a third party's existing branding on a near-identical phrase
+(see `docs/decisions.md`). Same definition, no term anywhere public depended on the
+old name - nothing in this fragment has ever been served.
 
 **Known, checked-for gap:** every entry's `basis` URL points at a `/defined/<slug>`
 page that does not exist in `site/` yet (`tests/test_defined_fragment.py` fails the

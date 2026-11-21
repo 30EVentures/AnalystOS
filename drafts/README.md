@@ -18,37 +18,32 @@ validateCharterDocument: []                          (zero errors)
 auditProperty, every x-capability declared: {"ok": true, "issues": [], "level": 2}
 ```
 
-**Why it is not the live charter.** `site/.well-known/flashyos-charter.json` still
-declares three roles (analysis, verification, evidence) and is what the deployed
-handshake's capabilities are derived from (`tools/build_flashyos_handshake.py`).
-Switching to this seven-role draft is a product decision, not a code change, and it
-has real consequences before it is safe to publish:
+**Promoted to the live charter 2026-11-21 (Slice 103, owner's decision).**
+`site/.well-known/flashyos-charter.json` and `site/flashyos.roles.json` now serve
+this seven-role charter; this file stays here only as the validated source copy with
+its own history. The handshake's `capabilities` array (`tools/build_flashyos_handshake.py`,
+Slice 94) derives from it automatically and now lists all seven role names - still
+only role names, never the `x-capability` discovery slugs, per `docs/mesh-identity.md`'s
+rule.
 
-1. It **changes what AnalystOS publicly declares it does.** A served charter is read
-   by a stranger as a governance claim - adding four roles that mint no agent and do
-   nothing yet would be exactly the gamed metric this repo's own doctrine refuses
-   elsewhere (`docs/mesh-identity.md`: "a capability is a claim that something is
-   callable").
-2. It needs **six more live agents**, one per new role, minted against the
-   `analystos` org on the live FlashyOS API. The tier was raised FREE→GROWTH on
-   Flashy's side 2026-11-21 (cap 5→50), so the ceiling is no longer the blocker, but
-   nothing on this repo's side can mint them - that needs the join-grant token
-   Flashy minted the same day, which must be re-minted first (the copies that
-   travelled through a terminal log into a chat are compromised; see
-   `ROADMAP.md`'s Blocked list).
-3. The `coordination`, `research`, `synthesis` and `client-delivery` roles'
-   `x-capability` discovery slugs (`engagement-coordination`, `source-research`,
-   `cross-document-synthesis`, `analyst-briefing`) name capabilities nothing in this
-   codebase can actually serve yet - there is no coordination/intake endpoint, no
+What switching the *file* did **not** do, and what still needs the owner's separate
+yes before any of it is real (tracked in `ROADMAP.md`'s Blocked list):
+
+1. **No agent was minted.** The four new roles (coordination, research, synthesis,
+   client-delivery) have no live agent on the FlashyOS API - that needs the
+   join-grant token re-minted (the copies that travelled through a terminal log into
+   a chat are compromised) and is an outward mesh action, not a file change.
+2. **No endpoint was built.** Their `x-capability` discovery slugs
+   (`engagement-coordination`, `source-research`, `cross-document-synthesis`,
+   `analyst-briefing`) stay out of the handshake because nothing in this codebase
+   can serve them yet - there is no coordination/intake endpoint, no
    source-research endpoint, no synthesis-across-documents endpoint, and no
-   client-delivery endpoint. Declaring them before they exist is the claim
-   `docs/mesh-identity.md` says never to make.
-
-**To promote this draft to the live charter**, once the owner has decided to and the
-six agents exist: copy this file over `site/.well-known/flashyos-charter.json` and
-`site/flashyos.roles.json` (keep them byte-identical, per `tests/test_mesh_identity.py`),
-run `python3 tools/refresh.py`, and run the full suite. Do this on a branch and open a
-PR; nothing in this repository's tooling does it for you, by design.
+   client-delivery endpoint.
+3. `measures()` (Slice 61/96) stays honest about this gap on its own: it computes
+   a real share only for the three roles with an audit-log event type
+   (`tests/test_api_v1.py::MeasuresTest::test_measure_text_matches_the_published_charter`),
+   and `tools/build_measures.py` marks the other four `"instrumented": false` with
+   null values rather than inventing a number.
 
 ## `measures.json`
 

@@ -2,6 +2,37 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-21 — seven-role charter switched live (owner's decision, builds on Slice 95)
+
+Owner's decision on the ROADMAP item carried since Slice 95: serve the seven-role
+team charter (coordination, research, analysis, verification, synthesis, evidence,
+client-delivery) rather than keep the original three. `drafts/flashyos-charter.team.json`
+(validated zero-errors against the real `@flashyos/aao@0.4.2`, level 2 under
+`auditProperty`) is now copied byte-identical to `site/.well-known/flashyos-charter.json`
+and `site/flashyos.roles.json`; `tools/build_flashyos_handshake.py` regenerated
+`flashyos.json`'s `capabilities` to all seven role names.
+
+What this does **not** do, by design (drafts/README.md's former "why it is not the
+live charter" risks #2 and #3, now moved to ROADMAP.md's Blocked list): no agent was
+minted for the four new roles, and none of their `x-capability` discovery slugs
+(`engagement-coordination`, `source-research`, `cross-document-synthesis`,
+`analyst-briefing`) were declared anywhere - the handshake derives only role *names*
+(Slice 94's already-established rule: a role name restates a governance fact the
+charter already publishes; a discovery slug claims something is callable). Minting
+the agents needs the re-minted join-grant token; declaring the slugs needs four
+endpoints that do not exist in this codebase yet.
+
+Two tests had to change to stay honest rather than to make this pass by weakening a
+real check: `tests/test_mesh_identity.py::CharterTest::test_no_role_claims_a_capability_the_product_lacks`
+now asserts the original three roles' capabilities are unchanged *and* names exactly
+the new roles' declared (not yet code-backed) capabilities, instead of silently
+accepting whatever the charter says. `tests/test_api_v1.py::MeasuresTest::test_measure_text_matches_the_published_charter`
+now checks `measures()`'s output is a subset of the charter's roles with matching
+text, not an exact match - `measures()` (Slice 61/96) was already honest about
+computing a share only for roles with a real audit-log event type, and the exact-match
+version of the test would have forced either a fabricated number for the four new
+roles or a weaker `measures()`; neither was the right fix.
+
 ## 2026-11-21 — Slice 103: a bare scaled-table number is stored at its real size, not as-is
 
 Owner's decision on the PROPOSALS item carried since the 2026-10-14 overnight run

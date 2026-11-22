@@ -2,6 +2,37 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-22 — Slice 105: the coordination role's accept/assign/schedule/escalate, honestly
+
+The live seven-role charter's `coordination` role has claimed four
+capabilities since Slice 103 - `accept`, `assign`, `schedule`, `escalate` -
+and a measure with no code behind either. This slice makes them real, scoped
+to what the codebase can actually do: one worker role (`analysis`), not an
+invented dispatcher.
+
+`POST /api/v1/jobs` takes an optional `agreed_by` (ISO date; malformed is
+`400`, never silently dropped). Every job's `assigned_role` is always
+`"analysis"` - a constant, not a free-text field, because that is the only
+role with real code. At delivery, the existing `analysis` audit event gains
+`agreed_by` and `on_time` (`None` when there was nothing to score against -
+never a guessed `True`). `audit.measures()` gains a `coordination` entry
+computed from exactly those two event types, matching the charter's own
+measure text word for word.
+
+`POST /api/v1/jobs/{id}/escalate` moves a **pending** job to `escalated`.
+This is a real, if narrow, enforcement: `run_job`'s existing "only a pending
+job runs" guard means an escalated job is genuinely blocked, not just
+logged - but there is no review dashboard or notification behind it, stated
+plainly rather than implied to exist. Idempotent once escalated; `409` from
+any other status.
+
+Explicitly not done here: declaring `coordination`'s `x-capability`
+(`engagement-coordination`) in the live handshake. `docs/mesh-identity.md`'s
+rule still applies - a discovery slug waits for the endpoint to be deployed
+and smoke-tested, not merely merged to `main`. Also not done: the other
+three new roles' endpoints (research, synthesis, client-delivery), or any
+review surface for an escalated job - both much bigger, separate slices.
+
 ## 2026-11-22 — Slice 104: token rotation resolved without a script, decision records confirmed and prepared
 
 Picks up where Slice 102 (`ops/README.md`) left off: neither token rotation nor

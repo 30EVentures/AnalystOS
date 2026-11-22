@@ -167,6 +167,10 @@
     {
       "source": "/api/v1/jobs/:job/run",
       "destination": "/api/v1/jobs?id=:job&run=true"
+    },
+    {
+      "source": "/api/v1/jobs/:job/escalate",
+      "destination": "/api/v1/jobs?id=:job&escalate=true"
     }
   ]
 }

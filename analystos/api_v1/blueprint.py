@@ -11,6 +11,7 @@ import shutil
 import sys
 import tempfile
 import time
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 from flask import Blueprint, Response, jsonify, request
@@ -208,13 +209,39 @@ def create_analysis():
 
 
 def _job_body(job_id, meta):
-    body = {"id": job_id, "status": meta["status"], "created": meta["created"]}
+    body = {
+        "id": job_id, "status": meta["status"], "created": meta["created"],
+        "agreed_by": meta.get("agreed_by"), "assigned_role": meta.get("assigned_role", "analysis"),
+    }
     if meta["status"] == "done":
         body["report_id"] = meta["report_id"]
         body["links"] = _paths(meta["report_id"])
     elif meta["status"] == "failed":
         body["error"] = meta.get("error")
     return body
+
+
+def _parse_agreed_by(raw):
+    """``None`` if not given; the ISO date string if valid. Raises ``ValueError``
+    for anything else, so the caller returns a clean 400 rather than storing a
+    value ``_on_time`` could not compare against later."""
+    raw = (raw or "").strip()
+    if not raw:
+        return None
+    try:
+        date.fromisoformat(raw)
+    except ValueError:
+        raise ValueError(f"agreed_by must be an ISO date (YYYY-MM-DD), got {raw!r}")
+    return raw
+
+
+def _on_time(agreed_by, now_ts):
+    """``None`` when there is nothing to score against (no ``agreed_by`` was
+    given at acceptance) - never a made-up True. Otherwise whether delivery's
+    UTC calendar date is on or before the agreed one."""
+    if not agreed_by:
+        return None
+    return datetime.fromtimestamp(now_ts, timezone.utc).date() <= date.fromisoformat(agreed_by)
 
 
 def _create_job():
@@ -237,15 +264,21 @@ def _create_job():
     suffix = Path(upload.filename).suffix.lower()
     if suffix not in SUPPORTED_EXTENSIONS:
         return _err(415, "unsupported_media", f"unsupported file type {suffix!r}; expected one of {sorted(SUPPORTED_EXTENSIONS)}")
+    try:
+        agreed_by = _parse_agreed_by(request.form.get("agreed_by"))
+    except ValueError as exc:
+        return _err(400, "bad_request", str(exc))
     store = _store()
     if store is None:
         return _err(503, "store_not_configured", "job storage is not configured on this server (set ANALYSTOS_STORE_DIR)")
     store.purge_expired()
     job_id = secrets.token_hex(16)
     title = request.form.get("title") or f"Review of {Path(upload.filename).name}"
-    meta = {"caller": caller, "status": "pending", "created": store_mod.iso(time.time()), "title": title}
+    meta = {"caller": caller, "status": "pending", "created": store_mod.iso(time.time()), "title": title,
+            "agreed_by": agreed_by, "assigned_role": "analysis"}
     store.create_job(job_id, meta, upload.filename, upload.read())
-    store_mod.emit_audit(store, {"type": "job_created", "id": job_id, "caller": caller})
+    store_mod.emit_audit(store, {"type": "job_created", "id": job_id, "caller": caller,
+                                 "agreed_by": agreed_by, "assigned_role": "analysis"})
     return jsonify(_job_body(job_id, meta)), 202
 
 
@@ -357,12 +390,14 @@ def _run_job_inner(job_id):
     analysis = trace.get("analysis") or {}
     store.put(digest, {"caller": caller, "created": bundle["payload"]["created"], "tier": trace["tier"],
                        "expires_ts": now + ttl, "expires": store_mod.iso(now + ttl)}, html, pdf, bundle)
+    agreed_by = meta.get("agreed_by")
     store_mod.emit_audit(store, {
         "type": "analysis", "caller": caller, "id": digest, "tier": trace["tier"],
         "fallback_reason": trace.get("fallback_reason"), "proposed": analysis.get("proposed", 0),
         "verified": analysis.get("verified", 0), "dropped": analysis.get("dropped", 0),
         "signed": bundle["signature"] is not None, "seal_ok": seal_ok, "extension": Path(filename).suffix.lower(),
         "model": trace.get("model"), "via": "job",
+        "agreed_by": agreed_by, "on_time": _on_time(agreed_by, now),
     })
     meta = store.update_job(job_id, status="done", report_id=digest)
     store.delete_job_upload(job_id)
@@ -387,8 +422,40 @@ def _run_job(job_id):
         return _fail_job(store, job_id, meta.get("caller"), ValueError("the analysis failed unexpectedly; submit the document again"))
 
 
+def _escalate_job(job_id):
+    """Moves a pending job to 'escalated' - coordination's escalate verb.
+    This only blocks further automatic progress (run_job already refuses
+    anything not pending); it does not notify anyone or open a review queue,
+    since this codebase has neither. Idempotent once already escalated."""
+    limited = _limited()
+    if limited:
+        return limited
+    if not store_mod.JOB_ID_RE.match(job_id or ""):
+        return _err(404, "not_found", "no such job")
+    store = _store()
+    if store is None:
+        return _err(503, "store_not_configured", "job storage is not configured on this server")
+    caller, denied = _caller()
+    if denied:
+        return denied
+    meta = store.job_meta(job_id)
+    if meta is not None and meta.get("caller") != caller:
+        meta = None  # someone else's job looks exactly like a missing one
+    if meta is None:
+        return _err(404, "not_found", "no such job")
+    if meta["status"] == "escalated":
+        return jsonify(_job_body(job_id, meta))
+    if meta["status"] != "pending":
+        return _err(409, "conflict", f"only a pending job can be escalated (this one is {meta['status']!r})")
+    meta = store.update_job(job_id, status="escalated")
+    store_mod.emit_audit(store, {"type": "job_escalated", "id": job_id, "caller": caller})
+    return jsonify(_job_body(job_id, meta))
+
+
 @bp.post("/jobs")
 def create_job_or_run_by_query():
+    if request.args.get("escalate"):
+        return _escalate_job(request.args.get("id", ""))
     if request.args.get("run"):
         return _run_job(request.args.get("id", ""))
     return _create_job()
@@ -397,6 +464,11 @@ def create_job_or_run_by_query():
 @bp.post("/jobs/<job>/run")
 def run_job(job):
     return _run_job(job)
+
+
+@bp.post("/jobs/<job>/escalate")
+def escalate_job(job):
+    return _escalate_job(job)
 
 
 @bp.get("/jobs/<job>")

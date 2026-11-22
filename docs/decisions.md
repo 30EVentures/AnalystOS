@@ -2,6 +2,42 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-22 — Slice 104: token rotation resolved without a script, decision records confirmed and prepared
+
+Picks up where Slice 102 (`ops/README.md`) left off: neither token rotation nor
+decision records had a confirmed endpoint in anything available to this
+session, so nothing was built against a guess. Both are resolved now, from the
+real `@flashyos/agent` package rather than from asking Flashy first.
+
+**Token rotation needed no script.** The package's own README states plainly:
+agent names are unique per org, and re-minting rotates - running
+`npx @flashyos/agent init` again with the same agent name replaces that agent's
+token, and the old one stops working immediately. Done for real the same day:
+`analystos-agent`'s original never-expiring token (minted 2026-09-28, the thing
+Flashy's register read as "not revocable") no longer exists.
+
+**Decision records.** Read `@flashyos/agent@0.21.0`'s own published source (the
+npm tarball's `dist/chunk-NL5JM7HU.mjs`, unpacked and read directly - not the
+README's prose alone, and not guessed): `requestApproval()`/`decide()` both
+call `POST /api/v1/orgs/{orgId}/decisions`, body
+`{orgId, token, agentName, summary, impact}`, impact one of `LOW` (auto-approves),
+`MEDIUM`, `HIGH`, `CRITICAL`. `ops/flashy_decide.py` mirrors this exactly in
+Python, including the same `STATUS_TO_STATE` response mapping
+(`AUTO_APPROVED`→`auto`, `PENDING`→`pending`, `APPROVED`/`REJECTED`→`reviewed`),
+so a caller reading its output gets the same shape the SDK's own
+`requestApproval()` would return.
+
+Same safety shape as `flashy_declare.py` (Slice 102): dry run by default,
+`send_request()` is the only network-touching function and no test calls it,
+`--execute`'s path to it is proven in-process with that function mocked. The
+package's own docs are explicit that this only *records* a decision - v1 is
+visibility and an audit trail, nothing here blocks AnalystOS's own code from
+doing the thing being logged, and enforcement is still on the upstream
+package's roadmap, not something assumed here. Calling this against any real
+action is a separate, per-use outward decision under CLAUDE.md's rule
+regardless of how confirmed the endpoint now is - nothing in this repository
+calls it automatically.
+
 ## 2026-11-21 — "decision-grade output" renamed to "action-ready output" (owner's decision)
 
 The 2026-11-21 trademark check (recorded separately, same date, below) found a live

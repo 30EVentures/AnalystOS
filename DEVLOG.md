@@ -3,6 +3,15 @@
 _This is the changelog. "Devlog" and "changelog" name the same document here —_
 _see `devlog/1` in `packages/shiplog/SPEC.md` if that reads like it needs reconciling._
 
+## 2026-11-22
+
+- Merge pull request #92 from 30EVentures/flashyos-coordination-endpoint-2026-11-22 ([`af8be6eae054`](https://github.com/30EVentures/analystos/commit/af8be6eae054d58f2cb2667812f93ab3db488444))
+- Merge pull request #91 from 30EVentures/flashyos-decision-records-2026-11-22 ([`96a347330e94`](https://github.com/30EVentures/analystos/commit/96a347330e9439883fdced35940649cee1f64758))
+
+## 2026-11-21
+
+- Merge pull request #90 from 30EVentures/flashyos-standardization-2026-11-21 ([`c3c8392550b0`](https://github.com/30EVentures/analystos/commit/c3c8392550b0790b4b556dd2f6eff03b03b197e7))
+
 ## 2026-11-20
 
 - Merge pull request #89 from 30EVentures/publish-seal-key ([`d2107d957b0e`](https://github.com/30EVentures/analystos/commit/d2107d957b0e2d08be67ede4703fc4f704d5735a))

@@ -93,12 +93,16 @@ document named exactly this - a fragment whose basis pages 404 - as the mistake 
 avoid. Build the pages, or decide to publish with 404 links anyway and say why,
 before serving this anywhere; see `ROADMAP.md`.
 
-## `devlog.fragment.json` (the served projection)
+## `devlog.fragment.json` - moved, 2026-11-22
 
-The public projection of this repository's real `shipped/1`/`devlog/1` record
-(root `shiplog.fragment.json` and `devlog.fragment.json` are the full, private
-source - see `docs/decisions.md`, Slice 99). Currently has zero entries, matching
-`.shiplog/config.json`'s `visibility: "private"`. Unlike every other file in this
-directory, the *record itself* is real and already committed at the repo root;
-only this served copy, and the decision to flip visibility and hand the URL to
-Flashy's fan-in, remain open - see `ROADMAP.md`.
+**No longer here.** The served projection of this repository's real
+`shipped/1`/`devlog/1` record now lives at `site/.well-known/devlog.fragment.json`
+(root `shiplog.fragment.json` and `devlog.fragment.json` stay the full, private
+source - see `docs/decisions.md`, Slice 99). Owner's decision: flip
+`.shiplog/config.json`'s `visibility` to `public` and actually serve it, Slice
+106. Running that for real surfaced a genuine privacy leak before anything
+went live - old merge-commit titles from this repo's personal-GitHub-fork era,
+and this session's own commit trailers riding inside the `detail` field - both
+now cleaned by `tools/redact_served_devlog.py` (rerun it after every future
+`node vendor-shiplog.mjs emit`). Still open: handing the served URL to Flashy's
+fan-in - see `ROADMAP.md`.

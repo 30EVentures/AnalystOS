@@ -6,8 +6,8 @@
   "authors": {
     "noreply@anthropic.com": "agent/claude"
   },
-  "visibility": "private",
+  "visibility": "public",
   "lexicon": "imperative",
   "prBase": "https://github.com/30EVentures/analystos/pull/",
-  "serve": "drafts/devlog.fragment.json"
+  "serve": "site/.well-known/devlog.fragment.json"
 }

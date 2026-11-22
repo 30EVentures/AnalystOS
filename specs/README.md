@@ -117,3 +117,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 103 | a bare scaled-table number is stored at its real size, not as-is | [spec](slice-103/spec.md) |
 | 104 | prepared, not executed: decision records on FlashyOS's governance feed | [spec](slice-104/spec.md) |
 | 105 | the coordination role's accept/assign/schedule/escalate, honestly | [spec](slice-105/spec.md) |
+| 106 | the public devlog, with a real privacy leak found and closed before it shipped | [spec](slice-106/spec.md) |

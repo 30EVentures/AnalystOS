@@ -2,6 +2,48 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-22 — Slice 106: the public devlog, with a real privacy leak found and closed before it shipped
+
+Owner's decision: flip `.shiplog/config.json`'s `visibility` to `public` and
+actually serve the record - not leave it parked in `drafts/` indefinitely.
+Flipped the config, re-ran `node vendor-shiplog.mjs emit --rederive` (every
+entry re-derived against the new setting, not just new ones appended with
+the old stamp - 94 entries total), and moved the served projection from
+`drafts/devlog.fragment.json` to a real path, `site/.well-known/devlog.fragment.json`,
+with the same headers every other `.well-known/*` file gets in `vercel.json`.
+
+Running this for real - not a dry run, the actual published tool against
+this repository's actual git history - surfaced a genuine privacy leak
+before anything deployed. Two different problems, found by the test suite
+itself failing the moment the suite ran after the flip:
+
+1. Old merge-commit titles from when this repository lived under the
+   owner's personal GitHub fork carry the raw username verbatim
+   (`"Merge pull request #66 from CalebSolway/site-new-homepage"`) - GitHub
+   bakes the fork name into the merge message itself, and the vendored tool
+   correctly reproduces it, since that is what the commit actually says.
+2. This session's own commit trailers (`Co-Authored-By: ... <noreply@anthropic.com>`,
+   `Claude-Session: https://claude.ai/code/session_...`) ride inside the
+   free-text `detail` field, since that field is the commit message body.
+
+Both conflict with the standing rule (public identity is 30E Ventures only).
+Owner's decision on remedy: exclude the affected entries rather than
+redact them in place - there is no version of a personal-name entry safe to
+publish. `tools/redact_served_devlog.py` does that, and only that, for
+problem 1 (66 of 94 entries, all from the pre-org-migration era, dropped
+entirely); for problem 2 it does something different and less destructive -
+truncates `detail` at the trailer, keeping the real written summary, since
+every commit this session made carries that trailer and dropping all of
+them too would have gutted the public record for no privacy gain. Proven in
+`tests/test_redact_served_devlog.py` and caught on any regression by the
+existing, generic `tests/test_site_identity.py` scan over every served file
+- not duplicated.
+
+Root `shiplog.fragment.json`/`devlog.fragment.json` are untouched - they stay
+the full, private source exactly as Slice 99 designed; only the served copy
+is filtered. Still open, and separate from "make it public": handing the
+served URL to Flashy's fan-in, an outward/contact decision on its own.
+
 ## 2026-11-22 — Slice 105: the coordination role's accept/assign/schedule/escalate, honestly
 
 The live seven-role charter's `coordination` role has claimed four

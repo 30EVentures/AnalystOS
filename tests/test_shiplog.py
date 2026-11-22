@@ -4,10 +4,11 @@ docs/decisions.md and ROADMAP.md for what this is and is not yet.
 
 Unlike every other draft in this session, these are committed as the tool's
 own real output (`.shiplog/config.json`, `vendor-shiplog.mjs`,
-`shiplog.fragment.json`, `DEVLOG.md`, `drafts/devlog.fragment.json`) - the
-point of this format is a committed, private record; the decision left open
-is whether and when to flip `visibility` to public and hand the URL to
-Flashy's fan-in, not whether to commit the record at all.
+`shiplog.fragment.json`, `DEVLOG.md`, `site/.well-known/devlog.fragment.json`).
+`visibility` was flipped to `public` 2026-11-22 (owner's decision) and every
+entry re-derived against it; the served projection moved from `drafts/` to a
+real `site/.well-known/` path the same day. Handing the URL to Flashy's
+fan-in is a separate, still-open step.
 """
 
 import json
@@ -19,7 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / ".shiplog" / "config.json"
 FRAGMENT_PATH = ROOT / "shiplog.fragment.json"
-DEVLOG_SERVED_PATH = ROOT / "drafts" / "devlog.fragment.json"
+DEVLOG_SERVED_PATH = ROOT / "site" / ".well-known" / "devlog.fragment.json"
 DEVLOG_MD_PATH = ROOT / "DEVLOG.md"
 SHIPLOG_BIN = ROOT / "tools" / "flashyos-check" / "node_modules" / ".bin" / "flashy-shiplog"
 
@@ -28,17 +29,19 @@ FRAGMENT = json.loads(FRAGMENT_PATH.read_text())
 
 
 class ConfigTest(unittest.TestCase):
-    def test_visibility_is_private_the_intended_first_state(self):
+    def test_visibility_is_public_the_owners_decision(self):
         # "Everything lands private, so the served fragment publishes
         # nothing until somebody decides otherwise" - the tool's own words
-        # when it adopted. Flipping this is an owner decision, recorded
-        # open in ROADMAP.md, not something this test should expect yet.
-        self.assertEqual(CONFIG["visibility"], "private")
+        # when it adopted. Flipped 2026-11-22 (owner's decision, recorded
+        # in docs/decisions.md and ROADMAP.md): the record is real work,
+        # already shipped, not something that needed to wait.
+        self.assertEqual(CONFIG["visibility"], "public")
 
-    def test_served_path_is_a_draft_not_the_live_site(self):
-        # Same safety boundary as every other draft this session built:
-        # a path under site/ would be live on the next deploy.
-        self.assertFalse(CONFIG["serve"].startswith("site/"))
+    def test_served_path_is_live_under_well_known(self):
+        # Flipped 2026-11-22 (owner's decision): unlike every other draft
+        # this session built, this record is real, already-shipped work -
+        # it is meant to be live, not parked under drafts/ forever.
+        self.assertEqual(CONFIG["serve"], "site/.well-known/devlog.fragment.json")
 
     def test_pr_base_was_auto_detected_as_a_real_https_url_not_left_opaque(self):
         # The documented silent-failure trap: with no GitHub-shaped prBase
@@ -59,10 +62,13 @@ class ConfigTest(unittest.TestCase):
 
 
 class FragmentTest(unittest.TestCase):
-    def test_every_entry_is_private(self):
+    def test_every_entry_is_public(self):
+        # Re-derived 2026-11-22 after the owner's decision to flip visibility -
+        # every entry, not just new ones, since --rederive discards the stale
+        # private-stamped history rather than leaving it half-flipped.
         self.assertTrue(FRAGMENT["entries"])
         for entry in FRAGMENT["entries"]:
-            self.assertEqual(entry.get("visibility"), "private", entry["id"])
+            self.assertEqual(entry.get("visibility"), "public", entry["id"])
 
     def test_no_entry_carries_a_raw_email_in_its_by_field(self):
         # The real finding from running this for real: unmapped git commit
@@ -72,11 +78,19 @@ class FragmentTest(unittest.TestCase):
             for by in entry.get("by", []):
                 self.assertNotIn("@", by, entry["id"])
 
-    def test_the_served_public_projection_has_zero_entries(self):
-        # Matches "everything lands private": the public projection is
-        # genuinely empty today, not merely unpublished.
+    def test_the_served_public_projection_is_a_filtered_subset_of_the_fragment(self):
+        # Now that visibility is public, every entry in the full fragment is
+        # tagged public - but the served copy is smaller (tools/redact_served_devlog.py
+        # drops anything naming the owner personally, found live 2026-11-22
+        # in old merge-commit titles from this repo's personal-fork era).
         served = json.loads(DEVLOG_SERVED_PATH.read_text())
-        self.assertEqual(served["entries"], [])
+        self.assertTrue(served["entries"])
+        served_ids = {e["id"] for e in served["entries"]}
+        fragment_ids = {e["id"] for e in FRAGMENT["entries"]}
+        self.assertTrue(served_ids <= fragment_ids)
+        self.assertLess(len(served_ids), len(fragment_ids))
+        for entry in served["entries"]:
+            self.assertEqual(entry.get("visibility"), "public", entry["id"])
 
     def test_devlog_md_exists_and_is_not_empty(self):
         self.assertTrue(DEVLOG_MD_PATH.exists())

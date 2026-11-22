@@ -2,8 +2,29 @@
   "devlog": "1",
   "source": "repo/analystos",
   "org": "org/analystos",
-  "generated": "2026-11-21T17:19:11.529Z",
+  "generated": "2026-11-22T23:11:22.041Z",
   "entries": [
+    {
+      "id": "devlog/analystos/af8be6eae054",
+      "at": "2026-11-22T17:48:05-05:00",
+      "summary": "Merge pull request #92 from 30EVentures/flashyos-coordination-endpoint-2026-11-22",
+      "commitSha": "af8be6eae054d58f2cb2667812f93ab3db488444",
+      "ref": "https://github.com/30EVentures/analystos/commit/af8be6eae054d58f2cb2667812f93ab3db488444"
+    },
+    {
+      "id": "devlog/analystos/96a347330e94",
+      "at": "2026-11-22T17:47:43-05:00",
+      "summary": "Merge pull request #91 from 30EVentures/flashyos-decision-records-2026-11-22",
+      "commitSha": "96a347330e9439883fdced35940649cee1f64758",
+      "ref": "https://github.com/30EVentures/analystos/commit/96a347330e9439883fdced35940649cee1f64758"
+    },
+    {
+      "id": "devlog/analystos/c3c8392550b0",
+      "at": "2026-11-21T15:08:05-05:00",
+      "summary": "Merge pull request #90 from 30EVentures/flashyos-standardization-2026-11-21",
+      "commitSha": "c3c8392550b0790b4b556dd2f6eff03b03b197e7",
+      "ref": "https://github.com/30EVentures/analystos/commit/c3c8392550b0790b4b556dd2f6eff03b03b197e7"
+    },
     {
       "id": "devlog/analystos/d2107d957b0e",
       "at": "2026-11-20T13:54:13-05:00",

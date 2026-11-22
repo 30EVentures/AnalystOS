@@ -190,6 +190,9 @@ class AsyncJobsTest(ApiTestCase):
     def poll(self, job, key=None):
         return self.client.get(f"/api/v1/jobs/{job['id']}", headers=self.h(key))
 
+    def escalate(self, job, key=None):
+        return self.client.post(f"/api/v1/jobs/{job['id']}/escalate", headers=self.h(key))
+
     def test_create_is_fast_and_pending(self):
         job = self.submitted()
         self.assertEqual(job["status"], "pending")
@@ -274,6 +277,84 @@ class AsyncJobsTest(ApiTestCase):
         with patch.dict(os.environ, {store_mod.STORE_ENV: ""}):
             r = self.submit()
         self.assertEqual((r.status_code, r.get_json()["error"]["code"]), (503, "store_not_configured"))
+
+    # --- Slice 105: coordination's accept/assign/schedule/escalate ---
+
+    def test_assigned_role_is_always_analysis(self):
+        job = self.submitted()
+        self.assertEqual(job["assigned_role"], "analysis")
+
+    def test_no_agreed_by_given_is_null_not_an_error(self):
+        job = self.submitted()
+        self.assertIsNone(job["agreed_by"])
+
+    def test_agreed_by_is_accepted_and_echoed_through_run(self):
+        job = self.submitted(agreed_by="2099-01-01")
+        self.assertEqual(job["agreed_by"], "2099-01-01")
+        done = self.run_job(job).get_json()
+        self.assertEqual(done["agreed_by"], "2099-01-01")
+
+    def test_malformed_agreed_by_is_refused(self):
+        r = self.submit(agreed_by="not-a-date")
+        self.assertEqual((r.status_code, r.get_json()["error"]["code"]), (400, "bad_request"))
+
+    def test_on_time_delivery_is_recorded_in_the_audit_log(self):
+        job = self.submitted(agreed_by="2099-01-01")  # comfortably in the future
+        self.run_job(job)
+        analysis_event = next(e for e in self.store.read_audit() if e["type"] == "analysis")
+        self.assertEqual(analysis_event["agreed_by"], "2099-01-01")
+        self.assertTrue(analysis_event["on_time"])
+
+    def test_late_delivery_is_recorded_as_not_on_time(self):
+        job = self.submitted(agreed_by="2000-01-01")  # comfortably in the past
+        self.run_job(job)
+        analysis_event = next(e for e in self.store.read_audit() if e["type"] == "analysis")
+        self.assertFalse(analysis_event["on_time"])
+
+    def test_no_agreed_by_means_on_time_is_null_not_a_guess(self):
+        job = self.submitted()
+        self.run_job(job)
+        analysis_event = next(e for e in self.store.read_audit() if e["type"] == "analysis")
+        self.assertIsNone(analysis_event["on_time"])
+
+    def test_escalate_moves_a_pending_job_to_escalated(self):
+        job = self.submitted()
+        escalated = self.escalate(job).get_json()
+        self.assertEqual(escalated["status"], "escalated")
+        self.assertEqual(self.poll(job).get_json()["status"], "escalated")
+        types = [e["type"] for e in self.store.read_audit()]
+        self.assertEqual(types, ["job_created", "job_escalated"])
+
+    def test_escalate_is_idempotent_once_escalated(self):
+        job = self.submitted()
+        first = self.escalate(job).get_json()
+        second = self.escalate(job).get_json()
+        self.assertEqual(first, second)
+        self.assertEqual(sum(1 for e in self.store.read_audit() if e["type"] == "job_escalated"), 1)
+
+    def test_an_escalated_job_refuses_to_run(self):
+        job = self.submitted()
+        self.escalate(job)
+        still_escalated = self.run_job(job).get_json()
+        self.assertEqual(still_escalated["status"], "escalated")
+
+    def test_escalate_refuses_a_done_job(self):
+        job = self.submitted()
+        self.run_job(job)
+        r = self.escalate(job)
+        self.assertEqual((r.status_code, r.get_json()["error"]["code"]), (409, "conflict"))
+
+    def test_only_the_creator_can_escalate(self):
+        job = self.submitted()
+        self.assertEqual(self.escalate(job, key=self.raw_b).status_code, 404)
+
+    def test_unknown_job_escalate_is_404(self):
+        self.assertEqual(self.escalate({"id": "a" * 32}).status_code, 404)
+
+    def test_escalate_via_query_form_behind_vercel_rewrites(self):
+        job = self.submitted()
+        r = self.client.post(f"/api/v1/jobs?id={job['id']}&escalate=true", headers=self.h())
+        self.assertEqual(r.get_json()["status"], "escalated")
 
 
 class AuthTest(ApiTestCase):
@@ -587,15 +668,30 @@ class MeasuresTest(unittest.TestCase):
     def test_an_empty_log_is_none_not_a_made_up_hundred_percent(self):
         self.assertTrue(all(v["share"] is None for v in measures([]).values()))
 
+    def test_coordination_measure_from_a_known_log(self):
+        events = [
+            {"type": "job_created", "agreed_by": "2099-01-01"},  # scorable: has an agreed date
+            {"type": "job_created", "agreed_by": "2099-01-01"},
+            {"type": "job_created", "agreed_by": None},  # accepted, but nothing to score it against
+            {"type": "analysis", "via": "job", "on_time": True},
+            {"type": "analysis", "via": "job", "on_time": False},
+            {"type": "analysis", "via": "analyses"},  # the synchronous path - never counted here
+        ]
+        m = measures(events)
+        self.assertEqual((m["coordination"]["numerator"], m["coordination"]["denominator"]), (1, 2))
+        self.assertAlmostEqual(m["coordination"]["share"], 0.5)
+
     def test_measure_text_matches_the_published_charter(self):
         # Slice 103's charter switch (2026-11-21) added four roles - coordination,
         # research, synthesis, client-delivery - with no audit-log event type of
         # their own yet (their endpoints do not exist: specs/slice-95/spec.md #5).
-        # measures() stays honest about that: it computes only for the roles it
-        # really has instrumentation for, a subset of the charter's roles, never
-        # a made-up measure for one it cannot compute. tools/build_measures.py
-        # already carries the uninstrumented roles through with
-        # instrumented: False rather than fabricating a number for them.
+        # Slice 105 gave coordination a real one (job_created's agreed_by,
+        # analysis's on_time); research/synthesis/client-delivery still have
+        # none. measures() stays honest about that: it computes only for the
+        # roles it really has instrumentation for, a subset of the charter's
+        # roles, never a made-up measure for one it cannot compute.
+        # tools/build_measures.py already carries the uninstrumented roles
+        # through with instrumented: False rather than fabricating a number.
         charter = json.loads((REPO / "site" / ".well-known" / "flashyos-charter.json").read_text())
         published = {r["name"]: r["measure"] for r in charter["roles"]}
         computed = {k: v["measure"] for k, v in measures([]).items()}
@@ -687,6 +783,7 @@ class VercelDoorsTest(unittest.TestCase):
         self.assertEqual(rewrites["/api/v1/verify/:digest"], "/api/v1/verify?digest=:digest")
         self.assertEqual(rewrites["/api/v1/jobs/:job"], "/api/v1/jobs?id=:job")
         self.assertEqual(rewrites["/api/v1/jobs/:job/run"], "/api/v1/jobs?id=:job&run=true")
+        self.assertEqual(rewrites["/api/v1/jobs/:job/escalate"], "/api/v1/jobs?id=:job&escalate=true")
 
     def test_the_old_routes_still_exist(self):
         rules = {str(r) for r in app.url_map.iter_rules()}

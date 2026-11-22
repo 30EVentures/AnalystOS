@@ -53,25 +53,36 @@ def build_openapi():
             }},
             "/api/v1/jobs": {"post": {
                 "operationId": "createJob", "summary": "Submit one document for async analysis", "security": _BEARER,
-                "description": "Returns immediately with a pending job id; no model calls yet. Call POST /jobs/{id}/run to actually run it, then GET /jobs/{id} (or poll it directly) for the result. See https://analystos.dev/docs/api.md#async-jobs for why this is not a background worker.",
+                "description": "Returns immediately with a pending job id; no model calls yet. Call POST /jobs/{id}/run to actually run it, then GET /jobs/{id} (or poll it directly) for the result. An optional agreed_by date (ISO, YYYY-MM-DD) records when this engagement was agreed to deliver by - used only to compute the coordination measure, never enforced. See https://analystos.dev/docs/api.md#async-jobs for why this is not a background worker.",
                 "requestBody": {"required": True, "content": {"multipart/form-data": {"schema": {
                     "type": "object", "required": ["file"],
                     "properties": {"file": {"type": "string", "format": "binary", "description": "csv, xlsx, docx, pptx or pdf; at most 10 MB"},
-                                   "title": {"type": "string"}}}}}},
+                                   "title": {"type": "string"},
+                                   "agreed_by": {"type": "string", "format": "date", "description": "ISO date (YYYY-MM-DD); 400 if malformed"}}}}}},
                 "responses": {
                     "202": {"description": "Pending", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Job"}}}},
-                    "400": _err("no file"), "401": _err("missing or invalid API key"), "415": _err("unsupported file type"),
+                    "400": _err("no file, or a malformed agreed_by date"), "401": _err("missing or invalid API key"), "415": _err("unsupported file type"),
                     "429": _err("rate limited"), "503": _err("no API keys or no job storage configured"),
                 },
             }},
             "/api/v1/jobs/{id}/run": {"post": {
                 "operationId": "runJob", "summary": "Run a pending job (idempotent once no longer pending)", "security": _BEARER,
-                "description": "One bounded call, same time ceiling as POST /analyses - not a background worker (see docs/api.md#async-jobs). Calling this again on a running/done/failed job just returns its current status.",
+                "description": "One bounded call, same time ceiling as POST /analyses - not a background worker (see docs/api.md#async-jobs). Calling this again on a running/done/failed job just returns its current status. An escalated job is also refused - it stays as it is until a human deals with it.",
                 "parameters": [_JOB_ID],
                 "responses": {
                     "200": {"description": "The job's status once this call returns", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Job"}}}},
                     "401": _err("missing or invalid API key"), "404": _err("not found"), "409": _err("the job's upload is missing"),
                     "429": _err("rate limited"), "503": _err("no job storage, or the seal key is malformed"),
+                },
+            }},
+            "/api/v1/jobs/{id}/escalate": {"post": {
+                "operationId": "escalateJob", "summary": "Flag a pending job for a human - coordination's escalate verb", "security": _BEARER,
+                "description": "Moves a pending job to escalated, which blocks it from running until someone else resolves it by hand - this endpoint has no review queue or notification of its own, it only stops automatic progress. Idempotent once already escalated; 409 from any other status.",
+                "parameters": [_JOB_ID],
+                "responses": {
+                    "200": {"description": "The job's status, now escalated", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Job"}}}},
+                    "401": _err("missing or invalid API key"), "404": _err("not found"),
+                    "409": _err("only a pending job can be escalated"), "429": _err("rate limited"), "503": _err("no job storage configured"),
                 },
             }},
             "/api/v1/jobs/{id}": {"get": {
@@ -168,8 +179,10 @@ def build_openapi():
                     "caller": {"type": "string"}, "at": {"type": "string", "format": "date-time"},
                     "approved": {"type": ["boolean", "null"]}}},
                 "Job": {"type": "object", "required": ["id", "status", "created"], "properties": {
-                    "id": {"type": "string"}, "status": {"enum": ["pending", "running", "done", "failed"]},
+                    "id": {"type": "string"}, "status": {"enum": ["pending", "running", "done", "failed", "escalated"]},
                     "created": {"type": "string", "format": "date-time"},
+                    "agreed_by": {"type": ["string", "null"], "format": "date", "description": "the ISO date given at acceptance, if any"},
+                    "assigned_role": {"type": "string", "description": "always 'analysis' - the only real worker role today"},
                     "report_id": {"type": "string", "description": "present once status is done"},
                     "links": {"type": ["object", "null"], "description": "present once status is done"},
                     "error": {"type": "string", "description": "present once status is failed"}}},

@@ -15,9 +15,10 @@ index of endpoints: `GET /api/v1`. Errors are always
 | `GET /api/v1` | none | index: version, endpoints, limits |
 | `GET /api/v1/openapi.json` | none | OpenAPI 3.1 |
 | `POST /api/v1/analyses` | API key | upload one document (`multipart`, field `file`, optional `title` of at most 200 characters, else `400`); returns the report, its seal and, if storage is configured, links |
-| `POST /api/v1/jobs` | API key | same upload; returns immediately, `202 {"id","status":"pending"}` - no model calls yet |
-| `POST /api/v1/jobs/{id}/run` | API key (creator) | run a pending job (idempotent once no longer pending) |
+| `POST /api/v1/jobs` | API key | same upload, plus an optional `agreed_by` (ISO date); returns immediately, `202 {"id","status":"pending"}` - no model calls yet |
+| `POST /api/v1/jobs/{id}/run` | API key (creator) | run a pending job (idempotent once no longer pending; refused if escalated) |
 | `GET /api/v1/jobs/{id}` | API key (creator) | poll a job's status; never executes anything |
+| `POST /api/v1/jobs/{id}/escalate` | API key (creator) | flag a *pending* job for a human; blocks it from running until someone resolves it by hand (no review queue or notification of its own) |
 | `GET /api/v1/reports/{id}?format=html\|pdf\|seal` | API key (creator) or signed link | fetch a stored report |
 | `POST /api/v1/reports/{id}/review` | API key (creator) | `{"approved"?: bool}` -> record that a human reviewed this report |
 | `POST /api/v1/links` | API key (creator) | `{"id","format","ttl_seconds"}` -> an expiring signed URL |
@@ -94,6 +95,23 @@ extra request. A `pending` job that is never run is deleted, upload included, on
 older than the report retention period (`ANALYSTOS_REPORT_TTL_DAYS`, 30 days by default); the
 sweep runs whenever a request creates a job or an analysis, so it is not instant. A finished
 job's record goes on the same schedule.
+
+### Accept, assign, schedule, escalate (Slice 105)
+
+An optional `agreed_by` field on `POST /jobs` (an ISO date, `YYYY-MM-DD`;
+malformed is `400`) records when this engagement was agreed to deliver by.
+Every job's `assigned_role` is always `"analysis"` - the only real worker
+role this codebase has; it is not a free-text field or a choice. Together
+these back the charter's `coordination` measure ("Engagements delivered by
+the date agreed at acceptance, as a share of engagements accepted"),
+computed honestly: a job accepted with no `agreed_by` has nothing to score
+it against and is simply not counted.
+
+`POST /jobs/{id}/escalate` moves a **pending** job to `escalated`, which
+blocks `/run` from doing anything with it (same guard that already refuses
+a non-`pending` job) until someone deals with it outside this API - there is
+no review dashboard here, and escalating notifies nobody. It is idempotent
+on an already-escalated job and `409` from any other status.
 
 ## The `id`
 

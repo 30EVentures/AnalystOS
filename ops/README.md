@@ -32,33 +32,55 @@ script prints a warning every time `offers` is used and before it ever
 constructs the real request; confirm the path with Flashy before passing
 `--execute` on it.
 
-## Token rotation and decision records - no script, because no confirmed endpoint
+## Token rotation - resolved, no script needed
 
-`ROADMAP.md`'s L3 criteria need `analystos-agent`'s never-expiring token rotated
-(`revocable`) and gated actions to produce decision records (`auditable`).
-Neither Flashy document gave an exact endpoint for either - only that the
-register checks for them. Writing a script against a guessed path here would be
-worse than not writing one: a confidently-wrong request looks the same as a
-correct one until it runs.
+Turned out not to need a script at all. `@flashyos/agent`'s own README is
+explicit: agent names are unique per org, and **re-minting rotates** - running
+`npx @flashyos/agent init` again with the same agent name replaces that agent's
+token and the old one stops working immediately. There is a separate `revoke`
+command for killing a leaked token outright (no un-revoke; re-mint instead).
+Done for real 2026-11-22: `analystos-agent`'s original never-expiring token was
+replaced this way.
 
-**Before building these for real:**
-1. Ask Flashy (or read `/api/v1/openapi.json` on the live hub, if reachable
-   with a real token) for the exact token-rotation endpoint.
-2. Confirm whether "decision records" are something AnalystOS's own API must
-   start emitting (most likely - `analystos.api_v1.store`'s existing audit log is
-   the natural place), or something FlashyOS's own side reads differently. If
-   it's the former, this is product work in `analystos/api_v1/`, not an ops
-   script - see `ROADMAP.md`.
-3. Only then write a script matching `flashy_declare.py`'s shape: confirmed
-   endpoint, redacted token in every printed request, a dry run by default, and
-   tests that mock the one network-touching function rather than ever calling
-   the real host.
+## `flashy_decide.py` - decision records
+
+Confirmed endpoint, read from `@flashyos/agent@0.21.0`'s own published source
+(the npm tarball's `dist/chunk-*.mjs`, not the README's prose alone, and not
+guessed):
+
+    POST /api/v1/orgs/{orgId}/decisions
+    body: {orgId, token, agentName, summary, impact}
+
+`impact` is one of `LOW` (auto-approves), `MEDIUM`, `HIGH`, `CRITICAL` (the
+package's own tier 1-4 mapping). This is the exact call `@flashyos/agent`'s
+`requestApproval()`/`decide()` make; `flashy_decide.py` mirrors it in Python
+so AnalystOS's own tooling can log a decision without depending on Node.
+
+```
+python3 ops/flashy_decide.py "deploy the seven-role charter" --tier 2 \
+    --org-id analystos --agent-name analystos-agent \
+    --token "$FLASHYOS_AGENT_TOKEN"        # prints the request, sends nothing
+
+... --execute                                # sends it for real
+```
+
+Defaults to a dry run, same shape as `flashy_declare.py`: always prints the
+exact request first, needs `--execute` to send anything, never prints the
+token in full.
+
+**This only records; it does not block.** Straight from the package's own
+docs: v1 is visibility and an audit trail, not enforcement - nothing here
+stops AnalystOS's own code from doing the thing being logged. Calling this for
+any specific real action remains a separate, per-use outward decision under
+CLAUDE.md's own rule, regardless of how confirmed the endpoint now is. Nothing
+in this repository calls it automatically.
 
 ## Testing discipline
 
-`tests/test_flashy_declare.py` never calls `api.flashyos.com`. The dry-run tests
-run the real CLI without `--execute`; the one test that proves `--execute` really
-reaches the network-touching function does so in-process with that function
-mocked out (`unittest.mock.patch`), never a real request. If a script is added
-for token rotation or decision records, follow the same pattern - no test in
-this repository should ever make a live call to a third party's API.
+Neither `tests/test_flashy_declare.py` nor `tests/test_flashy_decide.py` ever
+calls `api.flashyos.com`. The dry-run tests run the real CLI without
+`--execute`; the one test that proves `--execute` really reaches the
+network-touching function does so in-process with that function mocked out
+(`unittest.mock.patch`), never a real request. Any future script here follows
+the same pattern - no test in this repository should ever make a live call to
+a third party's API.

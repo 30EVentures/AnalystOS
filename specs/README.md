@@ -119,3 +119,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 105 | the coordination role's accept/assign/schedule/escalate, honestly | [spec](slice-105/spec.md) |
 | 106 | the public devlog, with a real privacy leak found and closed before it shipped | [spec](slice-106/spec.md) |
 | 107 | the Flashy fence: freeze the FlashyOS integration before the rebuild | [spec](slice-107/spec.md) |
+| 108 | the role catalog: 73 entry-level jobs, every one honestly "planned" | [spec](slice-108/spec.md) |

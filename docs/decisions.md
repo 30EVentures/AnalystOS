@@ -2,6 +2,33 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-23 — Slice 108: one shop for 73 entry-level roles, none claimed before it is proven
+
+Owner's decision, same day as Slice 107 and widening it: not only consulting but
+a one-stop shop for entry-level white-collar work - the owner listed 73 roles,
+from equity research to claims adjusting to junior software development.
+
+Seventy-three separate products would never be finished, so each role is a
+configuration of a shared engine: the roles fall into 13 families, each built on
+one skill (a cited brief, a deck, a sourced workbook, a reconciliation, a case
+file, code its tests verify, ...). The real cost per role is its evaluation set,
+not its code.
+
+The catalog is written down first, as data, with every role `planned`. The
+validator makes `available` impossible without a passed evaluation and an
+integer rate in US cents per engagement hour, so neither the site nor `/api/v2`
+can ever claim a role works before its own evaluation says so - the same
+refusal-first stance the seal and the fence take.
+
+Each role also states a boundary. Roles that would act in a client's tools
+(post, send, book an entry) are `approval-gated`, each action approved by a named
+human. Roles whose decisions are licensed or regulated (claims, underwriting,
+credit, audit opinions, tax and payroll filings, AML and sanctions dispositions,
+hiring and pay, legal advice, actuarial sign-off) are `human-decides`: the agent
+prepares the whole case and a qualified, named human makes the listed decisions.
+Which rules apply where is general knowledge, not checked rule by rule; each
+wave-4 role gets a real review of its rules before it is built.
+
 ## 2026-11-23 — Slice 107: rebuild into a consulting product, with the Flashy integration fenced
 
 Owner's decision: rebuild AnalystOS so a person or an agent enters a business

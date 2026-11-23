@@ -7,6 +7,11 @@ Tests are counted by *discovering* the suite (nothing is run); specs are the
 ``specs/slice-N/spec.md`` files. Every figure is matched by an explicit pattern
 below. A pattern that no longer matches exactly once is an error, so rewording the
 page cannot silently turn a live number into a frozen one.
+
+The test figure is the number of tests *in the suite*, not the number that pass
+(Slice 111): some tests are skipped on a machine without Node.js, so a pass count
+would depend on who ran this. The page's wording must say "in the suite", never
+"passing"; ``PASSING_CLAIM`` is the shape the suite refuses.
 """
 
 import re
@@ -17,16 +22,28 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PAGE = ROOT / "site" / "index.html"
 
-# (name, regex with one group around the number(s) to replace, kind)
+# (name, regex with one group around the number to replace, kind)
 PATTERNS = [
-    ("hero stat", r"<strong>(\d+)</strong><span>automated tests passing", "tests"),
+    ("hero stat", r"<strong>(\d+)</strong><span>automated tests in the suite", "tests"),
+    ("hero specs", r"<strong>(\d+)</strong><span>written specs behind the build", "specs"),
     ("built list", r"(\d+) automated tests with mocked calls", "tests"),
-    ("evidence card", r"(\d+) / \d+</b><p class=\"note\"[^>]*>automated tests passing", "tests_pair"),
+    ("evidence card", r"(\d+) automated tests</b><p class=\"note\"[^>]*>in the suite", "tests"),
     ("specs card", r"(\d+) specs</b>", "specs"),
     ("faq", r"(\d+) automated tests, a live suite", "tests"),
-    ("about", r"with (\d+) automated tests passing", "tests"),
-    ("measure", r"meas:'(\d+) mocked tests passing", "tests"),
+    ("about", r"backed by (\d+) automated tests", "tests"),
+    ("measure", r"meas:'(\d+) mocked tests in the suite", "tests"),
 ]
+
+# A test count presented as a pass count ("1352 automated tests passing", "1352
+# tests with mocked calls: ..., passing in under a minute") or as a pass ratio
+# ("1352 / 1352"). The count includes skipped tests, so neither is true. Matches
+# within one sentence and one text node, plus the hero's </strong><span> split.
+PASSING_CLAIM = r"\d+(?:</strong><span>|\s)[^.<]{0,80}?\btests\b[^.<]{0,80}?\bpassing\b|\b(\d+) / \1\b"
+
+
+def passing_claims(text):
+    """Every place the page presents the test count as a count of passing tests."""
+    return [m.group(0) for m in re.finditer(PASSING_CLAIM, text)]
 
 
 def count_tests():
@@ -47,11 +64,8 @@ def rewrite(text, tests, specs):
         if len(matches) != 1:
             problems.append(f"{name}: pattern matched {len(matches)} times, expected exactly 1 (was the page reworded?)")
             continue
-        if kind == "tests_pair":
-            text = regex.sub(lambda m: re.sub(r"^\d+ / \d+", f"{tests} / {tests}", m.group(0)), text, count=1)
-        else:
-            value = specs if kind == "specs" else tests
-            text = regex.sub(lambda m: m.group(0).replace(m.group(1), str(value), 1), text, count=1)
+        value = specs if kind == "specs" else tests
+        text = regex.sub(lambda m: m.group(0).replace(m.group(1), str(value), 1), text, count=1)
     return text, problems
 
 
@@ -65,8 +79,6 @@ def stale_figures(text, tests, specs):
         want = specs if kind == "specs" else tests
         if int(m.group(1)) != want:
             stale.append(f"{name}: page says {m.group(1)}, actual {want}")
-        elif kind == "tests_pair" and not re.search(rf"{tests} / {tests}<", m.group(0) + "<"):
-            stale.append(f"{name}: the second number of the pair is wrong")
     return stale
 
 
@@ -80,6 +92,7 @@ def main(argv=None):
         return 1
     if check:
         stale = stale_figures(text, tests, specs)
+        stale += [f"claims tests pass, but the count includes skipped ones: {c!r}" for c in passing_claims(text)]
         print("\n".join(stale) if stale else f"homepage counts are true ({tests} tests, {specs} specs)")
         return 1 if stale else 0
     PAGE.write_text(new, encoding="utf-8")

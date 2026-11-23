@@ -2,6 +2,28 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-23 — Slice 111: the homepage's test figure says what it counts
+
+A fresh-context review of Slice 108 found two wrong figures on the homepage.
+First, it called the discovered test count "passing", although 14 of those
+tests are `skipUnless` tests that skip on a machine without Node.js or the npm
+installs. Second, its hero still said "49 written specs" while the evidence
+card said 102.
+
+For the tests, the wording changed, not the number. The other option was to
+count tests that actually pass. That count depends on the machine, so the
+page's figure and `site_counts.py --check` would flip depending on who ran
+them. It would also mean running the whole suite from a tool that the suite
+calls itself. The discovered count is deterministic and offline. The page now
+says "automated tests in the suite", drops the "N / N" pass ratio, and says
+that tests needing Node.js are skipped without it.
+`site_counts.PASSING_CLAIM` refuses all five old wordings, and `--check`
+reports any that come back.
+
+No generator owned the hero's spec figure. It had been typed by hand and was
+frozen since about Slice 49. It now has its own `site_counts.py` pattern,
+generated from the same `count_specs()` as the evidence card.
+
 ## 2026-11-23 — Slice 110: the engagement gate recomputes, never trusts (review of Slice 109)
 
 A fresh-context review of Slice 109 finished after it merged (PR #96). Two ways

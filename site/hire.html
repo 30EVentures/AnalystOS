@@ -170,7 +170,7 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
         <label for="code">Access code</label>
         <input type="password" id="code" required>
       </div>
-      <p class="fine">Price: to be determined. Nothing is charged on this page. Today every role delivers a verified analysis deck, not its native work product. Roles marked "tested on worked examples" have not yet been tested on the live model.</p>
+      <p class="fine">Price: to be determined. Nothing is charged on this page. Today every role delivers a verified analysis deck, not its native work product. No role has been tested on the live model yet; each role says which worked example it was checked on.</p>
       <button class="btn" type="submit" id="go">Get the deck</button>
       <div class="result" id="result" role="status" aria-live="polite"></div>
     </form>
@@ -179,7 +179,7 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
 
 <footer>
   <div class="wrap">
-    <p class="fine">This page is a private preview gated by a shared access code. Your problem and answers are used for one request and are not stored. Each request that passes the scoping check makes one paid model call.</p>
+    <p class="fine">This page is a private preview gated by a shared access code. Your problem and answers are used for one request and are not stored. Each request that passes the scoping check makes one paid model call, or at most two if the first answer fails the checks. A retry after a timeout is a new request.</p>
   <!-- studio:footer:start -->
 <p class="studio-foot">AnalystOS is built by <a href="https://30eventures.com">30E Ventures</a>, a machine-native venture studio in Toronto building the agentic internet. <a href="https://30eventures.com/portfolio">Portfolio</a> &middot; <a href="https://30eventures.com/about">About</a> &middot; <a href="https://30eventures.com/brand">Brand</a> &middot; <a href="https://30eventures.com/press">Press</a> &middot; <a href="https://30eventures.com/contact">Contact</a></p>
 <!-- studio:footer:end -->
@@ -202,7 +202,7 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
     if (role.boundary === 'human-decides') parts.push('Prepares the decision; a qualified person decides: ' + role.human_decides.join('; ') + '.');
     else if (role.boundary === 'approval-gated') parts.push('Drafts only; you approve before anything happens: ' + role.gated_actions.join('; ') + '.');
     else parts.push('Delivers analysis; acts on nothing.');
-    parts.push(role.tested === 'live' ? 'Tested on the live model.' : 'Tested on worked examples, not yet on the live model.');
+    parts.push(role.tested === 'live' ? 'Tested on the live model.' : role.tested === 'mock' ? 'Tested on a worked example written for this role, not yet on the live model.' : 'Tested on a worked example written for a related role in the same family, not yet on the live model.');
     meta.textContent = parts.join(' ');
   }
   function showQuestions(role) {
@@ -239,7 +239,7 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
     var answers = {};
     qBox.querySelectorAll('textarea').forEach(function (t) { if (t.value.trim()) answers[t.getAttribute('data-qid')] = t.value; });
     var go = document.getElementById('go');
-    go.disabled = true; result.className = 'result'; result.textContent = 'Working on it. This usually takes a minute or two.';
+    go.disabled = true; result.className = 'result'; result.textContent = 'Working on it. This can take a few minutes.';
     fetch('/api/v2/engagements', {
       method: 'POST',
       headers: {'Content-Type': 'application/json', 'X-Access-Code': document.getElementById('code').value},
@@ -251,9 +251,16 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
         result.className = 'result ok'; result.textContent = 'Done. '; result.appendChild(a);
       });
       return r.json().then(function (j) {
-        var e = j.error || {}, msg = e.message || 'Something went wrong.';
+        var e = typeof j.error === 'string' ? {message: j.error} : (j.error || {});
+        var msg = e.message || 'Something went wrong.';
         if (e.open_questions && e.open_questions.length) msg += ' Still to answer: ' + e.open_questions.join(', ') + '.';
         result.className = 'result err'; result.textContent = msg;
+        var details = e.problems || [];
+        if (details.length) {
+          var box = el('details'), sum = el('summary', {}, 'Details (' + details.length + ')'), list = el('ul');
+          details.forEach(function (p) { list.appendChild(el('li', {}, p)); });
+          box.appendChild(sum); box.appendChild(list); result.appendChild(box);
+        }
       });
     }).catch(function () { result.className = 'result err'; result.textContent = 'The request did not complete. Please try again.'; })
       .finally(function () { go.disabled = false; });

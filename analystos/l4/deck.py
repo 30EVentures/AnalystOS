@@ -17,6 +17,7 @@ content digest so a reader can tie the file to the spec, not a signature.
 """
 
 import contextvars
+import math
 import hashlib
 import io
 import json
@@ -79,9 +80,49 @@ def _trim(text):
     return text.rstrip("0").rstrip(".") if "." in text else text
 
 
+def _nonzero(text, value):
+    """A nonzero value is never written as zero: widen to its first two significant digits."""
+    if value == 0 or any(ch in "123456789" for ch in text):
+        return text
+    places = min(12, max(2, 1 - math.floor(math.log10(abs(value)))))
+    text = re.sub(r"[0-9][0-9,]*(?:\.[0-9]+)?", _trim(f"{abs(value):.{places}f}"), text, count=1)
+    return text if value > 0 or text.startswith("-") else "-" + text
+
+
 def format_value(figure):
     """The one way a figure's value is written anywhere in a deck: sentences, tiles,
     chart labels and the sources slides all use it."""
+    return _nonzero(_format_value(figure), figure["value"])
+
+
+def exact_value(figure):
+    """The value as stored, to four decimal places, so a reader can redo every calculation
+    on the sources slides by hand; written with the same unit marks as ``format_value``."""
+    value, unit = figure["value"], figure["unit"]
+    text = _trim(f"{abs(value):,.4f}")
+    sign = "-" if value < 0 and text.strip("0.,") else ""
+    if unit == "percent":
+        return f"{sign}{text}%"
+    if unit == "points":
+        return f"{sign}{text} pts"
+    if unit == "usd":
+        return f"{sign}${text}"
+    if unit == "ratio":
+        return f"{sign}{text}x"
+    return f"{sign}{text}" + (" months" if unit == "months" else "")
+
+
+def value_cell(figure):
+    """The sources-slide value: as shown in the deck, plus the exact value when they differ."""
+    shown, exact = format_value(figure), exact_value(figure)
+    def number(text):
+        return float(re.sub(r"[^0-9.]", "", text) or "nan")
+    if number(exact) == number(shown):  # "$2.50" and "$2.5" are the same value
+        return shown
+    return f"{shown} (exact {exact})"
+
+
+def _format_value(figure):
     value, unit = figure["value"], figure["unit"]
     small = abs(value) < 1 and value != 0
     if unit in ("percent", "points"):
@@ -339,7 +380,8 @@ def _chart(slide, spec, chart, left, top, width, height):
     value_axis = graphic_chart.value_axis
     value_axis.visible = False
     value_axis.has_major_gridlines = False
-    value_axis.minimum_scale = 0
+    if all(f["value"] >= 0 for f in charted):  # a negative bar needs the axis below zero
+        value_axis.minimum_scale = 0
     category_axis = graphic_chart.category_axis
     category_axis.tick_labels.font.size = Pt(11)
     category_axis.tick_labels.font.color.rgb = MUTED
@@ -507,7 +549,10 @@ def _source_text(figure):
         return f"Client's words: “{figure['quote']}”"
     if figure["basis"] == "computed":
         return f"Calculated: {formula(figure['operation'], figure['inputs'])}"
-    return f"Assumption: {figure['rationale']}"
+    figures = _FIGURES.get()
+    rationale = _TAG_RE.sub(lambda m: f"{format_value(figures[m.group(1)])} ({m.group(1)})"
+                            if m.group(1) in figures else m.group(0), figure["rationale"])
+    return f"Assumption: {rationale}"
 
 
 def _sources_slides(prs, spec, s, number, total):
@@ -517,7 +562,7 @@ def _sources_slides(prs, spec, s, number, total):
     for k, chunk in enumerate(chunks):
         title = s["title"] if len(chunks) == 1 else f"{s['title']} ({k + 1} of {len(chunks)})"
         slide = _frame(prs, spec, title, [], number + k, total)
-        rows = [[f["id"], f["label"], format_value(f), f["basis"].title(), _source_text(f)] for f in chunk]
+        rows = [[f["id"], f["label"], value_cell(f), f["basis"].title(), _source_text(f)] for f in chunk]
         _table(slide, rows, [0.6, 3.2, 1.3, 1.2, 6.0], BODY_TOP, ["Ref", "Figure", "Value", "Basis", "Where it comes from"], 10)
         slides.append(slide)
     return slides

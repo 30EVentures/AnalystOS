@@ -1,0 +1,11 @@
+[
+ {"name": "strip a number even when it does not state its figure", "old": "            if tokens and states(tokens[-1], figure):", "new": "            if tokens:"},
+ {"name": "kind ignored when deciding a number states its figure", "old": "    if token.kind not in _KIND_FOR_UNIT.get(figure.get(\"unit\"), set()):\n        return False", "new": "    if False:\n        return False"},
+ {"name": "5% gap ignored", "old": "    return token.value == 0 if fv == 0 else abs(token.value - fv) / abs(fv) <= 0.05", "new": "    return True"},
+ {"name": "ambiguous quote narrowed anyway", "old": "    if len(candidates) != 1:\n        return None, None", "new": "    if not candidates:\n        return None, None"},
+ {"name": "computed value trusted", "old": "                            fig[\"value\"] = result", "new": "                            pass"},
+ {"name": "unexpected figure fields kept", "old": "                    if key not in _FIGURE_KEYS[basis]:\n                        del fig[key]", "new": "                    if False:\n                        del fig[key]"},
+ {"name": "unused figures kept", "old": "        doc[\"figures\"] = _drop_unused(doc)", "new": "        pass"},
+ {"name": "charted figures dropped as unused", "old": "            used.update(x for x in chart[\"figure_ids\"] if isinstance(x, str))", "new": "            pass"},
+ {"name": "durations left as digits", "old": "            return _durations(strip_redundant_numbers(value, figure_map))", "new": "            return strip_redundant_numbers(value, figure_map)"}
+]

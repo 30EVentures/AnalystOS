@@ -74,7 +74,7 @@ class LlmsTxtTest(unittest.TestCase):
             with self.subTest(url=url):
                 path = local_path(url)
                 if path is None:
-                    self.assertIn(url[len(BASE):], spec_paths | {"/api/v1"})
+                    self.assertIn(url[len(BASE):], spec_paths | {"/api/v1", "/api/v2/catalog"})  # v2 catalog: a public GET, see api_v2/blueprint.py
                 else:
                     self.assertTrue(path.exists(), f"{url} -> {path} is missing")
 

@@ -2,6 +2,7 @@ User-agent: *
 Allow: /
 Allow: /api/v1$
 Allow: /api/v1/openapi.json$
+Allow: /api/v2/catalog$
 Disallow: /api/
 
 Sitemap: https://analystos.dev/sitemap.xml

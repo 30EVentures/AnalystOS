@@ -31,9 +31,11 @@ _ID_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 MAX_RATE_CENTS = 2**53 - 1
 _TOP_KEYS = {"format", "description", "statuses", "boundaries", "waves", "families", "roles"}
 _EVAL_KEYS = {"set", "passed", "method"}
-# How a role's evaluation was run: "mock" = worked examples written and checked in a
-# working session (no model call); "live" = the production model on the eval set.
-EVAL_METHODS = ("mock", "live")
+# How a role's evaluation was run: "mock" = a worked example written for this role and
+# checked in a working session (no model call); "mock-family" = the same, but the example
+# was written for another role in its family (Slice 119: the honest label for 60 of the
+# 73 roles); "live" = the production model on the eval set.
+EVAL_METHODS = ("mock", "mock-family", "live")
 # The owner's decision, 2026-11-23: no price has been set for any role yet; pricing is to be determined.
 PRICE_TBD = "tbd"
 # What a role delivers today, as opposed to its native deliverables (which may not exist yet).

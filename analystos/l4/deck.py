@@ -18,6 +18,8 @@ import json
 import re
 
 from pptx import Presentation
+from pptx.chart.data import CategoryChartData
+from pptx.enum.chart import XL_CHART_TYPE, XL_LABEL_POSITION
 from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
@@ -52,6 +54,13 @@ _TAG_RE = re.compile(r"\[(F[1-9][0-9]{0,2})\]")
 def spec_digest(spec):
     canonical = json.dumps(spec, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
     return hashlib.sha256(canonical).hexdigest()
+
+
+# Excel number formats per unit, so a chart's data labels read exactly like the deck's text.
+NUMBER_FORMATS = {
+    "percent": '0.#"%"', "points": '0.#" pts"', "usd": '"$"#,##0', "count": "#,##0.#",
+    "ratio": '0.00"x"', "months": '0.#" months"', "other": "#,##0.##",
+}
 
 
 def format_value(figure):
@@ -281,6 +290,45 @@ def _issue_tree_slide(prs, spec, s, number, total):
     return slide
 
 
+def _chart(slide, spec, chart, left, top, width, height):
+    """A native, editable column chart whose bars are the charted figures' verified values."""
+    figures = {f["id"]: f for f in spec["content"]["figures"]}
+    charted = [figures[fid] for fid in chart["figure_ids"]]
+    data = CategoryChartData(number_format=NUMBER_FORMATS[charted[0]["unit"]])
+    data.categories = list(chart["labels"])
+    data.add_series("Value", [f["value"] for f in charted])
+    graphic = slide.shapes.add_chart(XL_CHART_TYPE.COLUMN_CLUSTERED, left, top, width, height, data)
+    graphic_chart = graphic.chart
+    graphic_chart.has_legend = False
+    graphic_chart.has_title = True
+    graphic_chart.chart_title.text_frame.text = ""
+    _rich(graphic_chart.chart_title.text_frame.paragraphs[0], chart["title"], 13, INK, bold=True)
+    plot = graphic_chart.plots[0]
+    plot.gap_width = 80
+    plot.has_data_labels = True
+    labels = plot.data_labels
+    labels.number_format = NUMBER_FORMATS[charted[0]["unit"]]
+    labels.number_format_is_linked = False
+    labels.position = XL_LABEL_POSITION.OUTSIDE_END
+    labels.font.size = Pt(12)
+    labels.font.bold = True
+    labels.font.color.rgb = INK
+    value_axis = graphic_chart.value_axis
+    value_axis.visible = False
+    value_axis.has_major_gridlines = False
+    value_axis.minimum_scale = 0
+    category_axis = graphic_chart.category_axis
+    category_axis.tick_labels.font.size = Pt(11)
+    category_axis.tick_labels.font.color.rgb = MUTED
+    category_axis.format.line.color.rgb = RULE
+    series = plot.series[0]
+    for i, fig in enumerate(charted):
+        point = series.points[i]
+        point.format.fill.solid()
+        point.format.fill.fore_color.rgb = FAINT if fig["basis"] == "assumption" else ACCENT
+    return graphic
+
+
 def _finding_slide(prs, spec, s, number, total):
     slide = _frame(prs, spec, s["title"], s["figure_ids"], number, total)
     left_w = Inches(7.2)
@@ -288,9 +336,18 @@ def _finding_slide(prs, spec, s, number, total):
     p = frame.paragraphs[0]
     _run(p, s["branch"].upper(), 12, ACCENT, bold=True)
     p.space_after = Pt(10)
+    has_chart = "chart" in s
     for point in s["bullets"]:
-        _bullet(frame, point, 17 if len(point) <= 160 else 15, space=12)
-    _stat_tiles(slide, spec, s["figure_ids"], MARGIN, BODY_TOP + Inches(3.4), left_w)
+        _bullet(frame, point, (15 if has_chart else 17) if len(point) <= 160 else 14, space=8 if has_chart else 12)
+    if s.get("so_what"):
+        para = frame.add_paragraph()
+        para.space_before = Pt(6)
+        _run(para, "So what: ", 14 if has_chart else 15, ACCENT, bold=True)
+        _rich(para, s["so_what"], 14 if has_chart else 15, INK, bold=True)
+    if has_chart:
+        _chart(slide, spec, s["chart"], MARGIN, BODY_TOP + Inches(2.25), left_w, Inches(2.75))
+    else:
+        _stat_tiles(slide, spec, s["figure_ids"], MARGIN, BODY_TOP + Inches(3.4), left_w)
     right = MARGIN + left_w + Inches(0.4)
     width = SLIDE_W - MARGIN - right
     _rect(slide, right, BODY_TOP, width, Inches(4.9), ACCENT_SOFT)

@@ -24,6 +24,22 @@ No generator owned the hero's spec figure. It had been typed by hand and was
 frozen since about Slice 49. It now has its own `site_counts.py` pattern,
 generated from the same `count_specs()` as the evidence card.
 
+## 2026-11-23 — Slice 114: charts that cannot carry a number of their own
+
+Owner's feedback on the first deck: add some graphs and a tiny bit more text.
+Each finding may now carry one bar chart, but the model only chooses which
+verified figures to chart and labels the bars; each bar's height is the
+figure's verified value, read by code, so a chart cannot introduce a number.
+Charts are native PowerPoint charts (editable by the client), formatted by unit,
+with assumption bars in grey. Each finding also gets one "so what" sentence,
+under the same number rule as everything else. Kept deliberately small: one
+chart type (columns), one extra sentence per finding.
+
+Quick Look (used to preview slides in the session) does not draw chart
+styling; the chart XML was read directly to confirm the number formats, colours
+and hidden value axis are in the file. How PowerPoint itself draws them was not
+checked here.
+
 ## 2026-11-23 — Slice 113: the deck renderer, and a renderer that adds no claims
 
 `analystos/l4/deck.py` lays out a verified deck spec as a 16:9 PowerPoint deck:

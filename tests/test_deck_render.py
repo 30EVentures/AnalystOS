@@ -61,6 +61,24 @@ class RenderTest(unittest.TestCase):
         self.assertIn("Assumption: A planning assumption", sources)
         self.assertIn("3 pts", sources)  # a percentage-point change is not shown as a percent
 
+    def test_each_finding_has_a_native_chart_of_verified_values(self):
+        figures = {f["id"]: f for f in SPEC["content"]["figures"]}
+        findings = [s for s in SPEC["slides"] if s["kind"] == "finding"]
+        rendered = [shape.chart for slide in PRS.slides for shape in slide.shapes if shape.has_chart]
+        self.assertEqual(len(rendered), len(findings))
+        for chart, spec_slide in zip(rendered, findings):
+            expected = [figures[fid]["value"] for fid in spec_slide["chart"]["figure_ids"]]
+            self.assertEqual(list(chart.plots[0].series[0].values), expected)
+            self.assertEqual(list(chart.plots[0].categories), spec_slide["chart"]["labels"])
+            self.assertFalse(chart.value_axis.visible)
+        self.assertEqual(rendered[0].plots[0].data_labels.number_format, deck.NUMBER_FORMATS["percent"])
+
+    def test_so_what_is_on_each_finding_slide(self):
+        texts = "\n".join(slide_text(s) for s in PRS.slides)
+        for spec_slide in SPEC["slides"]:
+            if spec_slide["kind"] == "finding":
+                self.assertIn("So what: " + spec_slide["so_what"], texts)
+
     def test_the_file_carries_a_digest_of_its_spec(self):
         self.assertIn(f"spec sha256 {deck.spec_digest(SPEC)}", PRS.core_properties.keywords)
         self.assertEqual(PRS.core_properties.author, "AnalystOS")

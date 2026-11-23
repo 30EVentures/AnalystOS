@@ -39,6 +39,9 @@ UNITS = ("percent", "points", "usd", "count", "ratio", "months", "other")
 BASES = ("client", "computed", "assumption")
 HORIZONS = ("First 30 days", "Days 31-60", "Days 61-90")
 TITLE_KEYS = ("situation", "options", "recommendation", "roadmap", "kpis", "risks")
+BRANCH_KEYS = {"branch", "finding", "points", "hypotheses", "so_what"}
+CHART_KEYS = {"title", "figure_ids", "labels"}
+MAX_CHART_LABEL = 40
 # L2's operations plus two a consulting estimate needs and L2 never did:
 # product (a count times a price) and percent_of (a total times a percent / 100).
 OPERATIONS = tuple(_OPERATIONS) + ("product", "percent_of")
@@ -86,8 +89,14 @@ TOOL = {
                                        "inputs": {"type": "array", "items": {"type": "string"}},
                                        "rationale": _string()}}},
             "issue_tree": {"type": "array", "minItems": 2, "maxItems": 5, "items": {
-                "type": "object", "required": ["branch", "finding", "points", "hypotheses"],
-                "properties": {"branch": _string(160), "finding": _string(200),
+                "type": "object", "required": ["branch", "finding", "points", "hypotheses", "so_what"],
+                "properties": {"branch": _string(160), "finding": _string(200), "so_what": _string(200),
+                               "chart": {"type": "object", "required": ["title", "figure_ids", "labels"],
+                                         "properties": {"title": _string(160),
+                                                        "figure_ids": {"type": "array", "minItems": 2, "maxItems": 6,
+                                                                       "items": {"type": "string"}},
+                                                        "labels": {"type": "array", "minItems": 2, "maxItems": 6,
+                                                                   "items": _string(MAX_CHART_LABEL)}}},
                                "points": {"type": "array", "minItems": 1, "maxItems": 4, "items": _string(_MAX_BULLET)},
                                "hypotheses": {"type": "array", "minItems": 1, "maxItems": 4, "items": {
                                    "type": "object", "required": ["text", "verdict"],
@@ -123,6 +132,11 @@ Method:
   its finding as an action title (a full sentence that states the conclusion),
   1-4 supporting points, and 1-4 hypotheses, each marked supported, refuted or
   untested. Be honest: untested means the client's information cannot settle it.
+- For each branch also write so_what: one sentence on what the finding means
+  for the decision. Where two to six figures in the same unit tell the branch's
+  story (before and after, segment against segment), add a chart: a title, the
+  figure ids in order, and a short label per bar. Bars are drawn from the
+  figures' own values; a chart adds no numbers of its own.
 - Lay out 2-4 distinct options, recommend exactly one by name, give a roadmap for
   exactly these horizons in this order: {", ".join(HORIZONS)}, then 2-6 KPIs and
   2-6 risks with mitigations.
@@ -325,6 +339,12 @@ def _texts(content):
             continue
         add(f"issue_tree[{i}].branch", branch.get("branch"))
         add(f"issue_tree[{i}].finding", branch.get("finding"))
+        add(f"issue_tree[{i}].so_what", branch.get("so_what"))
+        chart = branch.get("chart")
+        if isinstance(chart, dict):
+            add(f"issue_tree[{i}].chart.title", chart.get("title"))
+            for j, label in enumerate(_list(chart.get("labels"))):
+                add(f"issue_tree[{i}].chart.labels[{j}]", label)
         for j, point in enumerate(_list(branch.get("points"))):
             add(f"issue_tree[{i}].points[{j}]", point)
         for j, hyp in enumerate(_list(branch.get("hypotheses"))):
@@ -354,6 +374,30 @@ def _texts(content):
 
 def _list(value):
     return value if isinstance(value, list) else []
+
+
+def _chart_problems(where, chart, figures):
+    """A chart may only point at verified figures; it carries no values of its own."""
+    if not isinstance(chart, dict) or set(chart) != CHART_KEYS:
+        return [f"{where} must have exactly title, figure_ids and labels"]
+    problems = []
+    if not _is_sentence(chart["title"]) or not _nonempty(chart["title"], 160):
+        problems.append(f"{where}.title must be a sentence of 4 to 20 words")
+    ids, labels = chart["figure_ids"], chart["labels"]
+    if not isinstance(ids, list) or not 2 <= len(ids) <= 6 or not all(isinstance(x, str) for x in ids):
+        return problems + [f"{where}.figure_ids must list 2 to 6 figure ids"]
+    if len(set(ids)) != len(ids):
+        problems.append(f"{where}.figure_ids repeats a figure")
+    unknown = [x for x in ids if x not in figures]
+    if unknown:
+        problems.append(f"{where}.figure_ids names unknown or unverified figures {unknown}")
+    elif len({figures[x]["unit"] for x in ids}) != 1:
+        problems.append(f"{where} mixes units; every bar must share one unit")
+    if not isinstance(labels, list) or len(labels) != len(ids):
+        problems.append(f"{where}.labels must give one label per figure")
+    elif not all(_nonempty(label, MAX_CHART_LABEL) for label in labels):
+        problems.append(f"{where}.labels must be non-empty and at most {MAX_CHART_LABEL} characters")
+    return problems
 
 
 def _count_problem(name, value, lo, hi):
@@ -401,9 +445,13 @@ def verify_content(content, client_text):
     seen_branches = set()
     for i, branch in enumerate(_list(tree)):
         where = f"issue_tree[{i}]"
-        if not isinstance(branch, dict) or set(branch) != {"branch", "finding", "points", "hypotheses"}:
-            problems.append(f"{where}: must have exactly branch, finding, points, hypotheses")
+        if not isinstance(branch, dict) or not BRANCH_KEYS <= set(branch) <= BRANCH_KEYS | {"chart"}:
+            problems.append(f"{where}: must have branch, finding, points, hypotheses, so_what and optionally chart")
             continue
+        if not _is_sentence(branch["so_what"]) or not _nonempty(branch["so_what"], 200):
+            problems.append(f"{where}.so_what must be one sentence (4 to 20 words, at most 200 characters)")
+        if "chart" in branch:
+            problems += _chart_problems(f"{where}.chart", branch["chart"], figures)
         if not _nonempty(branch["branch"], 160):
             problems.append(f"{where}.branch must be non-empty text")
         elif branch["branch"].strip().lower() in seen_branches:
@@ -461,6 +509,9 @@ def verify_content(content, client_text):
                 problems.append(f"{name}[{i}] needs {' and '.join(keys)}")
 
     used = set()
+    for branch in _list(tree):
+        if isinstance(branch, dict) and isinstance(branch.get("chart"), dict):
+            used.update(x for x in _list(branch["chart"].get("figure_ids")) if isinstance(x, str))
     for where, text in _texts(content):
         if isinstance(text, str):
             problems += number_problems(where, text, figures)
@@ -496,8 +547,13 @@ def assemble_slides(content):
          "bullets": []},
     ]
     for branch in content["issue_tree"]:
-        slides.append({"kind": "finding", "title": branch["finding"], "bullets": list(branch["points"]),
-                       "hypotheses": [dict(h) for h in branch["hypotheses"]], "branch": branch["branch"]})
+        slide = {"kind": "finding", "title": branch["finding"], "bullets": list(branch["points"]),
+                 "hypotheses": [dict(h) for h in branch["hypotheses"]], "branch": branch["branch"],
+                 "so_what": branch["so_what"]}
+        if "chart" in branch:
+            slide["chart"] = {"title": branch["chart"]["title"], "figure_ids": list(branch["chart"]["figure_ids"]),
+                              "labels": list(branch["chart"]["labels"])}
+        slides.append(slide)
     slides += [
         {"kind": "options", "title": titles["options"], "options": [dict(o) for o in content["options"]], "bullets": []},
         {"kind": "recommendation", "title": titles["recommendation"],
@@ -507,7 +563,9 @@ def assemble_slides(content):
         {"kind": "risks", "title": titles["risks"], "risks": [dict(r) for r in content["risks"]], "bullets": []},
     ]
     for slide in slides:
-        texts = [slide["title"], *slide["bullets"]]
+        texts = [slide["title"], *slide["bullets"], slide.get("so_what", "")]
+        if "chart" in slide:
+            texts += [slide["chart"]["title"], *slide["chart"]["labels"]]
         for key in ("options", "roadmap", "kpis", "risks", "hypotheses"):
             for item in slide.get(key, []):
                 texts += [v for v in item.values() if isinstance(v, str)]
@@ -515,6 +573,9 @@ def assemble_slides(content):
         for branch in slide.get("tree", []):
             texts += [branch["branch"], *[h["text"] for h in branch["hypotheses"]]]
         slide["figure_ids"] = _tags_in(*texts)
+        for fid in slide.get("chart", {}).get("figure_ids", []):
+            if fid not in slide["figure_ids"]:
+                slide["figure_ids"].append(fid)
     slides.append({"kind": "sources", "title": "Every figure in this deck, and where it comes from",
                    "bullets": [], "figure_ids": [f["id"] for f in content["figures"]]})
     return slides

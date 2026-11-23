@@ -83,6 +83,10 @@ class EndToEndTest(unittest.TestCase):
         self.assertEqual(spec["role"], "management-consulting-analyst")
         self.assertEqual(spec["attempts"], 1)
         self.assertEqual(spec["evidence_mix"], {"client": 10, "computed": 4, "assumption": 1})
+        findings = [s for s in spec["slides"] if s["kind"] == "finding"]
+        self.assertEqual([s["chart"]["figure_ids"] for s in findings], [["F1", "F2"], ["F3", "F4"], ["F7", "F9"]])
+        self.assertTrue(all(s["so_what"] for s in findings))
+        self.assertIn("F1", findings[0]["figure_ids"])  # charted figures are listed on the slide that shows them
         kinds = [s["kind"] for s in spec["slides"]]
         self.assertEqual(kinds, ["title", "executive-summary", "situation", "issue-tree", "finding", "finding",
                                  "finding", "options", "recommendation", "roadmap", "kpis", "risks", "sources"])
@@ -253,6 +257,48 @@ class VerifyRefusesTest(unittest.TestCase):
             with self.subTest(case=name):
                 self.assertProblem(content(**change), needle)
 
+    def test_chart_and_so_what_rules(self):
+        cases = (
+            ("one bar", {"issue_tree__0__chart__figure_ids": ["F1"], "issue_tree__0__chart__labels": ["Then"]},
+             "must list 2 to 6 figure ids"),
+            ("seven bars", {"issue_tree__0__chart__figure_ids": ["F1", "F2", "F3", "F4", "F7", "F8", "F9"],
+                            "issue_tree__0__chart__labels": list("abcdefg")}, "must list 2 to 6 figure ids"),
+            ("an unknown figure", {"issue_tree__0__chart__figure_ids": ["F1", "F99"]}, "names unknown or unverified figures"),
+            ("a repeated figure", {"issue_tree__0__chart__figure_ids": ["F1", "F1"]}, "repeats a figure"),
+            ("mixed units", {"issue_tree__0__chart__figure_ids": ["F1", "F5"]}, "mixes units"),
+            ("label count", {"issue_tree__0__chart__labels": ["Only one"]}, "one label per figure"),
+            ("a long label", {"issue_tree__0__chart__labels": ["x" * 41, "Now"]}, "at most 40 characters"),
+            ("an empty label", {"issue_tree__0__chart__labels": ["", "Now"]}, "must be non-empty"),
+            ("a title that is not a sentence", {"issue_tree__0__chart__title": "Churn"}, ".title must be a sentence"),
+            ("an untagged number in a label", {"issue_tree__0__chart__labels": ["In 2 quarters", "Now"]}, "has no [F#] tag"),
+            ("an untagged number in a chart title", {"issue_tree__0__chart__title": "Churn went up by 3 points this year."},
+             "has no [F#] tag"),
+            ("a value smuggled into the chart", {"issue_tree__0__chart__values": [4, 9]}, "must have exactly title, figure_ids and labels"),
+            ("a missing so what", {"issue_tree__0__so_what": DELETE}, "must have branch, finding, points, hypotheses, so_what"),
+            ("an empty so what", {"issue_tree__0__so_what": ""}, "so_what must be one sentence"),
+            ("an over-long so what", {"issue_tree__0__so_what": "word " * 41}, "so_what must be one sentence"),
+            ("an untagged number in the so what", {"issue_tree__0__so_what": "Start with the 70 percent who churn."},
+             "has no [F#] tag"),
+        )
+        for name, change, needle in cases:
+            with self.subTest(case=name):
+                self.assertProblem(content(**change), needle)
+
+    def test_a_charted_figure_counts_as_used(self):
+        doc = content()
+        doc["figures"].append({"id": "F16", "label": "Churn target", "value": 4, "unit": "percent",
+                               "basis": "client", "quote": "Get monthly churn back to 4%"})
+        doc["issue_tree"][0]["chart"]["figure_ids"].append("F16")
+        doc["issue_tree"][0]["chart"]["labels"].append("Target")
+        self.assertEqual(c.verify_content(doc, CLIENT_TEXT), [])
+
+    def test_a_chart_is_optional(self):
+        doc = content()
+        for branch in doc["issue_tree"]:
+            branch.pop("chart")
+        # Every figure the charts drew on is also used in a sentence, so nothing else changes.
+        self.assertEqual(c.verify_content(doc, CLIENT_TEXT), [])
+
     def test_never_raises_on_any_json_value(self):
         junk = (None, True, 0, 1.5, "", "x", [], [1], {}, {"a": 1}, [[]], [{}], float("nan"))
         for value in junk:
@@ -260,6 +306,12 @@ class VerifyRefusesTest(unittest.TestCase):
         for key in RESPONSE:
             for value in junk:
                 c.verify_content(content(**{key: value}), CLIENT_TEXT)
+        for field in ("chart", "so_what"):
+            for value in junk:
+                c.verify_content(content(**{f"issue_tree__0__{field}": value}), CLIENT_TEXT)
+        for field in ("title", "figure_ids", "labels"):
+            for value in junk:
+                c.verify_content(content(**{f"issue_tree__0__chart__{field}": value}), CLIENT_TEXT)
         for i in range(len(RESPONSE["figures"])):
             for field in ("id", "value", "unit", "basis", "quote", "inputs", "operation", "rationale"):
                 for value in junk:

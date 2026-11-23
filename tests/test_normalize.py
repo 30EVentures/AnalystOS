@@ -31,7 +31,7 @@ TAG = re.compile(r"\[(F[1-9][0-9]{0,2})\]")
 
 
 def normalize(content):
-    return normalize_content(content, c.derived_units, c._recompute_figure, c.OPERATIONS)
+    return c._normalize(content)  # exactly what production runs, schema included
 
 
 def accepted_engagement(directory):
@@ -96,7 +96,7 @@ def naturalise(response, client_text, variant):
             if fig["unit"] in ("count", "other"):
                 fig["value"] = str(fig["value"])                           # a numeric string
         elif fig["basis"] == "computed":
-            fig["value"] = fig["value"] * 1.03 + 0.5                       # drifted
+            fig["value"] = round(fig["value"], 1)                          # rounded, within the verifier's 1%
             if fig["unit"] == "points":
                 fig["unit"] = "percent"                                     # percent minus percent "as percent"
         elif fig["basis"] == "assumption" and isinstance(fig.get("rationale"), str):
@@ -104,7 +104,9 @@ def naturalise(response, client_text, variant):
     doc["figures"].append({"id": "F99", "label": "Unused extra", "value": 1, "unit": "count",
                            "basis": "assumption", "rationale": "Never used."})
     doc["notes"] = "A field nobody asked for."
-    doc["roadmap"][0]["actions"].append("Review progress within 90 days.")
+    for option in doc["options"]:
+        option["pros"] = "A nested field nobody asked for."               # extra keys inside objects
+    doc["recommendation"]["option"] = "Option A: " + doc["recommendation"]["option"]
     return doc
 
 
@@ -124,7 +126,7 @@ class NaturalWritingTest(unittest.TestCase):
                     self.assertEqual(spec["attempts"], 1)
                     prs = Presentation(io.BytesIO(deck.render_deck(spec, record, CATALOG)))
                     self.assertEqual(unexplained_numbers(prs, spec), [])
-                    # Canonical values survive: the deck shows the verified numbers, not the drifted ones.
+                    # Canonical values survive: the deck shows the verified numbers, not the rounded ones.
                     canonical = {f["id"]: f["value"] for f in spec["content"]["figures"]}
                     for f in correct["figures"]:
                         if f["id"] in canonical:
@@ -165,18 +167,23 @@ class NormalisingNeverWeakensTest(unittest.TestCase):
 
     def test_narrowing_needs_a_unique_match(self):
         self.assertEqual(narrow_quote("went from 4% to 7% in two quarters", 7)[0], "to 7% in two quarters")
-        self.assertEqual(narrow_quote("went from 4% to 7% in two quarters", 0.04)[0], "went from 4% to")
+        self.assertEqual(narrow_quote("went from 4% to 7% in two quarters", 0.04, "percent")[0], "went from 4% to")
+        self.assertEqual(narrow_quote("went from 4% to 7% in two quarters", 0.04), (None, None))  # x100 only for percent
         self.assertEqual(narrow_quote("from 4% to 4% again", 4), (None, None))      # ambiguous
         self.assertEqual(narrow_quote("from 4% to 7%", 5), (None, None))            # no match
         self.assertEqual(narrow_quote("about $9.6 million in revenue", 9.6)[1].value, 9600000)
 
-    def test_a_drifted_computed_value_is_recomputed_not_trusted(self):
+    def test_a_wrong_computed_value_is_left_for_the_verifier(self):
+        # Slice 120: recomputing over the model's value hid reversed and wrong inputs.
         record = accepted_engagement(ROOT / "fixtures" / "consulting" / "churn-clinics")
         response = json.loads((ROOT / "fixtures" / "consulting" / "churn-clinics" / "response.json").read_text())
         response["figures"][13]["value"] = 999999
         out = normalize(response)
-        self.assertEqual(next(f for f in out["figures"] if f["id"] == "F14")["value"], 30600)
-        self.assertEqual(c.verify_content(out, c.client_text_of(record)), [])
+        self.assertEqual(next(f for f in out["figures"] if f["id"] == "F14")["value"], 999999)
+        self.assertTrue(any("F14" in p for p in c.verify_content(out, c.client_text_of(record))))
+        missing = json.loads((ROOT / "fixtures" / "consulting" / "churn-clinics" / "response.json").read_text())
+        del missing["figures"][13]["value"]  # a missing value is filled with the recomputation
+        self.assertEqual(next(f for f in normalize(missing)["figures"] if f["id"] == "F14")["value"], 30600)
 
     def test_never_raises(self):
         for junk in (None, 1, "x", [], {}, {"figures": None}, {"figures": [None, 1, {"id": []}]},
@@ -209,6 +216,139 @@ class StatesTest(unittest.TestCase):
                                 c.OPERATIONS)
         self.assertEqual(doc["figures"][0]["quote"], "from 100 to 7 clinics")
         self.assertIs(doc["figures"][0]["value"], True)
+
+
+class ReviewOfPr100Test(unittest.TestCase):
+    """Slice 120: every case the release review of PR #100 found, kept as a regression test."""
+
+    def setUp(self):
+        self.base = ROOT / "fixtures" / "consulting" / "churn-clinics"
+
+    def engagement(self, extra):
+        client = json.loads((self.base / "client.json").read_text())
+        client["answers"]["common.materials"] += " " + extra
+        record = eng.new_engagement(engagement_id="b" * 32, created="2026-11-23T18:00:00Z",
+                                    requested_by=client["requested_by"], problem=client["problem"],
+                                    roles=client["roles"], catalog=CATALOG)
+        for qid, text in client["answers"].items():
+            record = eng.answer(record, qid, text)
+        return eng.accept(record, CATALOG)[0]
+
+    def refused(self, extra, figure, sentence):
+        record = self.engagement(extra)
+        response = json.loads((self.base / "response.json").read_text())
+        response["figures"].append(figure)
+        response["answer"] += " " + sentence
+        return c.verify_content(normalize(response), c.client_text_of(record))
+
+    def test_a_word_quantity_is_never_cut_out_of_a_quote(self):
+        self.assertEqual(narrow_quote("A third of our 420 enterprise seats are idle", 420), (None, None))
+        self.assertEqual(narrow_quote("half of the $1,200 average", 1200, "usd"), (None, None))
+        self.assertEqual(narrow_quote("quoted $1.8 million for a system that doubles picks", 1.8e6, "usd")[0],
+                         "quoted $1.8 million for a system that")  # a word quantity after the number bounds the cut
+        self.assertTrue(self.refused("A third of our 420 enterprise seats are idle.",
+                                     {"id": "F16", "label": "Idle enterprise seats", "value": 420, "unit": "count",
+                                      "basis": "client", "quote": "A third of our 420 enterprise seats are idle"},
+                                     "Also, [F16] enterprise seats are idle."))
+
+    def test_a_scale_word_in_any_case_is_part_of_the_number(self):
+        for text, value in (("$12.2 Million", 12.2e6), ("$12.2 MILLION", 12.2e6), ("$12.2 MM", 12.2e6),
+                            ("$12.2 mn", 12.2e6), ("12 Billion", 12e9), ("3 crore", 3e7)):
+            with self.subTest(text=text):
+                self.assertAlmostEqual(find_numbers(text)[0].value, value)
+        client = "The pipeline was worth $12.2 Million last year."
+        self.assertFalse(c.quote_number_is_whole("The pipeline was worth $12.2", client))
+        self.assertTrue(c.quote_number_is_whole("The pipeline was worth $12.2 Million", client))
+        response = json.loads((self.base / "response.json").read_text())
+        response["figures"].append({"id": "F16", "label": "Pipeline value", "value": 12.2, "unit": "usd",
+                                    "basis": "client", "quote": "The pipeline was worth $12.2 Million last year"})
+        response["answer"] += " The pipeline was worth [F16]."
+        out = normalize(response)  # 12.2 with "Million" in the quote is read as 12.2 million, never $12.20
+        self.assertEqual(c.verify_content(out, c.client_text_of(self.engagement(client))), [])
+        self.assertAlmostEqual(next(f for f in out["figures"] if f["id"] == "F16")["value"], 12.2e6)
+
+    def test_a_quote_cannot_cut_a_grouped_number_a_sign_or_a_currency(self):
+        for client, quote in (("We have 12 200 trial users.", "200 trial users"),
+                              ("We have 12\u00a0200 trial users.", "200 trial users"),
+                              ("We have 12'200 trial users.", "200 trial users"),
+                              ("Margin moved by - 4% last year.", "4% last year"),
+                              ("Revenue was \u20b912.2 million last year.", "12.2 million last year"),
+                              ("Revenue was \u20ac12.2 million last year.", "12.2 million last year")):
+            with self.subTest(client=client):
+                self.assertFalse(c.quote_number_is_whole(quote, client))
+
+    def test_narrowing_respects_the_declared_unit_and_scale(self):
+        self.assertEqual(narrow_quote("churn hit 7% and 7 clinics left", 7, "count")[0], "and 7 clinics left")
+        self.assertEqual(narrow_quote("churn hit 7% and 7 clinics left", 7, "percent")[0], "churn hit 7% and")
+        self.assertEqual(narrow_quote("a $12,000 contract and a $5 fee", 12, "usd"), (None, None))  # no scale word
+        fig = {"id": "F1", "label": "Payback", "value": 6, "unit": "months", "basis": "client",
+               "quote": "a 6 month payback"}
+        self.assertEqual(normalize({"figures": [fig], "answer": "[F1]"})["figures"][0]["unit"], "months")
+
+    def test_an_ambiguous_option_name_is_left_alone(self):
+        doc = {"options": [{"name": "Save"}, {"name": "Save desk"}], "recommendation": {"option": "Option A: Save desk"}}
+        self.assertEqual(normalize(doc)["recommendation"]["option"], "Option A: Save desk")
+        doc = {"options": [{"name": "Save desk"}, {"name": "Hire"}], "recommendation": {"option": "Option A: Save desk"}}
+        self.assertEqual(normalize(doc)["recommendation"]["option"], "Save desk")
+
+    def test_a_boolean_computed_value_counts_as_missing(self):
+        figures = [{"id": "F1", "label": "a", "value": 3, "unit": "count", "basis": "assumption", "rationale": "r"},
+                   {"id": "F2", "label": "b", "value": 4, "unit": "count", "basis": "assumption", "rationale": "r"},
+                   {"id": "F3", "label": "c", "value": True, "unit": "count", "basis": "computed", "operation": "sum",
+                    "inputs": ["F1", "F2"]}]
+        self.assertEqual(normalize({"figures": figures, "answer": "[F3]"})["figures"][2]["value"], 7)
+
+    def test_reversed_or_wrong_inputs_are_refused_not_recomputed(self):
+        response = json.loads((self.base / "response.json").read_text())
+        f11 = next(f for f in response["figures"] if f["id"] == "F11")
+        f11["inputs"] = list(reversed(f11["inputs"]))
+        record = self.engagement("")
+        self.assertTrue(any("F11" in p for p in c.verify_content(normalize(response), c.client_text_of(record))))
+
+    def test_a_quote_cannot_change_the_declared_unit(self):
+        self.assertTrue(self.refused("We have 12,000 leads.",
+                                     {"id": "F16", "label": "Average deal size", "value": 12, "unit": "usd",
+                                      "basis": "client", "quote": "We have 12,000 leads"}, "The average deal is [F16]."))
+        self.assertTrue(self.refused("We lost 60 clinics.",
+                                     {"id": "F16", "label": "Quarterly churn rate", "value": 0.6, "unit": "percent",
+                                      "basis": "client", "quote": "We lost 60 clinics"}, "Quarterly churn is [F16]."))
+
+    def test_bare_small_digits_and_durations_are_numbers(self):
+        figures = {"F2": {"value": 7, "unit": "percent"}, "F5": {"value": 850, "unit": "count"}}
+        for text in ("We have 1 [F5] customers.", "Churn rose from 3 to [F2].", "Churn rose 7 [F2].",
+                     "Hire 2 analysts.", "Days sales outstanding has climbed to 90 days."):
+            with self.subTest(text=text):
+                self.assertEqual(normalize({"answer": text})["answer"], text)  # not rewritten ...
+                self.assertTrue(c.number_problems("t", text, figures))         # ... and refused
+
+    def test_years_tags_and_parentheticals(self):
+        figures = {"F2": {"value": 7, "unit": "percent"}, "F5": {"value": 850, "unit": "count"}}
+        for bad in ("Grow the base by 2030 customers.", "Customers grew from 2020 to 2030 clinics.",
+                    "Customers grew 2020-2030 clinics.", "We added after 2025 visits.", "Churn rose to [F2][F5].",
+                    "Churn rose to [F2].[F5] clinics."):
+            with self.subTest(bad=bad):
+                self.assertTrue(c.number_problems("t", bad, figures))
+        for ok in ("Launch the save desk by the end of 2026.", "Ship the fix in mid-2026.",
+                   "Churn rose after the March 2025 release.", "In 2025 churn rose to [F2].", "By 2027 sales grew."):
+            with self.subTest(ok=ok):
+                self.assertEqual(c.number_problems("t", ok, figures), [])
+        self.assertEqual(strip_redundant_numbers("Churn reached [F2] (7%).", {"F2": figures["F2"]}), "Churn reached [F2].")
+        self.assertEqual(strip_redundant_numbers("Churn reached [F2] (4%).", {"F2": figures["F2"]}),
+                         "Churn reached [F2] (4%).")
+
+    def test_a_refused_slip_is_fixed_on_the_second_attempt(self):
+        # The paths the normaliser no longer fixes still deliver: the repair request names the problem.
+        record = self.engagement("")
+        correct = json.loads((self.base / "response.json").read_text())
+        first = copy.deepcopy(correct)
+        first["roadmap"][0]["actions"].append("Review progress within 90 days.")
+        next(f for f in first["figures"] if f["id"] == "F14")["value"] = 31000
+        replay = ReplayClient([first, correct])
+        spec = c.build_deck_spec(record, CATALOG, client=replay)
+        self.assertEqual(spec["attempts"], 2)
+        self.assertIn("90", replay.requests[1]["messages"][0]["content"])
+        prs = Presentation(io.BytesIO(deck.render_deck(spec, record, CATALOG)))
+        self.assertEqual(unexplained_numbers(prs, spec), [])
 
 
 if __name__ == "__main__":

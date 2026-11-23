@@ -40,10 +40,11 @@ _YEAR_RE = re.compile(r"\b(?:in|since|during|until|before|after|through|Q[1-4]|H
 _DIGIT_RE = re.compile(
     r"(?P<cur>\$)?(?P<num>\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?|\.\d+)"
     r"(?:\s?(?P<suf>%|percent\b|per cent\b|percentage points?\b|pp\b|points?\b|pts\b"
-    r"|bn\b|billion\b|million\b|thousand\b|[kKmMB]\b|x\b))?"
+    r"|(?i:bn|billion|million|thousand|trillion|mm|mn|mln|mio|crores?|lakhs?)\b|[kKmMB]\b|x\b))?"
 )
-_SCALE = {"k": 1e3, "K": 1e3, "thousand": 1e3, "m": 1e6, "M": 1e6, "million": 1e6,
-          "B": 1e9, "bn": 1e9, "billion": 1e9}
+_SCALE = {"k": 1e3, "K": 1e3, "thousand": 1e3, "m": 1e6, "M": 1e6, "million": 1e6, "mm": 1e6, "mn": 1e6,
+          "mln": 1e6, "mio": 1e6, "B": 1e9, "bn": 1e9, "billion": 1e9, "trillion": 1e12, "lakh": 1e5,
+          "lakhs": 1e5, "crore": 1e7, "crores": 1e7}  # word scales in any case (Slice 120): "Million", "MM"
 _KIND = {"%": "percent", "percent": "percent", "per cent": "percent", "pp": "points", "point": "points",
          "points": "points", "pts": "points", "percentage point": "points", "percentage points": "points",
          "x": "ratio"}
@@ -100,7 +101,7 @@ def find_numbers(text):
             dec = "." + dec
         places = len(dec) - 1 if dec else 0
         suf = m.group("suf")
-        scale = _SCALE.get(suf, 1.0) if suf else 1.0
+        scale = (_SCALE.get(suf) or _SCALE.get(suf.lower(), 1.0)) if suf else 1.0
         try:
             value = float((raw.replace(",", "") or "0") + dec) * scale
         except ValueError:

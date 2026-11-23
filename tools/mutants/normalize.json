@@ -7,5 +7,15 @@
  {"name": "unexpected figure fields kept", "old": "                    if key not in _FIGURE_KEYS[basis]:\n                        del fig[key]", "new": "                    if False:\n                        del fig[key]"},
  {"name": "unused figures kept", "old": "        doc[\"figures\"] = _drop_unused(doc)", "new": "        pass"},
  {"name": "charted figures dropped as unused", "old": "            used.update(x for x in chart[\"figure_ids\"] if isinstance(x, str))", "new": "            pass"},
- {"name": "durations left as digits", "old": "            return _durations(strip_redundant_numbers(value, figure_map))", "new": "            return strip_redundant_numbers(value, figure_map)"}
+ {"name": "a present computed value recomputed (the PR #100 gap)", "old": "                    if _number(fig.get(\"value\")) is None and all(", "new": "                    if all("},
+ {"name": "a word quantity before the number cut away (the PR #100 gap)", "old": "    if any(t.value is None and t.start < chosen.start for t in every):\n        return None, None", "new": "    if False:\n        return None, None"},
+ {"name": "a quote matched regardless of unit (the PR #100 gap)", "old": "    return unit not in _UNITS or unit in _UNITS_FOR_KIND.get(token.kind, set())", "new": "    return True"},
+ {"name": "x100 match for any unit", "old": "        if unit == \"percent\" and token.kind == \"percent\":", "new": "        if True:"},
+ {"name": "scale match without a scale word", "old": "        if _SCALED.search(token.text) and _fits(token, unit):", "new": "        if _fits(token, unit):"},
+ {"name": "declared unit overridden by the quote", "old": "                    if fig.get(\"unit\") not in _UNITS:  # filled only when missing; never overridden", "new": "                    if True:"},
+ {"name": "nested unknown fields kept", "old": "                doc[key] = _drop_unknown(doc[key], schema[\"properties\"][key])", "new": "                pass"},
+ {"name": "option name not matched", "old": "    if len(inside) == 1:\n        rec[\"option\"] = inside[0]", "new": "    if False:\n        rec[\"option\"] = inside[0]"},
+ {"name": "ambiguous option name matched", "old": "    if len(inside) == 1:", "new": "    if inside:"},
+ {"name": "a restating parenthetical kept", "old": "                    pos = paren.end()", "new": "                    pass"},
+ {"name": "a parenthetical removed though it does not state the figure", "old": "                        inner[0], figure):\n                    pos = paren.end()", "new": "                        inner[0], figure) or True:\n                    pos = paren.end()"}
 ]

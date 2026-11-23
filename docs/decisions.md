@@ -24,6 +24,22 @@ No generator owned the hero's spec figure. It had been typed by hand and was
 frozen since about Slice 49. It now has its own `site_counts.py` pattern,
 generated from the same `count_specs()` as the evidence card.
 
+## 2026-11-23 — Slice 120: the release review of PR #100 failed it; close it before the second paid test
+
+The owner merged PR #100 (Slice 119) before its fresh-context release review
+finished, and the review then failed it: six ways the normaliser could make a
+wrong deck pass (narrowing cut "a third of" off "420 seats"; "$12.2" quoted out
+of "$12.2 Million" printed as $12.20; recomputing hid reversed inputs; unit
+matching ignored the kind of number; bare digits 0-12 beside tags; "90 days"
+rewritten anywhere). Slice 119's entry below and its PR said the normaliser
+"cannot change the delivered numbers" and that normalising "never makes a wrong
+number acceptable": both were false, because its own tests covered only friendly
+cases. Fixed in Slice 120 (see specs/slice-120): the normaliser fills only what
+is missing or restates what the verifier would accept, never overrides a value
+or unit the verifier checks. The cost: some slips it used to fix (a drifted
+calculation, "90 days") now go to the one repair request instead. Lesson,
+again: no merge before the review.
+
 ## 2026-11-23 — Slice 119: survive the live model's natural writing (the first paid test failed)
 
 The one paid test of Management Consulting Analyst (owner's consent, at most

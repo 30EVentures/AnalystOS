@@ -1,0 +1,62 @@
+# Slice 120 - close the release review of PR #100 before the second paid test
+
+## Goal
+
+The fresh-context release review of PR #100 (Slice 119) failed it, after the
+owner had merged it: the normaliser could make a wrong deck pass verification,
+the opposite of what Slice 119 claimed ("fixes only slips that cannot change
+what a reader is told"). Close every blocker before the second paid test, and
+cover the live-model slips the review predicted, so that money is not spent on
+a run that fails or, worse, on a deck that misleads.
+
+## What changes
+
+1. The normaliser may no longer change a number the verifier would refuse:
+   - a computed value that is present is never recomputed (only a missing one
+     is filled), so reversed or wrong inputs are refused again;
+   - quote narrowing matches only in the figure's own unit (x100 only for a
+     percent written as a fraction, x1e3-1e9 only when the quote has a scale
+     word), never overrides the declared unit, and refuses when a word quantity
+     comes before the number ("a third of our 420");
+   - "90 days" is no longer rewritten anywhere.
+2. Bare digits 0-12 in prose are numbers again (Slice 119 allowed them; "We
+   have 1 [F5] customers" and "from 3 to [F2]" passed).
+3. Scale words in any case ("Million", "MM", "mn", "crore") are part of the
+   number, so "$12.2" cannot be quoted out of "$12.2 Million"; a quote cannot
+   cut a grouped number ("12 200"), drop a detached sign ("- 4%") or a currency
+   other than the dollar ("EUR12.2 million" written with the euro sign).
+4. Years: a year followed by a plural noun is a count ("by 2030 customers");
+   more time words are allowed ("end of 2026", "mid-2026", "March 2025"). Tags
+   glued to tags ("[F2][F5]", "[F2].[F5]") are refused.
+5. Live-model slips the review predicted: unknown fields are dropped at every
+   depth (the first live failure was an extra field); "Option A: X" is matched
+   to the option named X; "[F2] (7%)" loses the parenthetical when it restates
+   the figure; the prompt lists the rest (digits for small counts and days,
+   dates, numbers beside tags, a fall as a negative figure, digits in labels).
+6. Wording: the catalog API defines "mock-family"; the hire page no longer says
+   each role names its worked example; Slice 119's claims are corrected in the
+   decisions log.
+
+## Done when
+
+1. Every blocker case from the review is a test that is refused (or, for
+   "$12.2 Million", read correctly as 12.2 million), and fails on main.
+2. A slip the normaliser now leaves alone (a drifted value, "90 days") is
+   refused on the first attempt and fixed on the second: a deck is delivered.
+3. The 48 natural-writing variants still build in one attempt and render.
+4. Full suite OK; `tools/refresh.py --check` clean; Flashy fence holds; the
+   mutation check covers the new rules; a fresh review passes before the PR.
+5. Left open, stated: an accounting-style "(4%)" quote is read as +4%; a
+   two-number contrast can be narrowed to the wrong one (as on main).
+
+## Results (2026-11-23)
+
+- Every blocker case from the review: a regression test that fails on main
+  (30 subtests across 8 tests) and passes here; the reviewer's own reproduction
+  scripts now refuse each case (or, for "$12.2 Million", read it as 12.2 million).
+- Mutation check: `normalize.py` 8/8 guards, 19/19 semantic; `numbers.py` 2/2
+  guards; `consulting.py` targeted run over every rule added or changed in Slices
+  119-120: all caught except one recorded equivalent (the same-span check), after
+  five survivors in the first pass were closed with tests.
+- Full suite OK; refresh check clean; Flashy fence holds (the regenerated
+  `drafts/measures.json` is left out, as in Slice 119).

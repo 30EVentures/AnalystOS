@@ -11,13 +11,25 @@ every judgement to the unchanged verifier:
   or currency beside the tag; code prints the verified value instead. A number
   that does not state its figure is left in place, so the verifier refuses it.
 - A client quote is narrowed, verbatim, to the part holding the one number that
-  equals the figure's value; the figure then takes its value and unit from that
-  number. A quote that is not the client's words is left for the verifier to
-  refuse.
-- A computed figure's value is recomputed and its unit derived from its inputs.
-- Fields that are never shown are dropped; unused figures that feed no other
-  figure are dropped; numeric strings become numbers.
-- Common durations written in digits ("within 90 days") become words.
+  equals the figure's value in the figure's own unit; the figure then takes that
+  number's value. Narrowing is refused when a quantity in words comes before
+  that number ("a third of our 420", "half of the $1,200"), which a cut would drop. The declared unit is
+  never overridden; a quote that is not the client's words is left for the
+  verifier to refuse.
+- A computed figure with no value gets its recomputation; a value that is there
+  is left for the verifier, which refuses it unless it matches (so reversed or
+  wrong inputs are still caught). A unit is derived only when exactly one fits.
+- Fields that are never shown (not in the tool schema, at any depth) are
+  dropped; unused figures that feed no other figure are dropped; numeric
+  strings become numbers; a recommendation naming an option with extra words
+  ("Option A: Save desk") is set to that option's exact name when exactly one
+  option name is inside it.
+- A parenthetical right after a tag that states that figure ("[F2] (7%)") is
+  removed.
+
+Slice 120 (release review of PR #100): earlier versions recomputed every computed
+value, matched quotes by scale and unit regardless of kind, cut across word
+quantities and rewrote "90 days" anywhere; each could make a wrong deck pass.
 
 Pure and total: never raises, never mutates its input.
 """
@@ -34,9 +46,6 @@ _FIGURE_KEYS = {
     "computed": {"id", "label", "value", "unit", "basis", "operation", "inputs"},
     "assumption": {"id", "label", "value", "unit", "basis", "rationale"},
 }
-_DURATIONS = {7: "a week", 14: "two weeks", 21: "three weeks", 30: "a month", 45: "six weeks", 60: "two months",
-              90: "three months", 120: "four months", 180: "six months", 270: "nine months", 365: "a year"}
-_DURATION_RE = re.compile(r"\b(7|14|21|30|45|60|90|120|180|270|365)[- ]days?\b", re.IGNORECASE)
 _KIND_FOR_UNIT = {"percent": {"percent"}, "points": {"points"}, "usd": {"usd"}, "ratio": {"ratio", None},
                   "count": {None}, "months": {None}, "other": {None}}
 _UNIT_AFTER = {
@@ -45,6 +54,7 @@ _UNIT_AFTER = {
     "usd": re.compile(r"\s*(?:USD\b|dollars?\b)", re.IGNORECASE),
     "ratio": re.compile(r"\s*(?:x\b|times\b)", re.IGNORECASE),
 }
+_PAREN_AFTER = re.compile(r"\s*\(\s*([^()\[\]]{1,20}?)\s*\)")
 _USD_BEFORE = re.compile(r"(?:\$|\bUSD)\s*$")
 
 
@@ -104,17 +114,29 @@ def strip_redundant_numbers(text, figures):
             after = _UNIT_AFTER[figure["unit"]].match(text, pos)
             if after:
                 pos = after.end()
+        if figure is not None:  # "[F2] (7%)": a parenthetical that only restates the figure
+            paren = _PAREN_AFTER.match(text, pos)
+            if paren:
+                inner = find_numbers(paren.group(1))
+                if len(inner) == 1 and inner[0].start == 0 and inner[0].end == len(paren.group(1)) and states(
+                        inner[0], figure):
+                    pos = paren.end()
     out.append(text[pos:])
     return re.sub(r"[ \t]{2,}", " ", "".join(out))
 
 
-def _durations(text):
-    if not isinstance(text, str):
-        return text
-    return _DURATION_RE.sub(lambda m: _DURATIONS[int(m.group(1))], text)
+_SCALED = re.compile(r"[kKmMB]$|thousand|million|billion|trillion|bn|mm|mn|mln|mio|crores?|lakhs?", re.IGNORECASE)
+_UNITS_FOR_KIND = {"percent": {"percent"}, "points": {"points"}, "usd": {"usd"}, "ratio": {"ratio"},
+                   None: {"count", "months", "other"}}
+_UNITS = {"percent", "points", "usd", "ratio", "count", "months", "other"}
 
 
-def narrow_quote(quote, value):
+def _fits(token, unit):
+    """True when the written number can be the figure's declared unit (any unit, if none is declared)."""
+    return unit not in _UNITS or unit in _UNITS_FOR_KIND.get(token.kind, set())
+
+
+def narrow_quote(quote, value, unit=None):
     """``(quote, token)`` narrowed to the verbatim part of ``quote`` holding the one number
     that matches ``value`` (as given, as a percent of 1, or at a thousand/million/billion
     scale). ``(None, None)`` when there is no unique match."""
@@ -123,13 +145,22 @@ def narrow_quote(quote, value):
     target = _number(value)
     candidates = []
     for token in tokens:
-        forms = {target, target * 100, target * 1e3, target * 1e6, target * 1e9} if target is not None else set()
-        if (len(tokens) == 1 and target is None) or any(
-                math.isclose(token.value, f, rel_tol=1e-9, abs_tol=1e-9) for f in forms):
+        if target is None:
+            if len(tokens) == 1 and _fits(token, unit):
+                candidates.append(token)
+            continue
+        forms = [target] if _fits(token, unit) else []
+        if unit == "percent" and token.kind == "percent":
+            forms.append(target * 100)           # a percent stored as a fraction (0.07 for 7%)
+        if _SCALED.search(token.text) and _fits(token, unit):
+            forms += [target * 1e3, target * 1e6, target * 1e9]  # "$12.2 million" stored as 12.2
+        if any(math.isclose(token.value, f, rel_tol=1e-9, abs_tol=1e-9) for f in forms):
             candidates.append(token)
     if len(candidates) != 1:
         return None, None
     chosen = candidates[0]
+    if any(t.value is None and t.start < chosen.start for t in every):
+        return None, None  # a word quantity before the number ("a third of our 420") could change it: never cut it away
     i = every.index(chosen)
     start = every[i - 1].end if i > 0 else 0
     end = every[i + 1].start if i + 1 < len(every) else len(quote)
@@ -148,7 +179,35 @@ TOP_LEVEL_KEYS = {"answer", "exec_summary", "situation", "complication", "key_qu
                   "issue_tree", "options", "recommendation", "roadmap", "kpis", "risks"}
 
 
-def normalize_content(content, derived_units, recompute, operations):
+def _drop_unknown(value, schema):
+    """``value`` without keys its schema does not list, at every depth (figures excepted:
+    their keys depend on the basis and are handled separately)."""
+    if not isinstance(schema, dict):
+        return value
+    if isinstance(value, dict) and isinstance(schema.get("properties"), dict):
+        props = schema["properties"]
+        return {k: _drop_unknown(v, props[k]) for k, v in value.items() if k in props}
+    if isinstance(value, list) and isinstance(schema.get("items"), dict):
+        return [_drop_unknown(v, schema["items"]) for v in value]
+    return value
+
+
+def _match_option(doc):
+    """A recommendation naming an option with extra words gets that option's exact name,
+    when exactly one option name appears inside it."""
+    rec, options = doc.get("recommendation"), doc.get("options")
+    if not isinstance(rec, dict) or not isinstance(rec.get("option"), str) or not isinstance(options, list):
+        return
+    names = [o["name"] for o in options if isinstance(o, dict) and isinstance(o.get("name"), str) and o["name"].strip()]
+    said = rec["option"].strip().lower()
+    if said in {n.strip().lower() for n in names}:
+        return
+    inside = [n for n in names if n.strip().lower() in said]
+    if len(inside) == 1:
+        rec["option"] = inside[0]
+
+
+def normalize_content(content, derived_units, recompute, operations, schema=None):
     """A copy of ``content`` with the mechanical slips above fixed. Anything it cannot fix
     is left for the verifier. ``derived_units``, ``recompute`` and ``operations`` come
     from the consulting pack (passed in to avoid an import cycle)."""
@@ -161,6 +220,11 @@ def normalize_content(content, derived_units, recompute, operations):
     for key in list(doc):
         if key not in TOP_LEVEL_KEYS:  # never shown; dropping it cannot change what a reader is told
             del doc[key]
+    if isinstance(schema, dict) and isinstance(schema.get("properties"), dict):
+        for key in list(doc):
+            if key != "figures" and key in schema["properties"]:
+                doc[key] = _drop_unknown(doc[key], schema["properties"][key])
+    _match_option(doc)
     figures = doc.get("figures")
     if isinstance(figures, list):
         fixed, by_id = [], {}
@@ -178,11 +242,12 @@ def normalize_content(content, derived_units, recompute, operations):
             if number is not None:
                 fig["value"] = number
             if basis == "client" and isinstance(fig.get("quote"), str):
-                piece, token = narrow_quote(fig["quote"], fig.get("value"))
+                piece, token = narrow_quote(fig["quote"], fig.get("value"), fig.get("unit"))
                 if piece:
                     fig["quote"] = piece
                     fig["value"] = token.value
-                    fig["unit"] = _client_unit(token, fig.get("unit"))
+                    if fig.get("unit") not in _UNITS:  # filled only when missing; never overridden
+                        fig["unit"] = _client_unit(token, None)
             elif basis == "computed":
                 inputs = fig.get("inputs")
                 op = fig.get("operation")
@@ -195,7 +260,8 @@ def normalize_content(content, derived_units, recompute, operations):
                     if fig.get("unit") not in allowed and len(allowed) == 1:
                         fig["unit"] = next(iter(allowed))
                     values = [by_id[x].get("value") for x in inputs]
-                    if all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in values):
+                    if _number(fig.get("value")) is None and all(
+                            isinstance(v, (int, float)) and not isinstance(v, bool) for v in values):
                         try:
                             result = recompute(op, values)
                         except (ArithmeticError, TypeError, ValueError):
@@ -212,7 +278,7 @@ def normalize_content(content, derived_units, recompute, operations):
 
     def clean(value):
         if isinstance(value, str):
-            return _durations(strip_redundant_numbers(value, figure_map))
+            return strip_redundant_numbers(value, figure_map)
         if isinstance(value, list):
             return [clean(v) for v in value]
         if isinstance(value, dict):

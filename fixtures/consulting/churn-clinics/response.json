@@ -7,13 +7,13 @@
   "Restoring churn to 4% [F10] recovers about 26 [F13] clinics a month, worth $30,600 [F14] in monthly recurring revenue each month."
  ],
  "situation": "A B2B scheduling platform for clinics with 850 [F5] customers paying on average $1,200 [F6] per month.",
- "complication": "Within two quarters monthly churn rose from 4% [F1] to 7% [F2], and support tickets per account doubled after the March release.",
+ "complication": "Within two quarters monthly churn rose from 4% [F1] to 7% [F2], and support tickets per account rose sharply after the March release.",
  "key_question": "What is driving the churn increase, and should next year's budget go to retention or to new sales?",
  "titles": {
-  "situation": "Churn nearly doubled in two quarters while the customer base stayed the same size.",
+  "situation": "Churn rose sharply in two quarters, and revenue retention fell with it.",
   "options": "Three ways to respond, and only one fits the hiring and engineering limits.",
   "recommendation": "Fund a small-clinic retention program before adding sales capacity.",
-  "roadmap": "Ninety days to prove the program on small clinics, then extend it.",
+  "roadmap": "Three months to prove the program on small clinics, then extend it.",
   "kpis": "Track four measures monthly so the board sees progress early.",
   "risks": "The main risks are a misread cause and a stretched support team."
  },
@@ -24,7 +24,7 @@
    "value": 4,
    "unit": "percent",
    "basis": "client",
-   "quote": "churn went from 4% to 7%"
+   "quote": "went from 4%"
   },
   {
    "id": "F2",
@@ -32,7 +32,7 @@
    "value": 7,
    "unit": "percent",
    "basis": "client",
-   "quote": "churn went from 4% to 7%"
+   "quote": "to 7% in two quarters"
   },
   {
    "id": "F3",
@@ -40,7 +40,7 @@
    "value": 104,
    "unit": "percent",
    "basis": "client",
-   "quote": "fell from 104% to 96%"
+   "quote": "fell from 104%"
   },
   {
    "id": "F4",
@@ -48,7 +48,7 @@
    "value": 96,
    "unit": "percent",
    "basis": "client",
-   "quote": "fell from 104% to 96%"
+   "quote": "to 96% over the same period"
   },
   {
    "id": "F5",
@@ -175,7 +175,7 @@
    ],
    "so_what": "Retention money should start with small clinics, where most of the loss sits.",
    "chart": {
-    "title": "Monthly logo churn nearly doubled in two quarters.",
+    "title": "Monthly logo churn rose sharply in two quarters.",
     "figure_ids": [
      "F1",
      "F2"
@@ -190,7 +190,7 @@
    "branch": "Why they leave",
    "finding": "The March release made the product harder to use for clinics that onboard alone.",
    "points": [
-    "Support tickets per account doubled after the March release.",
+    "Support tickets per account rose sharply after the March release.",
     "Onboarding is fully self-serve, so small clinics absorb the change without help."
    ],
    "hypotheses": [

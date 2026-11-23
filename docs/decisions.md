@@ -24,6 +24,55 @@ No generator owned the hero's spec figure. It had been typed by hand and was
 frozen since about Slice 49. It now has its own `site_counts.py` pattern,
 generated from the same `count_specs()` as the evidence card.
 
+## 2026-11-23 — Slice 115: making "every number is traced" true
+
+A fresh-context review of Slices 112-113 found the deck's central claim - every
+number traced to the client's words, a recomputed calculation or a labelled
+assumption, with no way for the model to slip in another - false as built.
+Nothing had been pushed. What it found, all reproduced, all now closed with a
+test that fails on the old code:
+
+- Numbers that were not ASCII-style digits passed untagged: "seven percent",
+  "tripled", "½", "NRR96%", ".5%", and any 1900-2099 integer read as a year.
+  `analystos/packs/numbers.py` now finds them; quantities it cannot read as a
+  value (words, multipliers, fractions) are refused outright, so the model must
+  write digits and tag them. Exempt: Q1-Q4, H1-H2, FY labels, version strings,
+  names like B2B, years after a time word, and the counting words one to twelve
+  (allowed and not checked - a stated limit, not a gap).
+- Figure labels and other label fields (key question, branch, option and KPI
+  names, chart labels) were never scanned; they may now carry no number at all.
+- Units were never verified. A client figure's unit now comes from its quote;
+  a computed figure's from its operation and inputs (a difference of percents
+  is points); every written number's kind must fit its figure's unit.
+- A client value could be any number in its quote, within 1%; computed values
+  drifted 1% per step. Quotes must state exactly one number, and verification
+  replaces every value with the canonical one (the quote's number, or the exact
+  recomputation from canonical inputs).
+- The renderer drew any spec with the right format string. A spec now carries
+  the client's text; `render_deck` re-verifies it and refuses one whose content
+  or slides were edited after verification.
+- The "renderer adds no numbers" test matched substrings of the whole content
+  and passed with numbers injected. It is now exact, per slide, and a negative
+  test injects five kinds of number and requires each to be caught. Its first
+  run found numbers the renderer really does add: the roadmap's fixed column
+  labels, now listed as allowed on the roadmap slide only.
+- The repair-retry prompt echoed the previous output unneutralised.
+
+**Corrections to earlier entries and commits.** Slice 112 said "7% matches
+6.96, not 6.9" - the code accepted 6.5 to 7.49; matching is now "at the
+precision shown and within 5%". Slice 112 said an assumption is "labelled
+wherever it appears" - not on the title or issue-tree slides; those fields now
+cannot carry figures. Slice 113 said the percent/points confusion was fixed -
+only the fixture was; the code now enforces it. Slice 113 said every number in
+the file is a figure value, reference, slide number or formula notation - the
+test could not show that; it now can. Slices 112-114 quoted mutation counts
+from a script outside the repo; `tools/mutation_check.py` (with mutant lists in
+`tools/mutants/`) now reproduces them. Slice 112's "recorded bad-then-good
+pair" was built in test code, not recorded.
+
+Not checked, by design: qualitative claims and the direction of a change
+("fell" against a rise). Those are read by a person.
+
 ## 2026-11-23 — Slice 114: charts that cannot carry a number of their own
 
 Owner's feedback on the first deck: add some graphs and a tiny bit more text.

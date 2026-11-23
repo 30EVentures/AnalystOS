@@ -1,0 +1,7 @@
+[
+ {"name": "no re-verification before rendering", "old": "    problems = check_deck_spec(spec)\n    if problems:", "new": "    problems = []\n    if problems:"},
+ {"name": "assumption flag dropped from the footer", "old": "        if assumptions:\n            note +=", "new": "        if False:\n            note +="},
+ {"name": "points shown as percent", "old": "        return f\"{text} pts\"", "new": "        return f\"{text}%\""},
+ {"name": "formula for percent_of wrong", "old": "        return f\"{a[0]} × {a[1]} ÷ 100\"", "new": "        return f\"{a[0]} × {a[1]}\""},
+ {"name": "chart value axis shown", "old": "    value_axis.visible = False", "new": "    value_axis.visible = True"}
+]

@@ -12,6 +12,7 @@ from pathlib import Path
 from pptx import Presentation
 
 from analystos.l4 import deck
+from analystos.packs.numbers import find_numbers
 from analystos.packs import consulting as c
 from analystos.packs.replay import ReplayClient
 from tests.test_consulting_pack import CATALOG, ENGAGEMENT, RESPONSE
@@ -19,6 +20,70 @@ from tests.test_consulting_pack import CATALOG, ENGAGEMENT, RESPONSE
 SPEC = c.build_deck_spec(ENGAGEMENT, CATALOG, client=ReplayClient([RESPONSE]))
 DATA = deck.render_deck(SPEC)
 PRS = Presentation(io.BytesIO(DATA))
+
+
+def _strings(value):
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, dict):
+        for v in value.values():
+            yield from _strings(v)
+    elif isinstance(value, list):
+        for v in value:
+            yield from _strings(v)
+
+
+def _allowed_per_rendered_slide(spec):
+    """For each rendered slide, the numbers it may show: those written in its own spec
+    slide, the formatted values of the figures that slide uses, and on sources slides
+    each listed figure's value, quote and rationale."""
+    figures = {f["id"]: f for f in spec["content"]["figures"]}
+    out = []
+    for spec_slide in spec["slides"]:
+        if spec_slide["kind"] == "sources":
+            for k in range(0, len(spec["content"]["figures"]), deck.SOURCES_PER_SLIDE):
+                chunk = spec["content"]["figures"][k:k + deck.SOURCES_PER_SLIDE]
+                texts = [deck.format_value(f) for f in chunk] + [f.get("quote", "") for f in chunk] + \
+                        [f.get("rationale", "") for f in chunk]
+                out.append(texts)
+            continue
+        texts = list(_strings({k: v for k, v in spec_slide.items() if k != "figure_ids"}))
+        texts += [deck.format_value(figures[fid]) for fid in spec_slide["figure_ids"] if fid in figures]
+        if spec_slide["kind"] == "issue-tree":
+            texts.append(spec["content"]["key_question"])
+        if spec_slide["kind"] == "recommendation":
+            texts += list(_strings(spec["content"]["recommendation"]))
+        if spec_slide["kind"] == "roadmap":
+            texts += list(c.HORIZONS)  # the fixed column labels, part of the format, not a claim
+        out.append(texts)
+    allowed = []
+    for texts in out:
+        tokens = set()
+        for text in texts:
+            tokens.update(t.text.strip() for t in find_numbers(text))
+            tokens.add(text.strip())
+        allowed.append(tokens)
+    return allowed
+
+
+def unexplained_numbers(prs, spec):
+    """Every number on a slide that is not, as a whole token, one that slide's own verified
+    content writes, a formatted value of a figure the slide uses, a slide number, sources
+    pagination or formula notation (and, on the roadmap slide only, its column labels)."""
+    allowed = _allowed_per_rendered_slide(spec)
+    total = len(prs.slides)
+    found = []
+    for i, slide in enumerate(prs.slides, start=1):
+        text = slide_text(slide)
+        text = re.sub(rf"\b{i} / {total}\b", " ", text)
+        text = re.sub(r"\(\d+ of \d+\)", " ", text)
+        text = re.sub("[\u00d7\u00f7] 100", " ", text)
+        text = re.sub(r"\bF[1-9]\d{0,2}\b", " ", text)
+        for token in find_numbers(text):
+            shown = token.text.strip()
+            if shown not in allowed[i - 1]:
+                found.append((i, shown))
+    return found
 
 
 def slide_text(slide):
@@ -55,7 +120,7 @@ class RenderTest(unittest.TestCase):
         sources = slide_text(PRS.slides[12]) + slide_text(PRS.slides[13])
         for fig in RESPONSE["figures"]:
             self.assertIn(fig["label"], sources)
-        self.assertIn("Client's words: “churn went from 4% to 7%”", sources)
+        self.assertIn("Client's words: “went from 4%”", sources)
         self.assertIn("Calculated: F5 × F2 ÷ 100", sources)
         self.assertIn("Calculated: F2 − F1", sources)
         self.assertIn("Assumption: A planning assumption", sources)
@@ -84,21 +149,32 @@ class RenderTest(unittest.TestCase):
         self.assertEqual(PRS.core_properties.author, "AnalystOS")
 
     def test_the_renderer_adds_no_numbers_of_its_own(self):
-        allowed = set()
-        for fig in SPEC["content"]["figures"]:
-            allowed.add(deck.format_value(fig))
-        spec_text = json.dumps(SPEC["content"], ensure_ascii=False)
-        number_re = re.compile(r"\$?\d[\d,]*(?:\.\d+)?%?")
-        for i, slide in enumerate(PRS.slides, start=1):
-            text = slide_text(slide)
-            text = re.sub(rf"\b{i} / {len(PRS.slides)}\b", "", text)        # slide numbers
-            text = re.sub(r"\bF\d+\b", "", text)                               # figure references
-            text = re.sub(r"\((?:1|2) of 2\)", "", text)                       # sources pagination
-            text = re.sub("[\u00d7\u00f7] 100", "", text)                     # formula notation, not a claim
-            for token in number_re.findall(text):
-                with self.subTest(slide=i, token=token):
-                    self.assertTrue(token in spec_text or token in allowed or token.rstrip("%") in spec_text,
-                                    f"slide {i} shows {token!r}, which is not in the verified spec")
+        self.assertEqual(unexplained_numbers(PRS, SPEC), [])
+
+    def test_the_check_catches_an_injected_number(self):
+        for injected in ("TOP 3 priorities", "a 10% uplift", "saves 60 clinics", "seventy percent", "2x faster"):
+            with self.subTest(injected=injected):
+                prs = Presentation(io.BytesIO(DATA))
+                shape = next(s for s in prs.slides[3].shapes if s.has_text_frame and s.text_frame.text.strip())
+                shape.text_frame.paragraphs[0].add_run().text = " " + injected
+                self.assertTrue(unexplained_numbers(prs, SPEC), injected)
+
+    def test_the_check_catches_a_misformatted_value(self):
+        prs = Presentation(io.BytesIO(DATA))
+        changed = 0
+        for shape in prs.slides[1].shapes:
+            if shape.has_text_frame and shape.text_frame.text.startswith("$30,600"):
+                shape.text_frame.paragraphs[0].runs[0].text = "$30,601"
+                changed += 1
+        self.assertEqual(changed, 1)
+        self.assertTrue(unexplained_numbers(prs, SPEC))
+
+    def test_an_edited_spec_is_refused(self):
+        edited = json.loads(json.dumps(SPEC))
+        edited["content"]["answer"] = "Churn will hit 40% next year, so act now on retention."
+        edited["slides"][1]["title"] = edited["content"]["answer"]
+        with self.assertRaisesRegex(ValueError, "refusing to render"):
+            deck.render_deck(edited)
 
     def test_refusals(self):
         for bad in (None, {}, {"format": "x"}, dict(SPEC, slides=[])):
@@ -106,8 +182,11 @@ class RenderTest(unittest.TestCase):
                 deck.render_deck(bad)
         weird = copy.deepcopy(SPEC)
         weird["slides"][3]["kind"] = "hologram"
-        with self.assertRaisesRegex(ValueError, "hologram"):
+        with self.assertRaisesRegex(ValueError, "refusing to render"):
             deck.render_deck(weird)
+        for malformed in ({"format": SPEC["format"]}, dict(SPEC, content=None), dict(SPEC, client_text=None)):
+            with self.assertRaises(ValueError):
+                deck.render_deck(malformed)
 
 
 class FormatTest(unittest.TestCase):

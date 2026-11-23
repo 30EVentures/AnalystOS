@@ -126,3 +126,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 112 | the consulting skill: a scoped engagement in, a verified deck spec out | [spec](slice-112/spec.md) |
 | 113 | the deck renderer: a verified deck spec in, a PowerPoint file out | [spec](slice-113/spec.md) |
 | 114 | charts and a "so what" on every finding | [spec](slice-114/spec.md) |
+| 115 | make "every number is traced" true (review of Slices 112-114) | [spec](slice-115/spec.md) |

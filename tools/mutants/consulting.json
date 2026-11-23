@@ -1,0 +1,98 @@
+[
+ {
+  "name": "no unit check on prose numbers",
+  "old": "    if token.value is None or token.kind not in _KINDS_FOR_UNIT.get(figure[\"unit\"], set()):",
+  "new": "    if token.value is None:"
+ },
+ {
+  "name": "no relative-gap check",
+  "old": "    return abs(token.value - fv) / abs(fv) <= _MAX_RELATIVE_GAP",
+  "new": "    return True"
+ },
+ {
+  "name": "tag anywhere in the text",
+  "old": "    for sentence in _SENTENCE_SPLIT_RE.split(text):",
+  "new": "    for sentence in [text]:"
+ },
+ {
+  "name": "word quantities allowed",
+  "old": "            if token.value is None:\n                problems.append(f\"{where}: {shown!r} is a quantity",
+  "new": "            if token.value is None:\n                continue\n                problems.append(f\"{where}: {shown!r} is a quantity"
+ },
+ {
+  "name": "labels unchecked",
+  "old": "    if _ANY_TAG_RE.search(text) or find_numbers(text):",
+  "new": "    if False:"
+ },
+ {
+  "name": "quote may hold several numbers",
+  "old": "            elif len(tokens) != 1 or tokens[0].value is None:",
+  "new": "            elif not tokens or tokens[0].value is None:"
+ },
+ {
+  "name": "client value may drift",
+  "old": "            elif fig[\"value\"] != tokens[0].value:",
+  "new": "            elif not _close_enough(fig[\"value\"], tokens[0].value):"
+ },
+ {
+  "name": "no canonical client value",
+  "old": "                canonical = tokens[0].value",
+  "new": "                canonical = fig[\"value\"]",
+  "equivalent": "a client value must already equal its quote's number exactly, so the canonical value is the same value"
+ },
+ {
+  "name": "no canonical computed value",
+  "old": "                    canonical = result",
+  "new": "                    canonical = fig[\"value\"]"
+ },
+ {
+  "name": "difference of percents stays percent",
+  "old": "        return {\"points\"} if units[0] in (\"percent\", \"points\") else {units[0]}",
+  "new": "        return {units[0], \"points\"}"
+ },
+ {
+  "name": "product may be any unit",
+  "old": "        return {\"usd\"} if \"usd\" in units else plain",
+  "new": "        return set(UNITS)"
+ },
+ {
+  "name": "percent_of wrong",
+  "old": "        return values[0] * values[1] / 100 if len(values) == 2 else None",
+  "new": "        return values[0] * values[1] if len(values) == 2 else None"
+ },
+ {
+  "name": "unused figures allowed",
+  "old": "            problems.append(f\"figure {fid} is never used\")",
+  "new": "            pass"
+ },
+ {
+  "name": "no repair retry",
+  "old": "    if found:\n        previous =",
+  "new": "    if False:\n        previous ="
+ },
+ {
+  "name": "repair echo not neutralised",
+  "old": "        previous = neutralize(json.dumps(content, ensure_ascii=False)[:20000])",
+  "new": "        previous = json.dumps(content, ensure_ascii=False)[:20000]"
+ },
+ {
+  "name": "client problem not neutralised",
+  "old": "    lines = [\"<<CLIENT problem>>\", neutralize(engagement[\"problem\"]), \"<</CLIENT problem>>\"]",
+  "new": "    lines = [\"<<CLIENT problem>>\", engagement[\"problem\"], \"<</CLIENT problem>>\"]"
+ },
+ {
+  "name": "spec not canonicalised",
+  "old": "    content = canonicalize(content, client_text)\n    return {",
+  "new": "    return {"
+ },
+ {
+  "name": "spec check skips slides",
+  "old": "        if spec.get(\"slides\") != assemble_slides(content):",
+  "new": "        if False:"
+ },
+ {
+  "name": "any state worked on",
+  "old": "    if engagement[\"state\"] != \"accepted\":",
+  "new": "    if False:"
+ }
+]

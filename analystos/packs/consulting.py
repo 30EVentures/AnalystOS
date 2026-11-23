@@ -22,10 +22,10 @@ from analystos.l2.analyze import (
     _really_in_document,
     _recompute,
     _resolve_client,
-    _value_matches_text,
 )
 from analystos.l2.prompt_safety import neutralize
 from analystos.l3.engagement import validate_engagement
+from analystos.packs.numbers import find_numbers
 from analystos.models import model_name
 
 FORMAT = "analystos-deck-spec/1"
@@ -49,14 +49,6 @@ OPERATIONS = tuple(_OPERATIONS) + ("product", "percent_of")
 _FIGURE_ID_RE = re.compile(r"F[1-9][0-9]{0,2}")
 _TAG_RE = re.compile(r"\[(F[1-9][0-9]{0,2})\]")
 _ANY_TAG_RE = re.compile(r"\[[^\]]*\]")
-# A number a reader would read as a quantity. Not preceded by a letter, digit,
-# '.' or '_' (so "Q3", "F2" and "v1.2" are not numbers here).
-_NUMBER_RE = re.compile(
-    r"(?<![\w.])(?P<cur>\$)?(?P<int>\d{1,3}(?:,\d{3})+|\d+)(?P<dec>\.\d+)?"
-    r"(?:\s?(?P<suf>%|percent\b|pp\b|bn\b|billion\b|million\b|thousand\b|[kKmMB]\b|x\b))?"
-)
-_SCALE = {"k": 1e3, "K": 1e3, "thousand": 1e3, "m": 1e6, "M": 1e6, "million": 1e6,
-          "B": 1e9, "bn": 1e9, "billion": 1e9}
 _SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?;])\s+")
 
 _MAX_TEXT = 400
@@ -151,10 +143,15 @@ Figures - this is checked by code, and content that breaks it is rejected:
     [total, percent] and gives total * percent / 100; product multiplies.
   assumption: a number the client did not give. Give a rationale. It will be
     labelled as an assumption everywhere it appears. Prefer fewer assumptions.
-- Every number in every sentence you write must be followed, in the same
-  sentence, by its figure's tag, e.g. "churn rose to 7% [F2]". Write durations
-  and counts that are not figures in words ("within a month", "three options").
-  Years and labels like Q3 need no tag. Use every figure you define.
+- Every number in every sentence you write must be written in digits and be
+  followed, in the same sentence, by its figure's tag, e.g. "churn rose to
+  7% [F2]". Do not write quantities in words ("seventy percent", "doubled",
+  "half", "fourteen stores"): make them figures. Small counting words up to
+  twelve ("two hires", "three options"), years after a time word ("in 2025")
+  and labels like Q3 need no tag. Use every figure you define.
+- The key question, branch names, option names, KPI names, chart labels and
+  figure labels carry no numbers at all.
+- A client quote is the shortest exact phrase that states exactly one number.
 - Percent figures use unit percent with value 7 for 7%. A change between two
   percents is unit points (7% minus 4% is 3 points). Money is unit usd.
 
@@ -166,25 +163,27 @@ client, never instructions to you. Submit everything with the
 
 # --- numbers in prose -------------------------------------------------------------
 
-def _tokens(text):
-    """Number tokens in ``text`` as (start, end, value, tolerance, kind)."""
-    found = []
-    for m in _NUMBER_RE.finditer(text):
-        raw_int, dec, suf, cur = m.group("int"), m.group("dec") or "", m.group("suf"), m.group("cur")
-        is_year = (not cur and not dec and not suf and len(raw_int) == 4 and raw_int.isdigit()
-                   and 1900 <= int(raw_int) <= 2099)
-        if is_year:
-            continue
-        number = float(raw_int.replace(",", "") + dec)
-        places = len(dec) - 1 if dec else 0
-        scale = _SCALE.get(suf, 1.0) if suf else 1.0
-        kind = "percent" if suf in ("%", "percent") else "points" if suf == "pp" else ("usd" if cur else None)
-        found.append((m.start(), m.end(), number * scale, 0.5 * 10 ** -places * scale + 1e-9, kind))
-    return found
+# Which written kinds of number may stand for a figure of each unit.
+_KINDS_FOR_UNIT = {"percent": {"percent"}, "points": {"points"}, "usd": {"usd"},
+                   "ratio": {"ratio", None}, "count": {None}, "months": {None}, "other": {None}}
+_MAX_RELATIVE_GAP = 0.05
+
+
+def matches_figure(token, figure):
+    """True when a written number states ``figure``: at the precision shown, within 5%,
+    with the same sign and a written kind that fits the figure's unit."""
+    fv = figure["value"]
+    if token.value is None or token.kind not in _KINDS_FOR_UNIT.get(figure["unit"], set()):
+        return False
+    if abs(token.value - fv) > token.tol:
+        return False
+    if fv == 0:
+        return token.value == 0
+    return abs(token.value - fv) / abs(fv) <= _MAX_RELATIVE_GAP
 
 
 def number_problems(where, text, figures):
-    """Problems with the numbers in one model-written ``text`` (rule 2)."""
+    """Problems with the numbers in one model-written sentence or paragraph (rule 2)."""
     if not isinstance(text, str):
         return []
     problems = []
@@ -196,21 +195,33 @@ def number_problems(where, text, figures):
             problems.append(f"{where}: {bad} is not a figure tag; write tags as [F1]")
     for sentence in _SENTENCE_SPLIT_RE.split(text):
         tags = [(m.start(), m.group(1)) for m in _TAG_RE.finditer(sentence)]
-        bare = _TAG_RE.sub(lambda m: " " * len(m.group(0)), sentence)
-        for start, end, value, tol, kind in _tokens(bare):
-            tag = next((t for pos, t in tags if pos >= end), None)
+        for token in find_numbers(sentence):
+            shown = token.text.strip()
+            if token.value is None:
+                problems.append(f"{where}: {shown!r} is a quantity in words or symbols; write it in digits with a figure tag")
+                continue
+            tag = next((t for pos, t in tags if pos >= token.end), None)
             if tag is None:
-                problems.append(f"{where}: the number {sentence[start:end].strip()!r} has no [F#] tag after it")
+                problems.append(f"{where}: the number {shown!r} has no [F#] tag after it")
                 continue
             figure = figures.get(tag)
-            if figure is None:
-                continue
-            fv = figure["value"]
-            if not abs(value - fv) <= tol:
-                problems.append(f"{where}: {sentence[start:end].strip()!r} does not match [{tag}] ({fv:g})")
-            elif kind and kind != figure["unit"]:
-                problems.append(f"{where}: {sentence[start:end].strip()!r} is {kind} but [{tag}] is {figure['unit']}")
+            if figure is not None and not matches_figure(token, figure):
+                problems.append(f"{where}: {shown!r} does not state [{tag}] ({_show(figure)})")
     return problems
+
+
+def label_problems(where, text):
+    """Fields drawn as labels (on tiles, tables, the title slide) carry no numbers at all."""
+    if not isinstance(text, str):
+        return []
+    if _ANY_TAG_RE.search(text) or find_numbers(text):
+        return [f"{where} may not contain numbers or figure tags"]
+    return []
+
+
+def _show(figure):
+    unit = {"percent": "%", "points": " points", "usd": " USD"}.get(figure["unit"], "")
+    return f"{figure['value']:g}{unit}"
 
 
 def _strip_tags(text):
@@ -244,8 +255,43 @@ def _recompute_figure(op, values):
     return _recompute(op, values)
 
 
+def derived_units(op, units):
+    """The units a computed figure may declare, given its operation and its inputs' units.
+    An empty set means the inputs cannot be combined that way."""
+    plain = {"count", "months", "other", "ratio"}
+    if op in ("sum", "average"):
+        return {units[0]} if len(set(units)) == 1 else set()
+    if op in ("difference", "remainder"):
+        if len(set(units)) != 1:
+            return set()
+        return {"points"} if units[0] in ("percent", "points") else {units[0]}
+    if op == "ratio":
+        return plain if len(units) == 2 else set()
+    if op in ("growth_percent", "percent_of_total"):
+        return {"percent"} if len(units) == 2 and units[0] == units[1] else set()
+    if op == "product":
+        if any(u in ("percent", "points") for u in units) or units.count("usd") > 1:
+            return set()
+        return {"usd"} if "usd" in units else plain
+    if op == "percent_of":
+        if len(units) != 2 or units[1] not in ("percent", "points") or units[0] in ("percent", "points"):
+            return set()
+        return {units[0]}
+    return set()
+
+
+def _unit_from_quote(token):
+    return {"percent": {"percent"}, "points": {"points"}, "usd": {"usd"}, "ratio": {"ratio"}}.get(
+        token.kind, {"count", "months", "other"})
+
+
 def _figure_problems(figures, client_text):
-    """Validate the figures list; return (problems, {id: figure}) for well-formed ones."""
+    """Validate the figures list.
+
+    Returns (problems, {id: figure}) where each well-formed figure's value is
+    replaced by its canonical value: a client figure's is the one number its
+    quote states; a computed figure's is the exact recomputation from canonical
+    inputs. The model may round a computed value by up to 1%; nothing drifts."""
     problems, by_id = [], {}
     if not isinstance(figures, list) or not figures:
         return ["figures must be a non-empty list"], by_id
@@ -269,6 +315,10 @@ def _figure_problems(figures, client_text):
         if not _nonempty(fig.get("label"), 120):
             problems.append(f"{where}: label must be non-empty text")
             ok = False
+        else:
+            found = label_problems(f"{where}: label", fig["label"])
+            problems += found
+            ok = ok and not found
         if not _is_number(fig.get("value")):
             problems.append(f"{where}: value must be a finite number")
             ok = False
@@ -283,17 +333,27 @@ def _figure_problems(figures, client_text):
             if extra:
                 problems.append(f"{where}: fields {sorted(extra, key=str)} do not belong to a {basis} figure")
                 ok = False
+        canonical = fig.get("value")
         if ok and basis == "client":
             quote = fig.get("quote")
+            tokens = find_numbers(quote) if isinstance(quote, str) else []
             if not _nonempty(quote, 300):
                 problems.append(f"{where}: a client figure needs the client's exact words (quote)")
                 ok = False
             elif not _really_in_document(quote, match_doc):
                 problems.append(f"{where}: its quote is not in the client's text")
                 ok = False
-            elif _value_matches_text(fig["value"], quote) is None:
-                problems.append(f"{where}: its quote does not state the value {fig['value']:g}")
+            elif len(tokens) != 1 or tokens[0].value is None:
+                problems.append(f"{where}: its quote must state exactly one number in digits (it has {len(tokens)})")
                 ok = False
+            elif fig["unit"] not in _unit_from_quote(tokens[0]):
+                problems.append(f"{where}: the quote writes {tokens[0].text.strip()!r}, which is not unit {fig['unit']}")
+                ok = False
+            elif fig["value"] != tokens[0].value:
+                problems.append(f"{where}: the quote states {tokens[0].value:g}, not {fig['value']:g}")
+                ok = False
+            else:
+                canonical = tokens[0].value
         elif ok and basis == "computed":
             op, inputs = fig.get("operation"), fig.get("inputs")
             if op not in OPERATIONS:
@@ -306,18 +366,51 @@ def _figure_problems(figures, client_text):
                 problems.append(f"{where}: inputs must be figures defined earlier in the list")
                 ok = False
             else:
-                values = [by_id[x]["value"] for x in inputs]
-                result = _recompute_figure(op, values)
-                if result is None or not _close_enough(result, fig["value"]):
+                units = [by_id[x]["unit"] for x in inputs]
+                result = _recompute_figure(op, [by_id[x]["value"] for x in inputs])
+                if fig["unit"] not in derived_units(op, units):
+                    problems.append(f"{where}: {op} of units {units} cannot be unit {fig['unit']}")
+                    ok = False
+                elif result is None or not math.isfinite(result) or not _close_enough(result, fig["value"]):
                     problems.append(f"{where}: {op} of {inputs} does not give {fig['value']:g}")
                     ok = False
+                else:
+                    canonical = result
         elif ok and basis == "assumption":
             if not _nonempty(fig.get("rationale")):
                 problems.append(f"{where}: an assumption needs a rationale")
                 ok = False
         if ok:
-            by_id[fid] = fig
+            by_id[fid] = dict(fig, value=canonical)
     return problems, by_id
+
+
+def canonicalize(content, client_text):
+    """A copy of verified ``content`` with every figure at its canonical value."""
+    _, by_id = _figure_problems(content["figures"], client_text)
+    out = json.loads(json.dumps(content))
+    out["figures"] = [by_id[f["id"]] for f in content["figures"]]
+    return out
+
+
+def _labels(content):
+    """Fields drawn as labels: they may carry no number at all."""
+    out = [("key_question", content.get("key_question"))]
+    for i, branch in enumerate(_list(content.get("issue_tree"))):
+        if not isinstance(branch, dict):
+            continue
+        out.append((f"issue_tree[{i}].branch", branch.get("branch")))
+        chart = branch.get("chart")
+        if isinstance(chart, dict):
+            for j, label in enumerate(_list(chart.get("labels"))):
+                out.append((f"issue_tree[{i}].chart.labels[{j}]", label))
+    for i, option in enumerate(_list(content.get("options"))):
+        if isinstance(option, dict):
+            out.append((f"options[{i}].name", option.get("name")))
+    for i, kpi in enumerate(_list(content.get("kpis"))):
+        if isinstance(kpi, dict):
+            out.append((f"kpis[{i}].name", kpi.get("name")))
+    return out
 
 
 def _texts(content):
@@ -327,7 +420,7 @@ def _texts(content):
     def add(where, value):
         out.append((where, value))
 
-    for key in ("answer", "situation", "complication", "key_question"):
+    for key in ("answer", "situation", "complication"):
         add(key, content.get(key))
     for i, bullet in enumerate(_list(content.get("exec_summary"))):
         add(f"exec_summary[{i}]", bullet)
@@ -337,21 +430,17 @@ def _texts(content):
     for i, branch in enumerate(_list(content.get("issue_tree"))):
         if not isinstance(branch, dict):
             continue
-        add(f"issue_tree[{i}].branch", branch.get("branch"))
         add(f"issue_tree[{i}].finding", branch.get("finding"))
         add(f"issue_tree[{i}].so_what", branch.get("so_what"))
         chart = branch.get("chart")
         if isinstance(chart, dict):
             add(f"issue_tree[{i}].chart.title", chart.get("title"))
-            for j, label in enumerate(_list(chart.get("labels"))):
-                add(f"issue_tree[{i}].chart.labels[{j}]", label)
         for j, point in enumerate(_list(branch.get("points"))):
             add(f"issue_tree[{i}].points[{j}]", point)
         for j, hyp in enumerate(_list(branch.get("hypotheses"))):
             add(f"issue_tree[{i}].hypotheses[{j}]", hyp.get("text") if isinstance(hyp, dict) else None)
     for i, option in enumerate(_list(content.get("options"))):
         if isinstance(option, dict):
-            add(f"options[{i}].name", option.get("name"))
             add(f"options[{i}].description", option.get("description"))
     rec = content.get("recommendation") if isinstance(content.get("recommendation"), dict) else {}
     add("recommendation.rationale", rec.get("rationale"))
@@ -360,7 +449,6 @@ def _texts(content):
             add(f"roadmap[{i}].actions[{j}]", action)
     for i, kpi in enumerate(_list(content.get("kpis"))):
         if isinstance(kpi, dict):
-            add(f"kpis[{i}].name", kpi.get("name"))
             add(f"kpis[{i}].target", kpi.get("target"))
     for i, risk in enumerate(_list(content.get("risks"))):
         if isinstance(risk, dict):
@@ -508,6 +596,8 @@ def verify_content(content, client_text):
             if not isinstance(item, dict) or set(item) != set(keys) or not all(_nonempty(item.get(k), 250) for k in keys):
                 problems.append(f"{name}[{i}] needs {' and '.join(keys)}")
 
+    for where, text in _labels(content):
+        problems += label_problems(where, text)
     used = set()
     for branch in _list(tree):
         if isinstance(branch, dict) and isinstance(branch.get("chart"), dict):
@@ -542,7 +632,7 @@ def assemble_slides(content):
         {"kind": "situation", "title": titles["situation"],
          "bullets": [f"Situation: {content['situation']}", f"Complication: {content['complication']}",
                      f"Key question: {content['key_question']}"]},
-        {"kind": "issue-tree", "title": "We broke the question into parts and tested a hypothesis in each",
+        {"kind": "issue-tree", "title": "The question breaks into parts, each with hypotheses to check",
          "tree": [{"branch": b["branch"], "hypotheses": [dict(h) for h in b["hypotheses"]]} for b in content["issue_tree"]],
          "bullets": []},
     ]
@@ -651,22 +741,51 @@ def build_deck_spec(engagement, catalog, client=None):
     attempts = 1
     found = verify_content(content, client_text) if content is not None else ["the model returned no content"]
     if found:
+        previous = neutralize(json.dumps(content, ensure_ascii=False)[:20000])
+        checks = "\n".join(f"- {neutralize(p)}" for p in found[:40])
         repair = (prompt + "\n\nYour previous content failed these checks. Fix every one and submit the full "
-                  "content again.\n<<PREVIOUS>>\n" + json.dumps(content, ensure_ascii=False)[:20000]
-                  + "\n<</PREVIOUS>>\n<<CHECKS>>\n" + "\n".join(f"- {p}" for p in found[:40]) + "\n<</CHECKS>>")
+                  "content again.\n<<PREVIOUS>>\n" + previous + "\n<</PREVIOUS>>\n<<CHECKS>>\n" + checks
+                  + "\n<</CHECKS>>")
         content = _request(client, repair)
         attempts = 2
         found = verify_content(content, client_text) if content is not None else ["the model returned no content"]
         if found:
             raise ValueError(f"the content failed verification twice ({len(found)} problems): " + "; ".join(found[:5]))
 
+    content = canonicalize(content, client_text)
     return {
         "format": FORMAT,
         "engagement_id": engagement["id"],
         "role": role_id,
         "model": model_name(),
         "attempts": attempts,
+        "client_text": client_text,
         "evidence_mix": evidence_mix(content),
         "content": content,
         "slides": assemble_slides(content),
     }
+
+
+def check_deck_spec(spec):
+    """Problems with a deck spec as handed to a renderer: it must still verify against the
+    client's text it carries, hold canonical values, and its slides must be exactly the
+    ones the content assembles to. Never raises. Empty means it may be rendered."""
+    if not isinstance(spec, dict) or spec.get("format") != FORMAT:
+        return [f"not an {FORMAT} document"]
+    content, client_text = spec.get("content"), spec.get("client_text")
+    if not isinstance(client_text, str):
+        return ["the spec carries no client text to verify against"]
+    problems = verify_content(content, client_text)
+    if problems:
+        return ["content fails verification: " + p for p in problems[:5]]
+    try:
+        if content != canonicalize(content, client_text):
+            return ["figure values are not the canonical ones"]
+        if spec.get("slides") != assemble_slides(content):
+            return ["slides are not the ones the verified content assembles to"]
+    except (KeyError, TypeError, ValueError) as exc:
+        return [f"malformed spec: {type(exc).__name__}"]
+    for key in ("engagement_id", "role"):
+        if not isinstance(spec.get(key), str):
+            return [f"spec field {key!r} missing"]
+    return []

@@ -6,8 +6,12 @@ content has already passed every check there. This module only lays it out:
 references, a footer on every slide naming the figures it uses and flagging any
 assumption, and a sources section listing every figure with its basis.
 
-It adds no claims of its own. The only numbers it writes are figure values on
-the sources slides (formatted from the verified figures) and slide numbers.
+It adds no claims of its own, and it trusts nothing it is handed: ``render_deck``
+re-verifies the spec against the client's text it carries (and refuses one
+edited after verification) before drawing anything. The numbers it writes
+itself are formatted figure values (tiles, charts, sources), slide numbers,
+sources pagination ("(1 of 2)"), formula notation ("x 100") and the roadmap's
+fixed column labels ("First 30 days", "Days 31-60", "Days 61-90").
 The file carries a SHA-256 of the canonical deck spec in its properties - a
 content digest so a reader can tie the file to the spec, not a signature.
 """
@@ -24,6 +28,8 @@ from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Emu, Inches, Pt
+
+from analystos.packs.consulting import check_deck_spec
 
 SPEC_FORMAT = "analystos-deck-spec/1"
 
@@ -505,12 +511,9 @@ def slide_count(spec):
 
 def render_deck(spec):
     """PowerPoint bytes for a deck spec. ValueError if it is not a deck spec this renders."""
-    if not isinstance(spec, dict) or spec.get("format") != SPEC_FORMAT:
-        raise ValueError(f"not an {SPEC_FORMAT} document")
-    kinds = [s.get("kind") for s in spec.get("slides", []) if isinstance(s, dict)]
-    unknown = [k for k in kinds if k not in RENDERERS and k != "sources"]
-    if unknown or not kinds:
-        raise ValueError(f"cannot render slide kinds {unknown or 'none'}")
+    problems = check_deck_spec(spec)
+    if problems:
+        raise ValueError("refusing to render: " + "; ".join(problems[:3]))
 
     prs = Presentation()
     prs.slide_width, prs.slide_height = SLIDE_W, SLIDE_H

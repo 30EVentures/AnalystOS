@@ -6,10 +6,17 @@ the answers, and may be accepted only when every requested role is available in
 the role catalog - the first code that reads Slice 108's status ladder.
 
 Pure functions over plain JSON-shaped dicts: no clock, no randomness (except
-``new_id``), no I/O except loading the scoping templates. Builders raise
-``ValueError`` naming the bad field; validators return a list of problems and
-never raise. Client text (``problem``, answers) is data, never instructions; it
-is cleaned on the way in and refused, not truncated, when too long.
+``new_id``), no I/O except loading the scoping templates. Builders
+(``new_engagement``, ``answer``, ``open_questions``) raise only ``ValueError``,
+naming the bad field; ``validate_*`` and ``accept`` return problems and never
+raise. Client text (``problem``, answers) is data, never instructions; it is
+cleaned on the way in, and refused - never truncated or silently altered in
+meaning - when it is too long or contains characters that cannot be stored
+faithfully.
+
+The gate (``accept``) trusts nothing the record says about itself: it
+re-validates the catalog and the templates and recomputes which questions the
+requested roles require (Slice 110, after a review found both trusted).
 """
 
 import copy
@@ -19,6 +26,8 @@ import secrets
 import unicodedata
 from datetime import datetime
 from pathlib import Path
+
+from analystos.catalog.validate import validate_catalog
 
 FORMAT = "analystos-engagement/1"
 SCOPING_FORMAT = "analystos-scoping/1"
@@ -37,23 +46,55 @@ _QID_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*\.[a-z0-9]+(?:-[a-z0-9]+)*")
 _RECORD_KEYS = {"format", "id", "created", "requested_by", "problem", "roles", "questions", "answers", "state"}
 _QUESTION_KEYS = {"id", "text", "required"}
 _KEEP = {"\n", "\t"}
+_INVISIBLE_CATEGORIES = ("Cc", "Cf", "Zl", "Zp")
+_REFUSED_CATEGORIES = {"Cs": "surrogate", "Co": "private-use", "Cn": "unassigned"}
+# Unicode's Default_Ignorable_Code_Point property (DerivedCoreProperties.txt):
+# characters that render as nothing. Python has no accessor for it, so the
+# ranges are listed; most are also category Cf, but not all (variation
+# selectors are Mn, the Hangul fillers Lo, U+034F Mn).
+_DEFAULT_IGNORABLE = (
+    (0x00AD, 0x00AD), (0x034F, 0x034F), (0x061C, 0x061C), (0x115F, 0x1160),
+    (0x17B4, 0x17B5), (0x180B, 0x180F), (0x200B, 0x200F), (0x202A, 0x202E),
+    (0x2060, 0x206F), (0x3164, 0x3164), (0xFE00, 0xFE0F), (0xFEFF, 0xFEFF),
+    (0xFFA0, 0xFFA0), (0xFFF0, 0xFFF8), (0x1BCA0, 0x1BCA3), (0x1D173, 0x1D17A),
+    (0xE0000, 0xE0FFF),
+)
+# Input longer than this many times its cap is refused before any processing.
+_RAW_FACTOR = 4
 
 
 # --- client text ------------------------------------------------------------
 
+def _invisible(ch):
+    if ch in _KEEP:
+        return False
+    if unicodedata.category(ch) in _INVISIBLE_CATEGORIES:
+        return True
+    cp = ord(ch)
+    return any(lo <= cp <= hi for lo, hi in _DEFAULT_IGNORABLE)
+
+
 def clean_text(value, field, cap):
     """``value`` as stored client text, or ValueError naming ``field``.
 
-    NFC-normalised; line endings unified; control characters and invisible
-    format characters (zero-width, bidi overrides) removed, keeping newlines
-    and tabs; surrounding whitespace trimmed. Empty or over ``cap`` is refused."""
+    In this order, so that cleaning twice changes nothing: line endings
+    unified; invisible characters removed (controls except newline and tab,
+    format characters, line/paragraph separators, Default_Ignorable code
+    points); NFC-normalised; trimmed. Surrogate, private-use and unassigned
+    characters are refused rather than dropped, as is empty or over-``cap``
+    text - client text is never silently truncated."""
     if not isinstance(value, str):
         raise ValueError(f"{field} must be text")
-    text = unicodedata.normalize("NFC", value).replace("\r\n", "\n").replace("\r", "\n")
-    text = "".join(
-        ch for ch in text
-        if ch in _KEEP or unicodedata.category(ch) not in ("Cc", "Cf", "Cs", "Co", "Cn", "Zl", "Zp")
-    ).strip()
+    if len(value) > cap * _RAW_FACTOR:
+        raise ValueError(f"{field} is far over its {cap}-character limit (refused, not truncated)")
+    for ch in value:
+        kind = _REFUSED_CATEGORIES.get(unicodedata.category(ch))
+        if kind:
+            article = "an" if kind[0] in "aeiou" else "a"
+            raise ValueError(f"{field} contains {article} {kind} character (U+{ord(ch):04X}); refused rather than altered")
+    text = value.replace("\r\n", "\n").replace("\r", "\n")
+    text = "".join(ch for ch in text if not _invisible(ch))
+    text = unicodedata.normalize("NFC", text).strip()
     if not text:
         raise ValueError(f"{field} is empty")
     if len(text) > cap:
@@ -94,8 +135,8 @@ def _question_problems(where, question):
     problems = []
     if not (isinstance(question["id"], str) and _QID_RE.fullmatch(question["id"])):
         problems.append(f"{where}: question id must look like 'family.slug'")
-    if not (isinstance(question["text"], str) and question["text"].strip()):
-        problems.append(f"{where}: question text must be non-empty")
+    if not _is_clean(question["text"], MAX_ANSWER_CHARS):
+        problems.append(f"{where}: question text must be clean, non-empty text")
     if not isinstance(question["required"], bool):
         problems.append(f"{where}: required must be true or false")
     return problems
@@ -105,6 +146,8 @@ def validate_scoping(doc, catalog):
     """Problems with the scoping templates; every catalog family must have questions."""
     if not isinstance(doc, dict):
         return ["scoping templates must be a JSON object"]
+    if not isinstance(catalog, dict) or not isinstance(catalog.get("families"), list):
+        return ["catalog must be a JSON object with a families list"]
     problems = []
     if doc.get("format") != SCOPING_FORMAT:
         problems.append(f"format must be {SCOPING_FORMAT!r}")
@@ -129,7 +172,7 @@ def validate_scoping(doc, catalog):
     families = doc.get("families")
     if not isinstance(families, dict):
         return problems + ["families must be an object keyed by catalog family id"]
-    catalog_families = {f.get("id") for f in catalog.get("families", []) if isinstance(f, dict)}
+    catalog_families = {f["id"] for f in catalog["families"] if isinstance(f, dict) and isinstance(f.get("id"), str)}
     for fid in sorted(catalog_families - set(families), key=str):
         problems.append(f"family {fid!r} has no scoping questions")
     for fid in sorted(set(families) - catalog_families, key=str):
@@ -167,6 +210,19 @@ def _state_for(questions, answers):
     return "scoped" if all(qid in answers for qid in required) else "scoping"
 
 
+def _input_problems(catalog, scoping):
+    problems = [f"catalog: {p}" for p in validate_catalog(catalog)]
+    if not problems:
+        problems = [f"scoping templates: {p}" for p in validate_scoping(scoping, catalog)]
+    return problems
+
+
+def _require_valid_inputs(catalog, scoping):
+    problems = _input_problems(catalog, scoping)
+    if problems:
+        raise ValueError("; ".join(problems[:3]) + (" ..." if len(problems) > 3 else ""))
+
+
 def new_engagement(*, engagement_id, created, requested_by, problem, roles, catalog, scoping=None):
     """A new engagement in state ``scoping`` (or ``scoped`` if nothing is required)."""
     if not (isinstance(engagement_id, str) and _ID_RE.fullmatch(engagement_id)):
@@ -184,6 +240,8 @@ def new_engagement(*, engagement_id, created, requested_by, problem, roles, cata
         raise ValueError("roles must be a non-empty list of catalog role ids")
     if len(roles) > MAX_ROLES:
         raise ValueError(f"at most {MAX_ROLES} roles per engagement")
+    scoping = scoping if scoping is not None else load_scoping()
+    _require_valid_inputs(catalog, scoping)
     by_id = _roles_by_id(catalog)
     for rid in roles:
         if not isinstance(rid, str) or rid not in by_id:
@@ -191,7 +249,6 @@ def new_engagement(*, engagement_id, created, requested_by, problem, roles, cata
     if len(set(roles)) != len(roles):
         raise ValueError("roles: each role may be requested once")
 
-    scoping = scoping if scoping is not None else load_scoping()
     questions = questions_for(roles, catalog, scoping)
     record = {
         "format": FORMAT,
@@ -207,16 +264,20 @@ def new_engagement(*, engagement_id, created, requested_by, problem, roles, cata
     return record
 
 
-def answer(engagement, question_id, text):
-    """A copy of ``engagement`` with ``question_id`` answered (or re-answered)."""
+def _require_record_shape(engagement):
     if (not isinstance(engagement, dict) or not isinstance(engagement.get("questions"), list)
             or not isinstance(engagement.get("answers"), dict)
-            or not all(isinstance(q, dict) and "id" in q for q in engagement["questions"])):
+            or not all(isinstance(q, dict) and isinstance(q.get("id"), str) for q in engagement["questions"])):
         raise ValueError("not an engagement record")
+
+
+def answer(engagement, question_id, text):
+    """A copy of ``engagement`` with ``question_id`` answered (or re-answered)."""
+    _require_record_shape(engagement)
     if engagement.get("state") == "accepted":
         raise ValueError("an accepted engagement's scope cannot change")
     ids = [q["id"] for q in engagement["questions"]]
-    if question_id not in ids:
+    if not isinstance(question_id, str) or question_id not in ids:
         raise ValueError(f"{question_id!r} is not a question this engagement asked")
     updated = copy.deepcopy(engagement)
     updated["answers"][question_id] = clean_text(text, f"answer to {question_id}", MAX_ANSWER_CHARS)
@@ -226,22 +287,44 @@ def answer(engagement, question_id, text):
 
 def open_questions(engagement):
     """Required questions not yet answered, in the order they were asked."""
+    _require_record_shape(engagement)
     return [q["id"] for q in engagement["questions"]
             if q.get("required") is True and q["id"] not in engagement["answers"]]
 
 
-def accept(engagement, catalog):
+def accept(engagement, catalog, scoping=None):
     """``(accepted copy, [])`` when the engagement may be taken on, else ``(None, problems)``.
 
-    It may be taken on only when it is scoped and every requested role is
-    'available' in the catalog - a role nobody has evaluated is never hired."""
+    It may be taken on only when the catalog and templates are valid, the record
+    is valid and scoped, every question the current templates require for its
+    roles is present, still required and answered, and every requested role is
+    'available' - a role nobody has evaluated is never hired. Never raises."""
+    if scoping is None:
+        try:
+            scoping = load_scoping()
+        except (OSError, ValueError) as exc:
+            return None, [f"scoping templates unreadable: {exc}"]
+    problems = _input_problems(catalog, scoping)
+    if problems:
+        return None, problems
     problems = list(validate_engagement(engagement, catalog))
     if problems:
         return None, problems
+    if engagement["state"] == "accepted":
+        return None, ["already accepted"]
     if engagement["state"] != "scoped":
-        if engagement["state"] == "accepted":
-            return None, ["already accepted"]
         problems.append("still scoping: unanswered " + ", ".join(open_questions(engagement)))
+    asked = {q["id"]: q for q in engagement["questions"]}
+    for template in questions_for(engagement["roles"], catalog, scoping):
+        if not template["required"]:
+            continue
+        qid = template["id"]
+        if qid not in asked:
+            problems.append(f"required question {qid!r} is missing from the record")
+        elif asked[qid]["required"] is not True:
+            problems.append(f"required question {qid!r} is marked optional in the record")
+        # A present, still-required question is answered whenever the record is
+        # scoped: validate_engagement has already checked the state against them.
     by_id = _roles_by_id(catalog)
     for rid in engagement["roles"]:
         status = by_id[rid].get("status")

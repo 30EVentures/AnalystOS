@@ -2,6 +2,36 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-23 — Slice 110: the engagement gate recomputes, never trusts (review of Slice 109)
+
+A fresh-context review of Slice 109 finished after it merged (PR #96). Two ways
+past the acceptance gate, both reproduced against main: `accept()` trusted the
+record's own question list (flip every question to optional, or swap the roles
+for a family never asked about, and an unanswered engagement was accepted), and
+it never validated the catalog (a role marked `available` with no evaluation and
+no rate was accepted - exactly what Slice 108 forbids). Neither was exploitable,
+since nothing stores engagements or takes one back from a client yet.
+
+The rule now: the gate re-validates the catalog and the scoping templates and
+recomputes which questions the requested roles require; each must be present in
+the record, still required and answered. A snapshot may carry extra questions
+from older templates but may not drop or soften a required one. Sealing records,
+or holding them server-side, is the lasting fix and comes with storage.
+
+Client text cleaning was not idempotent (normalising before stripping left
+non-NFC text the validator then refused, wedging an engagement); it now strips,
+then normalises, then trims, checked by a property test. Every Unicode
+Default_Ignorable code point is removed (a payload hidden in variation selectors
+used to survive), and surrogate, private-use and unassigned characters are
+refused rather than silently dropped. The CLI reads stdin as strict UTF-8 and
+no longer relabels `--agent ""` as a person.
+
+**Correction.** Slice 109's commit and PR said "disabling each of the module's
+42 guarded rules makes at least one test fail". That was true of the method used
+(turning each `if` guard off) but read as broader than it was: the reviewer's
+other mutations (changing logic rather than switching guards off) survived 10
+of 24. This slice states both methods and both counts.
+
 ## 2026-11-23 — Slice 109: engagement intake, and the first code that reads the role catalog
 
 The first piece of L3. A person or an agent states a problem and names catalog

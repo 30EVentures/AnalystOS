@@ -121,3 +121,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 107 | the Flashy fence: freeze the FlashyOS integration before the rebuild | [spec](slice-107/spec.md) |
 | 108 | the role catalog: 73 entry-level jobs, every one honestly "planned" | [spec](slice-108/spec.md) |
 | 109 | engagement intake: a problem in, a scoped engagement out | [spec](slice-109/spec.md) |
+| 110 | close the engagement gate's bypasses (review of Slice 109) | [spec](slice-110/spec.md) |

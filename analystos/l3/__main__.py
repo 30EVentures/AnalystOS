@@ -2,7 +2,8 @@
 
 Builds an engagement from the problem on stdin (Slice 109) and prints, as JSON,
 the record, its open scoping questions, and what the acceptance gate says.
-Exit 0 on success, 2 when the input is refused (the reason goes to stderr)."""
+stdin must be UTF-8 (anything else is refused, never guessed at). Exit 0 on
+success, 2 when the input is refused (the reason goes to stderr)."""
 
 import argparse
 import json
@@ -24,24 +25,32 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     catalog = load_catalog()
-    requested_by = {"kind": "agent", "ref": args.agent} if args.agent else {"kind": "person", "ref": args.person or "cli"}
+    if args.agent is not None:
+        requested_by = {"kind": "agent", "ref": args.agent}
+    else:
+        requested_by = {"kind": "person", "ref": "cli" if args.person is None else args.person}
+    try:
+        problem = sys.stdin.buffer.read().decode("utf-8")
+    except UnicodeDecodeError:
+        print("refused: the problem on stdin is not valid UTF-8", file=sys.stderr)
+        return 2
     try:
         engagement = new_engagement(
             engagement_id=new_id(),
             created=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             requested_by=requested_by,
-            problem=sys.stdin.read(),
+            problem=problem,
             roles=args.role,
             catalog=catalog,
         )
     except ValueError as exc:
         print(f"refused: {exc}", file=sys.stderr)
         return 2
-    _, refusals = accept(engagement, catalog)
+    accepted, refusals = accept(engagement, catalog)
     print(json.dumps({
         "engagement": engagement,
         "open_questions": open_questions(engagement),
-        "accept": {"accepted": False, "problems": refusals},
+        "accept": {"accepted": accepted is not None, "problems": refusals},
     }, indent=1, ensure_ascii=False))
     return 0
 

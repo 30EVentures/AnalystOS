@@ -1,6 +1,6 @@
 {
  "format": "analystos-role-catalog/1",
- "description": "Every role AnalystOS intends to offer, for hire by people and agents in engagement hours. A role is for hire only at status 'available', which requires a passed evaluation and an integer rate (US cents per engagement hour). See specs/slice-108/spec.md.",
+ "description": "Every role AnalystOS intends to offer, for hire by people and agents in engagement hours. A role may be marked 'available' only with a recorded passing evaluation and an integer rate (US cents per engagement hour); until evaluations are sealed and checkable, that record is a claim, not proof. See specs/slice-108/spec.md.",
  "statuses": [
   "planned",
   "built",
@@ -13,10 +13,10 @@
   "human-decides": "Prepares the full case; a qualified, named human makes the decisions listed in human_decides."
  },
  "waves": {
-  "1": "Deliverables on the existing verified-evidence engine",
-  "2": "New skills, still deliverables",
-  "3": "Needs connectors into client tools and approval gates",
-  "4": "The decision must stay with a qualified human"
+  "1": "Buildable on the existing verified-evidence engine (the role may still leave decisions to a human)",
+  "2": "Needs a new skill; output is still work product",
+  "3": "Acts in the client's own tools, so needs connectors and per-action approval gates (exactly the approval-gated roles)",
+  "4": "The role's core output is a regulated decision, filing or disposition; needs a review of the rules that apply and a decision-recording workflow before it is built (always human-decides)"
  },
  "families": [
   {
@@ -59,14 +59,14 @@
    "title": "Risk, audit and controls",
    "skill": "Testing a process against a named framework and recording evidence for each control",
    "wave": 2,
-   "roles": 8
+   "roles": 7
   },
   {
    "id": "financial-crime",
    "title": "Financial crime",
    "skill": "Screening and assembling case files for a human disposition",
    "wave": 4,
-   "roles": 4
+   "roles": 5
   },
   {
    "id": "legal-contracts-procurement",
@@ -86,7 +86,7 @@
    "id": "people-hr",
    "title": "People and HR",
    "skill": "Coordinating and analysing people processes; people decisions stay human",
-   "wave": 3,
+   "wave": 2,
    "roles": 4
   },
   {
@@ -117,14 +117,17 @@
    "title": "Financial / Equity Research Analyst",
    "family": "research-reporting",
    "wave": 1,
-   "boundary": "deliverable-only",
+   "boundary": "human-decides",
    "deliverables": [
     "report",
     "workbook"
    ],
    "status": "planned",
    "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "any rating or price target distributed to investors, by a registered research analyst"
+   ]
   },
   {
    "id": "market-research-analyst",
@@ -588,7 +591,7 @@
    "eval": null,
    "rate_cents_per_engagement_hour": null,
    "gated_actions": [
-    "approving or releasing a payment",
+    "releasing a payment that the client's authorised approver has approved (approving it stays human)",
     "sending a collection notice"
    ]
   },
@@ -799,7 +802,7 @@
   {
    "id": "compliance-aml-kyc-analyst",
    "title": "Compliance / AML / KYC Analyst",
-   "family": "risk-audit-controls",
+   "family": "financial-crime",
    "wave": 4,
    "boundary": "human-decides",
    "deliverables": [

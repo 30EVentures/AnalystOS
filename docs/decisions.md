@@ -15,10 +15,12 @@ file, code its tests verify, ...). The real cost per role is its evaluation set,
 not its code.
 
 The catalog is written down first, as data, with every role `planned`. The
-validator makes `available` impossible without a passed evaluation and an
-integer rate in US cents per engagement hour, so neither the site nor `/api/v2`
-can ever claim a role works before its own evaluation says so - the same
-refusal-first stance the seal and the fence take.
+validator makes `available` impossible without a recorded passing evaluation and
+an integer rate in US cents per engagement hour - the same refusal-first stance
+the seal and the fence take. Two limits, stated plainly: nothing reads the
+catalog yet (the site and `/api/v2` must read from it, not restate it, when they
+are built), and an `eval` record is a claim until evaluation runs are sealed so
+a stranger can re-check a pass (Phase 4).
 
 Each role also states a boundary. Roles that would act in a client's tools
 (post, send, book an entry) are `approval-gated`, each action approved by a named
@@ -26,6 +28,13 @@ human. Roles whose decisions are licensed or regulated (claims, underwriting,
 credit, audit opinions, tax and payroll filings, AML and sanctions dispositions,
 hiring and pay, legal advice, actuarial sign-off) are `human-decides`: the agent
 prepares the whole case and a qualified, named human makes the listed decisions.
+Waves are defined by what blocks the build, not by who decides: four wave-1
+roles (credit, equity research ratings, model validation, actuarial) leave a
+decision to a human but need nothing new to build; wave 4 is the roles whose
+core output is itself a regulated decision. A fresh-context review caught the
+first version conflating the two, moved AML/KYC into the financial-crime
+family, made investor-facing ratings human-decides and kept payment approval
+with the client's authorised approver.
 Which rules apply where is general knowledge, not checked rule by rule; each
 wave-4 role gets a real review of its rules before it is built.
 

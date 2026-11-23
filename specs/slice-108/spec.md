@@ -12,14 +12,17 @@ Before any role is built, this slice writes down the whole catalog as data a
 machine can read and a test can hold to account: `analystos/catalog/roles.json`
 (format `analystos-role-catalog/1`), validated by
 `analystos/catalog/validate.py`. Every role starts at status `planned`. The
-point is that nothing - the site, `/api/v2`, a sales conversation - can claim a
-role works before its own evaluation says so, because the status ladder is
-enforced in code:
+catalog itself cannot mark a role for hire without a recorded passing
+evaluation and an integer rate, because the status ladder is enforced in code.
+What that does not yet prove: nothing reads the catalog yet (serving it, and
+making the site and `/api/v2` read from it rather than restate it, comes with
+the front door), and an `eval` record is a claim, not evidence, until each
+evaluation run is sealed and checkable (roadmap Phase 4).
 
 | status | means | requires |
 |---|---|---|
 | `planned` | listed, not built | no `eval`, no rate |
-| `built` | the pack runs end to end | no rate |
+| `built` | the pack runs end to end | no `eval`, no rate |
 | `evaluated` | its eval set has been run | an `eval` record (pass or fail) |
 | `available` | for hire | an `eval` record with `passed: true`, and an integer rate |
 
@@ -39,10 +42,21 @@ Each role also states its **boundary** - what it may do at full capability:
 
 ## Families and waves
 
-The 73 roles fall into 13 families, each built on one shared skill. Waves are
-the build order: 1 = deliverables on the existing verified-evidence engine;
-2 = new skills, still deliverables; 3 = needs connectors into client tools and
-approval gates; 4 = the decision must stay with a qualified human.
+The 73 roles fall into 13 families, each built on one shared skill; a family's
+`wave` is the earliest wave of its roles. Waves are defined by what blocks the
+build, and the validator holds the data to them:
+
+1. buildable on the existing verified-evidence engine (a role may still leave
+   decisions to a human: credit, model validation, actuarial, equity research);
+2. needs a new skill, output is still work product;
+3. acts in the client's own tools, so needs connectors and per-action approval
+   gates - wave 3 is exactly the `approval-gated` roles;
+4. the role's core output is a regulated decision, filing or disposition, so it
+   needs a review of the applicable rules and a decision-recording workflow
+   first - every wave-4 role is `human-decides`.
+
+`human-decides` therefore appears in waves 1, 2 and 4: the boundary says who
+decides, the wave says what blocks the build.
 
 ## Done when
 
@@ -54,8 +68,11 @@ approval gates; 4 = the decision must stay with a qualified human.
    deliverable or wave; a `human-decides` role with no `human_decides`; a
    `planned`/`built` role with a rate; an `evaluated` role with no eval; an
    `available` role whose eval did not pass or whose rate is not a positive
-   integer (a float or a boolean is refused); a family whose listed role count
-   does not match.
+   integer no larger than 2**53 - 1 (a float, a string or a boolean is
+   refused); an eval with unknown fields or a non-boolean `passed`; a family
+   whose listed role count or wave does not match its roles; a wave that
+   contradicts the boundary rules above; duplicate JSON keys on load. Every
+   guarded rule has a test that fails when the rule is removed.
 3. `python3 -m analystos.catalog` prints a per-wave summary and exits 0, or
    prints problems and exits 1.
 4. ROADMAP.md carries the rebuild plan; `docs/decisions.md` records the

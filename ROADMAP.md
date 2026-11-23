@@ -46,16 +46,18 @@ an assumption. The rebuild fills the layers this repo named and never built (L3
 workspace, L5 distribution); L0-L2 and L4 carry over as the engine.
 
 - **The catalog** is `analystos/catalog/roles.json` (Slice 108): 73 roles in 13
-  families, each built on one shared skill. A role is for hire only at status
-  `available`, which the validator allows only with a passed evaluation and an
-  integer rate. All 73 are `planned` today.
-- **Boundaries**: 42 roles are deliverable-only, 13 act in client tools only after
-  a named human approves each action, 18 prepare the case for a decision a
+  families, each built on one shared skill. The validator allows status
+  `available` only with a recorded passing evaluation and an integer rate. All
+  73 are `planned` today. Not yet true: nothing reads the catalog, and an eval
+  record is a claim until evaluation runs are sealed (Phase 4).
+- **Boundaries**: 41 roles are deliverable-only, 13 act in client tools only after
+  a named human approves each action, 19 prepare the case for a decision a
   qualified human makes (licensing, independence or anti-discrimination rules).
-- **Waves** (build order): 1 = 24 roles on the existing engine (research and
-  reporting, consulting, finance and modeling); 2 = 23 roles needing new skills,
-  still deliverables; 3 = 13 roles needing connectors and approval gates; 4 = 13
-  roles where a human decides.
+- **Waves** (build order, by what blocks the build): 1 = 24 roles on the existing
+  engine (research and reporting, consulting, finance and modeling; four of them
+  leave a decision to a human); 2 = 23 roles needing a new skill; 3 = the 13
+  approval-gated roles, needing connectors; 4 = 13 roles whose core output is a
+  regulated decision, filing or disposition.
 - **The FlashyOS integration does not move.** `tools/flashy_freeze.py` (Slice 107)
   fails the suite on any drift. Catalog roles are not the charter's seven team
   roles; declaring them on the mesh is the owner's decision (Gate F).
@@ -66,10 +68,10 @@ workspace, L5 distribution); L0-L2 and L4 carry over as the engine.
 | 1 Catalog | 108 (this) | 73 roles, the status ladder, a validator | All `planned`, validator enforced |
 | 2 Engine | 109-112 | Engagement intake and scoping, a role-pack format, Reporting rebuilt as the first pack with unchanged output | A prompt becomes a scoped engagement; the Reporting pack matches today's reports |
 | 3 Deliverables | 113-116 | Deck, memo and workbook renderers; a deck seal (`seal-1` untouched) | Golden fixtures render and verify offline |
-| 4 Wave 1 | 117-126 | Research and reporting, consulting, finance and modeling, family by family, each role with its own eval set | Each role beats a plain-model baseline on its eval set before moving past `built` |
+| 4 Wave 1 | 117-126 | Research and reporting, consulting, finance and modeling, family by family, each role with its own eval set; sealed eval runs; a record of the named human's decision for the four wave-1 human-decides roles | Each role beats a plain-model baseline on a sealed eval run before it moves past `built` |
 | 5 Hiring | 127-131 | Engagement hours: rates, narrowing budgets, metering, hard stop, sealed receipts; test-mode payments only | A test hire stops exactly at its budget and reconciles to the cent |
 | 6 Front door | 132-134 | Web app and `/api/v2` (catalog, hire, status, deliverable) for people and agents | A full engagement runs in the browser and through the API |
-| 7 Waves 2-4 | ongoing | New skills, then connectors and approval gates, then human-decides case files | Same eval bar per role |
+| 7 Waves 2-4 | ongoing | New skills, then connectors and approval gates, then the regulated-decision roles, each after a review of the rules that apply | Same eval bar per role |
 | Gate F | owner | Declaring roles on the FlashyOS mesh | Owner says so |
 
 ## Working queue (unblocked, in priority order)

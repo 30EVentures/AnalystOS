@@ -1,10 +1,14 @@
 """Validates the role catalog, ``analystos/catalog/roles.json`` (Slice 108).
 
 Hand-rolled, like ``findings/validate.py``: the rules are few and specific, and
-the one that matters most - a role is for hire only once its own evaluation
-passed and it has an integer rate - is not something a generic schema says
+the one that matters most - a role is marked for hire only with a recorded
+passing evaluation and an integer rate - is not something a generic schema says
 well. Returns a list of human-readable problems; empty means valid. Never
-raises on a malformed catalog, and never passes an empty one.
+raises on any JSON value, and never passes an empty catalog.
+
+What this does NOT prove: an ``eval`` record is a recorded claim, not evidence.
+Binding it to a sealed evaluation run a stranger can re-check comes with the
+first real evaluation (roadmap Phase 4). Nothing serves the catalog yet.
 """
 
 import json
@@ -21,7 +25,12 @@ DELIVERABLES = (
     "brief", "report", "deck", "workbook", "memo", "register", "reconciliation",
     "case-file", "draft", "plan", "code",
 )
-_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+_ID_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
+# Largest integer a JSON reader in JavaScript keeps exactly (2**53 - 1): a rate
+# an agent's client would silently round is refused.
+MAX_RATE_CENTS = 2**53 - 1
+_TOP_KEYS = {"format", "description", "statuses", "boundaries", "waves", "families", "roles"}
+_EVAL_KEYS = {"set", "passed"}
 _ROLE_KEYS = {
     "id", "title", "family", "wave", "boundary", "deliverables", "status", "eval",
     "rate_cents_per_engagement_hour", "human_decides", "gated_actions",
@@ -32,6 +41,10 @@ _FAMILY_KEYS = {"id", "title", "skill", "wave", "roles"}
 
 def _is_int(value):
     return isinstance(value, int) and not isinstance(value, bool)
+
+
+def _is_slug(value):
+    return isinstance(value, str) and _ID_RE.fullmatch(value) is not None
 
 
 def _nonempty_str(value):
@@ -45,7 +58,7 @@ def _nonempty_str_list(value):
 def _validate_eval(where, record, must_pass):
     if not isinstance(record, dict):
         return [f"{where}: eval must be an object recording the run"]
-    problems = []
+    problems = [f"{where}: unknown eval field {k!r}" for k in sorted(set(record) - _EVAL_KEYS, key=str)]
     if not _nonempty_str(record.get("set")):
         problems.append(f"{where}: eval.set must name the evaluation set that was run")
     if not isinstance(record.get("passed"), bool):
@@ -67,13 +80,14 @@ def _validate_role(index, role, family_ids):
     for key in sorted(set(role) - _ROLE_KEYS):
         problems.append(f"{where}: unknown field {key!r}")
 
-    if not (isinstance(role.get("id"), str) and _ID_RE.match(role["id"])):
+    if not _is_slug(role.get("id")):
         problems.append(f"{where}: id must be a lowercase slug")
     if not _nonempty_str(role.get("title")):
         problems.append(f"{where}: title must be a non-empty string")
-    if role.get("family") not in family_ids:
+    if not (isinstance(role.get("family"), str) and role["family"] in family_ids):
         problems.append(f"{where}: unknown family {role.get('family')!r}")
-    if not _is_int(role.get("wave")) or role.get("wave") not in WAVES:
+    wave = role.get("wave")
+    if not _is_int(wave) or wave not in WAVES:
         problems.append(f"{where}: wave must be one of {list(WAVES)}")
 
     deliverables = role.get("deliverables")
@@ -81,11 +95,11 @@ def _validate_role(index, role, family_ids):
         problems.append(f"{where}: deliverables must be a non-empty list")
     else:
         for d in deliverables:
-            if d not in DELIVERABLES:
+            if not isinstance(d, str) or d not in DELIVERABLES:
                 problems.append(f"{where}: unknown deliverable {d!r}")
 
     boundary = role.get("boundary")
-    if boundary not in BOUNDARIES:
+    if not isinstance(boundary, str) or boundary not in BOUNDARIES:
         problems.append(f"{where}: unknown boundary {boundary!r}")
     if boundary == "human-decides" and not _nonempty_str_list(role.get("human_decides")):
         problems.append(f"{where}: a human-decides role must list the decisions that stay human (human_decides)")
@@ -95,21 +109,29 @@ def _validate_role(index, role, family_ids):
         problems.append(f"{where}: an approval-gated role must list the actions that need approval (gated_actions)")
     if boundary != "approval-gated" and "gated_actions" in role:
         problems.append(f"{where}: gated_actions is only for approval-gated roles")
+    # Waves are defined by what blocks the build (see the catalog's "waves"):
+    # wave 3 is exactly the roles that act in client tools; a wave-4 role's core
+    # output is a regulated decision, so it is always human-decides.
+    if _is_int(wave) and boundary in BOUNDARIES:
+        if (wave == 3) != (boundary == "approval-gated"):
+            problems.append(f"{where}: wave 3 is exactly the approval-gated roles (wave {wave}, {boundary})")
+        if wave == 4 and boundary != "human-decides":
+            problems.append(f"{where}: a wave-4 role must be human-decides")
 
     status = role.get("status")
     rate = role.get("rate_cents_per_engagement_hour")
     record = role.get("eval")
-    if status not in STATUSES:
+    if not isinstance(status, str) or status not in STATUSES:
         problems.append(f"{where}: unknown status {status!r}")
     elif status in ("planned", "built"):
         if rate is not None:
             problems.append(f"{where}: a {status} role cannot carry a rate")
-        if status == "planned" and record is not None:
-            problems.append(f"{where}: a planned role cannot carry an eval record")
+        if record is not None:
+            problems.append(f"{where}: a {status} role cannot carry an eval record (that makes it evaluated)")
     else:
         problems.extend(_validate_eval(where, record, must_pass=(status == "available")))
         if status == "available":
-            if not _is_int(rate) or rate <= 0:
+            if not _is_int(rate) or not 0 < rate <= MAX_RATE_CENTS:
                 problems.append(f"{where}: an available role needs a positive integer rate in US cents "
                                 f"(rate_cents_per_engagement_hour), got {rate!r}")
         elif rate is not None:
@@ -124,6 +146,14 @@ def validate_catalog(doc):
     problems = []
     if doc.get("format") != FORMAT:
         problems.append(f"format must be {FORMAT!r}")
+    for key in sorted(set(doc) - _TOP_KEYS, key=str):
+        problems.append(f"unknown top-level field {key!r}")
+    if doc.get("statuses") != list(STATUSES):
+        problems.append(f"statuses must be exactly {list(STATUSES)}")
+    if not isinstance(doc.get("boundaries"), dict) or set(doc["boundaries"]) != set(BOUNDARIES):
+        problems.append(f"boundaries must describe exactly {list(BOUNDARIES)}")
+    if not isinstance(doc.get("waves"), dict) or set(doc["waves"]) != {str(w) for w in WAVES}:
+        problems.append(f"waves must describe exactly {[str(w) for w in WAVES]}")
 
     families = doc.get("families")
     family_ids, declared_counts = set(), {}
@@ -135,7 +165,7 @@ def validate_catalog(doc):
             problems.append(f"family {i}: must have exactly the fields {sorted(_FAMILY_KEYS)}")
             continue
         fid = family["id"]
-        if not (isinstance(fid, str) and _ID_RE.match(fid)):
+        if not _is_slug(fid):
             problems.append(f"family {i}: id must be a lowercase slug")
             continue
         if fid in family_ids:
@@ -143,7 +173,8 @@ def validate_catalog(doc):
         family_ids.add(fid)
         if not _is_int(family["roles"]) or family["roles"] < 1:
             problems.append(f"family {fid!r}: roles must be a positive integer count")
-        declared_counts[fid] = family["roles"]
+        else:
+            declared_counts[fid] = family["roles"]
         if not _is_int(family["wave"]) or family["wave"] not in WAVES:
             problems.append(f"family {fid!r}: wave must be one of {list(WAVES)}")
         if not (_nonempty_str(family["title"]) and _nonempty_str(family["skill"])):
@@ -152,7 +183,7 @@ def validate_catalog(doc):
     roles = doc.get("roles")
     if not isinstance(roles, list) or not roles:
         return problems + ["roles must be a non-empty list (an empty catalog is never valid)"]
-    seen_ids, seen_titles, actual_counts = set(), set(), {}
+    seen_ids, seen_titles, actual_counts, earliest = set(), set(), {}, {}
     for i, role in enumerate(roles):
         problems.extend(_validate_role(i, role, family_ids))
         if not isinstance(role, dict):
@@ -166,16 +197,34 @@ def validate_catalog(doc):
             if title in seen_titles:
                 problems.append(f"role {rid!r}: duplicate title {title!r}")
             seen_titles.add(title)
-        if role.get("family") in family_ids:
+        if isinstance(role.get("family"), str) and role["family"] in family_ids:
             actual_counts[role["family"]] = actual_counts.get(role["family"], 0) + 1
+            if _is_int(role.get("wave")):
+                earliest[role["family"]] = min(earliest.get(role["family"], 5), role["wave"])
     for fid, declared in declared_counts.items():
         if actual_counts.get(fid, 0) != declared:
             problems.append(f"family {fid!r}: declares {declared} roles but the catalog lists {actual_counts.get(fid, 0)}")
+    for family in families:
+        fid = family.get("id") if isinstance(family, dict) else None
+        if isinstance(fid, str) and fid in earliest and family.get("wave") != earliest[fid]:
+            problems.append(f"family {family['id']!r}: wave must be the earliest wave of its roles "
+                            f"({earliest[family['id']]}), got {family.get('wave')!r}")
     return problems
 
 
+def _no_duplicate_keys(pairs):
+    seen = {}
+    for key, value in pairs:
+        if key in seen:
+            raise ValueError(f"duplicate JSON key {key!r}")
+        seen[key] = value
+    return seen
+
+
 def load_catalog(path=CATALOG_PATH):
-    return json.loads(Path(path).read_text(encoding="utf-8"))
+    """Parse the catalog, refusing duplicate keys (JSON's last-one-wins would
+    let a second "status" silently override the first)."""
+    return json.loads(Path(path).read_text(encoding="utf-8"), object_pairs_hook=_no_duplicate_keys)
 
 
 def summary(doc):

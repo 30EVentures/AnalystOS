@@ -295,7 +295,7 @@ class VerifyRefusesTest(unittest.TestCase):
             ("a version string hiding a ratio", {"answer": "Release v2.5x made churn worse for every clinic."}, "write numbers only as figure tags"),
             ("tag names no figure", {"answer": "Churn rose to [F77] and that is the problem today."}, "names no figure"),
             ("malformed tag", {"answer": "Churn rose to [f2] which is the problem today."}, "is not a figure tag"),
-            ("numbers in a title", {"titles__kpis": "Track 4 measures monthly so the board sees progress."}, "write numbers only as figure tags"),
+            ("numbers in a title", {"titles__kpis": "Track 40 measures monthly so the board sees progress."}, "write numbers only as figure tags"),
             ("numbers in an assumption's rationale", {f"figures__{figure('F15')}__rationale": "Typical teams reach 25 points."},
              "write numbers only as figure tags"),
             ("control characters", {"answer": "Churn rose to [F2]\u0001 and that is the problem today."}, "control, invisible or invalid"),
@@ -315,8 +315,15 @@ class VerifyRefusesTest(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertEqual(c.number_problems("t", text, figures), [])
         # A year is allowed only when the client wrote it.
-        self.assertEqual(c.number_problems("t", "Since 2024 churn has risen.", figures, {"2024"}), [])
-        self.assertTrue(c.number_problems("t", "Since 2024 churn has risen.", figures, set()))
+        self.assertEqual(c.number_problems("t", "Since 2015 churn has risen.", figures, {"2015"}), [])
+        self.assertTrue(c.number_problems("t", "Since 2015 churn has risen.", figures, set()))
+        # Recent years after a time word, and bare whole numbers up to twelve, need no tag ...
+        self.assertEqual(c.number_problems("t", "Hire 2 analysts in 2026.", figures), [])
+        # ... but not with a unit, scale or currency beside them.
+        for text in ("Churn rose 3 points.", "Grow 5% now.", "Save 2 million.", "A 3x return.", "Up 4 percent.",
+                     "Spend 9 dollars.", "Hire 20 people."):
+            with self.subTest(text=text):
+                self.assertTrue(c.number_problems("t", text, figures))
 
     def test_quotes_must_be_the_clients_exact_words(self):
         client = "We have 850 customers in a 5-7% range of churn and fewer than 10 staff."
@@ -439,6 +446,57 @@ class VerifyRefusesTest(unittest.TestCase):
                     doc["figures"][i][field] = value
                     c.verify_content(doc, CLIENT_TEXT)
         c.verify_content(RESPONSE, None)
+
+
+class ReviewOfPr99Test(unittest.TestCase):
+    """Slice 119: the two gaps the release review of PR #99 found, and the tag-edge cases."""
+
+    FIGURES = {"F1": {"value": 7, "unit": "percent"}}
+
+    def test_a_quote_cannot_cut_a_number_short(self):
+        client = "Annual revenue is $12.2 million. Churn is 12.5% a year. We have 40 staff."
+        for whole in ("Annual revenue is $12.2 million", "Churn is 12.5%", "We have 40 staff"):
+            with self.subTest(whole=whole):
+                self.assertTrue(c.quote_number_is_whole(whole, client))
+        for cut in ("Annual revenue is $12.2", "Churn is 12"):
+            with self.subTest(cut=cut):
+                self.assertTrue(c.quote_in_client_text(cut, client))  # verbatim words ...
+                self.assertFalse(c.quote_number_is_whole(cut, client))  # ... but the number is cut short
+        self.assertFalse(c.quote_number_is_whole("from 4% to 7%", "Churn went from 4% to 7%."))  # one number only
+        self.assertFalse(c.quote_number_is_whole("Revenue is $12.2 million", "Revenue is $12.2 billion."))  # not verbatim
+
+    def test_a_cut_quote_is_refused_with_a_reason(self):
+        client = "Annual revenue is $12.2 million."
+        fig = {"id": "F1", "label": "Revenue", "value": 12.2, "unit": "usd", "basis": "client",
+               "quote": "Annual revenue is $12.2"}
+        problems, _ = c._figure_problems([fig], client)
+        self.assertTrue(any("cuts off the number" in p for p in problems), problems)
+        whole = dict(fig, value=c.find_numbers("$12.2 million")[0].value, quote="Annual revenue is $12.2 million")
+        self.assertEqual(c._figure_problems([whole], client)[0], [])
+
+    def test_a_year_is_allowed_only_after_a_time_word(self):
+        years = {"2019", "2021"}
+        for ok in ("Since 2019 churn has risen.", "From 2019 to 2021 churn rose.", "In 2024-2026 we grow.",
+                   "By 2027 the plan is done.", "Churn rose to [F1] in 2019."):
+            with self.subTest(ok=ok):
+                self.assertEqual(c.number_problems("t", ok, self.FIGURES, years), [])
+        for bad in ("We lose 2019 clinics a year.", "Churn rose 2019[F1].", "In 1998 we started.",
+                    "In 2019% of cases churn rose.", "Since 2019 million users joined."):
+            with self.subTest(bad=bad):
+                self.assertTrue(c.number_problems("t", bad, self.FIGURES, years))
+        self.assertTrue(c.label_problems("t", "2019 clinics", years))
+
+    def test_a_tag_stands_on_its_own(self):
+        for ok in ("Churn rose to [F1], then fell.", "Churn rose to [F1].", "[F1] of clinics left.",
+                   "Churn rose to [F1]; it fell.", "Churn rose to [F1]: a record."):
+            with self.subTest(ok=ok):
+                self.assertEqual(c.number_problems("t", ok, self.FIGURES), [])
+        for bad in ("Churn rose to[F1].", "Churn rose [F1]x.", "Revenue is [F1],OOO.", "Revenue is l[F1].",
+                    "Revenue is [F1] \u041c.", "Revenue is [F1] mn.", "Revenue is [F1] lakh.", "Revenue is \u20b9[F1].",
+                    "Revenue is [F1] \u20b9.", "Revenue is seven [F1].", "Revenue is [F1] CAD.", "Revenue is [F1] grand.",
+                    "Revenue is [F1]\uff05.", "Revenue is [F1] \u0445."):
+            with self.subTest(bad=bad):
+                self.assertTrue(c.number_problems("t", bad, self.FIGURES), bad)
 
 
 if __name__ == "__main__":

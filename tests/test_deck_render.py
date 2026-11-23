@@ -79,6 +79,10 @@ def unexplained_numbers(prs, spec):
         for fid in ids:
             removable += [deck.format_value(figures[fid]), fid]
         if chunk is not None:
+            removable += [deck.value_cell(f) for f in chunk]
+            for f in chunk:
+                for ref in re.findall(r"\[(F[0-9]+)\]", f.get("rationale", "")):
+                    removable.append(f"{deck.format_value(figures[ref])} ({ref})")
             if pages > 1:
                 removable.append(f"({page} of {pages})")
             for f in chunk:
@@ -165,6 +169,7 @@ class RenderTest(unittest.TestCase):
         self.assertIn("Client's words: “went from 4%”", sources)
         self.assertIn("Calculated: F5 × F2 ÷ 100", sources)
         self.assertIn("3 pts", sources)
+        self.assertNotIn("[F", sources)  # an assumption's rationale shows values, not raw tags
 
     def test_role_title_comes_from_the_catalog(self):
         self.assertIn("Management Consulting Analyst", slide_text(PRS.slides[0]))
@@ -235,6 +240,45 @@ class FormatTest(unittest.TestCase):
         for value, unit, expected in cases:
             with self.subTest(value=value, unit=unit):
                 self.assertEqual(deck.format_value({"value": value, "unit": unit}), expected)
+
+    def test_a_nonzero_value_is_never_written_as_zero(self):
+        for value, unit, expected in ((0.004, "percent", "0.004%"), (0.001, "usd", "$0.001"),
+                                      (-0.004, "points", "-0.004 pts"), (0.004, "count", "0.004"),
+                                      (0.0004, "ratio", "0.0004x"), (-0.002, "usd", "-$0.002")):
+            with self.subTest(value=value, unit=unit):
+                self.assertEqual(deck.format_value({"value": value, "unit": unit}), expected)
+
+    def test_the_sources_value_is_exact_when_the_deck_rounds(self):
+        for value, unit, expected in ((59.5, "count", "60 (exact 59.5)"), (7, "percent", "7%"),
+                                      (30600, "usd", "$30,600"), (14.1667, "count", "14 (exact 14.1667)"),
+                                      (73.846, "percent", "73.8% (exact 73.846%)"), (2.5, "usd", "$2.50"),
+                                      (-18000.25, "usd", "-$18,000 (exact -$18,000.25)")):
+            with self.subTest(value=value, unit=unit):
+                self.assertEqual(deck.value_cell({"value": value, "unit": unit}), expected)
+
+    def test_a_negative_bar_gets_an_axis_below_zero(self):
+        for values, floor in (((-18000, 5000), None), ((18000, 5000), 0.0)):
+            figs = [{"id": f"F{i + 1}", "value": v, "unit": "usd", "basis": "client"} for i, v in enumerate(values)]
+            prs = Presentation()
+            slide = prs.slides.add_slide(prs.slide_layouts[6])
+            token = deck._FIGURES.set({f["id"]: f for f in figs})
+            try:
+                graphic = deck._chart(slide, {"content": {"figures": figs}},
+                                      {"figure_ids": ["F1", "F2"], "labels": ["A", "B"], "title": "Cash"}, 0, 0, 100, 100)
+            finally:
+                deck._FIGURES.reset(token)
+            with self.subTest(values=values):
+                self.assertEqual(graphic.chart.value_axis.minimum_scale, floor)
+
+    def test_an_assumption_rationale_shows_values_not_tags(self):
+        figs = {"F1": {"id": "F1", "value": 7, "unit": "percent", "basis": "client"},
+                "F2": {"id": "F2", "value": 2, "unit": "points", "basis": "assumption",
+                       "rationale": "Half of the rise above [F1] is recoverable."}}
+        token = deck._FIGURES.set(figs)
+        try:
+            self.assertEqual(deck._source_text(figs["F2"]), "Assumption: Half of the rise above 7% (F1) is recoverable.")
+        finally:
+            deck._FIGURES.reset(token)
 
     def test_formulas(self):
         self.assertEqual(deck.formula("difference", ["F2", "F1"]), "F2 − F1")

@@ -130,3 +130,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 116 | code writes every number; the model only points at figures | [spec](slice-116/spec.md) |
 | 117 | every role on the verified pipeline, each family with a worked example | [spec](slice-117/spec.md) |
 | 118 | the website: hire any of the 73 roles | [spec](slice-118/spec.md) |
+| 119 | survive the live model's natural writing (first paid test failed) | [spec](slice-119/spec.md) |

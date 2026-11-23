@@ -1,10 +1,10 @@
 [
  {"name": "digits allowed in prose", "old": "    if digits:\n        problems.append(f\"{where}: write numbers only as figure tags", "new": "    if False:\n        problems.append(f\"{where}: write numbers only as figure tags"},
- {"name": "unit after a tag allowed", "old": "        if _AFTER_TAG_RE.search(text[m.end():]):", "new": "        if False:"},
- {"name": "sign or currency before a tag allowed", "old": "        if _BEFORE_TAG_RE.search(text[:m.start()]):", "new": "        if False:"},
+ {"name": "unit after a tag allowed", "old": "        if _AFTER_TAG_RE.search(after) or _is_currency(after.lstrip()[:1]):", "new": "        if False:"},
+ {"name": "sign or currency before a tag allowed", "old": "        if _BEFORE_TAG_RE.search(before) or _is_currency(before.rstrip()[-1:]):", "new": "        if False:"},
  {"name": "loose percent marks allowed", "old": "    if _LOOSE_UNIT_RE.search(stripped):\n        problems.append", "new": "    if False:\n        problems.append"},
  {"name": "word quantities allowed", "old": "        if token.value is None:\n            problems.append(f\"{where}: {token.text.strip()!r} is a quantity", "new": "        if False:\n            problems.append(f\"{where}: {token.text.strip()!r} is a quantity"},
- {"name": "any year allowed", "old": "    stripped = _YEAR_RE.sub(lambda m: \" \" if m.group(0) in client_years else m.group(0), stripped)", "new": "    stripped = _YEAR_RE.sub(\" \", stripped)"},
+ {"name": "any year allowed", "old": "        if year and (year in client_years or 2020 <= int(year) <= 2035):", "new": "        if year:"},
  {"name": "labels unchecked", "old": "    if digits or _LOOSE_UNIT_RE.search(stripped) or any(t.value is None for t in find_numbers(stripped)):", "new": "    if False:"},
  {"name": "quote boundary ignored", "old": "        if before_ok and after_ok:", "new": "        if True:"},
  {"name": "quote needs no word", "old": "            elif not re.search(r\"[^\\W\\d_]{2,}\", quote):", "new": "            elif False:"},
@@ -21,9 +21,15 @@
  {"name": "no repair retry", "old": "    if found:\n        previous =", "new": "    if False:\n        previous ="},
  {"name": "repair echo not neutralised", "old": "        previous = neutralize(json.dumps(content, ensure_ascii=False)[:20000])", "new": "        previous = json.dumps(content, ensure_ascii=False)[:20000]"},
  {"name": "client problem not neutralised", "old": "    lines = [\"<<CLIENT problem>>\", neutralize(engagement[\"problem\"]), \"<</CLIENT problem>>\"]", "new": "    lines = [\"<<CLIENT problem>>\", engagement[\"problem\"], \"<</CLIENT problem>>\"]"},
- {"name": "spec not canonicalised", "old": "    content = canonicalize(content, client_text)\n    return {", "new": "    return {"},
+ {"name": "spec not canonicalised", "old": "    content = canonicalize(content, client_text)\n    return {", "new": "    return {", "equivalent": "since Slice 119 the normaliser sets every client value to its quote's number and every computed value to its exact recomputation before verification, so canonicalising again changes nothing; kept as defence in depth"},
  {"name": "spec check skips slides", "old": "        if spec.get(\"slides\") != assemble_slides(content):", "new": "        if False:"},
  {"name": "any state worked on", "old": "    if engagement[\"state\"] != \"accepted\":", "new": "    if False:"},
  {"name": "boundary left out of the prompt", "old": "    if role[\"boundary\"] == \"human-decides\":\n        lines.append", "new": "    if False:\n        lines.append"},
- {"name": "role brief left out of the prompt", "old": "             f\"Your focus: {briefs['roles'][role['id']]}\",", "new": ""}
+ {"name": "role brief left out of the prompt", "old": "             f\"Your focus: {briefs['roles'][role['id']]}\",", "new": ""},
+ {"name": "a client year allowed anywhere (the PR #99 gap)", "old": "    stripped = _TIME_YEAR_RE.sub(lambda m: _blank_years(m, client_years), stripped)", "new": "    stripped = _TIME_YEAR_RE.sub(lambda m: _blank_years(m, client_years), stripped)\n    stripped = _YEAR_RE.sub(lambda m: \" \" if m.group(0) in client_years else m.group(0), stripped)"},
+ {"name": "a quote may cut a number short (the PR #99 gap)", "old": "            elif not quote_number_is_whole(quote, client_text):", "new": "            elif False:"},
+ {"name": "the client's number matched by position only", "old": "        if ct is not None and ct.value == qt.value and ct.kind == qt.kind:", "new": "        if ct is not None:", "equivalent": "the same span in a verbatim match is the same characters up to letter case, and every case-sensitive suffix (M/m, K/k, B, x, percent) either reads the same either way or changes the span, so value and kind cannot differ; kept as defence in depth"},
+ {"name": "a tag may be glued to a word", "old": "        if (before[-1:].isalnum() or before[-1:] == \"_\" or after[:1].isalnum() or after[:1] == \"_\"", "new": "        if (False"},
+ {"name": "lookalike letters beside a tag not read as Latin", "old": "    return unicodedata.normalize(\"NFKC\", text).translate(_LOOKALIKES)", "new": "    return text"},
+ {"name": "number word before a tag allowed", "old": "        if _NUMBER_WORD_BEFORE_RE.search(before):", "new": "        if False:"}
 ]

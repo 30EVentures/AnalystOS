@@ -114,6 +114,9 @@ def create_engagement():
         client = client_factory() if client_factory else None
         spec = consulting.build_deck_spec(accepted, cat, client=client)
         data = render_deck(spec, accepted, cat)
+    except consulting.VerificationFailed as exc:
+        return _err(502, "not_verified", f"the work could not be verified, so nothing was delivered "
+                    f"({len(exc.problems)} problems)", problems=exc.problems[:100])
     except ValueError as exc:
         message = str(exc)
         if "temporarily unavailable" in message:

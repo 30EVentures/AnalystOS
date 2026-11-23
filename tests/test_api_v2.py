@@ -63,8 +63,12 @@ class ApiV2Test(unittest.TestCase):
         self.assertIn("to be determined", doc["pricing"])
         for role in doc["roles"]:
             self.assertEqual(role["pricing"], "tbd")
-            self.assertEqual(role["tested"], "mock")
+            self.assertIn(role["tested"], ("mock", "mock-family"))
             self.assertTrue(any(q["id"] == "common.decision" for q in role["questions"]))
+        tested = {r["id"]: r["tested"] for r in doc["roles"]}
+        self.assertEqual(tested["management-consulting-analyst"], "mock")
+        self.assertEqual(tested["financial-equity-research-analyst"], "mock-family")
+        self.assertEqual(sum(v == "mock" for v in tested.values()), 13)
 
     def test_hiring_returns_a_verified_deck(self):
         response = self.post(body())
@@ -115,7 +119,10 @@ class ApiV2Test(unittest.TestCase):
         self.responses = [bad, bad]
         response = self.post(body())
         self.assertEqual(response.status_code, 502)
-        self.assertIn("nothing was delivered", response.get_json()["error"]["message"])
+        error = response.get_json()["error"]
+        self.assertIn("nothing was delivered", error["message"])
+        self.assertTrue(error["problems"])  # the full list, so a failure can be diagnosed
+        self.assertTrue(any("write numbers only as figure tags" in p for p in error["problems"]))
         self.assertEqual(len(self.replays[0].requests), 2)  # one repair retry, never a third call
 
 

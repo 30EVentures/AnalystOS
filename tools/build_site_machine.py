@@ -51,6 +51,8 @@ def generated_files():
     lines += ["## API", "",
               f"- [OpenAPI 3.1]({BASE}/api/v1/openapi.json): every endpoint, request and response",
               f"- [API index]({BASE}/api/v1): machine-readable list of endpoints and limits",
+              f"- [Role catalog]({BASE}/api/v2/catalog): every role you can hire, its limits, how it was tested, and its questions",
+              f"- `POST {BASE}/api/v2/engagements`: hire a role for one problem (access code required; each request is a paid model call)",
               f"- [{GUIDES[0][1]}]({BASE}/docs/{GUIDES[0][0]}): {GUIDES[0][2]}", ""]
     lines += ["## Verifying a report", "",
               f"- [{GUIDES[1][1]}]({BASE}/docs/{GUIDES[1][0]}): {GUIDES[1][2]}",
@@ -86,11 +88,12 @@ def generated_files():
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
         + "".join(f"  <url><loc>{u}</loc></url>\n" for u in urls) + "</urlset>\n"
     )
-    # The API is not crawlable content, but its two machine-readable entry points are advertised in the
+    # The API is not crawlable content, but its machine-readable entry points (and, since Slice 119, the
+    # public role catalog in llms.txt) are advertised in the
     # sitemap, llms.txt and the api-catalog, so they are allowed by a longer (more specific) rule: the
     # longest match wins (RFC 9309), and '$' keeps "/api/v1" from opening everything below it.
     out["robots.txt"] = ("User-agent: *\nAllow: /\n"
-                         "Allow: /api/v1$\nAllow: /api/v1/openapi.json$\n"
+                         "Allow: /api/v1$\nAllow: /api/v1/openapi.json$\nAllow: /api/v2/catalog$\n"
                          f"Disallow: /api/\n\nSitemap: {BASE}/sitemap.xml\n")
     out[".well-known/api-catalog"] = json.dumps({"linkset": [{
         "anchor": f"{BASE}/api/v1",

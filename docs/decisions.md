@@ -24,7 +24,62 @@ No generator owned the hero's spec figure. It had been typed by hand and was
 frozen since about Slice 49. It now has its own `site_counts.py` pattern,
 generated from the same `count_specs()` as the evidence card.
 
-## 2026-11-23 — Slice 117: every role live on the verified pipeline (worked examples, no paid calls)
+## 2026-11-23 — Slice 119: survive the live model's natural writing (the first paid test failed)
+
+The one paid test of Management Consulting Analyst (owner's consent, at most
+about $0.21) failed: the live model's content failed verification twice, 40
+problems, and nothing was delivered - the safeguard worked, the role did not.
+The visible problems were quotes holding two numbers and an unexpected field;
+the API cut the rest at 300 characters. Every worked example had been written
+knowing the rules; the live model writes the natural way ("7% [F2]").
+
+Fix, without loosening what a reader is told: a deterministic normaliser runs
+before verification and fixes only slips that cannot change the delivered
+numbers - it removes a written number beside a tag when it states that very
+figure (otherwise the verifier still refuses it), narrows a multi-number quote
+verbatim to the part with the one matching number, takes client values and
+units from the quote and recomputes computed values, drops fields and figures
+that are never shown, and turns "within 90 days" into words. Bare whole numbers
+0-12 with no unit, and years 2020-2035 after a time word, are now allowed like
+the words one to twelve; label fields still allow no digits. The prompt shows a
+short correct example and the common mistakes. A failed request now returns
+every problem, and the hire page shows them.
+
+The free stand-in for the live model: all 16 worked examples rewritten three
+natural ways (numbers before tags, units after tags, currency before tags,
+whole-sentence quotes, percents as fractions, drifted computed values, wrong
+units, extra fields, an unused figure, "within 90 days") - 48 variants, each
+must fail raw, pass normalised, build in one attempt, render, and pass the
+independent no-new-numbers check. The stand-in found three real bugs before any
+money was spent (a unit after a tag was never removed; a quote with a number
+word was narrowed wrongly; a crash on a malformed id). It is still a stand-in:
+the live model may write in ways it does not cover.
+
+Also in this slice, the release review of PR #99 (which the owner merged before
+the review finished): its two blockers - a quote could cut a number short of
+its unit or scale ("$12.2" out of "$12.2 million" read as $12.20), and a year
+from the client's text let those digits through anywhere ("we lose 2019
+clinics") - are closed: a quote's number must be the client's whole number at
+that spot, and a year needs a time word or a range. Tag edges are tighter (any
+currency symbol, more unit words, lookalike letters, glued tags, number words),
+the sources slides show exact values where the deck rounds, and 60 roles are
+now labelled as checked on another role's worked example ("mock-family")
+rather than implying their own.
+
+## 2026-11-23 — Slice 118: the website - hire any role (merged as PR #99)
+
+`site/hire.html` (linked from the homepage), `GET /api/v2/catalog` (public) and
+`POST /api/v2/engagements` (the existing access code and per-IP limiter). The
+owner merged PR #99 before its fresh-context release review finished; the review
+then failed it on two gaps in the "every number traced" claim (a quote cut off
+before its unit or scale; a year from the client's text letting digits through)
+and passed everything about safety (no secrets, no unauthenticated paid call, no
+crash, no XSS, the FlashyOS integration untouched). Both gaps are fixed in Slice
+119. Every request past the gate is a paid model call (at most two); a retry
+after a timeout is a new paid request (no idempotency key yet); the serverless
+time limit is unmeasured.
+
+## 2026-11-23 — Slice 117: all 73 roles on the verified pipeline (checked on worked examples, no paid calls)
 
 Owner's direction: all 73 roles on the website and in the product by the end of
 the day; Management Consulting Analyst gets one paid real-model test, only with

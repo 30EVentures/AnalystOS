@@ -1,0 +1,18 @@
+{
+ "note": "A synthetic client (Slice 116 worked example). Not a real company.",
+ "roles": [
+  "content-writer-copywriter"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our customer newsletter's open rate fell from 38% to 24% this year. We want a content plan to win readers back.",
+ "answers": {
+  "common.decision": "What the newsletter should cover next quarter; the marketing lead decides.",
+  "common.deadline": "Plan in two weeks.",
+  "common.audience": "The marketing lead.",
+  "common.materials": "We send to 12,000 subscribers each issue. Issues with practical how-to content had a 41% open rate.",
+  "content-communications.brief": "Small business owners, email, friendly and practical, short."
+ }
+}

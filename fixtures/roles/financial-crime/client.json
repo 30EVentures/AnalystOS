@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 116 worked example). Not a real company.",
+ "roles": [
+  "fraud-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our card fraud alerts have grown and analysts cannot keep up. We had 3,000 alerts last month.",
+ "answers": {
+  "common.decision": "How to prioritise alerts; the fraud manager decides each case.",
+  "common.deadline": "Two weeks.",
+  "common.audience": "The fraud manager.",
+  "common.materials": "Analysts close about 2,200 alerts a month. 4% of alerts turn out to be real fraud. The average confirmed fraud loss is $900.",
+  "financial-crime.case": "Card transaction alerts, United States, our fraud policy.",
+  "financial-crime.decider": "The fraud manager decides each case."
+ }
+}

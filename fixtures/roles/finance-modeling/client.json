@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 116 worked example). Not a real company.",
+ "roles": [
+  "fpa-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our quarterly operating expenses were $2.4 million against a budget of $2.1 million. We need to explain the overrun to the board and forecast next quarter.",
+ "answers": {
+  "common.decision": "Whether to cut discretionary spend next quarter; the CFO decides.",
+  "common.deadline": "Board pack due in ten days.",
+  "common.audience": "The CFO and the board.",
+  "common.materials": "Contractor spend was $600,000 against a plan of $350,000. Travel was $180,000 against $200,000. Headcount costs matched budget.",
+  "finance-modeling.purpose": "Explain the variance and forecast next quarter.",
+  "finance-modeling.data": "Quarterly actuals and budget by cost line, in US dollars."
+ }
+}

@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 116 worked example). Not a real company.",
+ "roles": [
+  "learning-and-development-coordinator"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "New hires take too long to become productive. Our onboarding takes 10 weeks on average and we want to cut it.",
+ "answers": {
+  "common.decision": "Whether to redesign onboarding; the head of people decides.",
+  "common.deadline": "One month.",
+  "common.audience": "The head of people and team leads.",
+  "common.materials": "We hire about 60 people a year. New hires who had a buddy reached full productivity in 7 weeks.",
+  "people-hr.process": "Onboarding for all new hires, using our learning system.",
+  "people-hr.decider": "The head of people approves program changes."
+ }
+}

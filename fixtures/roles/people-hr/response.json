@@ -1,0 +1,166 @@
+{
+ "answer": "Give every new hire a buddy: buddied hires reach full productivity in [F3] weeks against [F1], about [F5] productive weeks gained a year.",
+ "exec_summary": [
+  "Onboarding takes [F1] weeks on average.",
+  "Hires with a buddy got there in [F3] weeks, [F4] weeks sooner.",
+  "Across [F2] hires a year, that is about [F5] weeks."
+ ],
+ "situation": "A growing company hiring steadily across teams.",
+ "complication": "New hires take a long time to become productive, which slows every team.",
+ "key_question": "How can onboarding get new hires productive sooner?",
+ "titles": {
+  "situation": "Steady hiring makes slow onboarding expensive.",
+  "options": "Two ways to shorten the time to productivity.",
+  "recommendation": "Pair every new hire with a trained buddy.",
+  "roadmap": "Launch buddies for the next hires and measure the result.",
+  "kpis": "Two measures show whether onboarding got faster.",
+  "risks": "Buddies may lack the time to help properly."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Weeks to full productivity, average",
+   "value": 10,
+   "unit": "other",
+   "basis": "client",
+   "quote": "Our onboarding takes 10 weeks"
+  },
+  {
+   "id": "F2",
+   "label": "Hires per year",
+   "value": 60,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We hire about 60 people a year"
+  },
+  {
+   "id": "F3",
+   "label": "Weeks to full productivity with a buddy",
+   "value": 7,
+   "unit": "other",
+   "basis": "client",
+   "quote": "reached full productivity in 7 weeks"
+  },
+  {
+   "id": "F4",
+   "label": "Weeks saved per hire",
+   "value": 3,
+   "unit": "other",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F3"
+   ]
+  },
+  {
+   "id": "F5",
+   "label": "Productive weeks gained per year",
+   "value": 180,
+   "unit": "other",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F2",
+    "F4"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "What works today",
+   "finding": "Hires with a buddy become productive noticeably sooner.",
+   "points": [
+    "Buddied hires reached full productivity in [F3] weeks."
+   ],
+   "hypotheses": [
+    {
+     "text": "A buddy speeds up onboarding.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "The fastest fix scales something already working.",
+   "chart": {
+    "title": "Buddied hires become productive sooner than the average.",
+    "figure_ids": [
+     "F1",
+     "F3"
+    ],
+    "labels": [
+     "Average",
+     "With a buddy"
+    ]
+   }
+  },
+  {
+   "branch": "What it is worth",
+   "finding": "Faster onboarding adds up across a year of hiring.",
+   "points": [
+    "The gain is about [F5] weeks a year."
+   ],
+   "hypotheses": [
+    {
+     "text": "Every team can supply buddies.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The program is worth a small amount of buddy time."
+  }
+ ],
+ "options": [
+  {
+   "name": "Buddy program",
+   "description": "Train buddies and pair one with every new hire.",
+   "effort": "low"
+  },
+  {
+   "name": "New onboarding course",
+   "description": "Build a new online course for all new hires.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Buddy program",
+  "rationale": "It scales the practice that already cut onboarding to [F3] weeks."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Recruit and brief buddies in each team."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Pair every new hire with a buddy."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Compare time to productivity with the [F1] weeks today."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Weeks to full productivity",
+   "target": "Down from [F1]"
+  },
+  {
+   "name": "New hires with a buddy",
+   "target": "Every new hire"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Buddies lack time.",
+   "mitigation": "Give buddies protected time each week."
+  },
+  {
+   "risk": "Productivity is measured unevenly.",
+   "mitigation": "Agree one definition with team leads."
+  }
+ ]
+}

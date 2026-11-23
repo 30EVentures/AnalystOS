@@ -107,12 +107,16 @@ class TheRealCatalogTest(unittest.TestCase):
         self.assertEqual(len(OWNER_ROLES), 73)
         self.assertEqual(sorted(r["title"] for r in CATALOG["roles"]), sorted(OWNER_ROLES))
 
-    def test_every_role_is_honestly_planned(self):
+    def test_every_role_is_available_on_a_worked_example_and_none_claims_a_live_test(self):
+        # Owner's decision 2026-11-23: every role live today, proven by worked examples in the
+        # session (method "mock"); only one paid live test, which has not been run.
         for role in CATALOG["roles"]:
             with self.subTest(role=role["id"]):
-                self.assertEqual(role["status"], "planned")
-                self.assertIsNone(role["eval"])
-                self.assertIsNone(role["rate_cents_per_engagement_hour"])
+                self.assertEqual(role["status"], "available")
+                self.assertEqual(role["eval"]["method"], "mock")
+                self.assertTrue((ROOT / role["eval"]["set"]).is_dir(), role["eval"]["set"])
+                self.assertEqual(role["rate_cents_per_engagement_hour"], "tbd")
+                self.assertEqual(role["delivers_today"], "verified-deck")
 
     def test_thirteen_families_and_the_wave_split(self):
         self.assertEqual(len(CATALOG["families"]), 13)
@@ -155,8 +159,11 @@ class ValidatorRefusesTest(unittest.TestCase):
         self.assertTrue(any(needle in p for p in problems), f"expected a problem with {needle!r}, got {problems}")
 
     def mutated(self, change, role_id="management-consulting-analyst"):
+        """A copy of the catalog with the role reset to planned, then changed."""
         doc = copy.deepcopy(CATALOG)
-        change(_role(doc, role_id), doc)
+        role = _role(doc, role_id)
+        role.update(status="planned", eval=None, rate_cents_per_engagement_hour=None)
+        change(role, doc)
         return doc
 
     def test_not_a_catalog_at_all(self):
@@ -221,7 +228,7 @@ class ValidatorRefusesTest(unittest.TestCase):
 
     def test_available_needs_a_passed_eval(self):
         def change(r, d):
-            r.update(status="available", eval={"set": "evals/consulting-v1", "passed": False},
+            r.update(status="available", eval={"set": "evals/consulting-v1", "passed": False, "method": "mock"},
                      rate_cents_per_engagement_hour=5000)
         self.assertProblem(self.mutated(change), "its evaluation did not pass")
 
@@ -229,13 +236,29 @@ class ValidatorRefusesTest(unittest.TestCase):
         for rate in (None, 0, -100, 49.99, "5000", True):
             with self.subTest(rate=rate):
                 def change(r, d, rate=rate):
-                    r.update(status="available", eval={"set": "evals/consulting-v1", "passed": True},
+                    r.update(status="available", eval={"set": "evals/consulting-v1", "passed": True, "method": "mock"},
                              rate_cents_per_engagement_hour=rate)
                 self.assertProblem(self.mutated(change), "needs a positive integer rate")
 
+    def test_tbd_pricing_and_an_unknown_eval_method(self):
+        ok = {"set": "fixtures/consulting", "passed": True, "method": "mock"}
+        self.assertEqual(validate_catalog(self.mutated(lambda r, d: r.update(
+            status="available", eval=ok, rate_cents_per_engagement_hour="tbd"))), [])
+        self.assertProblem(self.mutated(lambda r, d: r.update(
+            status="available", eval=dict(ok, method="vibes"), rate_cents_per_engagement_hour="tbd")),
+            "eval.method must be one of")
+        self.assertProblem(self.mutated(lambda r, d: r.update(
+            status="available", eval=dict(ok, method=None), rate_cents_per_engagement_hour="tbd")),
+            "eval.method must be one of")
+        self.assertProblem(self.mutated(lambda r, d: r.update(
+            status="available", eval=ok, rate_cents_per_engagement_hour="free")), "needs a positive integer rate")
+        self.assertProblem(self.mutated(lambda r, d: r.update(
+            status="planned", rate_cents_per_engagement_hour="tbd")), "cannot carry a rate")
+        self.assertProblem(self.mutated(lambda r, d: r.update(delivers_today="code")), "delivers_today must be one of")
+
     def test_a_correctly_available_role_passes(self):
         def change(r, d):
-            r.update(status="available", eval={"set": "evals/consulting-v1", "passed": True},
+            r.update(status="available", eval={"set": "evals/consulting-v1", "passed": True, "method": "mock"},
                      rate_cents_per_engagement_hour=5000)
         self.assertEqual(validate_catalog(self.mutated(change)), [])
 
@@ -246,7 +269,7 @@ class ValidatorRefusesTest(unittest.TestCase):
 
     def test_each_remaining_rule_refuses(self):
         """One case per rule the first review found untested (it disabled each rule and no test broke)."""
-        ok_eval = {"set": "evals/consulting-v1", "passed": True}
+        ok_eval = {"set": "evals/consulting-v1", "passed": True, "method": "mock"}
         cases = (
             ("eval.passed as the string 'true'", "management-consulting-analyst",
              lambda r, d: r.update(status="evaluated", eval={"set": "x", "passed": "true"}), "eval.passed must be true or false"),
@@ -254,7 +277,7 @@ class ValidatorRefusesTest(unittest.TestCase):
              lambda r, d: r.update(status="available", eval={"set": "x", "passed": 1}, rate_cents_per_engagement_hour=5000),
              "eval.passed must be true or false"),
             ("eval without set", "management-consulting-analyst",
-             lambda r, d: r.update(status="evaluated", eval={"passed": True}), "eval.set must name"),
+             lambda r, d: r.update(status="evaluated", eval={"passed": True, "method": "mock"}), "eval.set must name"),
             ("unknown eval field", "management-consulting-analyst",
              lambda r, d: r.update(status="evaluated", eval=dict(ok_eval, verified_by="me")), "unknown eval field"),
             ("evaluated with a rate", "management-consulting-analyst",

@@ -1,7 +1,13 @@
 [
  {"name": "no re-verification before rendering", "old": "    problems = check_deck_spec(spec)\n    if problems:", "new": "    problems = []\n    if problems:"},
+ {"name": "client text taken from the spec", "old": "    if client_text_of(engagement) != spec[\"client_text\"]:", "new": "    if False:"},
+ {"name": "engagement not checked", "old": "    if engagement.get(\"state\") != \"accepted\" or engagement.get(\"id\") != spec[\"engagement_id\"]:", "new": "    if False:"},
+ {"name": "role not checked against the engagement", "old": "    if spec[\"role\"] not in roles or spec[\"role\"] not in engagement[\"roles\"]:", "new": "    if spec[\"role\"] not in roles:"},
  {"name": "assumption flag dropped from the footer", "old": "        if assumptions:\n            note +=", "new": "        if False:\n            note +="},
- {"name": "points shown as percent", "old": "        return f\"{text} pts\"", "new": "        return f\"{text}%\""},
- {"name": "formula for percent_of wrong", "old": "        return f\"{a[0]} × {a[1]} ÷ 100\"", "new": "        return f\"{a[0]} × {a[1]}\""},
- {"name": "chart value axis shown", "old": "    value_axis.visible = False", "new": "    value_axis.visible = True"}
+ {"name": "points shown as percent", "old": "        return f\"{text}%\" if unit == \"percent\" else f\"{text} pts\"", "new": "        return f\"{text}%\""},
+ {"name": "tag printed raw instead of its value", "old": "        _run(paragraph, format_value(figures[m.group(1)]), size, color, bold)", "new": "        _run(paragraph, m.group(0), size, color, bold)"},
+ {"name": "chart labels not from the formatter", "old": "        _run(label.text_frame.paragraphs[0], format_value(fig), 12, INK, bold=True)", "new": "        _run(label.text_frame.paragraphs[0], str(fig[\"value\"]), 12, INK, bold=True)"},
+ {"name": "counts not rounded", "old": "        elif abs(value) >= 10:\n            text = f\"{round(value):,}\"", "new": "        elif False:\n            text = f\"{round(value):,}\""},
+ {"name": "human-decides framed as a recommendation", "old": "    header = \"PREPARED FOR YOUR DECISION\" if boundary == \"human-decides\" else \"WE RECOMMEND\"", "new": "    header = \"WE RECOMMEND\""},
+ {"name": "drawing errors raised raw", "old": "    except Exception as exc:  # noqa: BLE001 - a drawing failure is reported, never raised raw\n        raise ValueError", "new": "    except ZeroDivisionError as exc:  # noqa: BLE001 - a drawing failure is reported, never raised raw\n        raise ValueError"}
 ]

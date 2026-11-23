@@ -14,6 +14,17 @@ from analystos.l3 import engagement as eng
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = load_catalog()
+
+
+def planned(catalog):
+    """The catalog with every role set back to 'planned', for testing the gate's refusal."""
+    out = copy.deepcopy(catalog)
+    for role in out["roles"]:
+        role.update(status="planned", eval=None, rate_cents_per_engagement_hour=None)
+    return out
+
+
+PLANNED = planned(CATALOG)
 SCOPING = eng.load_scoping()
 ID = "0" * 31 + "1"
 WHEN = "2026-11-23T18:00:00Z"
@@ -36,9 +47,9 @@ def answer_all(record, required_only=True):
 
 
 def catalog_with_available(role_id, base=None):
-    catalog = copy.deepcopy(base if base is not None else CATALOG)
+    catalog = copy.deepcopy(base if base is not None else PLANNED)
     role = next(r for r in catalog["roles"] if r["id"] == role_id)
-    role.update(status="available", eval={"set": "evals/test", "passed": True}, rate_cents_per_engagement_hour=5000)
+    role.update(status="available", eval={"set": "evals/test", "passed": True, "method": "mock"}, rate_cents_per_engagement_hour=5000)
     return catalog
 
 
@@ -240,10 +251,9 @@ class AnswerTest(unittest.TestCase):
 
 
 class AcceptanceGateTest(unittest.TestCase):
-    def test_every_role_today_is_refused_at_the_gate(self):
-        # All 73 roles are 'planned' (Slice 108): no engagement can be accepted yet, by design.
+    def test_a_planned_role_is_refused_at_the_gate(self):
         record = answer_all(make(roles=["management-consulting-analyst", "fpa-analyst"]))
-        accepted, problems = eng.accept(record, CATALOG)
+        accepted, problems = eng.accept(record, PLANNED)
         self.assertIsNone(accepted)
         self.assertIn("role 'management-consulting-analyst' is planned, not available for hire", problems)
         self.assertIn("role 'fpa-analyst' is planned, not available for hire", problems)
@@ -327,10 +337,10 @@ class AcceptanceGateTest(unittest.TestCase):
 
     def test_an_invalid_catalog_is_refused(self):
         record = answer_all(make())
-        no_eval = copy.deepcopy(CATALOG)
+        no_eval = copy.deepcopy(PLANNED)
         next(r for r in no_eval["roles"] if r["id"] == "management-consulting-analyst")["status"] = "available"
         twice = catalog_with_available("management-consulting-analyst")
-        twice["roles"].insert(0, copy.deepcopy(next(r for r in CATALOG["roles"] if r["id"] == "management-consulting-analyst")))
+        twice["roles"].insert(0, copy.deepcopy(next(r for r in PLANNED["roles"] if r["id"] == "management-consulting-analyst")))
         for name, catalog in (("available without eval or rate", no_eval), ("role listed twice", twice),
                               ("not a catalog", None), ("empty", {})):
             with self.subTest(case=name):

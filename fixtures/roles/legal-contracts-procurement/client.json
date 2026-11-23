@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 116 worked example). Not a real company.",
+ "roles": [
+  "contract-procurement-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our cloud hosting contract renews next month at $240,000 a year. We want to know whether to renegotiate or switch.",
+ "answers": {
+  "common.decision": "Renegotiate or switch; the head of procurement decides.",
+  "common.deadline": "Two weeks.",
+  "common.audience": "The head of procurement and the CTO.",
+  "common.materials": "A competitor quoted $198,000 a year for the same capacity. Our contract allows a 5% annual price increase. Migration would cost about $60,000 one time.",
+  "legal-contracts-procurement.documents": "The hosting agreement and the competitor quote.",
+  "legal-contracts-procurement.reviewer": "Our general counsel reviews contract changes."
+ }
+}

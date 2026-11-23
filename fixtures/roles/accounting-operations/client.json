@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 116 worked example). Not a real company.",
+ "roles": [
+  "staff-accountant-bookkeeper"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our bank balance and our ledger cash balance do not agree at month end. The bank shows $84,200 and the ledger shows $79,950.",
+ "answers": {
+  "common.decision": "Which entries to post to close the month; the controller approves.",
+  "common.deadline": "Month-end close in three days.",
+  "common.audience": "The controller.",
+  "common.materials": "There are $3,100 of deposits in transit and $1,850 of uncleared cheques. A $5,500 customer payment was received but never recorded in the ledger.",
+  "accounting-operations.systems": "Our accounting system, October, standard chart of accounts.",
+  "accounting-operations.approver": "The controller approves all entries."
+ }
+}

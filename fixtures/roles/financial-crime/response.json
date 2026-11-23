@@ -1,0 +1,187 @@
+{
+ "answer": "Prepare a risk-ranked queue for the fraud manager: alerts exceed capacity by [F5] a month, and the unreviewed alerts likely hide about [F6] real frauds worth about [F7].",
+ "exec_summary": [
+  "Alerts reached [F1] last month against capacity of [F2].",
+  "At a [F3] fraud rate, the backlog likely holds about [F6] real frauds.",
+  "Each confirmed fraud costs about [F4], so the backlog carries about [F7] of exposure."
+ ],
+ "situation": "A card issuer whose analysts review fraud alerts one by one.",
+ "complication": "Alerts now exceed what analysts can review, so some go unreviewed each month.",
+ "key_question": "How should alerts be prioritised so the riskiest are reviewed first?",
+ "titles": {
+  "situation": "Alert volume has outgrown the review team.",
+  "options": "Two ways to put the riskiest alerts first.",
+  "recommendation": "Rank alerts by risk so the fraud manager reviews the riskiest first.",
+  "roadmap": "Rank the queue now, then measure what the ranking catches.",
+  "kpis": "Two measures show whether the ranking works.",
+  "risks": "A poor ranking could push real fraud to the back of the queue."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Alerts last month",
+   "value": 3000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We had 3,000 alerts last month"
+  },
+  {
+   "id": "F2",
+   "label": "Alerts analysts close per month",
+   "value": 2200,
+   "unit": "count",
+   "basis": "client",
+   "quote": "Analysts close about 2,200 alerts a month"
+  },
+  {
+   "id": "F3",
+   "label": "Alerts that are real fraud",
+   "value": 4,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "4% of alerts turn out to be real fraud"
+  },
+  {
+   "id": "F4",
+   "label": "Average confirmed fraud loss",
+   "value": 900,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "The average confirmed fraud loss is $900"
+  },
+  {
+   "id": "F5",
+   "label": "Alerts left unreviewed per month",
+   "value": 800,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Likely real frauds among unreviewed alerts",
+   "value": 32,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F5",
+    "F3"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Likely fraud loss in unreviewed alerts",
+   "value": 28800,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F6",
+    "F4"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "The capacity gap",
+   "finding": "More alerts arrive each month than analysts can close.",
+   "points": [
+    "Alerts exceed capacity by [F5] a month."
+   ],
+   "hypotheses": [
+    {
+     "text": "The team can clear the backlog at today's pace.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "Some alerts will go unreviewed, so the order of review matters.",
+   "chart": {
+    "title": "Monthly alerts exceed what analysts can close.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "Alerts",
+     "Closed"
+    ]
+   }
+  },
+  {
+   "branch": "What the backlog risks",
+   "finding": "Unreviewed alerts likely hide a meaningful amount of real fraud.",
+   "points": [
+    "About [F6] real frauds may sit in the backlog.",
+    "That is about [F7] of exposure."
+   ],
+   "hypotheses": [
+    {
+     "text": "Unreviewed alerts are mostly harmless.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Reviewing the riskiest alerts first protects most of that exposure."
+  }
+ ],
+ "options": [
+  {
+   "name": "Risk-ranked queue",
+   "description": "Score alerts by amount and risk signals and review the highest first.",
+   "effort": "medium"
+  },
+  {
+   "name": "Hire more analysts",
+   "description": "Add analysts so every alert is closed.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Risk-ranked queue",
+  "rationale": "It puts the riskiest of the [F5] excess alerts first without new hires; every disposition stays with the fraud manager."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Score open alerts by amount and risk signals."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Work the queue in score order and track confirmed fraud."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Review with the fraud manager whether the ranking catches more fraud."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Confirmed fraud found per analyst hour",
+   "target": "Higher than before ranking"
+  },
+  {
+   "name": "Unreviewed alerts",
+   "target": "Falling each month"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The score misses a new fraud pattern.",
+   "mitigation": "Sample low-score alerts every week."
+  },
+  {
+   "risk": "Customers wait longer on low-score alerts.",
+   "mitigation": "Set a maximum wait for every alert."
+  }
+ ]
+}

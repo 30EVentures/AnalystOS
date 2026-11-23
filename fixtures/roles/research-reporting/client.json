@@ -1,0 +1,18 @@
+{
+ "note": "A synthetic client (Slice 116 worked example). Not a real company.",
+ "roles": [
+  "market-research-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We make premium dog food and sell it through pet stores. We want to know whether a direct subscription in Denver is worth testing.",
+ "answers": {
+  "common.decision": "Whether to fund a Denver test; the founders decide.",
+  "common.deadline": "Two weeks.",
+  "common.audience": "The founders.",
+  "common.materials": "Denver metro has about 1,200,000 households. A city survey says 38% of households own a dog. Our store customers spend on average $65 a month on our food.",
+  "research-reporting.scope": "Denver metro, the next year."
+ }
+}

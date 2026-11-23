@@ -1,13 +1,13 @@
 {
- "answer": "Put next year's money into retention, aimed at small clinics: churn rose from 4% [F1] to 7% [F2] after the March release, and the extra churn costs $30,600 [F14] of monthly recurring revenue every month.",
+ "answer": "Put next year's money into retention, aimed at small clinics: churn rose from [F1] to [F2] after the March release, and the extra churn costs [F14] of monthly recurring revenue every month.",
  "exec_summary": [
-  "Monthly logo churn rose by 3 points [F11], and net revenue retention fell from 104% [F3] to 96% [F4].",
-  "Clinics with fewer than ten staff make up 70% [F8] of churned logos; they onboard alone and hit the March release hardest.",
-  "Price is what churned clients say, but a discount saves only 15% [F9] of cancellations, so price is the stated reason rather than the cause.",
-  "Restoring churn to 4% [F10] recovers about 26 [F13] clinics a month, worth $30,600 [F14] in monthly recurring revenue each month."
+  "Monthly logo churn rose by [F11], and net revenue retention fell from [F3] to [F4].",
+  "Clinics with fewer than ten staff make up [F8] of churned logos; they onboard alone and hit the March release hardest.",
+  "Price is what churned clients say, but a discount saves only [F9] of cancellations, so price is the stated reason rather than the cause.",
+  "Restoring churn to [F10] recovers about [F13] clinics a month, worth [F14] in monthly recurring revenue each month."
  ],
- "situation": "A B2B scheduling platform for clinics with 850 [F5] customers paying on average $1,200 [F6] per month.",
- "complication": "Within two quarters monthly churn rose from 4% [F1] to 7% [F2], and support tickets per account rose sharply after the March release.",
+ "situation": "A B2B scheduling platform for clinics with [F5] customers paying on average [F6] per month.",
+ "complication": "Within two quarters monthly churn rose from [F1] to [F2], and support tickets per account rose sharply after the March release.",
  "key_question": "What is driving the churn increase, and should next year's budget go to retention or to new sales?",
  "titles": {
   "situation": "Churn rose sharply in two quarters, and revenue retention fell with it.",
@@ -160,8 +160,8 @@
    "branch": "Who is churning",
    "finding": "Small clinics drive the increase, not the customer base as a whole.",
    "points": [
-    "Clinics with fewer than ten staff are 70% [F8] of churned logos.",
-    "At 7% [F2] churn the company loses about 60 [F12] clinics a month."
+    "Clinics with fewer than ten staff are [F8] of churned logos.",
+    "At [F2] churn the company loses about [F12] clinics a month."
    ],
    "hypotheses": [
     {
@@ -220,8 +220,8 @@
    "branch": "Whether price is the cause",
    "finding": "Price is the stated reason for leaving, but discounts barely change the decision.",
    "points": [
-    "60% [F7] of churned accounts cite a cheaper tool.",
-    "The cancellation discount saves only 15% [F9] of requests."
+    "[F7] of churned accounts cite a cheaper tool.",
+    "The cancellation discount saves only [F9] of requests."
    ],
    "hypotheses": [
     {
@@ -266,7 +266,7 @@
  ],
  "recommendation": {
   "option": "Small-clinic retention program",
-  "rationale": "It targets the segment behind 70% [F8] of churned logos, attacks the effort problem the March release created, needs no engineering in Q1, and fits within two hires; new sales would refill a base that is losing $30,600 [F14] of monthly recurring revenue each month."
+  "rationale": "It targets the segment behind [F8] of churned logos, attacks the effort problem the March release created, needs no engineering in Q1, and fits within two hires; new sales would refill a base that is losing [F14] of monthly recurring revenue each month."
  },
  "roadmap": [
   {
@@ -281,7 +281,7 @@
    "horizon": "Days 31-60",
    "actions": [
     "Launch a guided onboarding call for every new small clinic.",
-    "Measure the save rate weekly against the planning assumption of 25% [F15]."
+    "Measure the save rate weekly against the planning assumption of [F15]."
    ]
   },
   {
@@ -295,7 +295,7 @@
  "kpis": [
   {
    "name": "Monthly logo churn",
-   "target": "Back to 4% [F10] within two quarters"
+   "target": "Back to [F10] within two quarters"
   },
   {
    "name": "Small-clinic churn",
@@ -303,7 +303,7 @@
   },
   {
    "name": "Save rate on cancellation requests",
-   "target": "Above today's 15% [F9]"
+   "target": "Above today's [F9]"
   },
   {
    "name": "Support tickets per account",

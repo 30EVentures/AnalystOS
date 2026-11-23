@@ -1,0 +1,20 @@
+{
+ "note": "A synthetic client (Slice 115 mock). Not a real company.",
+ "roles": [
+  "management-consulting-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "mock-client"
+ },
+ "problem": "We run a regional bakery chain with 14 stores. Gross margin fell from 62% to 54% in a year, mostly because flour and butter got more expensive. We need to decide whether to raise prices or cut costs.",
+ "answers": {
+  "common.decision": "Whether to raise prices or cut costs; the two owners decide next month.",
+  "common.deadline": "Before the spring menu, in six weeks.",
+  "common.audience": "The two owners. Plain language, no jargon.",
+  "common.materials": "Annual revenue is $9.6 million. Ingredient costs rose 30% year on year. Bread is 45% of sales; pastries are 35% and coffee is 20%. Our prices have not changed in two years.",
+  "consulting.current-state": "We tried a smaller croissant last autumn and complaints doubled. Waste is about 8% of production. Competitors raised prices by roughly 10% this year.",
+  "consulting.success": "Get gross margin back to 60% without losing customers.",
+  "consulting.constraints": "We will not close stores or change suppliers this year."
+ }
+}

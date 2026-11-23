@@ -79,7 +79,7 @@ def generated_files():
         full += [f"<!-- source: {BASE}/docs/{name} -->", "", (ROOT / "docs" / name).read_text(encoding="utf-8").rstrip(), "", "---", ""]
     out["llms-full.txt"] = "\n".join(full)
 
-    urls = [f"{BASE}/", f"{BASE}/upload.html", f"{BASE}/llms.txt", f"{BASE}/llms-full.txt",
+    urls = [f"{BASE}/", f"{BASE}/upload.html", f"{BASE}/hire.html", f"{BASE}/llms.txt", f"{BASE}/llms-full.txt",
             f"{BASE}/api/v1/openapi.json"] + [f"{BASE}/docs/{n}" for n, _, _ in GUIDES]
     out["sitemap.xml"] = (
         '<?xml version="1.0" encoding="UTF-8"?>\n'

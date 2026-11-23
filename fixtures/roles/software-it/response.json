@@ -1,0 +1,175 @@
+{
+ "answer": "Fix the database query first: it takes [F3] of the page's [F1] seconds, about [F6] of the load time.",
+ "exec_summary": [
+  "The dashboard loads in [F1] seconds against a goal of [F2].",
+  "The database query alone takes [F3] seconds.",
+  "Everything else, including [F4] API calls, takes about [F5] seconds."
+ ],
+ "situation": "A customer dashboard with a Python backend and a React frontend.",
+ "complication": "The page is slow enough that customers complain.",
+ "key_question": "What should be fixed first to make the dashboard fast?",
+ "titles": {
+  "situation": "A slow dashboard is hurting the customer experience.",
+  "options": "Two ways to cut the load time this sprint.",
+  "recommendation": "Optimise the slow database query before anything else.",
+  "roadmap": "Fix the query, then batch the API calls.",
+  "kpis": "Two measures show the page is fast enough.",
+  "risks": "A query change could return wrong data if untested."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Dashboard load time, seconds",
+   "value": 6.5,
+   "unit": "other",
+   "basis": "client",
+   "quote": "takes 6.5 seconds to load"
+  },
+  {
+   "id": "F2",
+   "label": "Target load time, seconds",
+   "value": 2,
+   "unit": "other",
+   "basis": "client",
+   "quote": "We want it under 2 seconds"
+  },
+  {
+   "id": "F3",
+   "label": "Database query time, seconds",
+   "value": 4.8,
+   "unit": "other",
+   "basis": "client",
+   "quote": "the database query takes 4.8 seconds"
+  },
+  {
+   "id": "F4",
+   "label": "Separate API calls per page load",
+   "value": 40,
+   "unit": "count",
+   "basis": "client",
+   "quote": "The page makes 40 separate API calls"
+  },
+  {
+   "id": "F5",
+   "label": "Load time outside the query, seconds",
+   "value": 1.7,
+   "unit": "other",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F3"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Query share of load time",
+   "value": 73.8,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F3",
+    "F1"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Where the time goes",
+   "finding": "One database query accounts for most of the load time.",
+   "points": [
+    "The query takes [F3] seconds of the total."
+   ],
+   "hypotheses": [
+    {
+     "text": "A single query dominates the load time.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "No other fix can reach the goal while the query stays slow.",
+   "chart": {
+    "title": "The query takes most of the total load time.",
+    "figure_ids": [
+     "F3",
+     "F5"
+    ],
+    "labels": [
+     "Database query",
+     "Everything else"
+    ]
+   }
+  },
+  {
+   "branch": "What else slows the page",
+   "finding": "Many separate API calls add delay after the query.",
+   "points": [
+    "The page makes [F4] separate API calls."
+   ],
+   "hypotheses": [
+    {
+     "text": "Batching API calls would save meaningful time.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Batching is the second step once the query is fixed."
+  }
+ ],
+ "options": [
+  {
+   "name": "Optimise the query",
+   "description": "Add the missing index and rewrite the query, with tests for its results.",
+   "effort": "low"
+  },
+  {
+   "name": "Cache the whole page",
+   "description": "Cache the dashboard and refresh it in the background.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Optimise the query",
+  "rationale": "It targets about [F6] of the load time and keeps the data fresh."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Profile the query plan and add the missing index.",
+    "Write tests that compare query results before and after."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Batch the API calls into fewer requests."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Monitor load time against the [F2] second goal."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Dashboard load time",
+   "target": "Under [F2] seconds"
+  },
+  {
+   "name": "Query time",
+   "target": "Well below today's [F3] seconds"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The query returns different data.",
+   "mitigation": "Compare results in tests before release."
+  },
+  {
+   "risk": "Load time regresses later.",
+   "mitigation": "Add a load-time check to CI."
+  }
+ ]
+}

@@ -30,12 +30,19 @@ _ID_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 # an agent's client would silently round is refused.
 MAX_RATE_CENTS = 2**53 - 1
 _TOP_KEYS = {"format", "description", "statuses", "boundaries", "waves", "families", "roles"}
-_EVAL_KEYS = {"set", "passed"}
+_EVAL_KEYS = {"set", "passed", "method"}
+# How a role's evaluation was run: "mock" = worked examples written and checked in a
+# working session (no model call); "live" = the production model on the eval set.
+EVAL_METHODS = ("mock", "live")
+# The owner's decision, 2026-11-23: no price has been set for any role yet; pricing is to be determined.
+PRICE_TBD = "tbd"
+# What a role delivers today, as opposed to its native deliverables (which may not exist yet).
+DELIVERS_TODAY = ("verified-deck",)
 _ROLE_KEYS = {
     "id", "title", "family", "wave", "boundary", "deliverables", "status", "eval",
-    "rate_cents_per_engagement_hour", "human_decides", "gated_actions",
+    "rate_cents_per_engagement_hour", "human_decides", "gated_actions", "delivers_today",
 }
-_REQUIRED_ROLE_KEYS = _ROLE_KEYS - {"human_decides", "gated_actions"}
+_REQUIRED_ROLE_KEYS = _ROLE_KEYS - {"human_decides", "gated_actions", "delivers_today"}
 _FAMILY_KEYS = {"id", "title", "skill", "wave", "roles"}
 
 
@@ -65,6 +72,8 @@ def _validate_eval(where, record, must_pass):
         problems.append(f"{where}: eval.passed must be true or false")
     elif must_pass and record["passed"] is not True:
         problems.append(f"{where}: is 'available' but its evaluation did not pass")
+    if not isinstance(record.get("method"), str) or record.get("method") not in EVAL_METHODS:
+        problems.append(f"{where}: eval.method must be one of {list(EVAL_METHODS)}")
     return problems
 
 
@@ -90,6 +99,8 @@ def _validate_role(index, role, family_ids):
     if not _is_int(wave) or wave not in WAVES:
         problems.append(f"{where}: wave must be one of {list(WAVES)}")
 
+    if "delivers_today" in role and role["delivers_today"] not in DELIVERS_TODAY:
+        problems.append(f"{where}: delivers_today must be one of {list(DELIVERS_TODAY)}")
     deliverables = role.get("deliverables")
     if not isinstance(deliverables, list) or not deliverables:
         problems.append(f"{where}: deliverables must be a non-empty list")
@@ -131,9 +142,9 @@ def _validate_role(index, role, family_ids):
     else:
         problems.extend(_validate_eval(where, record, must_pass=(status == "available")))
         if status == "available":
-            if not _is_int(rate) or not 0 < rate <= MAX_RATE_CENTS:
-                problems.append(f"{where}: an available role needs a positive integer rate in US cents "
-                                f"(rate_cents_per_engagement_hour), got {rate!r}")
+            if rate != PRICE_TBD and (not _is_int(rate) or not 0 < rate <= MAX_RATE_CENTS):
+                problems.append(f"{where}: an available role needs a positive integer rate in US cents, or "
+                                f"{PRICE_TBD!r} (rate_cents_per_engagement_hour), got {rate!r}")
         elif rate is not None:
             problems.append(f"{where}: an evaluated role is not for hire yet and cannot carry a rate")
     return problems

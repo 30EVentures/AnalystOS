@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 115 mock). Not a real company.",
+ "roles": [
+  "management-consulting-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "mock-client"
+ },
+ "problem": "We roast specialty coffee and sell 2,000 bags a month through cafés. We want to know whether to launch a direct-to-consumer coffee subscription next year.",
+ "answers": {
+  "common.decision": "Launch the subscription or not; the founder decides in January.",
+  "common.deadline": "Three weeks.",
+  "common.audience": "The founder and one investor.",
+  "common.materials": "A bag sells to cafés at $11 and costs us $6 to roast and pack. We have 3,000 people on our newsletter. We have never sold online.",
+  "consulting.current-state": "Cafés reorder monthly. Two of our largest café customers asked whether we would undercut them online.",
+  "consulting.success": "A subscription that pays for itself within a year without losing café accounts."
+ }
+}

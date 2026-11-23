@@ -1,0 +1,291 @@
+{
+ "answer": "Run a pre-order test before launching: on planning assumptions a subscription would earn about [F11] a month, small next to [F12] from cafés, and it puts café accounts at risk.",
+ "exec_summary": [
+  "Each café bag earns [F5]; a subscription bag would earn about [F8], but only on assumed prices and shipping costs.",
+  "Converting [F9] of the newsletter would mean about [F10] subscribers, an assumption until it is measured.",
+  "That would add about [F11] a month against [F12] a month from café sales today.",
+  "Two large cafés have already asked about being undercut, so channel conflict is a real cost."
+ ],
+ "situation": "A specialty roaster selling [F1] bags a month to cafés, with no online sales yet.",
+ "complication": "A subscription could earn more per bag, but the numbers that decide it have never been measured, and cafés are wary.",
+ "key_question": "Should the roaster launch a direct-to-consumer subscription next year?",
+ "titles": {
+  "situation": "A healthy café business with no direct channel yet.",
+  "options": "Three ways forward, from waiting to launching in full.",
+  "recommendation": "Run a pre-order test before committing to a full launch.",
+  "roadmap": "Measure real demand within two months, then decide in January.",
+  "kpis": "Three measures turn today's assumptions into facts.",
+  "risks": "Café conflict and weak demand are the risks to test first."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Bags sold to cafés per month",
+   "value": 2000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "sell 2,000 bags a month"
+  },
+  {
+   "id": "F2",
+   "label": "Café price per bag",
+   "value": 11,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "A bag sells to cafés at $11"
+  },
+  {
+   "id": "F3",
+   "label": "Cost to roast and pack a bag",
+   "value": 6,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "costs us $6 to roast and pack"
+  },
+  {
+   "id": "F4",
+   "label": "Newsletter readers",
+   "value": 3000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We have 3,000 people on our newsletter"
+  },
+  {
+   "id": "F5",
+   "label": "Margin per café bag",
+   "value": 5,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F3"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Subscription price per bag",
+   "value": 18,
+   "unit": "usd",
+   "basis": "assumption",
+   "rationale": "A typical direct price for a specialty bag; the pre-order page tests it."
+  },
+  {
+   "id": "F7",
+   "label": "Shipping and mailer cost per bag",
+   "value": 4,
+   "unit": "usd",
+   "basis": "assumption",
+   "rationale": "An estimate for posting a single bag; a carrier quote replaces it."
+  },
+  {
+   "id": "F8",
+   "label": "Margin per subscription bag",
+   "value": 8,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F6",
+    "F3",
+    "F7"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Newsletter readers who subscribe",
+   "value": 5,
+   "unit": "percent",
+   "basis": "assumption",
+   "rationale": "A planning figure for an engaged list; the pre-order test replaces it with a measured rate."
+  },
+  {
+   "id": "F10",
+   "label": "Subscribers",
+   "value": 150,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F4",
+    "F9"
+   ]
+  },
+  {
+   "id": "F11",
+   "label": "Subscription margin per month",
+   "value": 1200,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F10",
+    "F8"
+   ]
+  },
+  {
+   "id": "F12",
+   "label": "Café margin per month",
+   "value": 10000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F1",
+    "F5"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Whether the economics work",
+   "finding": "Per bag the subscription looks better, but only on assumed costs.",
+   "points": [
+    "A café bag earns [F5] against about [F8] for a subscription bag.",
+    "That rests on an assumed price of [F6] and shipping of [F7]."
+   ],
+   "hypotheses": [
+    {
+     "text": "A subscription bag earns more than a café bag.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The margin case needs real prices and shipping quotes before it can carry a decision.",
+   "chart": {
+    "title": "A subscription bag would earn more, on assumed costs.",
+    "figure_ids": [
+     "F5",
+     "F8"
+    ],
+    "labels": [
+     "Café bag",
+     "Subscription bag"
+    ]
+   }
+  },
+  {
+   "branch": "Whether demand is there",
+   "finding": "Demand is unknown; the newsletter is the only signal and it is untested.",
+   "points": [
+    "The newsletter reaches [F4] people.",
+    "At an assumed [F9] sign-up rate that is about [F10] subscribers."
+   ],
+   "hypotheses": [
+    {
+     "text": "Enough newsletter readers would subscribe to matter.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "A cheap pre-order page answers this question faster than any forecast.",
+   "chart": {
+    "title": "Readers on the list compared with assumed subscribers.",
+    "figure_ids": [
+     "F4",
+     "F10"
+    ],
+    "labels": [
+     "Newsletter readers",
+     "Assumed subscribers"
+    ]
+   }
+  },
+  {
+   "branch": "What it could cost the café business",
+   "finding": "Café income dwarfs the likely subscription income and is at risk.",
+   "points": [
+    "Café sales earn about [F12] a month.",
+    "Two large cafés asked whether direct prices would undercut them."
+   ],
+   "hypotheses": [
+    {
+     "text": "Cafés will accept a direct channel priced above theirs.",
+     "verdict": "untested"
+    },
+    {
+     "text": "A subscription could replace café income.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "Protecting café accounts matters more than the subscription's upside.",
+   "chart": {
+    "title": "Café income is many times the likely subscription income.",
+    "figure_ids": [
+     "F12",
+     "F11"
+    ],
+    "labels": [
+     "Café margin, monthly",
+     "Subscription, monthly"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Pre-order test",
+   "description": "Open a pre-order page to the newsletter at a price above café pricing and measure sign-ups.",
+   "effort": "low"
+  },
+  {
+   "name": "Full launch",
+   "description": "Build a subscription shop and fulfilment now.",
+   "effort": "high"
+  },
+  {
+   "name": "Wait a year",
+   "description": "Grow café accounts and revisit direct sales later.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Pre-order test",
+  "rationale": "It replaces the assumptions behind the case with measured numbers within weeks, costs little, and keeps prices above café pricing so cafés are not undercut."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Build a simple pre-order page priced above café pricing.",
+    "Get a carrier quote for single-bag shipping."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Email the newsletter and count pre-orders.",
+    "Tell key cafés the plan and the price floor."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Decide with the investor whether measured demand justifies a launch.",
+    "Update the margin estimate with real shipping costs."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Pre-order sign-up rate",
+   "target": "Measured against the assumed [F9]"
+  },
+  {
+   "name": "Shipping cost per bag",
+   "target": "At or below the assumed [F7]"
+  },
+  {
+   "name": "Café accounts retained",
+   "target": "No café lost during the test"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Cafés see the test as competition.",
+   "mitigation": "Price above café pricing and tell them before the email goes out."
+  },
+  {
+   "risk": "The test shows weak demand.",
+   "mitigation": "Treat that as the answer and keep the focus on café growth."
+  }
+ ]
+}

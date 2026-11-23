@@ -24,6 +24,68 @@ No generator owned the hero's spec figure. It had been typed by hand and was
 frozen since about Slice 49. It now has its own `site_counts.py` pattern,
 generated from the same `count_specs()` as the evidence card.
 
+## 2026-11-23 — Slice 117: every role live on the verified pipeline (worked examples, no paid calls)
+
+Owner's direction: all 73 roles on the website and in the product by the end of
+the day; Management Consulting Analyst gets one paid real-model test, only with
+the owner's yes right before it and the exact cost stated; every other role is
+proven with worked examples written and checked in the working session; price
+is to be determined: no price has been set for any role (first recorded as "open
+for negotiation, per engagement"; the owner changed it the same day).
+
+One pipeline serves every role: the verified consulting pipeline, plus a brief
+per role and a method brief per family (`analystos/packs/briefs.json`) in the
+system prompt, and the role's boundary - a human-decides role is told to prepare
+the decision, never make it, and its deck says "Prepared for your decision" and
+names the decisions that stay with a qualified person; an approval-gated role's
+actions are drafts for a named approver. Every number rule applies unchanged.
+
+The catalog now says how each role was tested (`eval.method`: `mock` for worked
+examples, `live` for the production model) so a mock-tested role can never be
+shown as live-tested; `available` accepts `"tbd"` pricing (no price set yet); and
+`delivers_today: verified-deck` says plainly that every role delivers the
+verified analysis deck today, not its native work product (code, copy,
+reconciliations). All 73 are `available` on a mock eval pointing at their
+family's worked example: 16 examples, at least one per family, each run end to
+end in tests (intake, the gate, the pipeline through ReplayClient, rendering,
+the independent no-new-numbers check). Regulated roles were included at the
+owner's direction; each still frames its output as preparation for a qualified
+person, and the rules that apply to each have not been reviewed one by one.
+
+## 2026-11-23 — Slice 116: code writes every number; the model only points at figures
+
+A second fresh-context review (of Slice 115) found the claim still false:
+edited "client quotes" (the L2 matcher folds away `$`, scale words and leading
+signs), digit shorthand ("ARR10M"), fraction words ("a quarter of"), unit and
+scale words after a number ("850 USD", "$1,200 Bn"), sign tricks, a spec that
+carried its own forged client text, crashes on huge values and control
+characters, chart labels formatted differently from the text, and a
+no-new-numbers test that shared the detector's blind spots. Patching a detector
+form by form was losing, so the design changed: the model never writes a digit.
+Every number is a figure tag that code prints from the verified figure with one
+formatter used everywhere (sentences, tiles, chart labels, sources), so value,
+unit, sign and scale cannot be misstated. Any digit outside a tag is refused
+except Q1-Q4, H1-H2, FY labels, B2B/B2C and years the client wrote; a tag may
+not carry a sign, currency, bracket, unit or scale word beside it; quotes must
+be the client's exact words at a word boundary, with a word and one number.
+`render_deck(spec, engagement)` recomputes the client text from the engagement,
+takes the role's title from the catalog, re-verifies, and reports any drawing
+failure as ValueError. The no-new-numbers test is now independent of the
+detector (it removes the exact formatted values a slide may show and requires
+no numeric character to remain, chart text included) and checks every tile.
+
+Stated limits, not gaps: whether a figure is used about the right thing
+("revenue grew [F2]" where F2 is churn) is not checked; quantities written in
+words are caught by a list, not exhaustively; counting words one to twelve are
+allowed.
+
+**Corrections to Slice 115's entry and commit.** It said the review's findings
+were "all now closed" and that numbers.py "finds every quantity a reader reads
+as one" - neither held (the second review reproduced misses). It said a spec
+edited after verification "cannot be rendered" - a spec that forged its own
+client text could. It said malformed specs raise ValueError - two crashes
+remained. Its spec claimed "four recorded cases" when one was committed.
+
 ## 2026-11-23 — Slice 115: making "every number is traced" true
 
 A fresh-context review of Slices 112-113 found the deck's central claim - every

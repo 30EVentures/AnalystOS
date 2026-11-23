@@ -1,0 +1,211 @@
+{
+ "answer": "Start with the mobile funnel: conversion fell from [F1] to [F2], about [F9] fewer orders last month, and mobile carries [F5] of sessions.",
+ "exec_summary": [
+  "Conversion fell by [F6] in a month.",
+  "At last month's [F3] sessions, that is about [F9] lost orders.",
+  "Mobile is [F5] of sessions, so a mobile problem would explain the most."
+ ],
+ "situation": "An online store that tracks every step of its funnel by device.",
+ "complication": "Conversion dropped sharply last month and nobody yet knows at which step.",
+ "key_question": "Where in the funnel are customers dropping off, and what should be fixed first?",
+ "titles": {
+  "situation": "Conversion fell quickly while data is available step by step.",
+  "options": "Two ways to find and fix the drop.",
+  "recommendation": "Analyse and fix the mobile funnel first.",
+  "roadmap": "Find the failing step within a week, then fix and measure.",
+  "kpis": "Two measures confirm the fix worked.",
+  "risks": "The cause may be outside the checkout entirely."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Conversion rate, before",
+   "value": 3.2,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "conversion rate fell from 3.2%"
+  },
+  {
+   "id": "F2",
+   "label": "Conversion rate, last month",
+   "value": 2.5,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "to 2.5% last month"
+  },
+  {
+   "id": "F3",
+   "label": "Sessions last month",
+   "value": 200000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We had 200,000 sessions last month"
+  },
+  {
+   "id": "F4",
+   "label": "Sessions that reached a product page",
+   "value": 40,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "40% of sessions reached a product page"
+  },
+  {
+   "id": "F5",
+   "label": "Mobile share of sessions",
+   "value": 70,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "Mobile is 70% of sessions"
+  },
+  {
+   "id": "F6",
+   "label": "Fall in conversion",
+   "value": 0.7,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Orders last month",
+   "value": 5000,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F3",
+    "F2"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Orders at the old conversion rate",
+   "value": 6400,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F3",
+    "F1"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Orders lost to the fall in conversion",
+   "value": 1400,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F8",
+    "F7"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "How big the drop is",
+   "finding": "The drop costs a meaningful number of orders every month.",
+   "points": [
+    "About [F8] orders at the old rate became [F7]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The drop is large enough to act on now.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "This is worth a focused fix rather than waiting for it to recover.",
+   "chart": {
+    "title": "Orders fell from the old conversion rate to the new one.",
+    "figure_ids": [
+     "F8",
+     "F7"
+    ],
+    "labels": [
+     "At the old rate",
+     "Last month"
+    ]
+   }
+  },
+  {
+   "branch": "Where it happens",
+   "finding": "Mobile is the most likely place, but the failing step is not yet known.",
+   "points": [
+    "Mobile is [F5] of sessions.",
+    "Only [F4] of sessions reach a product page."
+   ],
+   "hypotheses": [
+    {
+     "text": "The drop is concentrated on mobile.",
+     "verdict": "untested"
+    },
+    {
+     "text": "The checkout step is where customers leave.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "A device-by-step cut of the funnel will name the step to fix."
+  }
+ ],
+ "options": [
+  {
+   "name": "Mobile funnel analysis",
+   "description": "Cut the funnel by device and step, then fix the worst mobile step.",
+   "effort": "low"
+  },
+  {
+   "name": "Site-wide redesign",
+   "description": "Redesign the whole checkout for every device.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Mobile funnel analysis",
+  "rationale": "It targets the device behind [F5] of sessions and costs little before anything is rebuilt."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Cut last month's funnel by device and step."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Fix the worst mobile step and test it."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Compare conversion with the [F1] it had before."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Conversion rate",
+   "target": "Back toward [F1]"
+  },
+  {
+   "name": "Mobile checkout completion",
+   "target": "Rising week on week after the fix"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The cause is a pricing or stock change, not the site.",
+   "mitigation": "Check price and stock changes from the same week first."
+  },
+  {
+   "risk": "The fix helps mobile but hurts desktop.",
+   "mitigation": "Test the change on both devices."
+  }
+ ]
+}

@@ -16,6 +16,7 @@ The file carries a SHA-256 of the canonical deck spec in its properties - a
 content digest so a reader can tie the file to the spec, not a signature.
 """
 
+import contextvars
 import hashlib
 import io
 import json
@@ -29,7 +30,12 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Emu, Inches, Pt
 
-from analystos.packs.consulting import check_deck_spec
+from analystos.catalog import load_catalog
+from analystos.l3.engagement import validate_engagement
+from analystos.packs.consulting import check_deck_spec, client_text_of
+
+# The figures of the deck being drawn, so every [F#] tag is printed from its verified value.
+_FIGURES = contextvars.ContextVar("deck_figures", default={})
 
 SPEC_FORMAT = "analystos-deck-spec/1"
 
@@ -69,21 +75,33 @@ NUMBER_FORMATS = {
 }
 
 
+def _trim(text):
+    return text.rstrip("0").rstrip(".") if "." in text else text
+
+
 def format_value(figure):
+    """The one way a figure's value is written anywhere in a deck: sentences, tiles,
+    chart labels and the sources slides all use it."""
     value, unit = figure["value"], figure["unit"]
-    if unit == "percent":
-        text = f"{value:,.1f}".rstrip("0").rstrip(".")
-        return f"{text}%"
-    if unit == "points":
-        text = f"{value:,.1f}".rstrip("0").rstrip(".")
-        return f"{text} pts"
+    small = abs(value) < 1 and value != 0
+    if unit in ("percent", "points"):
+        text = _trim(f"{value:,.2f}") if small else _trim(f"{value:,.1f}")
+        return f"{text}%" if unit == "percent" else f"{text} pts"
     if unit == "usd":
-        return f"${value:,.0f}" if float(value).is_integer() or abs(value) >= 100 else f"${value:,.2f}"
+        if float(value).is_integer() or abs(value) >= 100:
+            return f"-${abs(value):,.0f}" if value < 0 else f"${value:,.0f}"
+        return f"-${abs(value):,.2f}" if value < 0 else f"${value:,.2f}"
     if unit == "ratio":
         return f"{value:,.2f}x"
-    if unit == "months":
-        return f"{value:,.1f}".rstrip("0").rstrip(".") + " months"
-    return f"{value:,.1f}".rstrip("0").rstrip(".")
+    if unit in ("count", "months", "other"):
+        if float(value).is_integer():
+            text = f"{value:,.0f}"
+        elif abs(value) >= 10:
+            text = f"{round(value):,}"
+        else:
+            text = _trim(f"{value:,.2f}") if small else _trim(f"{value:,.1f}")
+        return text + (" months" if unit == "months" else "")
+    return _trim(f"{value:,.2f}")
 
 
 # --- text helpers ---------------------------------------------------------------
@@ -99,12 +117,15 @@ def _run(paragraph, text, size, color=INK, bold=False):
 
 
 def _rich(paragraph, text, size, color=INK, bold=False):
-    """Write ``text`` with each [F#] tag as a small grey reference."""
+    """Write ``text`` with each [F#] tag printed as its figure's verified value, followed
+    by a small grey reference to the figure."""
+    figures = _FIGURES.get()
     pos = 0
     for m in _TAG_RE.finditer(text):
-        before = text[pos:m.start()].rstrip()
+        before = text[pos:m.start()]
         if before:
             _run(paragraph, before, size, color, bold)
+        _run(paragraph, format_value(figures[m.group(1)]), size, color, bold)
         _run(paragraph, f" {m.group(1)}", max(size - 6, 8), FAINT)
         pos = m.end()
     rest = text[pos:]
@@ -229,10 +250,11 @@ def _title_slide(prs, spec, s, number, total):
     _, frame = _textbox(slide, MARGIN + Inches(0.4), Inches(2.1), Inches(11.4), Inches(2.6), MSO_ANCHOR.MIDDLE)
     _rich(frame.paragraphs[0], s["title"], 32 if len(s["title"]) <= 110 else 26, WHITE, bold=True)
     _, sub = _textbox(slide, MARGIN + Inches(0.4), Inches(5.0), Inches(11.4), Inches(1.0))
-    role = spec["role"].replace("-", " ").title()
+    role = spec["_role_title"]
     _run(sub.paragraphs[0], f"{role}  ·  Prepared by AnalystOS", 16, RULE)
     p = sub.add_paragraph()
-    _run(p, "Every figure is traced to the client's own words, a stated calculation, or a labelled assumption.", 12, FAINT)
+    _run(p, "Every number shown is printed from a figure traced to the client's own words, a stated calculation, "
+            "or a labelled assumption.", 12, FAINT)
     return slide
 
 
@@ -313,12 +335,7 @@ def _chart(slide, spec, chart, left, top, width, height):
     plot.gap_width = 80
     plot.has_data_labels = True
     labels = plot.data_labels
-    labels.number_format = NUMBER_FORMATS[charted[0]["unit"]]
-    labels.number_format_is_linked = False
     labels.position = XL_LABEL_POSITION.OUTSIDE_END
-    labels.font.size = Pt(12)
-    labels.font.bold = True
-    labels.font.color.rgb = INK
     value_axis = graphic_chart.value_axis
     value_axis.visible = False
     value_axis.has_major_gridlines = False
@@ -332,6 +349,12 @@ def _chart(slide, spec, chart, left, top, width, height):
         point = series.points[i]
         point.format.fill.solid()
         point.format.fill.fore_color.rgb = FAINT if fig["basis"] == "assumption" else ACCENT
+        # Each bar's label is written with the same formatter as the text, so a chart
+        # can never show a value differently from the sentence beside it.
+        label = point.data_label
+        label.position = XL_LABEL_POSITION.OUTSIDE_END
+        label.text_frame.text = ""
+        _run(label.text_frame.paragraphs[0], format_value(fig), 12, INK, bold=True)
     return graphic
 
 
@@ -411,7 +434,9 @@ def _recommendation_slide(prs, spec, s, number, total):
     rec = spec["content"]["recommendation"]
     _rect(slide, MARGIN, BODY_TOP, CONTENT_W, Inches(1.3), INK)
     _, top = _textbox(slide, MARGIN + Inches(0.3), BODY_TOP, CONTENT_W - Inches(0.6), Inches(1.3), MSO_ANCHOR.MIDDLE)
-    _run(top.paragraphs[0], "WE RECOMMEND", 12, RULE, bold=True)
+    boundary = spec.get("_boundary", "deliverable-only")
+    header = "PREPARED FOR YOUR DECISION" if boundary == "human-decides" else "WE RECOMMEND"
+    _run(top.paragraphs[0], header, 12, RULE, bold=True)
     p = top.add_paragraph()
     _rich(p, rec["option"], 26, WHITE, bold=True)
     _, why = _textbox(slide, MARGIN, BODY_TOP + Inches(1.6), CONTENT_W, Inches(1.7))
@@ -419,7 +444,16 @@ def _recommendation_slide(prs, spec, s, number, total):
     p = why.add_paragraph()
     p.space_before = Pt(8)
     _rich(p, rec["rationale"], 18 if len(rec["rationale"]) <= 260 else 15, INK)
-    _stat_tiles(slide, spec, s["figure_ids"], MARGIN, BODY_TOP + Inches(3.4), CONTENT_W)
+    limits = []
+    if boundary == "human-decides":
+        limits = ["Decisions that stay with a qualified person: " + "; ".join(spec.get("_human_decides", [])) + "."]
+    elif boundary == "approval-gated":
+        limits = ["Drafts for your approval before anything happens: " + "; ".join(spec.get("_gated_actions", [])) + "."]
+    if limits:
+        p = why.add_paragraph()
+        p.space_before = Pt(8)
+        _run(p, limits[0], 12, MUTED, bold=True)
+    _stat_tiles(slide, spec, s["figure_ids"], MARGIN, BODY_TOP + Inches(3.6 if limits else 3.4), CONTENT_W)
     return slide
 
 
@@ -509,29 +543,54 @@ def slide_count(spec):
     return sum(sources if s["kind"] == "sources" else 1 for s in spec["slides"])
 
 
-def render_deck(spec):
-    """PowerPoint bytes for a deck spec. ValueError if it is not a deck spec this renders."""
+def render_deck(spec, engagement, catalog=None):
+    """PowerPoint bytes for a deck spec, or ValueError.
+
+    Trusts nothing in the spec it can derive: the client's text is recomputed from
+    the engagement (which must be valid and accepted, and the spec's), the role's
+    title comes from the catalog, and the content is re-verified and the slides
+    rebuilt before anything is drawn. Any drawing error is a ValueError."""
+    catalog = catalog if catalog is not None else load_catalog()
     problems = check_deck_spec(spec)
     if problems:
         raise ValueError("refusing to render: " + "; ".join(problems[:3]))
-
-    prs = Presentation()
-    prs.slide_width, prs.slide_height = SLIDE_W, SLIDE_H
-    total = slide_count(spec)
-    number = 1
-    for s in spec["slides"]:
-        if s["kind"] == "sources":
-            number += len(_sources_slides(prs, spec, s, number, total))
-        else:
-            RENDERERS[s["kind"]](prs, spec, s, number, total)
-            number += 1
-
-    props = prs.core_properties
-    props.title = spec["content"]["key_question"][:250]
-    props.author = "AnalystOS"
-    props.subject = spec["role"]
-    props.keywords = f"{SPEC_FORMAT}; engagement {spec['engagement_id']}; spec sha256 {spec_digest(spec)}"
-    props.comments = "Every figure is traced to the client's own words, a stated calculation, or a labelled assumption."
-    buffer = io.BytesIO()
-    prs.save(buffer)
-    return buffer.getvalue()
+    if not isinstance(engagement, dict) or validate_engagement(engagement, catalog):
+        raise ValueError("refusing to render: the engagement is not valid")
+    if engagement.get("state") != "accepted" or engagement.get("id") != spec["engagement_id"]:
+        raise ValueError("refusing to render: the spec does not belong to this accepted engagement")
+    if client_text_of(engagement) != spec["client_text"]:
+        raise ValueError("refusing to render: the spec's client text is not the engagement's")
+    roles = {r["id"]: r for r in catalog["roles"]}
+    if spec["role"] not in roles or spec["role"] not in engagement["roles"]:
+        raise ValueError("refusing to render: the role is not one this engagement asked for")
+    role = roles[spec["role"]]
+    drawn = dict(spec, _role_title=role["title"], _boundary=role["boundary"],
+                 _human_decides=list(role.get("human_decides", [])), _gated_actions=list(role.get("gated_actions", [])))
+    token = _FIGURES.set({f["id"]: f for f in spec["content"]["figures"]})
+    try:
+        prs = Presentation()
+        prs.slide_width, prs.slide_height = SLIDE_W, SLIDE_H
+        total = slide_count(spec)
+        number = 1
+        for s in spec["slides"]:
+            if s["kind"] == "sources":
+                number += len(_sources_slides(prs, drawn, s, number, total))
+            else:
+                RENDERERS[s["kind"]](prs, drawn, s, number, total)
+                number += 1
+        props = prs.core_properties
+        props.title = spec["content"]["key_question"][:250]
+        props.author = "AnalystOS"
+        props.subject = role["title"]
+        props.keywords = f"{SPEC_FORMAT}; engagement {spec['engagement_id']}; spec sha256 {spec_digest(spec)}"
+        props.comments = ("Every number shown is printed from a figure traced to the client's own words, "
+                          "a stated calculation, or a labelled assumption.")
+        buffer = io.BytesIO()
+        prs.save(buffer)
+        return buffer.getvalue()
+    except ValueError:
+        raise
+    except Exception as exc:  # noqa: BLE001 - a drawing failure is reported, never raised raw
+        raise ValueError(f"could not draw the deck: {type(exc).__name__}") from exc
+    finally:
+        _FIGURES.reset(token)

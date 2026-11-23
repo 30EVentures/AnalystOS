@@ -2,6 +2,35 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-23 — Slice 107: rebuild into a consulting product, with the Flashy integration fenced
+
+Owner's decision: rebuild AnalystOS so a person or an agent enters a business
+problem and gets a consulting-grade deck back (every figure cited to a source
+or labelled an assumption, sealed), with specialist agents hireable by the
+hour - and leave the FlashyOS integration exactly where it is. The rebuild
+fills layers the architecture already names and never built (L3 workspace,
+L5 distribution) rather than replacing L0-L2/L4.
+
+The constraint became a check before any product code: `tools/flashy_freeze.py`
+pins the integration in `flashy-freeze.json` and the suite fails on any drift.
+It is deliberately not a `tools/refresh.py` step (a fence that regenerates
+itself protects nothing); moving it needs `--update --reason`, and each move
+is logged with exactly what it re-pinned. Product routes go in a new API
+version, never `/api/v1`. A fresh-context review of the first version found
+the fence too literal in places (exact-string `vercel.json` matching,
+untracked files invisible, fenced code importing unfenced code, set-only
+append checks, an unprotected log); each was fixed in the same pull request
+with a test. Not done: pinning the integration's own test files, since
+`tests/` grows every slice; the fence's own tests are the guard instead.
+
+"Hired per hour" means **engagement hours** (owner's choice, 2026-11-23): an
+hour buys a fixed, published budget of agent work (model calls and tokens),
+priced per specialist in integer cents, bought as a budget that only narrows,
+with a hard stop that delivers what is finished, marked partial, and a sealed
+receipt. Not wall-clock time (agents finish most tasks in minutes) and not
+per deliverable. Declaring a consulting offer on the FlashyOS mesh stays a
+separate decision for the owner.
+
 ## 2026-11-22 — Slice 106: the public devlog, with a real privacy leak found and closed before it shipped
 
 Owner's decision: flip `.shiplog/config.json`'s `visibility` to `public` and

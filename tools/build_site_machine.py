@@ -25,6 +25,15 @@ GUIDES = [
     ("using-analystos.md", "Using AnalystOS", "Running it yourself from the command line"),
 ]
 
+
+
+def _guide_line(name):
+    """The llms.txt link line for one guide, looked up by file name, not position, so
+    adding a guide cannot shift the FlashyOS section (which the Slice 107 fence pins)."""
+    title, description = next((t, d) for n, t, d in GUIDES if n == name)
+    return f"- [{title}]({BASE}/docs/{name}): {description}"
+
+
 SUMMARY = (
     "Reads a source document and returns a report in which every figure is a verified quote "
     "or an independently recomputed calculation, sealed so anyone can re-verify it offline. "
@@ -53,8 +62,8 @@ def generated_files():
     lines += ["## Identity and the FlashyOS mesh", "",
               f"- [Handshake]({BASE}/.well-known/flashyos.json): flashyos/1",
               f"- [Charter]({BASE}/.well-known/flashyos-charter.json): AAO 0.1, three roles, each with a measure",
-              f"- [{GUIDES[3][1]}]({BASE}/docs/{GUIDES[3][0]}): {GUIDES[3][2]}",
-              f"- [{GUIDES[2][1]}]({BASE}/docs/{GUIDES[2][0]}): {GUIDES[2][2]}", ""]
+              _guide_line("mesh-identity.md"),
+              _guide_line("aao.md"), ""]
     lines += ["## Limits, stated plainly", "",
               f"- [Trust and known limits]({BASE}/#trust): what leaves your environment, what is and is not checked",
               "- Every figure is proven; only some relationships between figures are checked",

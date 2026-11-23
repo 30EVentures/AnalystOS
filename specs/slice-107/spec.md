@@ -25,31 +25,51 @@ or an agent) can see when and why the integration changed.
    `analystos-seal-key.json`, `site/flashyos.roles.json`,
    `solwayholdings.aao.json`), the drafts the charter and playbook come from
    (`drafts/`, except `drafts/measures.json`, a derived output of the fenced
-   generator and charter that the suite itself rewrites, so it is watched), the AAO checker (`analystos/aao/`), the seal and its verifier and
+   generator and charter that the suite itself rewrites, so it is watched),
+   the AAO checker (`analystos/aao/`), the seal and its verifier and
    acceptance criteria (`analystos/l4/seal*.py`, `acceptance.py`), the
    conformance corpus and its runner (`conformance/`, `analystos/conformance.py`,
-   `tools/build_conformance_corpus.py`), the MCP server (`mcp-server/`,
-   `.mcp.json`), the live-API scripts (`ops/`), the handshake/measures/proxy
-   builders and the checker pin (`tools/`), the findings register (`findings/`),
-   the shiplog config, vendored tool and redaction step, and the docs that
-   describe the integration (`docs/aao.md`, `docs/mesh-identity.md`,
-   `docs/seal.md`, the two `docs/flashyos-*.md` notes).
+   `tools/build_conformance_corpus.py`) and the code they import
+   (`analystos/api_v1/audit_chain.py`, `audit.py`), the MCP server
+   (`mcp-server/`), the live-API scripts (`ops/`), the
+   handshake/measures/proxy builders and the checker pin (`tools/`), the
+   findings register (`findings/`), the shiplog config, vendored tool and
+   redaction step, the fence tool itself, and the docs that describe the
+   integration (`docs/aao.md`, `docs/mesh-identity.md`, `docs/seal.md`, the two
+   `docs/flashyos-*.md` notes) with their served copies under `site/docs/`.
+   (`.mcp.json` is not fenced: it is a local, untracked file, not part of the
+   repository.)
 2. **The `/api/v1` contract**: the canonical JSON of
-   `analystos.api_v1.openapi.build_openapi()`. Bug fixes inside v1 are allowed;
-   a change to what an agent calling v1 sees is not. New product routes go in a
-   new version.
-3. **Parts of shared files**: in `vercel.json`, every header or rewrite block for the five
-   served Flashy/seal/devlog paths (the rest of the file is free for new
-   routes); in `site/llms.txt`, the "Identity and the FlashyOS mesh" section.
-4. **Append-only records**: `devlog.fragment.json`, `shiplog.fragment.json` and
+   `analystos.api_v1.openapi.build_openapi()`, built from the code being
+   checked. Bug fixes inside v1 are allowed; a change to what an agent calling
+   v1 sees is not. New product routes go in a new version with its own builder.
+3. **Parts of shared files**: in `vercel.json`, every `headers`, `rewrites` or
+   `redirects` block whose source pattern can match a fenced served path
+   (wildcards included, so a site-wide `/(.*)` block counts), plus every
+   `/api/v1` block; blocks for anything else are free. In `site/llms.txt`,
+   the "Identity and the FlashyOS mesh" section, which must appear exactly once
+   (`tools/build_site_machine.py` now looks its guides up by file name, so
+   adding a guide cannot shift it).
+4. **The set of files in `site/.well-known/`**: publishing a new well-known
+   document is an outward decision, so a new or removed file is drift even if
+   it never says "Flashy".
+5. **Append-only records**: `devlog.fragment.json`, `shiplog.fragment.json` and
    the served `site/.well-known/devlog.fragment.json` grow with every commit by
-   design. Every entry present at freeze time must still be present and
-   byte-identical (by canonical hash); new entries are allowed. Their top-level
-   fields other than `generated` and `entries` are frozen exactly.
-5. **Coverage**: every tracked file outside `tests/` and `specs/` that mentions
-   FlashyOS or AAO must be either fenced or named in the manifest's `watched`
-   list with a one-line reason it is not frozen. A new file that couples to
-   Flashy fails the suite until someone decides which it is.
+   design. Every entry present at freeze time must still be present,
+   byte-identical (by canonical hash) and in the same order; entry ids must be
+   unique; new entries are allowed. Their top-level fields other than
+   `generated` and `entries` are frozen exactly.
+6. **Coverage**: every file outside `tests/` and `specs/` that mentions
+   FlashyOS or AAO, committed or merely not yet `git add`-ed, must be either
+   fenced or named in the `watched` list with a one-line reason it is not
+   frozen. A new file that couples to Flashy fails the suite until someone
+   decides which it is. A watched file that stops mentioning Flashy is a
+   warning, not drift (routine rewrites are what watching allows).
+7. **The decision log**: the manifest's log must be non-empty, start with this
+   slice's first pin, and give a reason for every move. Each move records the
+   exact drift it re-pinned. `--update` refuses an unreadable manifest rather
+   than silently starting a new log. Unreadable inputs are reported as drift,
+   never raised.
 
 ## Done when
 
@@ -59,9 +79,11 @@ or an agent) can see when and why the integration changed.
 2. `tests/test_flashy_freeze.py` runs the check as part of the normal suite and
    proves, each with a test that fails when the fence is absent, that the check
    fails on: a one-byte charter edit, a changed v1 OpenAPI document, an edited
-   Flashy block in `vercel.json` (while a new, unrelated `vercel.json` block
-   passes), an edited or deleted past devlog entry (while a new entry passes),
-   and a new unfenced file that mentions FlashyOS.
+   Flashy block or a wildcard block over fenced paths in `vercel.json` (while
+   a new, unrelated block passes), an edited, deleted, reordered or duplicated
+   past devlog entry (while a new entry passes), a new `.well-known` document,
+   a new unfenced file that mentions FlashyOS (tracked or not), and an emptied
+   decision log.
 3. The manifest log's first entry records this slice and the owner's decision.
 4. The full suite is `OK` and `tools/refresh.py --check` is clean.
 

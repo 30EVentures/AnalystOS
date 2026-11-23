@@ -814,7 +814,7 @@ What exists, by layer (code in `analystos/`; roadmap in `ROADMAP.md`).
 | L0 Evidence kernel | Built: SHA-256 content addressing, Fernet encryption at rest (key you set; a public development fallback if you do not), retention purge | `analystos/l0/` |
 | L1 Structure | Built: CSV, Excel, Word, PowerPoint, PDF (multi-column, image-derived facts), table unification, footnotes, boilerplate stripping | `analystos/l1/` |
 | L2 Reasoning | Built: a model proposes facts, code verifies them (quote, computed, event, prose); a narrator writes from verified facts; Gate 1 validators; a blind Gate 2 proofreader | `analystos/l2/` |
-| L3 Workspace | Not built | - |
+| L3 Workspace | Started: engagement intake - a problem and the roles asked for become a scoped engagement record, accepted only when every role is available in the role catalog (`analystos/catalog/`) | `analystos/l3/` |
 | L4 Deliverable and attestation | Built: HTML and PDF reports, charts, a zero-model deterministic floor, basis tags, **sealed reports** with a standalone verifier | `analystos/l4/` |
 | L5 Distribution | Not built: one shared access code plus per-caller API keys; no tenants | `api/`, `analystos/api_v1/` |
 | L6 AAO and mesh | Partly built: an AAO checker, a `flashyos/1` handshake and charter (in the repo, not deployed), an agent-callable API. No org, token or capability on the network | `analystos/aao/`, `site/.well-known/`, `analystos/api_v1/` |

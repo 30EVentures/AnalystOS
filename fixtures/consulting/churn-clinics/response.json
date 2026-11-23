@@ -28,7 +28,7 @@
   {"id": "F8", "label": "Share of churned logos that are small clinics", "value": 70, "unit": "percent", "basis": "client", "quote": "which are 70% of churned logos"},
   {"id": "F9", "label": "Save rate of the cancellation discount", "value": 15, "unit": "percent", "basis": "client", "quote": "the save rate is 15% of cancellation requests"},
   {"id": "F10", "label": "Target monthly churn", "value": 4, "unit": "percent", "basis": "client", "quote": "Get monthly churn back to 4%"},
-  {"id": "F11", "label": "Increase in monthly churn (percentage points)", "value": 3, "unit": "percent", "basis": "computed", "operation": "difference", "inputs": ["F2", "F1"]},
+  {"id": "F11", "label": "Increase in monthly churn", "value": 3, "unit": "points", "basis": "computed", "operation": "difference", "inputs": ["F2", "F1"]},
   {"id": "F12", "label": "Clinics lost per month at current churn", "value": 59.5, "unit": "count", "basis": "computed", "operation": "percent_of", "inputs": ["F5", "F2"]},
   {"id": "F13", "label": "Extra clinics lost per month versus the old churn rate", "value": 25.5, "unit": "count", "basis": "computed", "operation": "percent_of", "inputs": ["F5", "F11"]},
   {"id": "F14", "label": "Monthly recurring revenue lost each month to the extra churn", "value": 30600, "unit": "usd", "basis": "computed", "operation": "product", "inputs": ["F13", "F6"]},

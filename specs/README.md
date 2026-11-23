@@ -124,3 +124,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 110 | close the engagement gate's bypasses (review of Slice 109) | [spec](slice-110/spec.md) |
 | 111 | the homepage's test and spec figures say what they actually count | [spec](slice-111/spec.md) |
 | 112 | the consulting skill: a scoped engagement in, a verified deck spec out | [spec](slice-112/spec.md) |
+| 113 | the deck renderer: a verified deck spec in, a PowerPoint file out | [spec](slice-113/spec.md) |

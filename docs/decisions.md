@@ -24,6 +24,21 @@ No generator owned the hero's spec figure. It had been typed by hand and was
 frozen since about Slice 49. It now has its own `site_counts.py` pattern,
 generated from the same `count_specs()` as the evidence card.
 
+## 2026-11-23 — Slice 113: the deck renderer, and a renderer that adds no claims
+
+`analystos/l4/deck.py` lays out a verified deck spec as a 16:9 PowerPoint deck:
+action titles, figure references beside numbers, a footer naming each slide's
+figures and flagging assumptions, big-number tiles drawn only from figures the
+slide already uses, verdict pills, and sources slides that show each figure's
+basis (the client's exact words, the formula, or the assumption's rationale).
+
+The rule held in a test: the renderer adds no numbers of its own. Every number
+in the file is a figure value, a figure reference, a slide number or formula
+notation. A percentage-point change got its own unit after the first preview
+showed "3%" for a 3-point rise - a real misreading the layout would have
+introduced. Layout was checked by previewing every slide as an image in the
+working session; the spec was written after the code for that reason.
+
 ## 2026-11-23 — Slice 112: the consulting skill, proved with mocks instead of spend
 
 Owner's decision: take one role all the way through first (Management

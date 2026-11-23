@@ -120,3 +120,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 106 | the public devlog, with a real privacy leak found and closed before it shipped | [spec](slice-106/spec.md) |
 | 107 | the Flashy fence: freeze the FlashyOS integration before the rebuild | [spec](slice-107/spec.md) |
 | 108 | the role catalog: 73 entry-level jobs, every one honestly "planned" | [spec](slice-108/spec.md) |
+| 109 | engagement intake: a problem in, a scoped engagement out | [spec](slice-109/spec.md) |

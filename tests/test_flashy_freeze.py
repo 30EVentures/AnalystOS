@@ -207,7 +207,7 @@ class FlashyFenceTest(unittest.TestCase):
         self.assertEqual(self.check(), [])
 
     def test_a_new_unfenced_flashy_file_is_drift(self):
-        (self.repo / "analystos/l3").mkdir(parents=True)
+        (self.repo / "analystos/l3").mkdir(parents=True, exist_ok=True)
         (self.repo / "analystos/l3/mesh_offer.py").write_text("# declare the deck offer on FlashyOS\n")
         self.assertDrift("neither fenced nor watched: analystos/l3/mesh_offer.py")
 

@@ -1,0 +1,199 @@
+{
+ "format": "analystos-scoping/1",
+ "description": "Scoping questions asked at engagement intake (Slice 109): the common ones for every engagement, plus each requested role family's own. Snapshotted into each engagement at creation.",
+ "common": [
+  {
+   "id": "common.decision",
+   "text": "What decision will this work inform, and who makes it?",
+   "required": true
+  },
+  {
+   "id": "common.deadline",
+   "text": "When do you need the result, and is there an earlier checkpoint?",
+   "required": true
+  },
+  {
+   "id": "common.audience",
+   "text": "Who will read or use the deliverable (role, level of detail they expect)?",
+   "required": true
+  },
+  {
+   "id": "common.materials",
+   "text": "What material can you share (documents, data, prior work), and is any of it confidential?",
+   "required": false
+  },
+  {
+   "id": "common.out-of-scope",
+   "text": "What is explicitly out of scope?",
+   "required": false
+  }
+ ],
+ "families": {
+  "research-reporting": [
+   {
+    "id": "research-reporting.scope",
+    "text": "Which companies, markets, policies or topics, which geography and which period?",
+    "required": true
+   },
+   {
+    "id": "research-reporting.sources",
+    "text": "Any sources to prioritise or to exclude?",
+    "required": false
+   }
+  ],
+  "consulting": [
+   {
+    "id": "consulting.current-state",
+    "text": "What has been tried already, and what do the numbers show today?",
+    "required": true
+   },
+   {
+    "id": "consulting.success",
+    "text": "What would success look like, and how would you measure it?",
+    "required": true
+   },
+   {
+    "id": "consulting.constraints",
+    "text": "What constraints apply (budget, people, timing, appetite for change)?",
+    "required": false
+   }
+  ],
+  "finance-modeling": [
+   {
+    "id": "finance-modeling.purpose",
+    "text": "What must the model answer (valuation, forecast, credit capacity, pricing, scenario)?",
+    "required": true
+   },
+   {
+    "id": "finance-modeling.data",
+    "text": "Which financials are available, for which periods, in which currency and units?",
+    "required": true
+   },
+   {
+    "id": "finance-modeling.assumptions",
+    "text": "Any house views or assumptions the model must use?",
+    "required": false
+   }
+  ],
+  "data-analytics": [
+   {
+    "id": "data-analytics.data",
+    "text": "Which datasets or systems hold the data, how can they be shared, and roughly how large are they?",
+    "required": true
+   },
+   {
+    "id": "data-analytics.question",
+    "text": "Which metric or question should the analysis answer?",
+    "required": true
+   }
+  ],
+  "accounting-operations": [
+   {
+    "id": "accounting-operations.systems",
+    "text": "Which ledger or system, which period, and which chart of accounts?",
+    "required": true
+   },
+   {
+    "id": "accounting-operations.approver",
+    "text": "Who approves postings and payments on your side?",
+    "required": true
+   }
+  ],
+  "risk-audit-controls": [
+   {
+    "id": "risk-audit-controls.framework",
+    "text": "Which framework, standard or internal policy applies?",
+    "required": true
+   },
+   {
+    "id": "risk-audit-controls.scope",
+    "text": "Which processes, systems and period are in scope?",
+    "required": true
+   }
+  ],
+  "financial-crime": [
+   {
+    "id": "financial-crime.case",
+    "text": "What kind of alert or case, in which jurisdiction, under which programme or policy?",
+    "required": true
+   },
+   {
+    "id": "financial-crime.decider",
+    "text": "Who makes the disposition on each case?",
+    "required": true
+   }
+  ],
+  "legal-contracts-procurement": [
+   {
+    "id": "legal-contracts-procurement.documents",
+    "text": "Which documents, and which playbook, positions or template should they be checked against?",
+    "required": true
+   },
+   {
+    "id": "legal-contracts-procurement.reviewer",
+    "text": "Who reviews the output before it is relied on (for legal matters, a lawyer)?",
+    "required": true
+   }
+  ],
+  "content-communications": [
+   {
+    "id": "content-communications.brief",
+    "text": "Audience, channel, tone and length?",
+    "required": true
+   },
+   {
+    "id": "content-communications.facts",
+    "text": "Approved claims, sources or a brand guide to follow?",
+    "required": false
+   }
+  ],
+  "people-hr": [
+   {
+    "id": "people-hr.process",
+    "text": "Which process, which systems, and what volume?",
+    "required": true
+   },
+   {
+    "id": "people-hr.decider",
+    "text": "Who makes the people decisions this work supports?",
+    "required": true
+   }
+  ],
+  "software-it": [
+   {
+    "id": "software-it.codebase",
+    "text": "Which codebase or system, which language, and how are tests run?",
+    "required": true
+   },
+   {
+    "id": "software-it.done",
+    "text": "What does done look like (the issue, acceptance criteria)?",
+    "required": true
+   }
+  ],
+  "insurance": [
+   {
+    "id": "insurance.file",
+    "text": "Which line of business and jurisdiction, and which policy documents apply?",
+    "required": true
+   },
+   {
+    "id": "insurance.decider",
+    "text": "Which licensed adjuster or underwriter makes the decision?",
+    "required": true
+   }
+  ],
+  "sales-customer-coordination": [
+   {
+    "id": "sales-customer-coordination.targets",
+    "text": "Which accounts, segment, customers or project?",
+    "required": true
+   },
+   {
+    "id": "sales-customer-coordination.approver",
+    "text": "Who approves outgoing messages and changes in your tools?",
+    "required": true
+   }
+  ]
+ }
+}

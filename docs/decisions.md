@@ -2,6 +2,25 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-23 — Slice 109: engagement intake, and the first code that reads the role catalog
+
+The first piece of L3. A person or an agent states a problem and names catalog
+roles; `analystos/l3/engagement.py` turns that into an `analystos-engagement/1`
+record holding five common scoping questions plus each requested family's own
+(`analystos/l3/scoping.json`, snapshotted into the record so later template
+edits never rewrite an engagement), and the answers. The acceptance gate refuses
+unless the engagement is scoped and every requested role is `available` in the
+catalog - so today every engagement is refused, by design: nothing can be taken
+on for a role nobody has evaluated. This is what turns Slice 108's ladder from a
+file into an enforced rule.
+
+Deliberately no model call: routing from the problem text is Slice 110, so every
+rule here is deterministic and tested offline. Client text is data: cleaned of
+control and invisible format characters on the way in, and refused rather than
+truncated when over its cap (silently dropping part of a problem would change
+what was asked). An agent is a first-class requester (`requested_by.kind`), and
+`open_questions()` gives it the unanswered questions in order to work through.
+
 ## 2026-11-23 — Slice 108: one shop for 73 entry-level roles, none claimed before it is proven
 
 Owner's decision, same day as Slice 107 and widening it: not only consulting but

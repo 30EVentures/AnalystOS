@@ -122,3 +122,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 108 | the role catalog: 73 entry-level jobs, every one honestly "planned" | [spec](slice-108/spec.md) |
 | 109 | engagement intake: a problem in, a scoped engagement out | [spec](slice-109/spec.md) |
 | 110 | close the engagement gate's bypasses (review of Slice 109) | [spec](slice-110/spec.md) |
+| 111 | the homepage's test and spec figures say what they actually count | [spec](slice-111/spec.md) |

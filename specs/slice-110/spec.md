@@ -19,7 +19,7 @@ client yet), but both must be closed before `/api/v2` exists. This slice also
 fixes the review's smaller findings and corrects an overclaim in Slice 109's
 commit message and PR description.
 
-(Routing from the problem text, planned as Slice 110, moves to Slice 111.)
+(Routing from the problem text, planned as Slice 110, moves to Slice 112; Slice 111 is the homepage-counts fix.)
 
 ## Done when
 
@@ -55,4 +55,4 @@ commit message and PR description.
 
 - Sealing engagement records or holding them server-side (the lasting fix for
   tampering; comes with storage and `/api/v2`).
-- Routing from the problem text (Slice 111).
+- Routing from the problem text (Slice 112).

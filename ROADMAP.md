@@ -36,6 +36,44 @@ struck through and dated, new ones from the Flashy exchange are added at the end
 - [x] ~~Flip `.shiplog/config.json`'s `visibility` to `"public"`, deploy~~ - owner's decision, 2026-11-22. Done, Slice 106: visibility flipped, every entry re-derived (`--rederive`), served at a real path (`site/.well-known/devlog.fragment.json`, matching headers in `vercel.json`). Running it for real surfaced a genuine privacy leak before it ever deployed - old merge-commit titles from this repo's personal-GitHub-fork era, and this session's own commit trailers inside `detail` - closed by `tools/redact_served_devlog.py` (66 of 94 entries from the personal-fork era dropped; the rest had only their trailer stripped). **Still open:** handing the served URL to Flashy's fan-in - a separate outward/contact decision, not a default of making it public. No checkpoint/1 tree head was attempted this session.
 - [ ] **Hand the 24 audit findings to the register** - the finding content lives in the owner's local `flashy-audit` material, not in any repo reachable from this session. This session built the register's schema, validator and generator (Slice 101) against a clearly marked template entry (`F-00`, `status: "template"`) and tested every rule against synthetic fixtures - deliberately not against invented finding content. `tests/test_findings.py::RegistryContentTest` fails the moment a real entry is added without reading `findings/README.md`'s publishing section, by design. Needs the real write-ups, then a decision on where and when to publish them (findings/README.md's "Publishing" section).
 
+## The rebuild: a one-stop shop for entry-level white-collar work (from 2026-11-23)
+
+Owner's decision, 2026-11-23. A person or an agent states a problem and hires the
+roles that solve it, billed in **engagement hours** (an hour buys a fixed, published
+budget of agent work; integer cents; budgets only narrow; hard stop; sealed receipt).
+Every deliverable keeps the core rule: each figure is cited to a source or labelled
+an assumption. The rebuild fills the layers this repo named and never built (L3
+workspace, L5 distribution); L0-L2 and L4 carry over as the engine.
+
+- **The catalog** is `analystos/catalog/roles.json` (Slice 108): 73 roles in 13
+  families, each built on one shared skill. The validator allows status
+  `available` only with a recorded passing evaluation and an integer rate. All
+  73 are `planned` today. Not yet true: nothing reads the catalog, and an eval
+  record is a claim until evaluation runs are sealed (Phase 4).
+- **Boundaries**: 41 roles are deliverable-only, 13 act in client tools only after
+  a named human approves each action, 19 prepare the case for a decision a
+  qualified human makes (licensing, independence or anti-discrimination rules).
+- **Waves** (build order, by what blocks the build): 1 = 24 roles on the existing
+  engine (research and reporting, consulting, finance and modeling; four of them
+  leave a decision to a human); 2 = 23 roles needing a new skill; 3 = the 13
+  approval-gated roles, needing connectors; 4 = 13 roles whose core output is a
+  regulated decision, filing or disposition.
+- **The FlashyOS integration does not move.** `tools/flashy_freeze.py` (Slice 107)
+  fails the suite on any drift. Catalog roles are not the charter's seven team
+  roles; declaring them on the mesh is the owner's decision (Gate F).
+
+| Phase | Slices (approx.) | What | Done when |
+|---|---|---|---|
+| 0 Fence | 107 (done) | Freeze the FlashyOS integration | Merged, PR #94 |
+| 1 Catalog | 108 (this) | 73 roles, the status ladder, a validator | All `planned`, validator enforced |
+| 2 Engine | 109-112 | Engagement intake and scoping, a role-pack format, Reporting rebuilt as the first pack with unchanged output | A prompt becomes a scoped engagement; the Reporting pack matches today's reports |
+| 3 Deliverables | 113-116 | Deck, memo and workbook renderers; a deck seal (`seal-1` untouched) | Golden fixtures render and verify offline |
+| 4 Wave 1 | 117-126 | Research and reporting, consulting, finance and modeling, family by family, each role with its own eval set; sealed eval runs; a record of the named human's decision for the four wave-1 human-decides roles | Each role beats a plain-model baseline on a sealed eval run before it moves past `built` |
+| 5 Hiring | 127-131 | Engagement hours: rates, narrowing budgets, metering, hard stop, sealed receipts; test-mode payments only | A test hire stops exactly at its budget and reconciles to the cent |
+| 6 Front door | 132-134 | Web app and `/api/v2` (catalog, hire, status, deliverable) for people and agents | A full engagement runs in the browser and through the API |
+| 7 Waves 2-4 | ongoing | New skills, then connectors and approval gates, then the regulated-decision roles, each after a review of the rules that apply | Same eval bar per role |
+| Gate F | owner | Declaring roles on the FlashyOS mesh | Owner says so |
+
 ## Working queue (unblocked, in priority order)
 
 Each item gets a `specs/slice-N/spec.md` first, tests, a commit, and a line in

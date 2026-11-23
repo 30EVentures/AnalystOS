@@ -1,0 +1,1236 @@
+{
+ "format": "analystos-role-catalog/1",
+ "description": "Every role AnalystOS intends to offer, for hire by people and agents in engagement hours. A role may be marked 'available' only with a recorded passing evaluation and an integer rate (US cents per engagement hour); until evaluations are sealed and checkable, that record is a claim, not proof. See specs/slice-108/spec.md.",
+ "statuses": [
+  "planned",
+  "built",
+  "evaluated",
+  "available"
+ ],
+ "boundaries": {
+  "deliverable-only": "Produces work product; acts on nothing.",
+  "approval-gated": "May act in the client's own tools, only after a named human approves each action (gated_actions).",
+  "human-decides": "Prepares the full case; a qualified, named human makes the decisions listed in human_decides."
+ },
+ "waves": {
+  "1": "Buildable on the existing verified-evidence engine (the role may still leave decisions to a human)",
+  "2": "Needs a new skill; output is still work product",
+  "3": "Acts in the client's own tools, so needs connectors and per-action approval gates (exactly the approval-gated roles)",
+  "4": "The role's core output is a regulated decision, filing or disposition; needs a review of the rules that apply and a decision-recording workflow before it is built (always human-decides)"
+ },
+ "families": [
+  {
+   "id": "research-reporting",
+   "title": "Research and reporting",
+   "skill": "A cited research brief: every figure quoted from a source or labelled an assumption",
+   "wave": 1,
+   "roles": 5
+  },
+  {
+   "id": "consulting",
+   "title": "Consulting",
+   "skill": "A problem in, a hypothesis-driven deck out, every number traced",
+   "wave": 1,
+   "roles": 8
+  },
+  {
+   "id": "finance-modeling",
+   "title": "Finance and modeling",
+   "skill": "A spreadsheet model with every input sourced, plus a memo",
+   "wave": 1,
+   "roles": 11
+  },
+  {
+   "id": "data-analytics",
+   "title": "Data and analytics",
+   "skill": "Data in, a checked analysis out (queries, tables, charts, a written read-out)",
+   "wave": 2,
+   "roles": 7
+  },
+  {
+   "id": "accounting-operations",
+   "title": "Accounting and finance operations",
+   "skill": "Matching, reconciling and preparing entries against the client's own ledgers",
+   "wave": 3,
+   "roles": 8
+  },
+  {
+   "id": "risk-audit-controls",
+   "title": "Risk, audit and controls",
+   "skill": "Testing a process against a named framework and recording evidence for each control",
+   "wave": 2,
+   "roles": 7
+  },
+  {
+   "id": "financial-crime",
+   "title": "Financial crime",
+   "skill": "Screening and assembling case files for a human disposition",
+   "wave": 4,
+   "roles": 5
+  },
+  {
+   "id": "legal-contracts-procurement",
+   "title": "Legal, contracts and procurement",
+   "skill": "Reviewing and drafting documents against a playbook, clause by clause",
+   "wave": 2,
+   "roles": 5
+  },
+  {
+   "id": "content-communications",
+   "title": "Content and communications",
+   "skill": "Drafting on-brief copy with every factual claim sourced",
+   "wave": 2,
+   "roles": 5
+  },
+  {
+   "id": "people-hr",
+   "title": "People and HR",
+   "skill": "Coordinating and analysing people processes; people decisions stay human",
+   "wave": 2,
+   "roles": 4
+  },
+  {
+   "id": "software-it",
+   "title": "Software and IT",
+   "skill": "Code and fixes that the client's own tests verify",
+   "wave": 2,
+   "roles": 3
+  },
+  {
+   "id": "insurance",
+   "title": "Insurance",
+   "skill": "Assembling a claim or risk file for a licensed human's decision",
+   "wave": 4,
+   "roles": 2
+  },
+  {
+   "id": "sales-customer-coordination",
+   "title": "Sales, customer and coordination",
+   "skill": "Research and drafts first, approved actions in the client's tools later",
+   "wave": 3,
+   "roles": 3
+  }
+ ],
+ "roles": [
+  {
+   "id": "financial-equity-research-analyst",
+   "title": "Financial / Equity Research Analyst",
+   "family": "research-reporting",
+   "wave": 1,
+   "boundary": "human-decides",
+   "deliverables": [
+    "report",
+    "workbook"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "any rating or price target distributed to investors, by a registered research analyst"
+   ]
+  },
+  {
+   "id": "market-research-analyst",
+   "title": "Market Research Analyst",
+   "family": "research-reporting",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "brief",
+    "deck"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "policy-analyst-research-assistant",
+   "title": "Policy Analyst / Research Assistant",
+   "family": "research-reporting",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "brief",
+    "memo"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "regulatory-change-analyst",
+   "title": "Regulatory Change Analyst",
+   "family": "research-reporting",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "brief",
+    "register"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "esg-sustainability-reporting-analyst",
+   "title": "ESG / Sustainability Reporting Analyst",
+   "family": "research-reporting",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "report",
+    "workbook"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "management-consulting-analyst",
+   "title": "Management Consulting Analyst",
+   "family": "consulting",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "deck"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "business-analyst",
+   "title": "Business Analyst",
+   "family": "consulting",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "brief",
+    "deck"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "risk-advisory-associate",
+   "title": "Risk Advisory Associate",
+   "family": "consulting",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "deck",
+    "register"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "technology-consulting-analyst",
+   "title": "Technology Consulting Analyst",
+   "family": "consulting",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "deck",
+    "brief"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "regulatory-compliance-advisory-associate",
+   "title": "Regulatory / Compliance Advisory Associate",
+   "family": "consulting",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "deck",
+    "register"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "process-improvement-operations-consulting-analyst",
+   "title": "Process Improvement / Operations Consulting Analyst",
+   "family": "consulting",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "deck",
+    "workbook"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "data-and-analytics-consulting-analyst",
+   "title": "Data & Analytics Consulting Analyst",
+   "family": "consulting",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "deck",
+    "workbook"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "digital-assets-blockchain-advisory-associate",
+   "title": "Digital Assets / Blockchain Advisory Associate",
+   "family": "consulting",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "deck",
+    "brief"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "credit-analyst",
+   "title": "Credit Analyst",
+   "family": "finance-modeling",
+   "wave": 1,
+   "boundary": "human-decides",
+   "deliverables": [
+    "workbook",
+    "memo"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "whether to extend credit, and on what terms"
+   ]
+  },
+  {
+   "id": "investment-banking-analyst",
+   "title": "Investment Banking Analyst",
+   "family": "finance-modeling",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "workbook",
+    "deck"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "financial-advisory-transaction-services-analyst",
+   "title": "Financial Advisory / Transaction Services Analyst",
+   "family": "finance-modeling",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "workbook",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "fpa-analyst",
+   "title": "Financial Planning & Analysis (FP&A) Analyst",
+   "family": "finance-modeling",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "workbook",
+    "memo"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "corporate-finance-analyst",
+   "title": "Corporate Finance Analyst",
+   "family": "finance-modeling",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "workbook",
+    "memo"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "treasury-analyst",
+   "title": "Treasury Analyst",
+   "family": "finance-modeling",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "workbook",
+    "memo"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "pricing-analyst",
+   "title": "Pricing Analyst",
+   "family": "finance-modeling",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "workbook",
+    "memo"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "real-estate-analyst",
+   "title": "Real Estate Analyst",
+   "family": "finance-modeling",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "workbook",
+    "memo"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "market-risk-analyst",
+   "title": "Market Risk Analyst",
+   "family": "finance-modeling",
+   "wave": 1,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "workbook",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "model-validation-analyst",
+   "title": "Model Validation Analyst",
+   "family": "finance-modeling",
+   "wave": 1,
+   "boundary": "human-decides",
+   "deliverables": [
+    "report",
+    "workbook"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "the validation opinion, signed by a qualified validator independent of the model's owner"
+   ]
+  },
+  {
+   "id": "actuarial-analyst",
+   "title": "Actuarial Analyst",
+   "family": "finance-modeling",
+   "wave": 1,
+   "boundary": "human-decides",
+   "deliverables": [
+    "workbook",
+    "memo"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "any actuarial opinion or reserve sign-off, by a credentialed actuary"
+   ]
+  },
+  {
+   "id": "data-bi-analyst",
+   "title": "Data / BI Analyst",
+   "family": "data-analytics",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "workbook",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "sales-operations-analyst",
+   "title": "Sales Operations Analyst",
+   "family": "data-analytics",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "workbook",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "revenue-operations-analyst",
+   "title": "Revenue Operations Analyst",
+   "family": "data-analytics",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "workbook",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "product-analyst-associate-product-manager",
+   "title": "Product Analyst / Associate Product Manager",
+   "family": "data-analytics",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "report",
+    "brief"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "supply-chain-logistics-analyst",
+   "title": "Supply Chain / Logistics Analyst",
+   "family": "data-analytics",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "workbook",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "demand-planning-analyst",
+   "title": "Demand Planning Analyst",
+   "family": "data-analytics",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "workbook",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "hr-analyst-people-analytics",
+   "title": "HR Analyst (People Analytics)",
+   "family": "data-analytics",
+   "wave": 2,
+   "boundary": "human-decides",
+   "deliverables": [
+    "workbook",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "any hiring, promotion, pay or termination decision the analysis informs"
+   ]
+  },
+  {
+   "id": "staff-accountant-bookkeeper",
+   "title": "Staff Accountant / Bookkeeper",
+   "family": "accounting-operations",
+   "wave": 3,
+   "boundary": "approval-gated",
+   "deliverables": [
+    "reconciliation",
+    "workbook"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "gated_actions": [
+    "posting a journal entry to the client's ledger"
+   ]
+  },
+  {
+   "id": "accounts-payable-receivable-clerk",
+   "title": "Accounts Payable / Receivable Clerk",
+   "family": "accounting-operations",
+   "wave": 3,
+   "boundary": "approval-gated",
+   "deliverables": [
+    "reconciliation",
+    "draft"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "gated_actions": [
+    "releasing a payment that the client's authorised approver has approved (approving it stays human)",
+    "sending a collection notice"
+   ]
+  },
+  {
+   "id": "payroll-specialist",
+   "title": "Payroll Specialist",
+   "family": "accounting-operations",
+   "wave": 4,
+   "boundary": "human-decides",
+   "deliverables": [
+    "reconciliation",
+    "workbook"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "running payroll",
+    "filing payroll taxes"
+   ]
+  },
+  {
+   "id": "tax-associate",
+   "title": "Tax Associate",
+   "family": "accounting-operations",
+   "wave": 4,
+   "boundary": "human-decides",
+   "deliverables": [
+    "workbook",
+    "memo"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "signing or filing any return, by a qualified preparer"
+   ]
+  },
+  {
+   "id": "fund-accountant",
+   "title": "Fund Accountant",
+   "family": "accounting-operations",
+   "wave": 3,
+   "boundary": "approval-gated",
+   "deliverables": [
+    "reconciliation",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "gated_actions": [
+    "striking or publishing a NAV"
+   ]
+  },
+  {
+   "id": "trade-support-middle-office-analyst",
+   "title": "Trade Support / Middle Office Analyst",
+   "family": "accounting-operations",
+   "wave": 3,
+   "boundary": "approval-gated",
+   "deliverables": [
+    "reconciliation",
+    "case-file"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "gated_actions": [
+    "amending or cancelling a booked trade"
+   ]
+  },
+  {
+   "id": "operations-analyst-banking-capital-markets",
+   "title": "Operations Analyst (Banking / Capital Markets)",
+   "family": "accounting-operations",
+   "wave": 3,
+   "boundary": "approval-gated",
+   "deliverables": [
+    "reconciliation",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "gated_actions": [
+    "any change to a client account or a settlement instruction"
+   ]
+  },
+  {
+   "id": "regulatory-reporting-analyst",
+   "title": "Regulatory Reporting Analyst",
+   "family": "accounting-operations",
+   "wave": 4,
+   "boundary": "human-decides",
+   "deliverables": [
+    "report",
+    "workbook"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "submitting a return to a regulator"
+   ]
+  },
+  {
+   "id": "audit-associate-external-audit",
+   "title": "Audit Associate (External Audit)",
+   "family": "risk-audit-controls",
+   "wave": 4,
+   "boundary": "human-decides",
+   "deliverables": [
+    "workbook",
+    "register"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "any audit conclusion or opinion, by the licensed engagement team"
+   ]
+  },
+  {
+   "id": "internal-audit-associate",
+   "title": "Internal Audit Associate",
+   "family": "risk-audit-controls",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "workbook",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "operational-risk-analyst",
+   "title": "Operational Risk Analyst",
+   "family": "risk-audit-controls",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "register",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "third-party-vendor-risk-analyst",
+   "title": "Third-Party / Vendor Risk Analyst",
+   "family": "risk-audit-controls",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "register",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "information-security-grc-analyst",
+   "title": "Information Security / GRC Analyst",
+   "family": "risk-audit-controls",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "register",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "privacy-data-protection-analyst",
+   "title": "Privacy / Data Protection Analyst",
+   "family": "risk-audit-controls",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "register",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "cybersecurity-analyst-junior",
+   "title": "Cybersecurity Analyst (junior)",
+   "family": "risk-audit-controls",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "report",
+    "case-file"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "compliance-aml-kyc-analyst",
+   "title": "Compliance / AML / KYC Analyst",
+   "family": "financial-crime",
+   "wave": 4,
+   "boundary": "human-decides",
+   "deliverables": [
+    "case-file",
+    "register"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "onboarding or exiting a customer",
+    "whether to file a suspicious activity report"
+   ]
+  },
+  {
+   "id": "fraud-analyst",
+   "title": "Fraud Analyst",
+   "family": "financial-crime",
+   "wave": 4,
+   "boundary": "human-decides",
+   "deliverables": [
+    "case-file"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "the disposition of each alert or case"
+   ]
+  },
+  {
+   "id": "sanctions-screening-analyst",
+   "title": "Sanctions Screening Analyst",
+   "family": "financial-crime",
+   "wave": 4,
+   "boundary": "human-decides",
+   "deliverables": [
+    "case-file"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "clearing or escalating each potential match"
+   ]
+  },
+  {
+   "id": "financial-crime-investigator-junior",
+   "title": "Financial Crime Investigator (junior)",
+   "family": "financial-crime",
+   "wave": 4,
+   "boundary": "human-decides",
+   "deliverables": [
+    "case-file",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "any finding of wrongdoing and any regulatory filing"
+   ]
+  },
+  {
+   "id": "forensic-investigations-analyst",
+   "title": "Forensic / Investigations Analyst",
+   "family": "financial-crime",
+   "wave": 4,
+   "boundary": "human-decides",
+   "deliverables": [
+    "case-file",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "any conclusion about who did what"
+   ]
+  },
+  {
+   "id": "paralegal-contracts-administrator",
+   "title": "Paralegal / Contracts Administrator",
+   "family": "legal-contracts-procurement",
+   "wave": 2,
+   "boundary": "human-decides",
+   "deliverables": [
+    "draft",
+    "register"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "any legal advice or position, by a licensed lawyer"
+   ]
+  },
+  {
+   "id": "contract-procurement-analyst",
+   "title": "Contract / Procurement Analyst",
+   "family": "legal-contracts-procurement",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "register",
+    "memo"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "legal-operations-analyst",
+   "title": "Legal Operations Analyst",
+   "family": "legal-contracts-procurement",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "report",
+    "workbook"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "procurement-assistant",
+   "title": "Procurement Assistant",
+   "family": "legal-contracts-procurement",
+   "wave": 3,
+   "boundary": "approval-gated",
+   "deliverables": [
+    "draft",
+    "workbook"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "gated_actions": [
+    "issuing a purchase order",
+    "sending a request to a supplier"
+   ]
+  },
+  {
+   "id": "grants-administrator",
+   "title": "Grants Administrator",
+   "family": "legal-contracts-procurement",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "draft",
+    "workbook"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "content-writer-copywriter",
+   "title": "Content Writer / Copywriter",
+   "family": "content-communications",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "draft"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "seo-sem-specialist",
+   "title": "SEO / SEM Specialist",
+   "family": "content-communications",
+   "wave": 3,
+   "boundary": "approval-gated",
+   "deliverables": [
+    "report",
+    "draft"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "gated_actions": [
+    "publishing a page change",
+    "changing ad spend or bids"
+   ]
+  },
+  {
+   "id": "social-media-coordinator",
+   "title": "Social Media Coordinator",
+   "family": "content-communications",
+   "wave": 3,
+   "boundary": "approval-gated",
+   "deliverables": [
+    "draft"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "gated_actions": [
+    "publishing a post",
+    "replying in public"
+   ]
+  },
+  {
+   "id": "corporate-communications-coordinator",
+   "title": "Corporate Communications Coordinator",
+   "family": "content-communications",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "draft",
+    "brief"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "technical-writer",
+   "title": "Technical Writer",
+   "family": "content-communications",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "draft"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "recruiting-coordinator",
+   "title": "Recruiting Coordinator",
+   "family": "people-hr",
+   "wave": 3,
+   "boundary": "approval-gated",
+   "deliverables": [
+    "draft",
+    "plan"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "gated_actions": [
+    "sending a message to a candidate",
+    "booking an interview"
+   ]
+  },
+  {
+   "id": "talent-acquisition-associate",
+   "title": "Talent Acquisition Associate",
+   "family": "people-hr",
+   "wave": 4,
+   "boundary": "human-decides",
+   "deliverables": [
+    "brief",
+    "draft"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "screening a candidate in or out",
+    "any offer"
+   ]
+  },
+  {
+   "id": "compensation-and-benefits-analyst",
+   "title": "Compensation & Benefits Analyst",
+   "family": "people-hr",
+   "wave": 4,
+   "boundary": "human-decides",
+   "deliverables": [
+    "workbook",
+    "memo"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "any individual's pay or benefits decision"
+   ]
+  },
+  {
+   "id": "learning-and-development-coordinator",
+   "title": "Learning & Development Coordinator",
+   "family": "people-hr",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "plan",
+    "draft"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "junior-software-developer",
+   "title": "Junior Software Developer",
+   "family": "software-it",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "code"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "qa-test-analyst",
+   "title": "QA / Test Analyst",
+   "family": "software-it",
+   "wave": 2,
+   "boundary": "deliverable-only",
+   "deliverables": [
+    "code",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null
+  },
+  {
+   "id": "it-help-desk-technical-support-specialist",
+   "title": "IT Help Desk / Technical Support Specialist",
+   "family": "software-it",
+   "wave": 3,
+   "boundary": "approval-gated",
+   "deliverables": [
+    "draft",
+    "case-file"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "gated_actions": [
+    "changing a user's access or a system setting",
+    "replying to the user"
+   ]
+  },
+  {
+   "id": "claims-adjuster",
+   "title": "Claims Adjuster",
+   "family": "insurance",
+   "wave": 4,
+   "boundary": "human-decides",
+   "deliverables": [
+    "case-file",
+    "workbook"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "paying, settling or denying a claim, by a licensed adjuster"
+   ]
+  },
+  {
+   "id": "underwriting-assistant",
+   "title": "Underwriting Assistant",
+   "family": "insurance",
+   "wave": 4,
+   "boundary": "human-decides",
+   "deliverables": [
+    "case-file",
+    "workbook"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "human_decides": [
+    "accepting, pricing or declining a risk, by an underwriter"
+   ]
+  },
+  {
+   "id": "sales-development-representative-sdr",
+   "title": "Sales Development Representative (SDR)",
+   "family": "sales-customer-coordination",
+   "wave": 3,
+   "boundary": "approval-gated",
+   "deliverables": [
+    "brief",
+    "draft"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "gated_actions": [
+    "sending any outreach message"
+   ]
+  },
+  {
+   "id": "customer-success-associate",
+   "title": "Customer Success Associate",
+   "family": "sales-customer-coordination",
+   "wave": 3,
+   "boundary": "approval-gated",
+   "deliverables": [
+    "report",
+    "draft"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "gated_actions": [
+    "sending any message to a customer"
+   ]
+  },
+  {
+   "id": "project-program-coordinator",
+   "title": "Project / Program Coordinator",
+   "family": "sales-customer-coordination",
+   "wave": 3,
+   "boundary": "approval-gated",
+   "deliverables": [
+    "plan",
+    "report"
+   ],
+   "status": "planned",
+   "eval": null,
+   "rate_cents_per_engagement_hour": null,
+   "gated_actions": [
+    "changing a plan, owner or date in the client's tools"
+   ]
+  }
+ ]
+}

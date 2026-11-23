@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 116 worked example). Not a real company.",
+ "roles": [
+  "junior-software-developer"
+ ],
+ "requested_by": {
+  "kind": "agent",
+  "ref": "example-agent"
+ },
+ "problem": "Our customer dashboard takes 6.5 seconds to load and customers complain. We want it under 2 seconds.",
+ "answers": {
+  "common.decision": "Which fix to build first; the engineering lead decides.",
+  "common.deadline": "This sprint.",
+  "common.audience": "The engineering lead.",
+  "common.materials": "Profiling shows the database query takes 4.8 seconds. The page makes 40 separate API calls.",
+  "software-it.codebase": "Python backend, React frontend, tests run in CI.",
+  "software-it.done": "The dashboard loads fast enough, with tests passing."
+ }
+}

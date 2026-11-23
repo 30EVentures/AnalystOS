@@ -1,0 +1,20 @@
+{
+ "note": "A synthetic client (Slice 115 mock). Not a real company.",
+ "roles": [
+  "management-consulting-analyst"
+ ],
+ "requested_by": {
+  "kind": "agent",
+  "ref": "mock-coo-assistant"
+ },
+ "problem": "We are an online home-goods retailer with our own warehouse. On-time shipping fell from 96% to 88% this year as orders grew from 4,000 to 6,500 a day. We need to decide whether to hire more pickers or invest in automation.",
+ "answers": {
+  "common.decision": "Hire or automate; the COO decides at the end of the quarter.",
+  "common.deadline": "A recommendation in four weeks.",
+  "common.audience": "The COO and the finance lead.",
+  "common.materials": "We have 40 pickers. Each picker handles about 120 orders a day on average. A picker costs $52,000 a year fully loaded. A vendor quoted $1.8 million for a goods-to-person system that roughly doubles picks per worker.",
+  "consulting.current-state": "We already run two shifts. Peak season is November and December, when orders reach 9,000 a day.",
+  "consulting.success": "On-time shipping back above 95% through next peak.",
+  "consulting.constraints": "No new building; the system must fit in the current warehouse."
+ }
+}

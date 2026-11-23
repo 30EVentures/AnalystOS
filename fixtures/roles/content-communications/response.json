@@ -1,0 +1,187 @@
+{
+ "answer": "Make practical how-to pieces the core of the newsletter: they open at [F4] against [F2] overall, which would mean about [F7] readers per issue instead of [F6].",
+ "exec_summary": [
+  "Open rates fell by [F5] this year.",
+  "How-to issues open at [F4], well above today's [F2].",
+  "Across [F3] subscribers, that is the difference between about [F6] and [F7] readers."
+ ],
+ "situation": "A business newsletter sent regularly to small business owners.",
+ "complication": "Fewer readers open each issue, and the reason is not yet clear.",
+ "key_question": "What should the newsletter cover to win back its readers?",
+ "titles": {
+  "situation": "A loyal list is opening fewer issues than before.",
+  "options": "Two content directions for the next quarter.",
+  "recommendation": "Lead every issue with practical how-to content.",
+  "roadmap": "Change the mix now and measure opens issue by issue.",
+  "kpis": "Two measures show whether readers are coming back.",
+  "risks": "Readers may tire of one format if it is repeated too often."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Open rate, last year",
+   "value": 38,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "open rate fell from 38%"
+  },
+  {
+   "id": "F2",
+   "label": "Open rate, now",
+   "value": 24,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "to 24% this year"
+  },
+  {
+   "id": "F3",
+   "label": "Subscribers",
+   "value": 12000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We send to 12,000 subscribers"
+  },
+  {
+   "id": "F4",
+   "label": "Open rate of how-to issues",
+   "value": 41,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "had a 41% open rate"
+  },
+  {
+   "id": "F5",
+   "label": "Fall in open rate",
+   "value": 14,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Readers per issue now",
+   "value": 2880,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F3",
+    "F2"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Readers per issue at the how-to rate",
+   "value": 4920,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F3",
+    "F4"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "What readers respond to",
+   "finding": "Practical how-to content outperforms everything else.",
+   "points": [
+    "How-to issues opened at [F4]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Readers want practical help more than company news.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "The content mix, not the list, is the lever.",
+   "chart": {
+    "title": "How-to issues open far more often than the average issue.",
+    "figure_ids": [
+     "F2",
+     "F4"
+    ],
+    "labels": [
+     "All issues now",
+     "How-to issues"
+    ]
+   }
+  },
+  {
+   "branch": "How much is at stake",
+   "finding": "The fall in opens costs many readers on every issue.",
+   "points": [
+    "About [F6] readers open today.",
+    "At the how-to rate it would be about [F7]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Subject lines, not content, caused the fall.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Even a partial recovery reaches far more customers per issue."
+  }
+ ],
+ "options": [
+  {
+   "name": "How-to first",
+   "description": "Lead every issue with one practical how-to piece and keep news short.",
+   "effort": "low"
+  },
+  {
+   "name": "Redesign and rebrand",
+   "description": "Launch a new design and name for the newsletter.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "How-to first",
+  "rationale": "It builds on the only content already opening at [F4] and needs no redesign."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Plan the next issues around one how-to piece each."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Test subject lines on the how-to pieces."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Review opens against the [F1] the newsletter had before."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Open rate",
+   "target": "Back toward [F1]"
+  },
+  {
+   "name": "Readers per issue",
+   "target": "Above today's [F6]"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Readers tire of one format.",
+   "mitigation": "Vary the how-to topics and formats."
+  },
+  {
+   "risk": "A factual claim in an issue is wrong.",
+   "mitigation": "Check every claim against the client's own material before sending."
+  }
+ ]
+}

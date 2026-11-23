@@ -1,0 +1,186 @@
+{
+ "answer": "Fund a small Denver test: about [F4] households own a dog, and even a [F5] premium share would be a market of about [F7] a month.",
+ "exec_summary": [
+  "Denver has about [F1] households, and [F2] of them own a dog.",
+  "If [F5] of dog-owning households bought premium food direct, that is about [F6] households.",
+  "At today's average spend of [F3] a month, that market is worth about [F7] a month."
+ ],
+ "situation": "A premium dog-food maker selling through pet stores, with no direct channel yet.",
+ "complication": "Direct demand in Denver has never been measured, and the premium share is an assumption.",
+ "key_question": "Is there enough demand in Denver to justify testing a direct subscription?",
+ "titles": {
+  "situation": "A store-based brand is weighing its first direct channel.",
+  "options": "Two ways to learn whether Denver demand is real.",
+  "recommendation": "Run a small paid test before building a full direct channel.",
+  "roadmap": "Learn fast, then decide whether to expand the test.",
+  "kpis": "Two measures decide whether the test succeeded.",
+  "risks": "Store partners and a weak response are the main risks."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Households in metro Denver",
+   "value": 1200000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "about 1,200,000 households"
+  },
+  {
+   "id": "F2",
+   "label": "Households that own a dog",
+   "value": 38,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "38% of households own a dog"
+  },
+  {
+   "id": "F3",
+   "label": "Average monthly spend per customer",
+   "value": 65,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "spend on average $65 a month"
+  },
+  {
+   "id": "F4",
+   "label": "Dog-owning households in metro Denver",
+   "value": 456000,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F5",
+   "label": "Dog owners who would buy premium food direct",
+   "value": 5,
+   "unit": "percent",
+   "basis": "assumption",
+   "rationale": "A planning share for direct premium buyers; the test replaces it with a measured rate."
+  },
+  {
+   "id": "F6",
+   "label": "Potential direct premium households",
+   "value": 22800,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F4",
+    "F5"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Potential monthly market",
+   "value": 1482000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F6",
+    "F3"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "How big the market is",
+   "finding": "The dog-owning market in Denver is large on its own.",
+   "points": [
+    "About [F4] Denver households own a dog."
+   ],
+   "hypotheses": [
+    {
+     "text": "The Denver market is large enough to matter.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "Market size is not the constraint; the premium share is.",
+   "chart": {
+    "title": "Most dog owners may never buy premium food direct.",
+    "figure_ids": [
+     "F4",
+     "F6"
+    ],
+    "labels": [
+     "Dog households",
+     "Premium buyers, assumed"
+    ]
+   }
+  },
+  {
+   "branch": "Who would buy direct",
+   "finding": "The share that would buy premium food direct is unknown.",
+   "points": [
+    "The plan assumes [F5] of dog owners, which only a test can confirm."
+   ],
+   "hypotheses": [
+    {
+     "text": "Enough owners would switch to a direct subscription.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "A small test is the cheapest way to replace the assumption with a measured rate."
+  }
+ ],
+ "options": [
+  {
+   "name": "Paid local test",
+   "description": "Run targeted ads and a sign-up page in Denver for a short period.",
+   "effort": "low"
+  },
+  {
+   "name": "Full direct launch",
+   "description": "Build delivery and a subscription shop for all of Denver now.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Paid local test",
+  "rationale": "It measures the one number the case depends on before any large spend."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Launch a sign-up page and targeted ads in Denver."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Measure sign-ups against the assumed share."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Decide whether to expand, change or stop."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Sign-up rate among dog owners reached",
+   "target": "Measured against the assumed [F5]"
+  },
+  {
+   "name": "Average monthly order",
+   "target": "Close to today's [F3]"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Store partners object to a direct channel.",
+   "mitigation": "Tell them first and price above store prices."
+  },
+  {
+   "risk": "Ads reach the wrong audience.",
+   "mitigation": "Target by neighbourhood and review weekly."
+  }
+ ]
+}

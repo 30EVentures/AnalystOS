@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hire an AnalystOS role</title>
+<meta name="description" content="Describe a business problem, pick one of 73 entry-level roles, and get a verified deck in which every number is traced to your own words, a stated calculation or a labelled assumption.">
+<link rel="canonical" href="https://analyst-os-phi.vercel.app/hire.html">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%232F5CE0%22>▸</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --paper:#F3F4F7; --surface:#FBFBFD; --raised:#FFFFFF;
+  --ink:#10151F; --graphite:#565E6B; --faint:#8A93A1;
+  --hairline:#D9DCE3; --hairline-strong:#C3C8D2;
+  --institutional:#1B3A6B; --signal:#2F5CE0; --signal-ink:#22326b;
+  --amber:#A9631A; --amber-ink:#8a5115; --good:#1C7A57;
+  --font-display:"Newsreader",Georgia,"Times New Roman",serif;
+  --font-sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --measure:62ch; --pad:clamp(1.25rem,5vw,4rem);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0B0F16; --surface:#121824; --raised:#161D2B;
+  --ink:#E9ECF2; --graphite:#9AA4B4; --faint:#6C7787;
+  --hairline:#25303F; --hairline-strong:#33404F;
+  --institutional:#A8C1EA; --signal:#7297FF; --signal-ink:#b9caff;
+  --amber:#D79A5C; --amber-ink:#E4B27E; --good:#57C79E;
+}}
+:root[data-theme="dark"]{
+  --paper:#0B0F16; --surface:#121824; --raised:#161D2B;
+  --ink:#E9ECF2; --graphite:#9AA4B4; --faint:#6C7787;
+  --hairline:#25303F; --hairline-strong:#33404F;
+  --institutional:#A8C1EA; --signal:#7297FF; --signal-ink:#b9caff;
+  --amber:#D79A5C; --amber-ink:#E4B27E; --good:#57C79E;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--font-sans);font-size:1.05rem;line-height:1.6;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+h1,h2{font-family:var(--font-display);font-weight:500;text-wrap:balance;line-height:1.15;margin:0}
+p{margin:0}
+a{color:var(--signal);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--signal) 35%,transparent)}
+a:hover{border-bottom-color:var(--signal)}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--signal);outline-offset:2px;border-radius:2px}
+.mono{font-family:var(--font-mono)}
+.wrap{max-width:48rem;margin:0 auto;padding:0 var(--pad)}
+.eyebrow{font-family:var(--font-mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+
+header.top{border-bottom:1px solid var(--hairline);position:sticky;top:0;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);z-index:10}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:1.1rem var(--pad);max-width:48rem;margin:0 auto}
+.wordmark{font-family:var(--font-sans);font-weight:600;font-size:1.15rem;letter-spacing:-.01em;display:inline-flex;align-items:baseline;gap:.12em;color:var(--ink);border-bottom:none}
+.wordmark .os{font-family:var(--font-mono);font-weight:500;font-size:.78em;border:1px solid var(--hairline-strong);border-radius:3px;padding:0 .28em;color:var(--signal-ink)}
+.caret{color:var(--signal)}
+.btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:8px;padding:.6rem 1.15rem;font-size:.92rem;font-weight:600;border:1px solid var(--signal);background:var(--signal);color:#fff;border-bottom:none;cursor:pointer}
+.btn:hover{filter:brightness(1.06)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--hairline-strong)}
+.btn:disabled{opacity:.55;cursor:not-allowed;filter:none}
+.btn.small{padding:.45rem .85rem;font-size:.82rem}
+
+main{padding:clamp(2.5rem,6vw,4rem) 0 5rem}
+.page-head{margin-bottom:2.2rem}
+.page-head h1{font-size:clamp(1.9rem,4.5vw,2.5rem);margin:.6rem 0 .8rem}
+.page-head p{color:var(--graphite);max-width:52ch;line-height:1.6}
+
+.form-card{border:1px solid var(--hairline);border-radius:12px;background:var(--surface);padding:1.8rem 1.6rem}
+.field{margin-bottom:1.3rem}
+.field:last-of-type{margin-bottom:0}
+.field label{display:block;font-family:var(--font-mono);font-size:.78rem;letter-spacing:.03em;color:var(--graphite);margin-bottom:.45rem}
+.field .hint{font-family:var(--font-mono);font-size:.74rem;color:var(--faint);margin-top:.5rem;line-height:1.6}
+input[type=file],input[type=text],input[type=password],select,textarea{
+  width:100%;font-family:var(--font-mono);font-size:.88rem;
+  padding:.6rem .7rem;border:1px solid var(--hairline-strong);border-radius:8px;
+  background:var(--raised);color:var(--ink);
+}
+textarea{min-height:6rem;resize:vertical;line-height:1.5}
+.file-row{display:flex;gap:.8rem;align-items:flex-start;flex-wrap:wrap}
+.file-row input[type=file]{flex:1 1 14rem}
+.checkbox-label{display:flex!important;align-items:center;gap:.55rem;font-family:var(--font-sans)!important;font-size:.95rem!important;color:var(--ink)!important;letter-spacing:normal!important;text-transform:none!important;font-weight:600;cursor:pointer}
+.checkbox-label input[type=checkbox]{width:auto;margin:0}
+.submit-row{margin-top:1.6rem;display:flex;align-items:center;gap:1rem}
+#status,#detect-status{font-family:var(--font-mono);font-size:.82rem;color:var(--faint)}
+
+#error,#detect-error{
+  margin-top:1.4rem;border:1px solid color-mix(in srgb,var(--amber) 45%,var(--hairline-strong));
+  border-radius:8px;padding:.9rem 1.1rem;background:color-mix(in srgb,var(--amber) 8%,var(--surface));
+  color:var(--amber-ink);font-size:.92rem;line-height:1.5;
+}
+#pdf-warning{
+  margin-top:.9rem;border:1px solid color-mix(in srgb,var(--amber) 45%,var(--hairline-strong));
+  border-radius:8px;padding:.8rem 1rem;background:color-mix(in srgb,var(--amber) 8%,var(--surface));
+  color:var(--amber-ink);font-size:.86rem;line-height:1.5;
+}
+#preview-wrap{margin-top:.9rem;overflow-x:auto;border:1px solid var(--hairline);border-radius:8px}
+#preview-table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:.8rem}
+#preview-table th,#preview-table td{padding:.5rem .7rem;text-align:left;border-bottom:1px solid var(--hairline);white-space:nowrap}
+#preview-table thead th{color:var(--graphite);background:var(--raised);font-weight:600}
+#preview-note{font-family:var(--font-mono);font-size:.74rem;color:var(--faint);margin-top:.5rem}
+
+#result{margin-top:2.2rem}
+.result-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:.9rem}
+.result-head h2{font-size:1.15rem;margin:0}
+#report-frame{width:100%;min-height:70vh;border:1px solid var(--hairline);border-radius:12px;background:#fff}
+
+[hidden]{display:none!important}
+
+footer{border-top:1px solid var(--hairline);padding:2rem 0 3rem;margin-top:2rem}
+footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);line-height:1.7;max-width:60ch}
+/* studio:css:start */
+.studio-bar{background:#030508;color:#e8f4ff;font:500 13px/1 system-ui,-apple-system,'Segoe UI',sans-serif;border-bottom:1px solid #16202c}
+.studio-in{max-width:1100px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:18px}
+.studio-brand{display:flex;align-items:center;gap:9px;color:#e8f4ff;text-decoration:none;font-weight:700;letter-spacing:.14em}
+.studio-mark{width:16px;height:16px;flex:none}
+.studio-sub{margin-left:.6em;font-weight:400;font-size:.85em;letter-spacing:.3em;color:#7d8fa3}
+.studio-line{color:#7d8fa3}
+.studio-links{margin-left:auto;display:flex;gap:16px}
+.studio-links a{color:#e8f4ff;text-decoration:none;opacity:.85}
+.studio-links a:hover,.studio-links a:focus-visible{opacity:1;text-decoration:underline}
+.studio-foot{margin:14px 0 0;font-size:.85rem;opacity:.9}
+.studio-foot a{color:inherit;text-decoration:underline}
+@media (max-width:640px){.studio-line,.studio-sub{display:none}.studio-in{padding:9px 14px;gap:12px}.studio-links{gap:12px}}
+@media print{.studio-bar{display:none}}
+/* studio:css:end */
+
+.roles-note{font-size:.88rem;color:var(--graphite);margin:.4rem 0 0}
+.role-meta{font-size:.85rem;color:var(--graphite);border-left:3px solid var(--hairline-strong);padding:.4rem .8rem;margin:.8rem 0 0}
+.q{margin-top:1rem}
+.q label{display:block;font-weight:600;font-size:.92rem;margin-bottom:.35rem}
+.q .opt{font-weight:400;color:var(--faint);font-size:.82rem}
+.result{margin-top:1.2rem;font-size:.95rem}
+.result.err{color:var(--amber-ink)}
+.result.ok{color:var(--good)}
+</style>
+</head>
+<body>
+<!-- studio:bar:start -->
+<div class="studio-bar" role="navigation" aria-label="30E Ventures"><div class="studio-in"><a class="studio-brand" href="https://30eventures.com"><svg class="studio-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="3" height="18" fill="#f2f6fa"/><rect x="6" y="3" width="15" height="3" fill="#f2f6fa"/><rect x="6" y="10.5" width="10" height="3" fill="#f2f6fa"/><rect x="6" y="18" width="15" height="3" fill="#2fd4ff"/></svg><span>30E<span class="studio-sub">VENTURES</span></span></a><span class="studio-line">AnalystOS is a 30E Ventures product</span><span class="studio-links"><a href="https://30eventures.com/portfolio">Portfolio</a><a href="https://30eventures.com/about">About</a><a href="https://30eventures.com/press">Press</a></span></div></div>
+<!-- studio:bar:end -->
+
+<header class="top">
+  <div class="topbar">
+    <a class="wordmark" href="index.html">Analyst<span class="os">OS</span><span class="caret">▸</span></a>
+    <a class="btn ghost" href="index.html">← Back to site</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <h1>Hire an AnalystOS role</h1>
+    <p class="lede">Describe the problem, pick the role, answer a few scoping questions, and get back a deck. Every number in it is printed from a figure traced to your own words, a stated calculation, or a labelled assumption.</p>
+    <p class="roles-note" id="roles-note">Loading roles…</p>
+
+    <form id="hire-form" class="form-card" autocomplete="off">
+      <div class="q">
+        <label for="role">Role</label>
+        <select id="role" required></select>
+        <div class="role-meta" id="role-meta"></div>
+      </div>
+      <div class="q">
+        <label for="problem">The problem, in your own words</label>
+        <textarea id="problem" required maxlength="8000" placeholder="What is happening, with the numbers you have."></textarea>
+      </div>
+      <div id="questions"></div>
+      <div class="q">
+        <label for="code">Access code</label>
+        <input type="password" id="code" required>
+      </div>
+      <p class="fine">Price: to be determined. Nothing is charged on this page. Today every role delivers a verified analysis deck, not its native work product. Roles marked "tested on worked examples" have not yet been tested on the live model.</p>
+      <button class="btn" type="submit" id="go">Get the deck</button>
+      <div class="result" id="result" role="status" aria-live="polite"></div>
+    </form>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="fine">This page is a private preview gated by a shared access code. Your problem and answers are used for one request and are not stored. Each request that passes the scoping check makes one paid model call.</p>
+  <!-- studio:footer:start -->
+<p class="studio-foot">AnalystOS is built by <a href="https://30eventures.com">30E Ventures</a>, a machine-native venture studio in Toronto building the agentic internet. <a href="https://30eventures.com/portfolio">Portfolio</a> &middot; <a href="https://30eventures.com/about">About</a> &middot; <a href="https://30eventures.com/brand">Brand</a> &middot; <a href="https://30eventures.com/press">Press</a> &middot; <a href="https://30eventures.com/contact">Contact</a></p>
+<!-- studio:footer:end -->
+  </div>
+</footer>
+
+<script>
+(function () {
+  var roles = [], families = {};
+  var roleSel = document.getElementById('role'), meta = document.getElementById('role-meta');
+  var qBox = document.getElementById('questions'), result = document.getElementById('result');
+  function el(tag, attrs, text) {
+    var e = document.createElement(tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+  function describe(role) {
+    var parts = [];
+    if (role.boundary === 'human-decides') parts.push('Prepares the decision; a qualified person decides: ' + role.human_decides.join('; ') + '.');
+    else if (role.boundary === 'approval-gated') parts.push('Drafts only; you approve before anything happens: ' + role.gated_actions.join('; ') + '.');
+    else parts.push('Delivers analysis; acts on nothing.');
+    parts.push(role.tested === 'live' ? 'Tested on the live model.' : 'Tested on worked examples, not yet on the live model.');
+    meta.textContent = parts.join(' ');
+  }
+  function showQuestions(role) {
+    qBox.textContent = '';
+    role.questions.forEach(function (q) {
+      var wrap = el('div', {'class': 'q'});
+      var label = el('label', {'for': 'q-' + q.id}, q.text + ' ');
+      if (!q.required) label.appendChild(el('span', {'class': 'opt'}, '(optional)'));
+      var box = el('textarea', {'id': 'q-' + q.id, 'data-qid': q.id, 'maxlength': '4000'});
+      if (q.required) box.required = true;
+      wrap.appendChild(label); wrap.appendChild(box); qBox.appendChild(wrap);
+    });
+  }
+  fetch('/api/v2/catalog').then(function (r) { return r.json(); }).then(function (cat) {
+    roles = cat.roles; cat.families.forEach(function (f) { families[f.id] = f.title; });
+    var groups = {};
+    roles.forEach(function (r) { (groups[r.family] = groups[r.family] || []).push(r); });
+    Object.keys(groups).forEach(function (fid) {
+      var og = el('optgroup', {'label': families[fid] || fid});
+      groups[fid].forEach(function (r) { og.appendChild(el('option', {'value': r.id}, r.title)); });
+      roleSel.appendChild(og);
+    });
+    document.getElementById('roles-note').textContent = roles.length + ' roles. ' + cat.pricing;
+    var start = new URLSearchParams(location.search).get('role');
+    if (start && roles.some(function (r) { return r.id === start; })) roleSel.value = start;
+    roleSel.dispatchEvent(new Event('change'));
+  }).catch(function () { document.getElementById('roles-note').textContent = 'Could not load the roles. Please try again shortly.'; });
+  roleSel.addEventListener('change', function () {
+    var role = roles.find(function (r) { return r.id === roleSel.value; });
+    if (role) { describe(role); showQuestions(role); }
+  });
+  document.getElementById('hire-form').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var answers = {};
+    qBox.querySelectorAll('textarea').forEach(function (t) { if (t.value.trim()) answers[t.getAttribute('data-qid')] = t.value; });
+    var go = document.getElementById('go');
+    go.disabled = true; result.className = 'result'; result.textContent = 'Working on it. This usually takes a minute or two.';
+    fetch('/api/v2/engagements', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'X-Access-Code': document.getElementById('code').value},
+      body: JSON.stringify({role: roleSel.value, problem: document.getElementById('problem').value, answers: answers,
+                            requested_by: {kind: 'person', ref: 'hire-page'}})
+    }).then(function (r) {
+      if (r.ok) return r.blob().then(function (b) {
+        var a = el('a', {'href': URL.createObjectURL(b), 'download': 'analystos-' + roleSel.value + '.pptx'}, 'Download the deck');
+        result.className = 'result ok'; result.textContent = 'Done. '; result.appendChild(a);
+      });
+      return r.json().then(function (j) {
+        var e = j.error || {}, msg = e.message || 'Something went wrong.';
+        if (e.open_questions && e.open_questions.length) msg += ' Still to answer: ' + e.open_questions.join(', ') + '.';
+        result.className = 'result err'; result.textContent = msg;
+      });
+    }).catch(function () { result.className = 'result err'; result.textContent = 'The request did not complete. Please try again.'; })
+      .finally(function () { go.disabled = false; });
+  });
+})();
+</script>
+</body>
+</html>

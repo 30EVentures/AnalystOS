@@ -78,6 +78,7 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from analystos.api_v1 import register as register_api_v1  # noqa: E402
+from analystos.api_v2 import register as register_api_v2  # noqa: E402
 from analystos.l1.detect import SUPPORTED_EXTENSIONS, extract_any  # noqa: E402
 from analystos.l1.guard import upload_name  # noqa: E402
 from analystos.l4.export import render_html  # noqa: E402
@@ -336,3 +337,5 @@ def _seal_or_none(trace):
 
 # Slice 61: the agent-callable /api/v1 routes share this app and its limiter.
 register_api_v1(app, rate_limit=_rate_limit_denied)
+# Slice 118: hire a catalog role. Same limiter, same access code as /api/analyze.
+register_api_v2(app, rate_limit=_rate_limit_denied, access_denied=_access_denied)

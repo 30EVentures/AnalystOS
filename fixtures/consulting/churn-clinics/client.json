@@ -1,0 +1,15 @@
+{
+ "note": "A synthetic client (Slice 112 mock). Not a real company.",
+ "roles": ["management-consulting-analyst"],
+ "requested_by": {"kind": "person", "ref": "mock-client"},
+ "problem": "We are a B2B SaaS company selling scheduling software to mid-sized clinics. Our monthly logo churn went from 4% to 7% in two quarters and we don't know why. Net revenue retention fell from 104% to 96% over the same period.",
+ "answers": {
+  "common.decision": "Whether next year's budget goes into a retention program or into new sales. The CEO decides at the board meeting.",
+  "common.deadline": "Board meeting in five weeks; a draft in three weeks.",
+  "common.audience": "The CEO and the board. They want the answer first and the few numbers that matter.",
+  "common.materials": "We have 850 customers paying on average $1,200 per month. 60% of churned accounts cited switching to a cheaper tool in exit surveys. Support tickets per account doubled after the March release.",
+  "consulting.current-state": "We added a discount offer at cancellation in Q2; the save rate is 15% of cancellation requests. Onboarding is fully self-serve. Churn is concentrated in clinics with fewer than 10 staff, which are 70% of churned logos.",
+  "consulting.success": "Get monthly churn back to 4% within two quarters without cutting list price.",
+  "consulting.constraints": "No more than two new hires, and engineering is committed through Q1."
+ }
+}

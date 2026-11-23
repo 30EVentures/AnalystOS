@@ -123,3 +123,10 @@ spec folder must appear below, and every slice without one must be marked.
 | 109 | engagement intake: a problem in, a scoped engagement out | [spec](slice-109/spec.md) |
 | 110 | close the engagement gate's bypasses (review of Slice 109) | [spec](slice-110/spec.md) |
 | 111 | the homepage's test and spec figures say what they actually count | [spec](slice-111/spec.md) |
+| 112 | the consulting skill: a scoped engagement in, a verified deck spec out | [spec](slice-112/spec.md) |
+| 113 | the deck renderer: a verified deck spec in, a PowerPoint file out | [spec](slice-113/spec.md) |
+| 114 | charts and a "so what" on every finding | [spec](slice-114/spec.md) |
+| 115 | make "every number is traced" true (review of Slices 112-114) | [spec](slice-115/spec.md) |
+| 116 | code writes every number; the model only points at figures | [spec](slice-116/spec.md) |
+| 117 | every role on the verified pipeline, each family with a worked example | [spec](slice-117/spec.md) |
+| 118 | the website: hire any of the 73 roles | [spec](slice-118/spec.md) |

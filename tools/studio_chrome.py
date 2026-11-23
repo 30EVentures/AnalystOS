@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PAGES = [ROOT / "site" / "index.html", ROOT / "site" / "upload.html"]
+PAGES = [ROOT / "site" / "index.html", ROOT / "site" / "upload.html", ROOT / "site" / "hire.html"]
 
 STUDIO = "https://30eventures.com"
 PRODUCT = "AnalystOS"

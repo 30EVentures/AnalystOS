@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 116 worked example). Not a real company.",
+ "roles": [
+  "internal-audit-associate"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We want an internal audit of employee expense claims. Last year we paid 4,800 claims and we suspect approvals are weak.",
+ "answers": {
+  "common.decision": "Whether to tighten the expense policy; the CFO decides.",
+  "common.deadline": "Report in three weeks.",
+  "common.audience": "The CFO and the audit committee.",
+  "common.materials": "In a sample of 120 claims, 18 had no manager approval and 6 exceeded the policy limit.",
+  "risk-audit-controls.framework": "Our internal expense policy.",
+  "risk-audit-controls.scope": "All expense claims paid last year."
+ }
+}

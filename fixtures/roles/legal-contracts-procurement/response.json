@@ -1,0 +1,200 @@
+{
+ "answer": "Renegotiate rather than switch this year: the competitor saves [F5] a year, but migration costs [F4], so use the quote as leverage.",
+ "exec_summary": [
+  "The renewal costs [F1] a year against a competitor quote of [F2].",
+  "Switching saves [F5] a year but costs [F4] to migrate.",
+  "The contract's [F3] increase would lift next year to [F8]."
+ ],
+ "situation": "A company renewing its cloud hosting contract next month.",
+ "complication": "A cheaper competitor quote exists, but switching has a one-time cost.",
+ "key_question": "Should the company renegotiate its hosting contract or switch providers?",
+ "titles": {
+  "situation": "A renewal is due with a cheaper alternative on the table.",
+  "options": "Two ways to lower hosting costs at renewal.",
+  "recommendation": "Use the competitor quote to renegotiate before switching.",
+  "roadmap": "Negotiate now, and keep switching ready if talks fail.",
+  "kpis": "Two measures show whether the negotiation worked.",
+  "risks": "Talks could fail late, leaving little time to switch."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Renewal price per year",
+   "value": 240000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "renews next month at $240,000 a year"
+  },
+  {
+   "id": "F2",
+   "label": "Competitor quote per year",
+   "value": 198000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "A competitor quoted $198,000 a year"
+  },
+  {
+   "id": "F3",
+   "label": "Annual price increase allowed",
+   "value": 5,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "allows a 5% annual price increase"
+  },
+  {
+   "id": "F4",
+   "label": "One-time migration cost",
+   "value": 60000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Migration would cost about $60,000 one time"
+  },
+  {
+   "id": "F5",
+   "label": "Annual saving from switching",
+   "value": 42000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Extra cost of switching in the first year",
+   "value": 18000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F4",
+    "F5"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Next year's increase",
+   "value": 12000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F1",
+    "F3"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Next year's price if nothing changes",
+   "value": 252000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "sum",
+   "inputs": [
+    "F1",
+    "F7"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "What switching would save",
+   "finding": "Switching saves money every year but costs more in the first.",
+   "points": [
+    "The annual saving is [F5].",
+    "After migration, the first year costs [F6] more than staying."
+   ],
+   "hypotheses": [
+    {
+     "text": "Switching pays back within the first year.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "Switching only pays off over several years.",
+   "chart": {
+    "title": "The competitor is cheaper than the renewal price.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "Renewal",
+     "Competitor"
+    ]
+   }
+  },
+  {
+   "branch": "What the contract allows",
+   "finding": "The contract's price increase makes staying dearer each year.",
+   "points": [
+    "Prices may rise [F3] a year.",
+    "That would take next year to [F8]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The current provider will match the competitor.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Removing the increase is as valuable as a lower starting price."
+  }
+ ],
+ "options": [
+  {
+   "name": "Renegotiate with the quote",
+   "description": "Ask the current provider to match the competitor and drop the annual increase.",
+   "effort": "low"
+  },
+  {
+   "name": "Switch providers",
+   "description": "Move to the competitor and pay for migration.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Renegotiate with the quote",
+  "rationale": "It can capture much of the [F5] saving without the [F4] migration cost; general counsel reviews any contract change."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Send the current provider the competitor quote and target terms."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Agree revised terms for general counsel to review."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "If talks fail, begin a migration plan for the next renewal."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Annual hosting price",
+   "target": "Closer to the competitor's [F2]"
+  },
+  {
+   "name": "Annual price increase",
+   "target": "Removed or below today's [F3]"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The provider refuses to move.",
+   "mitigation": "Keep the competitor offer valid until talks close."
+  },
+  {
+   "risk": "The renewal date passes during talks.",
+   "mitigation": "Agree a short extension in writing."
+  }
+ ]
+}

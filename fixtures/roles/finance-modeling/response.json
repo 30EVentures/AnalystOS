@@ -1,0 +1,235 @@
+{
+ "answer": "The overrun is a contractor problem: of the [F7] over budget, [F8] came from contractors, so manage that line rather than cutting across the board.",
+ "exec_summary": [
+  "Operating expenses were [F1] against a budget of [F2].",
+  "Contractors explain about [F10] of the overrun.",
+  "Travel came in [F9] under budget, and headcount matched budget."
+ ],
+ "situation": "A company reporting quarterly operating expenses against an approved budget.",
+ "complication": "Spending ran [F7] over budget, and the board wants to know why and what happens next.",
+ "key_question": "What caused the overrun, and what should next quarter's spending plan be?",
+ "titles": {
+  "situation": "One quarter ran over budget, and the board wants an explanation.",
+  "options": "Two ways to bring next quarter back toward budget.",
+  "recommendation": "Manage contractor spend directly instead of cutting every line.",
+  "roadmap": "Bring contractor spend under control within the quarter.",
+  "kpis": "Two measures show whether spending is back on plan.",
+  "risks": "Cutting contractors too fast could delay the migration project."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Operating expenses this quarter",
+   "value": 2400000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "operating expenses were $2.4 million"
+  },
+  {
+   "id": "F2",
+   "label": "Operating budget this quarter",
+   "value": 2100000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "against a budget of $2.1 million"
+  },
+  {
+   "id": "F3",
+   "label": "Contractor spend",
+   "value": 600000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Contractor spend was $600,000"
+  },
+  {
+   "id": "F4",
+   "label": "Contractor plan",
+   "value": 350000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "against a plan of $350,000"
+  },
+  {
+   "id": "F5",
+   "label": "Travel spend",
+   "value": 180000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Travel was $180,000"
+  },
+  {
+   "id": "F6",
+   "label": "Travel budget",
+   "value": 200000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "against $200,000"
+  },
+  {
+   "id": "F7",
+   "label": "Total overrun",
+   "value": 300000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Contractor overrun",
+   "value": 250000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F3",
+    "F4"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Travel under budget",
+   "value": 20000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F6",
+    "F5"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Contractors' share of the overrun",
+   "value": 83.3,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F8",
+    "F7"
+   ]
+  },
+  {
+   "id": "F11",
+   "label": "Contractor spend next quarter",
+   "value": 450000,
+   "unit": "usd",
+   "basis": "assumption",
+   "rationale": "Assumes the contractor ramp-down already planned for the migration project; confirm with project owners."
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Where the overrun came from",
+   "finding": "Contractor spend explains almost all of the overrun.",
+   "points": [
+    "Contractors ran [F8] over their plan.",
+    "That is about [F10] of the total overrun."
+   ],
+   "hypotheses": [
+    {
+     "text": "A single cost line drives the overrun.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "The fix belongs to whoever owns contractor spend.",
+   "chart": {
+    "title": "Contractor spend far exceeded its plan.",
+    "figure_ids": [
+     "F4",
+     "F3"
+    ],
+    "labels": [
+     "Plan",
+     "Actual"
+    ]
+   }
+  },
+  {
+   "branch": "What the rest of the budget shows",
+   "finding": "Other lines are on or under budget, so broad cuts are not needed.",
+   "points": [
+    "Travel was [F9] under budget.",
+    "Headcount costs matched budget."
+   ],
+   "hypotheses": [
+    {
+     "text": "Spending is drifting up across every line.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "Across-the-board cuts would punish lines that are already on plan.",
+   "chart": {
+    "title": "Travel came in under its budget.",
+    "figure_ids": [
+     "F6",
+     "F5"
+    ],
+    "labels": [
+     "Budget",
+     "Actual"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Targeted contractor plan",
+   "description": "Set a contractor budget with the project owners and review it monthly.",
+   "effort": "low"
+  },
+  {
+   "name": "Across-the-board cut",
+   "description": "Cut every discretionary line by the same share.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Targeted contractor plan",
+  "rationale": "It addresses the line behind [F8] of the overrun without cutting lines that are on plan."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Agree a contractor budget with project owners."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Review contractor spend monthly against it."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Forecast next quarter with contractor spend near [F11]."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Contractor spend against plan",
+   "target": "At or below the agreed plan each month"
+  },
+  {
+   "name": "Total operating expenses",
+   "target": "Back within budget next quarter"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Contractor cuts delay the migration project.",
+   "mitigation": "Agree the ramp-down with project owners first."
+  },
+  {
+   "risk": "The forecast assumption is wrong.",
+   "mitigation": "Replace it with the project owners' plan within a month."
+  }
+ ]
+}

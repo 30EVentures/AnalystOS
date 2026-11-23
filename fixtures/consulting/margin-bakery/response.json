@@ -1,0 +1,324 @@
+{
+ "answer": "Raise prices on coffee and pastries and cut waste, rather than cutting costs alone: margin fell from [F1] to [F2], which at today's revenue costs about [F13] a year.",
+ "exec_summary": [
+  "Gross margin is down [F11], and reaching the [F10] goal needs [F12] back.",
+  "Ingredient costs rose [F4] while prices stayed flat for two years, so the squeeze is on price, not on volume.",
+  "Competitors already raised prices by about [F9], which gives room to move without standing out.",
+  "Coffee and pastries are [F15] of sales and leave the everyday loaf untouched, so they move first."
+ ],
+ "situation": "A regional bakery chain with [F16] stores and [F3] in annual revenue.",
+ "complication": "Ingredient costs rose [F4] in a year and gross margin fell from [F1] to [F2], while prices have not moved in two years.",
+ "key_question": "Should the bakery raise prices or cut costs to get its margin back?",
+ "titles": {
+  "situation": "Costs rose sharply while prices stood still for two years.",
+  "options": "Three ways to restore margin, with very different risk to customers.",
+  "recommendation": "Raise prices where customers resist least, and cut waste alongside.",
+  "roadmap": "Move coffee prices first, learn, then move pastries before spring.",
+  "kpis": "Three numbers tell the owners whether the plan is working.",
+  "risks": "The main risks are customer pushback and a waste effort that stalls."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Gross margin, last year",
+   "value": 62,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "Gross margin fell from 62%"
+  },
+  {
+   "id": "F2",
+   "label": "Gross margin, now",
+   "value": 54,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "to 54% in a year"
+  },
+  {
+   "id": "F3",
+   "label": "Annual revenue",
+   "value": 9600000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Annual revenue is $9.6 million"
+  },
+  {
+   "id": "F4",
+   "label": "Rise in ingredient costs, year on year",
+   "value": 30,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "Ingredient costs rose 30% year on year"
+  },
+  {
+   "id": "F5",
+   "label": "Bread, share of sales",
+   "value": 45,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "Bread is 45% of sales"
+  },
+  {
+   "id": "F6",
+   "label": "Pastries, share of sales",
+   "value": 35,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "pastries are 35%"
+  },
+  {
+   "id": "F7",
+   "label": "Coffee, share of sales",
+   "value": 20,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "coffee is 20%"
+  },
+  {
+   "id": "F8",
+   "label": "Waste, share of production",
+   "value": 8,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "Waste is about 8% of production"
+  },
+  {
+   "id": "F9",
+   "label": "Competitors' price rise this year",
+   "value": 10,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "Competitors raised prices by roughly 10% this year"
+  },
+  {
+   "id": "F10",
+   "label": "Target gross margin",
+   "value": 60,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "Get gross margin back to 60%"
+  },
+  {
+   "id": "F11",
+   "label": "Fall in gross margin",
+   "value": 8,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F12",
+   "label": "Margin still needed to reach the target",
+   "value": 6,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F10",
+    "F2"
+   ]
+  },
+  {
+   "id": "F13",
+   "label": "Gross profit lost per year at today's revenue",
+   "value": 768000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F3",
+    "F11"
+   ]
+  },
+  {
+   "id": "F14",
+   "label": "Planned price rise on coffee and pastries",
+   "value": 6,
+   "unit": "percent",
+   "basis": "assumption",
+   "rationale": "A planning figure set below what competitors already charged; the two-store coffee test confirms or replaces it."
+  },
+  {
+   "id": "F15",
+   "label": "Coffee and pastries, share of sales",
+   "value": 55,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "sum",
+   "inputs": [
+    "F6",
+    "F7"
+   ]
+  },
+  {
+   "id": "F16",
+   "label": "Stores",
+   "value": 14,
+   "unit": "count",
+   "basis": "client",
+   "quote": "with 14 stores"
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Where the margin went",
+   "finding": "Rising ingredient costs, not lower sales, explain the lost margin.",
+   "points": [
+    "Ingredient costs rose [F4] year on year.",
+    "At today's revenue the lost margin is worth about [F13] a year."
+   ],
+   "hypotheses": [
+    {
+     "text": "Higher ingredient costs explain most of the drop.",
+     "verdict": "supported"
+    },
+    {
+     "text": "Falling sales volumes are a second cause.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The fix has to come from price or ingredient use, not from selling more.",
+   "chart": {
+    "title": "Gross margin fell sharply in a single year.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "Last year",
+     "Now"
+    ]
+   }
+  },
+  {
+   "branch": "How much price room there is",
+   "finding": "Competitors have already moved, so a moderate rise will not stand out.",
+   "points": [
+    "Competitors raised prices by roughly [F9] this year.",
+    "Prices here have not changed in two years."
+   ],
+   "hypotheses": [
+    {
+     "text": "Customers will accept a rise in line with competitors.",
+     "verdict": "untested"
+    },
+    {
+     "text": "A smaller product is an acceptable substitute for a price rise.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "A visible price rise is safer than another quiet cut in portion size.",
+   "chart": {
+    "title": "Competitors moved prices while this bakery held still.",
+    "figure_ids": [
+     "F9",
+     "F14"
+    ],
+    "labels": [
+     "Competitors' rise",
+     "Planned rise"
+    ]
+   }
+  },
+  {
+   "branch": "Where to start",
+   "finding": "Coffee and pastries carry most of the sales and spare the everyday loaf.",
+   "points": [
+    "Coffee and pastries are [F15] of sales.",
+    "Bread is [F5] of sales, so leaving it unchanged protects the everyday purchase."
+   ],
+   "hypotheses": [
+    {
+     "text": "Coffee buyers are less price-sensitive than bread buyers.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Starting with coffee and pastries tests a price rise without touching the everyday loaf.",
+   "chart": {
+    "title": "Coffee and pastries together outweigh bread in sales.",
+    "figure_ids": [
+     "F5",
+     "F6",
+     "F7"
+    ],
+    "labels": [
+     "Bread",
+     "Pastries",
+     "Coffee"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Targeted price rise",
+   "description": "Raise coffee and pastry prices in line with competitors, hold bread, and cut waste.",
+   "effort": "low"
+  },
+  {
+   "name": "Across-the-board price rise",
+   "description": "Raise every price by the same amount at once.",
+   "effort": "low"
+  },
+  {
+   "name": "Cost cutting only",
+   "description": "Shrink portions and trim staff hours while keeping prices flat.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Targeted price rise",
+  "rationale": "It goes after the [F12] still missing, follows a market that already moved about [F9], and avoids the portion cuts that drew more complaints last autumn."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Raise coffee prices at two stores and track daily sales.",
+    "Start weighing waste by product at every store."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Roll the coffee change to all stores if sales hold.",
+    "Raise pastry prices with the spring menu."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Review margin against the [F10] goal with the owners.",
+    "Decide whether bread needs a smaller change."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Gross margin",
+   "target": "Back to [F10]"
+  },
+  {
+   "name": "Weekly transactions per store",
+   "target": "Within the normal range after each price change"
+  },
+  {
+   "name": "Waste as a share of production",
+   "target": "Below today's [F8]"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Regular customers react badly to the coffee rise.",
+   "mitigation": "Test at two stores first and hold the rise if transactions fall."
+  },
+  {
+   "risk": "Waste tracking adds work for busy staff.",
+   "mitigation": "Weigh waste once a day at close, not per batch."
+  }
+ ]
+}

@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 116 worked example). Not a real company.",
+ "roles": [
+  "data-bi-analyst"
+ ],
+ "requested_by": {
+  "kind": "agent",
+  "ref": "example-agent"
+ },
+ "problem": "Our online store's conversion rate fell from 3.2% to 2.5% last month. We need to know where in the funnel customers drop off.",
+ "answers": {
+  "common.decision": "Which part of the checkout to fix first; the e-commerce lead decides.",
+  "common.deadline": "One week.",
+  "common.audience": "The e-commerce lead and the web team.",
+  "common.materials": "We had 200,000 sessions last month. 40% of sessions reached a product page. Mobile is 70% of sessions.",
+  "data-analytics.data": "Web analytics export by device and funnel step.",
+  "data-analytics.question": "Where customers drop off and why conversion fell."
+ }
+}

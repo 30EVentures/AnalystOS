@@ -24,6 +24,175 @@ No generator owned the hero's spec figure. It had been typed by hand and was
 frozen since about Slice 49. It now has its own `site_counts.py` pattern,
 generated from the same `count_specs()` as the evidence card.
 
+## 2026-11-23 — Slice 117: every role live on the verified pipeline (worked examples, no paid calls)
+
+Owner's direction: all 73 roles on the website and in the product by the end of
+the day; Management Consulting Analyst gets one paid real-model test, only with
+the owner's yes right before it and the exact cost stated; every other role is
+proven with worked examples written and checked in the working session; price
+is to be determined: no price has been set for any role (first recorded as "open
+for negotiation, per engagement"; the owner changed it the same day).
+
+One pipeline serves every role: the verified consulting pipeline, plus a brief
+per role and a method brief per family (`analystos/packs/briefs.json`) in the
+system prompt, and the role's boundary - a human-decides role is told to prepare
+the decision, never make it, and its deck says "Prepared for your decision" and
+names the decisions that stay with a qualified person; an approval-gated role's
+actions are drafts for a named approver. Every number rule applies unchanged.
+
+The catalog now says how each role was tested (`eval.method`: `mock` for worked
+examples, `live` for the production model) so a mock-tested role can never be
+shown as live-tested; `available` accepts `"tbd"` pricing (no price set yet); and
+`delivers_today: verified-deck` says plainly that every role delivers the
+verified analysis deck today, not its native work product (code, copy,
+reconciliations). All 73 are `available` on a mock eval pointing at their
+family's worked example: 16 examples, at least one per family, each run end to
+end in tests (intake, the gate, the pipeline through ReplayClient, rendering,
+the independent no-new-numbers check). Regulated roles were included at the
+owner's direction; each still frames its output as preparation for a qualified
+person, and the rules that apply to each have not been reviewed one by one.
+
+## 2026-11-23 — Slice 116: code writes every number; the model only points at figures
+
+A second fresh-context review (of Slice 115) found the claim still false:
+edited "client quotes" (the L2 matcher folds away `$`, scale words and leading
+signs), digit shorthand ("ARR10M"), fraction words ("a quarter of"), unit and
+scale words after a number ("850 USD", "$1,200 Bn"), sign tricks, a spec that
+carried its own forged client text, crashes on huge values and control
+characters, chart labels formatted differently from the text, and a
+no-new-numbers test that shared the detector's blind spots. Patching a detector
+form by form was losing, so the design changed: the model never writes a digit.
+Every number is a figure tag that code prints from the verified figure with one
+formatter used everywhere (sentences, tiles, chart labels, sources), so value,
+unit, sign and scale cannot be misstated. Any digit outside a tag is refused
+except Q1-Q4, H1-H2, FY labels, B2B/B2C and years the client wrote; a tag may
+not carry a sign, currency, bracket, unit or scale word beside it; quotes must
+be the client's exact words at a word boundary, with a word and one number.
+`render_deck(spec, engagement)` recomputes the client text from the engagement,
+takes the role's title from the catalog, re-verifies, and reports any drawing
+failure as ValueError. The no-new-numbers test is now independent of the
+detector (it removes the exact formatted values a slide may show and requires
+no numeric character to remain, chart text included) and checks every tile.
+
+Stated limits, not gaps: whether a figure is used about the right thing
+("revenue grew [F2]" where F2 is churn) is not checked; quantities written in
+words are caught by a list, not exhaustively; counting words one to twelve are
+allowed.
+
+**Corrections to Slice 115's entry and commit.** It said the review's findings
+were "all now closed" and that numbers.py "finds every quantity a reader reads
+as one" - neither held (the second review reproduced misses). It said a spec
+edited after verification "cannot be rendered" - a spec that forged its own
+client text could. It said malformed specs raise ValueError - two crashes
+remained. Its spec claimed "four recorded cases" when one was committed.
+
+## 2026-11-23 — Slice 115: making "every number is traced" true
+
+A fresh-context review of Slices 112-113 found the deck's central claim - every
+number traced to the client's words, a recomputed calculation or a labelled
+assumption, with no way for the model to slip in another - false as built.
+Nothing had been pushed. What it found, all reproduced, all now closed with a
+test that fails on the old code:
+
+- Numbers that were not ASCII-style digits passed untagged: "seven percent",
+  "tripled", "½", "NRR96%", ".5%", and any 1900-2099 integer read as a year.
+  `analystos/packs/numbers.py` now finds them; quantities it cannot read as a
+  value (words, multipliers, fractions) are refused outright, so the model must
+  write digits and tag them. Exempt: Q1-Q4, H1-H2, FY labels, version strings,
+  names like B2B, years after a time word, and the counting words one to twelve
+  (allowed and not checked - a stated limit, not a gap).
+- Figure labels and other label fields (key question, branch, option and KPI
+  names, chart labels) were never scanned; they may now carry no number at all.
+- Units were never verified. A client figure's unit now comes from its quote;
+  a computed figure's from its operation and inputs (a difference of percents
+  is points); every written number's kind must fit its figure's unit.
+- A client value could be any number in its quote, within 1%; computed values
+  drifted 1% per step. Quotes must state exactly one number, and verification
+  replaces every value with the canonical one (the quote's number, or the exact
+  recomputation from canonical inputs).
+- The renderer drew any spec with the right format string. A spec now carries
+  the client's text; `render_deck` re-verifies it and refuses one whose content
+  or slides were edited after verification.
+- The "renderer adds no numbers" test matched substrings of the whole content
+  and passed with numbers injected. It is now exact, per slide, and a negative
+  test injects five kinds of number and requires each to be caught. Its first
+  run found numbers the renderer really does add: the roadmap's fixed column
+  labels, now listed as allowed on the roadmap slide only.
+- The repair-retry prompt echoed the previous output unneutralised.
+
+**Corrections to earlier entries and commits.** Slice 112 said "7% matches
+6.96, not 6.9" - the code accepted 6.5 to 7.49; matching is now "at the
+precision shown and within 5%". Slice 112 said an assumption is "labelled
+wherever it appears" - not on the title or issue-tree slides; those fields now
+cannot carry figures. Slice 113 said the percent/points confusion was fixed -
+only the fixture was; the code now enforces it. Slice 113 said every number in
+the file is a figure value, reference, slide number or formula notation - the
+test could not show that; it now can. Slices 112-114 quoted mutation counts
+from a script outside the repo; `tools/mutation_check.py` (with mutant lists in
+`tools/mutants/`) now reproduces them. Slice 112's "recorded bad-then-good
+pair" was built in test code, not recorded.
+
+Not checked, by design: qualitative claims and the direction of a change
+("fell" against a rise). Those are read by a person.
+
+## 2026-11-23 — Slice 114: charts that cannot carry a number of their own
+
+Owner's feedback on the first deck: add some graphs and a tiny bit more text.
+Each finding may now carry one bar chart, but the model only chooses which
+verified figures to chart and labels the bars; each bar's height is the
+figure's verified value, read by code, so a chart cannot introduce a number.
+Charts are native PowerPoint charts (editable by the client), formatted by unit,
+with assumption bars in grey. Each finding also gets one "so what" sentence,
+under the same number rule as everything else. Kept deliberately small: one
+chart type (columns), one extra sentence per finding.
+
+Quick Look (used to preview slides in the session) does not draw chart
+styling; the chart XML was read directly to confirm the number formats, colours
+and hidden value axis are in the file. How PowerPoint itself draws them was not
+checked here.
+
+## 2026-11-23 — Slice 113: the deck renderer, and a renderer that adds no claims
+
+`analystos/l4/deck.py` lays out a verified deck spec as a 16:9 PowerPoint deck:
+action titles, figure references beside numbers, a footer naming each slide's
+figures and flagging assumptions, big-number tiles drawn only from figures the
+slide already uses, verdict pills, and sources slides that show each figure's
+basis (the client's exact words, the formula, or the assumption's rationale).
+
+The rule held in a test: the renderer adds no numbers of its own. Every number
+in the file is a figure value, a figure reference, a slide number or formula
+notation. A percentage-point change got its own unit after the first preview
+showed "3%" for a 3-point rise - a real misreading the layout would have
+introduced. Layout was checked by previewing every slide as an image in the
+working session; the spec was written after the code for that reason.
+
+## 2026-11-23 — Slice 112: the consulting skill, proved with mocks instead of spend
+
+Owner's decision: take one role all the way through first (Management
+Consulting Analyst), in days not months, proving it with mocks in the working
+session rather than paying for a model call on every try.
+
+`analystos/packs/consulting.py` turns an accepted engagement into an
+`analystos-deck-spec/1`. The model writes structured content (answer first, an
+issue tree of hypotheses, figures, options, one recommendation, a 30/60/90
+roadmap, KPIs, risks); code assembles the slides in a fixed storyline, so the
+deck's shape is never the model's to get wrong. Code verifies every figure's
+basis with the existing L2 matchers (a client figure's quote must be in the
+client's own words and spell out its value; a computed figure must recompute;
+an assumption needs a rationale and is labelled wherever it appears) and every
+number in every sentence (it must carry a `[F#]` tag in the same sentence, and
+match that figure at the precision shown). Two operations were added inside the
+pack, not to L2: `product` and `percent_of`. One repair retry, then a hard
+error; all calls go through `_create_message`, so the spend ceiling applies.
+
+`ReplayClient` replays recorded responses with the real client's shape; the
+first recorded case (a synthetic clinic-software churn problem) was written in
+the working session, and the verifier caught a real slip in it ("fewer than 10
+staff" read as a number claiming the 70% figure) before it was fixed. What
+mocks prove: the pipeline, the verifier, the rendering. What they do not: that
+the production model writes content this good - that needs a few live runs
+before the role is marked `evaluated`.
+
 ## 2026-11-23 — Slice 110: the engagement gate recomputes, never trusts (review of Slice 109)
 
 A fresh-context review of Slice 109 finished after it merged (PR #96). Two ways

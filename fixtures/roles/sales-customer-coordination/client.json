@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 116 worked example). Not a real company.",
+ "roles": [
+  "sales-development-representative-sdr"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We sell scheduling software to dental clinics. Our outbound emails get a 1.5% reply rate and we need more meetings.",
+ "answers": {
+  "common.decision": "Which accounts and messages to use next quarter; the sales manager approves outreach.",
+  "common.deadline": "Two weeks.",
+  "common.audience": "The sales manager.",
+  "common.materials": "We email 2,000 clinics a month. Clinics with larger practices reply at 4%. About 30% of our list are larger practices.",
+  "sales-customer-coordination.targets": "Dental clinics in the United States, our current prospect list.",
+  "sales-customer-coordination.approver": "The sales manager approves all outgoing messages."
+ }
+}

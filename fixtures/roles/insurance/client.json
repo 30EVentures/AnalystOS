@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 116 worked example). Not a real company.",
+ "roles": [
+  "claims-adjuster"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We need help preparing a water damage claim file. The policyholder claims $18,000 for a burst pipe.",
+ "answers": {
+  "common.decision": "Whether to pay the claim and how much; our licensed adjuster decides.",
+  "common.deadline": "Five days.",
+  "common.audience": "The licensed adjuster.",
+  "common.materials": "The policy has a $1,000 deductible. The repair estimate is $14,500. The policyholder reported the leak 3 days after it started.",
+  "insurance.file": "Homeowners policy, standard water damage terms.",
+  "insurance.decider": "Our licensed adjuster decides."
+ }
+}

@@ -1,6 +1,6 @@
 {
  "format": "analystos-role-catalog/1",
- "description": "Every role AnalystOS intends to offer, for hire by people and agents in engagement hours. A role may be marked 'available' only with a recorded passing evaluation and an integer rate (US cents per engagement hour); until evaluations are sealed and checkable, that record is a claim, not proof. See specs/slice-108/spec.md.",
+ "description": "Every role AnalystOS offers, for hire by people and agents. Price: to be determined; no price has been set for any role (rate_cents_per_engagement_hour = 'tbd'). A role is 'available' only with a recorded passing evaluation; eval.method says how it was run: 'mock' = worked examples written and checked in a working session, with no model call; 'live' = the production model. Today every role delivers a verified analysis deck (delivers_today), not its native work product. See specs/slice-108, slice-117.",
  "statuses": [
   "planned",
   "built",
@@ -122,12 +122,17 @@
     "report",
     "workbook"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/research-reporting",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "any rating or price target distributed to investors, by a registered research analyst"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "market-research-analyst",
@@ -139,9 +144,14 @@
     "brief",
     "deck"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/research-reporting",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "policy-analyst-research-assistant",
@@ -153,9 +163,14 @@
     "brief",
     "memo"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/research-reporting",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "regulatory-change-analyst",
@@ -167,9 +182,14 @@
     "brief",
     "register"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/research-reporting",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "esg-sustainability-reporting-analyst",
@@ -181,9 +201,14 @@
     "report",
     "workbook"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/research-reporting",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "management-consulting-analyst",
@@ -194,9 +219,14 @@
    "deliverables": [
     "deck"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/consulting",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "business-analyst",
@@ -208,9 +238,14 @@
     "brief",
     "deck"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/consulting",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "risk-advisory-associate",
@@ -222,9 +257,14 @@
     "deck",
     "register"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/consulting",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "technology-consulting-analyst",
@@ -236,9 +276,14 @@
     "deck",
     "brief"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/consulting",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "regulatory-compliance-advisory-associate",
@@ -250,9 +295,14 @@
     "deck",
     "register"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/consulting",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "process-improvement-operations-consulting-analyst",
@@ -264,9 +314,14 @@
     "deck",
     "workbook"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/consulting",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "data-and-analytics-consulting-analyst",
@@ -278,9 +333,14 @@
     "deck",
     "workbook"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/consulting",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "digital-assets-blockchain-advisory-associate",
@@ -292,9 +352,14 @@
     "deck",
     "brief"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/consulting",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "credit-analyst",
@@ -306,12 +371,17 @@
     "workbook",
     "memo"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/finance-modeling",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "whether to extend credit, and on what terms"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "investment-banking-analyst",
@@ -323,9 +393,14 @@
     "workbook",
     "deck"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/finance-modeling",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "financial-advisory-transaction-services-analyst",
@@ -337,9 +412,14 @@
     "workbook",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/finance-modeling",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "fpa-analyst",
@@ -351,9 +431,14 @@
     "workbook",
     "memo"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/finance-modeling",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "corporate-finance-analyst",
@@ -365,9 +450,14 @@
     "workbook",
     "memo"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/finance-modeling",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "treasury-analyst",
@@ -379,9 +469,14 @@
     "workbook",
     "memo"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/finance-modeling",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "pricing-analyst",
@@ -393,9 +488,14 @@
     "workbook",
     "memo"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/finance-modeling",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "real-estate-analyst",
@@ -407,9 +507,14 @@
     "workbook",
     "memo"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/finance-modeling",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "market-risk-analyst",
@@ -421,9 +526,14 @@
     "workbook",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/finance-modeling",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "model-validation-analyst",
@@ -435,12 +545,17 @@
     "report",
     "workbook"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/finance-modeling",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "the validation opinion, signed by a qualified validator independent of the model's owner"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "actuarial-analyst",
@@ -452,12 +567,17 @@
     "workbook",
     "memo"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/finance-modeling",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "any actuarial opinion or reserve sign-off, by a credentialed actuary"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "data-bi-analyst",
@@ -469,9 +589,14 @@
     "workbook",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/data-analytics",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "sales-operations-analyst",
@@ -483,9 +608,14 @@
     "workbook",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/data-analytics",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "revenue-operations-analyst",
@@ -497,9 +627,14 @@
     "workbook",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/data-analytics",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "product-analyst-associate-product-manager",
@@ -511,9 +646,14 @@
     "report",
     "brief"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/data-analytics",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "supply-chain-logistics-analyst",
@@ -525,9 +665,14 @@
     "workbook",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/data-analytics",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "demand-planning-analyst",
@@ -539,9 +684,14 @@
     "workbook",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/data-analytics",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "hr-analyst-people-analytics",
@@ -553,12 +703,17 @@
     "workbook",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/data-analytics",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "any hiring, promotion, pay or termination decision the analysis informs"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "staff-accountant-bookkeeper",
@@ -570,12 +725,17 @@
     "reconciliation",
     "workbook"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/accounting-operations",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [
     "posting a journal entry to the client's ledger"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "accounts-payable-receivable-clerk",
@@ -587,13 +747,18 @@
     "reconciliation",
     "draft"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/accounting-operations",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [
     "releasing a payment that the client's authorised approver has approved (approving it stays human)",
     "sending a collection notice"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "payroll-specialist",
@@ -605,13 +770,18 @@
     "reconciliation",
     "workbook"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/accounting-operations",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "running payroll",
     "filing payroll taxes"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "tax-associate",
@@ -623,12 +793,17 @@
     "workbook",
     "memo"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/accounting-operations",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "signing or filing any return, by a qualified preparer"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "fund-accountant",
@@ -640,12 +815,17 @@
     "reconciliation",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/accounting-operations",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [
     "striking or publishing a NAV"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "trade-support-middle-office-analyst",
@@ -657,12 +837,17 @@
     "reconciliation",
     "case-file"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/accounting-operations",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [
     "amending or cancelling a booked trade"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "operations-analyst-banking-capital-markets",
@@ -674,12 +859,17 @@
     "reconciliation",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/accounting-operations",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [
     "any change to a client account or a settlement instruction"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "regulatory-reporting-analyst",
@@ -691,12 +881,17 @@
     "report",
     "workbook"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/accounting-operations",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "submitting a return to a regulator"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "audit-associate-external-audit",
@@ -708,12 +903,17 @@
     "workbook",
     "register"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/risk-audit-controls",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "any audit conclusion or opinion, by the licensed engagement team"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "internal-audit-associate",
@@ -725,9 +925,14 @@
     "workbook",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/risk-audit-controls",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "operational-risk-analyst",
@@ -739,9 +944,14 @@
     "register",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/risk-audit-controls",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "third-party-vendor-risk-analyst",
@@ -753,9 +963,14 @@
     "register",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/risk-audit-controls",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "information-security-grc-analyst",
@@ -767,9 +982,14 @@
     "register",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/risk-audit-controls",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "privacy-data-protection-analyst",
@@ -781,9 +1001,14 @@
     "register",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/risk-audit-controls",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "cybersecurity-analyst-junior",
@@ -795,9 +1020,14 @@
     "report",
     "case-file"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/risk-audit-controls",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "compliance-aml-kyc-analyst",
@@ -809,13 +1039,18 @@
     "case-file",
     "register"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/financial-crime",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "onboarding or exiting a customer",
     "whether to file a suspicious activity report"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "fraud-analyst",
@@ -826,12 +1061,17 @@
    "deliverables": [
     "case-file"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/financial-crime",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "the disposition of each alert or case"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "sanctions-screening-analyst",
@@ -842,12 +1082,17 @@
    "deliverables": [
     "case-file"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/financial-crime",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "clearing or escalating each potential match"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "financial-crime-investigator-junior",
@@ -859,12 +1104,17 @@
     "case-file",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/financial-crime",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "any finding of wrongdoing and any regulatory filing"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "forensic-investigations-analyst",
@@ -876,12 +1126,17 @@
     "case-file",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/financial-crime",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "any conclusion about who did what"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "paralegal-contracts-administrator",
@@ -893,12 +1148,17 @@
     "draft",
     "register"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/legal-contracts-procurement",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "any legal advice or position, by a licensed lawyer"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "contract-procurement-analyst",
@@ -910,9 +1170,14 @@
     "register",
     "memo"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/legal-contracts-procurement",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "legal-operations-analyst",
@@ -924,9 +1189,14 @@
     "report",
     "workbook"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/legal-contracts-procurement",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "procurement-assistant",
@@ -938,13 +1208,18 @@
     "draft",
     "workbook"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/legal-contracts-procurement",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [
     "issuing a purchase order",
     "sending a request to a supplier"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "grants-administrator",
@@ -956,9 +1231,14 @@
     "draft",
     "workbook"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/legal-contracts-procurement",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "content-writer-copywriter",
@@ -969,9 +1249,14 @@
    "deliverables": [
     "draft"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/content-communications",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "seo-sem-specialist",
@@ -983,13 +1268,18 @@
     "report",
     "draft"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/content-communications",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [
     "publishing a page change",
     "changing ad spend or bids"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "social-media-coordinator",
@@ -1000,13 +1290,18 @@
    "deliverables": [
     "draft"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/content-communications",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [
     "publishing a post",
     "replying in public"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "corporate-communications-coordinator",
@@ -1018,9 +1313,14 @@
     "draft",
     "brief"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/content-communications",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "technical-writer",
@@ -1031,9 +1331,14 @@
    "deliverables": [
     "draft"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/content-communications",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "recruiting-coordinator",
@@ -1045,13 +1350,18 @@
     "draft",
     "plan"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/people-hr",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [
     "sending a message to a candidate",
     "booking an interview"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "talent-acquisition-associate",
@@ -1063,13 +1373,18 @@
     "brief",
     "draft"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/people-hr",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "screening a candidate in or out",
     "any offer"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "compensation-and-benefits-analyst",
@@ -1081,12 +1396,17 @@
     "workbook",
     "memo"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/people-hr",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "any individual's pay or benefits decision"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "learning-and-development-coordinator",
@@ -1098,9 +1418,14 @@
     "plan",
     "draft"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/people-hr",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "junior-software-developer",
@@ -1111,9 +1436,14 @@
    "deliverables": [
     "code"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/software-it",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "qa-test-analyst",
@@ -1125,9 +1455,14 @@
     "code",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/software-it",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
+   "delivers_today": "verified-deck"
   },
   {
    "id": "it-help-desk-technical-support-specialist",
@@ -1139,13 +1474,18 @@
     "draft",
     "case-file"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/software-it",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [
     "changing a user's access or a system setting",
     "replying to the user"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "claims-adjuster",
@@ -1157,12 +1497,17 @@
     "case-file",
     "workbook"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/insurance",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "paying, settling or denying a claim, by a licensed adjuster"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "underwriting-assistant",
@@ -1174,12 +1519,17 @@
     "case-file",
     "workbook"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/insurance",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
     "accepting, pricing or declining a risk, by an underwriter"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "sales-development-representative-sdr",
@@ -1191,12 +1541,17 @@
     "brief",
     "draft"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/sales-customer-coordination",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [
     "sending any outreach message"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "customer-success-associate",
@@ -1208,12 +1563,17 @@
     "report",
     "draft"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/sales-customer-coordination",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [
     "sending any message to a customer"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   },
   {
    "id": "project-program-coordinator",
@@ -1225,12 +1585,17 @@
     "plan",
     "report"
    ],
-   "status": "planned",
-   "eval": null,
-   "rate_cents_per_engagement_hour": null,
+   "status": "available",
+   "eval": {
+    "set": "fixtures/roles/sales-customer-coordination",
+    "passed": true,
+    "method": "mock"
+   },
+   "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [
     "changing a plan, owner or date in the client's tools"
-   ]
+   ],
+   "delivers_today": "verified-deck"
   }
  ]
 }

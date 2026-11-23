@@ -1,0 +1,358 @@
+{
+ "answer": "Invest in automation rather than hiring: covering peak by hiring needs about [F16] more pickers at roughly [F17] a year, while a [F8] system lifts capacity to about [F19] orders a day with today's team.",
+ "exec_summary": [
+  "On-time shipping fell from [F1] to [F2] as daily orders grew from [F3] to [F4].",
+  "Today's team can pick about [F12] orders a day, a shortfall of [F13] before peak season begins.",
+  "At peak, demand of [F9] orders a day would need about [F16] extra pickers.",
+  "The system's one-time cost of [F8] is close to one year of the extra peak payroll at [F17]."
+ ],
+ "situation": "An online home-goods retailer picking all orders in its own warehouse with [F5] pickers.",
+ "complication": "Orders grew to [F4] a day while capacity stayed near [F12], and on-time shipping fell to [F2].",
+ "key_question": "Should the retailer hire more pickers or automate picking to ship on time through peak?",
+ "titles": {
+  "situation": "Demand outgrew the warehouse team within a single year.",
+  "options": "Three ways to close the gap, from quick to lasting.",
+  "recommendation": "Automate picking, and bridge to installation with temporary staff.",
+  "roadmap": "Bridge this peak with temporary staff while the system is installed.",
+  "kpis": "Three measures show whether capacity keeps pace with demand.",
+  "risks": "Installation timing and the vendor's claims are the risks to manage."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "On-time shipping, last year",
+   "value": 96,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "On-time shipping fell from 96%"
+  },
+  {
+   "id": "F2",
+   "label": "On-time shipping, now",
+   "value": 88,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "to 88% this year"
+  },
+  {
+   "id": "F3",
+   "label": "Orders per day, last year",
+   "value": 4000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "orders grew from 4,000"
+  },
+  {
+   "id": "F4",
+   "label": "Orders per day, now",
+   "value": 6500,
+   "unit": "count",
+   "basis": "client",
+   "quote": "to 6,500 a day"
+  },
+  {
+   "id": "F5",
+   "label": "Pickers",
+   "value": 40,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We have 40 pickers"
+  },
+  {
+   "id": "F6",
+   "label": "Orders picked per picker per day",
+   "value": 120,
+   "unit": "count",
+   "basis": "client",
+   "quote": "Each picker handles about 120 orders a day"
+  },
+  {
+   "id": "F7",
+   "label": "Cost of a picker per year, fully loaded",
+   "value": 52000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "A picker costs $52,000 a year fully loaded"
+  },
+  {
+   "id": "F8",
+   "label": "Quoted cost of the goods-to-person system",
+   "value": 1800000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "A vendor quoted $1.8 million"
+  },
+  {
+   "id": "F9",
+   "label": "Orders per day at peak",
+   "value": 9000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "orders reach 9,000 a day"
+  },
+  {
+   "id": "F11",
+   "label": "Target on-time shipping",
+   "value": 95,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "On-time shipping back above 95%"
+  },
+  {
+   "id": "F12",
+   "label": "Picking capacity per day today",
+   "value": 4800,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F5",
+    "F6"
+   ]
+  },
+  {
+   "id": "F13",
+   "label": "Shortfall per day today",
+   "value": 1700,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F4",
+    "F12"
+   ]
+  },
+  {
+   "id": "F14",
+   "label": "Shortfall per day at peak",
+   "value": 4200,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F9",
+    "F12"
+   ]
+  },
+  {
+   "id": "F15",
+   "label": "Extra pickers needed today",
+   "value": 14.2,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "ratio",
+   "inputs": [
+    "F13",
+    "F6"
+   ]
+  },
+  {
+   "id": "F16",
+   "label": "Extra pickers needed at peak",
+   "value": 35,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "ratio",
+   "inputs": [
+    "F14",
+    "F6"
+   ]
+  },
+  {
+   "id": "F17",
+   "label": "Payroll for the extra peak pickers, per year",
+   "value": 1820000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F16",
+    "F7"
+   ]
+  },
+  {
+   "id": "F18",
+   "label": "Orders picked per worker per day with the system",
+   "value": 240,
+   "unit": "count",
+   "basis": "assumption",
+   "rationale": "The vendor's claimed picks per worker with the system, applied to today's team; not yet measured on site."
+  },
+  {
+   "id": "F19",
+   "label": "Picking capacity per day with the system",
+   "value": 9600,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F5",
+    "F18"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "How big the gap is",
+   "finding": "The team is short of today's demand, and far short of peak.",
+   "points": [
+    "Capacity is about [F12] orders a day against [F4] ordered.",
+    "At peak the shortfall grows to [F14] orders a day."
+   ],
+   "hypotheses": [
+    {
+     "text": "Capacity, not process errors, is the main cause of late orders.",
+     "verdict": "supported"
+    },
+    {
+     "text": "Late orders are concentrated in one shift.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Any answer must add capacity at scale, not tune today's process.",
+   "chart": {
+    "title": "Peak demand is far above today's picking capacity.",
+    "figure_ids": [
+     "F12",
+     "F4",
+     "F9"
+    ],
+    "labels": [
+     "Capacity today",
+     "Orders today",
+     "Orders at peak"
+    ]
+   }
+  },
+  {
+   "branch": "What hiring would take",
+   "finding": "Hiring for peak means a large payroll increase that recurs every year.",
+   "points": [
+    "Even today's gap needs about [F15] more pickers.",
+    "Covering peak needs about [F16], costing about [F17] a year."
+   ],
+   "hypotheses": [
+    {
+     "text": "Hiring can be done fast enough for this peak.",
+     "verdict": "untested"
+    },
+    {
+     "text": "Hiring avoids a large one-time cost.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "Hiring buys capacity one person at a time and pays for it every year.",
+   "chart": {
+    "title": "Peak hiring would cost each year about what the system costs once.",
+    "figure_ids": [
+     "F17",
+     "F8"
+    ],
+    "labels": [
+     "Extra pickers, per year",
+     "System, one time"
+    ]
+   }
+  },
+  {
+   "branch": "What automation would deliver",
+   "finding": "The system would cover peak with today's team, if the vendor's claim holds.",
+   "points": [
+    "At the vendor's rate of [F18] picks per worker, capacity rises to about [F19] orders a day.",
+    "That clears the peak of [F9] orders a day."
+   ],
+   "hypotheses": [
+    {
+     "text": "The system reaches the vendor's claimed picks per worker.",
+     "verdict": "untested"
+    },
+    {
+     "text": "The system fits in the current warehouse.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Automation solves the problem only if the vendor's rate is proven before signing.",
+   "chart": {
+    "title": "Capacity with the system would clear peak demand.",
+    "figure_ids": [
+     "F12",
+     "F19",
+     "F9"
+    ],
+    "labels": [
+     "Capacity today",
+     "With the system",
+     "Orders at peak"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Goods-to-person automation",
+   "description": "Install the quoted system and keep today's team.",
+   "effort": "high"
+  },
+  {
+   "name": "Hire permanent pickers",
+   "description": "Add permanent pickers to cover peak demand.",
+   "effort": "medium"
+  },
+  {
+   "name": "Temporary staff only",
+   "description": "Cover each peak with agency staff and accept slower service between peaks.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Goods-to-person automation",
+  "rationale": "It covers peak demand of [F9] orders a day with today's team, costs about the same as one year of peak hiring, and bridges this season with temporary staff while it is installed."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Ask the vendor for a site test proving the picks-per-worker claim.",
+    "Book temporary staff for the coming peak."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Confirm the system fits the current floor plan.",
+    "Sign only if the site test meets the vendor's claimed rate."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Begin installation outside peak weeks.",
+    "Track on-time shipping weekly against the [F11] goal."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "On-time shipping",
+   "target": "Above [F11] through next peak"
+  },
+  {
+   "name": "Orders picked per worker per day",
+   "target": "Rising toward the vendor's rate after installation"
+  },
+  {
+   "name": "Daily picking capacity",
+   "target": "Above peak demand of [F9]"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The system does not reach the vendor's claimed rate.",
+   "mitigation": "Make a site test and a performance guarantee conditions of signing."
+  },
+  {
+   "risk": "Installation overlaps peak season.",
+   "mitigation": "Schedule installation for the quiet months and keep temporary staff on call."
+  }
+ ]
+}

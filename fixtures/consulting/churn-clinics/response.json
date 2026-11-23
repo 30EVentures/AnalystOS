@@ -1,0 +1,75 @@
+{
+ "answer": "Put next year's money into retention, aimed at small clinics: churn rose from 4% [F1] to 7% [F2] after the March release, and the extra churn costs $30,600 [F14] of monthly recurring revenue every month.",
+ "exec_summary": [
+  "Monthly logo churn rose by 3 points [F11], and net revenue retention fell from 104% [F3] to 96% [F4].",
+  "Clinics with fewer than ten staff make up 70% [F8] of churned logos; they onboard alone and hit the March release hardest.",
+  "Price is what churned clients say, but a discount saves only 15% [F9] of cancellations, so price is the stated reason rather than the cause.",
+  "Restoring churn to 4% [F10] recovers about 26 [F13] clinics a month, worth $30,600 [F14] in monthly recurring revenue each month."
+ ],
+ "situation": "A B2B scheduling platform for clinics with 850 [F5] customers paying on average $1,200 [F6] per month.",
+ "complication": "Within two quarters monthly churn rose from 4% [F1] to 7% [F2], and support tickets per account doubled after the March release.",
+ "key_question": "What is driving the churn increase, and should next year's budget go to retention or to new sales?",
+ "titles": {
+  "situation": "Churn nearly doubled in two quarters while the customer base stayed the same size.",
+  "options": "Three ways to respond, and only one fits the hiring and engineering limits.",
+  "recommendation": "Fund a small-clinic retention program before adding sales capacity.",
+  "roadmap": "Ninety days to prove the program on small clinics, then extend it.",
+  "kpis": "Track four measures monthly so the board sees progress early.",
+  "risks": "The main risks are a misread cause and a stretched support team."
+ },
+ "figures": [
+  {"id": "F1", "label": "Monthly logo churn, two quarters ago", "value": 4, "unit": "percent", "basis": "client", "quote": "churn went from 4% to 7%"},
+  {"id": "F2", "label": "Monthly logo churn, now", "value": 7, "unit": "percent", "basis": "client", "quote": "churn went from 4% to 7%"},
+  {"id": "F3", "label": "Net revenue retention, two quarters ago", "value": 104, "unit": "percent", "basis": "client", "quote": "fell from 104% to 96%"},
+  {"id": "F4", "label": "Net revenue retention, now", "value": 96, "unit": "percent", "basis": "client", "quote": "fell from 104% to 96%"},
+  {"id": "F5", "label": "Customers", "value": 850, "unit": "count", "basis": "client", "quote": "We have 850 customers"},
+  {"id": "F6", "label": "Average revenue per customer per month", "value": 1200, "unit": "usd", "basis": "client", "quote": "paying on average $1,200 per month"},
+  {"id": "F7", "label": "Churned accounts citing a cheaper tool", "value": 60, "unit": "percent", "basis": "client", "quote": "60% of churned accounts cited switching to a cheaper tool"},
+  {"id": "F8", "label": "Share of churned logos that are small clinics", "value": 70, "unit": "percent", "basis": "client", "quote": "which are 70% of churned logos"},
+  {"id": "F9", "label": "Save rate of the cancellation discount", "value": 15, "unit": "percent", "basis": "client", "quote": "the save rate is 15% of cancellation requests"},
+  {"id": "F10", "label": "Target monthly churn", "value": 4, "unit": "percent", "basis": "client", "quote": "Get monthly churn back to 4%"},
+  {"id": "F11", "label": "Increase in monthly churn (percentage points)", "value": 3, "unit": "percent", "basis": "computed", "operation": "difference", "inputs": ["F2", "F1"]},
+  {"id": "F12", "label": "Clinics lost per month at current churn", "value": 59.5, "unit": "count", "basis": "computed", "operation": "percent_of", "inputs": ["F5", "F2"]},
+  {"id": "F13", "label": "Extra clinics lost per month versus the old churn rate", "value": 25.5, "unit": "count", "basis": "computed", "operation": "percent_of", "inputs": ["F5", "F11"]},
+  {"id": "F14", "label": "Monthly recurring revenue lost each month to the extra churn", "value": 30600, "unit": "usd", "basis": "computed", "operation": "product", "inputs": ["F13", "F6"]},
+  {"id": "F15", "label": "Save rate a dedicated retention owner could reach", "value": 25, "unit": "percent", "basis": "assumption", "rationale": "A planning assumption for a staffed save desk replacing a discount-only offer; to be measured in the first month rather than relied on."}
+ ],
+ "issue_tree": [
+  {"branch": "Who is churning",
+   "finding": "Small clinics drive the increase, not the customer base as a whole.",
+   "points": ["Clinics with fewer than ten staff are 70% [F8] of churned logos.", "At 7% [F2] churn the company loses about 60 [F12] clinics a month."],
+   "hypotheses": [{"text": "Churn is concentrated in a segment rather than spread evenly.", "verdict": "supported"},
+                  {"text": "Larger clinics are churning at the new, higher rate too.", "verdict": "untested"}]},
+  {"branch": "Why they leave",
+   "finding": "The March release made the product harder to use for clinics that onboard alone.",
+   "points": ["Support tickets per account doubled after the March release.", "Onboarding is fully self-serve, so small clinics absorb the change without help."],
+   "hypotheses": [{"text": "The March release raised the effort of daily use.", "verdict": "supported"},
+                  {"text": "Self-serve onboarding leaves small clinics without a fallback.", "verdict": "supported"}]},
+  {"branch": "Whether price is the cause",
+   "finding": "Price is the stated reason for leaving, but discounts barely change the decision.",
+   "points": ["60% [F7] of churned accounts cite a cheaper tool.", "The cancellation discount saves only 15% [F9] of requests."],
+   "hypotheses": [{"text": "A lower price would win most churning clinics back.", "verdict": "refuted"},
+                  {"text": "Cheaper tools feel easier, so price stands in for effort.", "verdict": "untested"}]}
+ ],
+ "options": [
+  {"name": "Small-clinic retention program", "description": "Guided onboarding and a staffed save desk for clinics under ten staff, using the two allowed hires.", "effort": "medium"},
+  {"name": "Deeper cancellation discounts", "description": "Raise the cancellation discount and add an annual-plan discount.", "effort": "low"},
+  {"name": "Shift budget to new sales", "description": "Hire sales capacity and accept current churn while acquisition grows the base.", "effort": "high"}
+ ],
+ "recommendation": {"option": "Small-clinic retention program", "rationale": "It targets the segment behind 70% [F8] of churned logos, attacks the effort problem the March release created, needs no engineering in Q1, and fits within two hires; new sales would refill a base that is losing $30,600 [F14] of monthly recurring revenue each month."},
+ "roadmap": [
+  {"horizon": "First 30 days", "actions": ["Hire a small-clinic success lead and a save-desk specialist.", "Call every small clinic that opened a support ticket since the March release.", "Replace the discount-only offer with a guided save conversation."]},
+  {"horizon": "Days 31-60", "actions": ["Launch a guided onboarding call for every new small clinic.", "Measure the save rate weekly against the planning assumption of 25% [F15]."]},
+  {"horizon": "Days 61-90", "actions": ["Decide with the board whether to extend the program to all clinics.", "Hand the product team the top support issues for the Q2 roadmap."]}
+ ],
+ "kpis": [
+  {"name": "Monthly logo churn", "target": "Back to 4% [F10] within two quarters"},
+  {"name": "Small-clinic churn", "target": "Falls faster than overall churn every month"},
+  {"name": "Save rate on cancellation requests", "target": "Above today's 15% [F9]"},
+  {"name": "Support tickets per account", "target": "Back to the level before the March release"}
+ ],
+ "risks": [
+  {"risk": "Price, not effort, turns out to be the real driver.", "mitigation": "Track the reasons given on saved and lost accounts in the first month and revisit the discount if effort fixes do not move churn."},
+  {"risk": "Two hires cannot cover every small clinic.", "mitigation": "Prioritise clinics with open support tickets and automate the onboarding call script."}
+ ]
+}

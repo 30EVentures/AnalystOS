@@ -24,6 +24,33 @@ No generator owned the hero's spec figure. It had been typed by hand and was
 frozen since about Slice 49. It now has its own `site_counts.py` pattern,
 generated from the same `count_specs()` as the evidence card.
 
+## 2026-11-23 — Slice 112: the consulting skill, proved with mocks instead of spend
+
+Owner's decision: take one role all the way through first (Management
+Consulting Analyst), in days not months, proving it with mocks in the working
+session rather than paying for a model call on every try.
+
+`analystos/packs/consulting.py` turns an accepted engagement into an
+`analystos-deck-spec/1`. The model writes structured content (answer first, an
+issue tree of hypotheses, figures, options, one recommendation, a 30/60/90
+roadmap, KPIs, risks); code assembles the slides in a fixed storyline, so the
+deck's shape is never the model's to get wrong. Code verifies every figure's
+basis with the existing L2 matchers (a client figure's quote must be in the
+client's own words and spell out its value; a computed figure must recompute;
+an assumption needs a rationale and is labelled wherever it appears) and every
+number in every sentence (it must carry a `[F#]` tag in the same sentence, and
+match that figure at the precision shown). Two operations were added inside the
+pack, not to L2: `product` and `percent_of`. One repair retry, then a hard
+error; all calls go through `_create_message`, so the spend ceiling applies.
+
+`ReplayClient` replays recorded responses with the real client's shape; the
+first recorded case (a synthetic clinic-software churn problem) was written in
+the working session, and the verifier caught a real slip in it ("fewer than 10
+staff" read as a number claiming the 70% figure) before it was fixed. What
+mocks prove: the pipeline, the verifier, the rendering. What they do not: that
+the production model writes content this good - that needs a few live runs
+before the role is marked `evaluated`.
+
 ## 2026-11-23 — Slice 110: the engagement gate recomputes, never trusts (review of Slice 109)
 
 A fresh-context review of Slice 109 finished after it merged (PR #96). Two ways

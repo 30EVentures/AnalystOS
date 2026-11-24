@@ -42,7 +42,9 @@ does to numbers, stated exactly: it never fills or recomputes a computed
 figure's value; it never cuts or changes a client quote, and never rescales or fills
 in a value: the one value it changes is a percent stored as a fraction (0.07
 with a quote saying "7%" becomes 7). A fifth review found the rescaling turned
-"12 million-dollar contracts" (value 12) into 12,000,000; it fills a unit only when none is given
+"12 million-dollar contracts" (value 12) into 12,000,000, and the sixth that the
+first fix made "$2bn-a-year" read as $2; now abbreviations always scale and a
+spelled-out scale joined to the next word is ambiguous and refused; it fills a unit only when none is given
 and maps aliases ("%", "USD"); and on a computed figure it sets the unit to the
 only one its operation allows and turns a "ratio" declared as a percent into
 percent_of_total (the value is still checked). Cutting a two-number quote down

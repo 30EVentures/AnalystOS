@@ -101,6 +101,15 @@ no longer rescales or fills in any value - the only value it changes is a
 percent stored as a fraction (0.07 with a quote saying "7%"). "[F1] months" no
 longer prints "months months".
 
+## Sixth check (same day)
+
+The check of 0a717e2 found that blocking a hyphenated scale word also blocked
+the abbreviations: "$2bn-a-year" read as $2, so a value of 2 passed and the deck
+said "$2 a year". Fixed: abbreviations ("bn", "mn", "mm") and glued letters
+("1k", "$5M") always scale; a spelled-out scale joined to the next word ("12
+million-dollar contracts", "$3 billion-plus") has no value, so a quote holding
+it is refused whichever value the model gives.
+
 ## Results (2026-11-23)
 
 - Every blocker case from the review: a regression test that fails on main

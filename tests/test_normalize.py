@@ -392,7 +392,14 @@ class SecondReviewTest(unittest.TestCase):
 
     def test_a_scale_word_on_the_next_noun_never_scales_the_number(self):
         # Fifth review: "12 million-dollar contracts" became "12,000,000 contracts".
-        self.assertEqual([t.value for t in find_numbers("We signed 12 million-dollar contracts")][:1], [12])
+        self.assertIsNone(find_numbers("We signed 12 million-dollar contracts")[0].value)  # ambiguous: refused
+        for text, value in (("$40bn-plus", 4e10), ("a $2bn-a-year business", 2e9), ("$500mn-a-year", 5e8),
+                            ("$5mm-ARR", 5e6), ("$1.2bn-valuation", 1.2e9), ("$5M-ARR", 5e6), ("$12.2-million", 12.2e6)):
+            with self.subTest(text=text):  # sixth review: abbreviations and glued letters still scale
+                self.assertAlmostEqual(find_numbers(text)[0].value, value)
+        for text in ("$3 billion-plus", "2 million-strong", "a 10 million-user base"):
+            with self.subTest(ambiguous=text):
+                self.assertIsNone(find_numbers(text)[0].value)
         self.assertEqual(find_numbers("We sell 1k-seat licences")[0].value, 1000)  # a glued letter scales the number
         for quote, value, unit in (("We signed 12 million-dollar contracts last year", 12, "count"),
                                    ("We sell 1k-seat licences", 1, "count"), ("We have a 7m runway", 7, "months")):

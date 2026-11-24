@@ -180,6 +180,22 @@ quarters" and "we have 850 customers paying on average $1,200 per month"):
   chart: {{"title": "Monthly churn rose sharply in two quarters.",
           "figure_ids": ["F1", "F2"], "labels": ["Before", "Now"]}}
 
+Quality rules (a board reader catches these):
+- Put a cost on the problem: when the client gives counts with prices,
+  revenue or costs, add a computed figure for what the problem costs (a month
+  or a year) and use it in the answer.
+- Fit the plan to the client's deadline: the roadmap horizons are fixed (First
+  30 days, Days 31-60, Days 61-90), so anything the client needs before its
+  deadline goes in a horizon that ends before it, and the action says so.
+- Claim only what the client's text supports: no timing ("before",
+  "immediately after") or proportion ("disproportionate", "most of the
+  market") unless a figure or the client's words state it. Describe the client
+  only in its own words (who it sells to is not its own size).
+- A hypothesis is supported or refuted only when the client's figures or
+  words in that branch clearly show it; mixed or indirect evidence is untested.
+- A number word in a title must match the rows under it: "three options" only
+  over exactly three options.
+
 Common mistakes that get content rejected:
 - "7% [F2]" or "[F2]%" or "$[F6]": write only "[F2]", "[F6]".
 - A quote with two numbers ("went from 4% to 7%"): quote only the part with
@@ -691,6 +707,43 @@ def _chart_problems(where, chart, figures):
     return problems
 
 
+# A title that counts all its rows must count them right (Slice 125: the first live deck said "Three paths
+# exist" over four options and "Six metrics track..." over five). Only that phrasing is checked: the title opens
+# with the count directly followed by the rows' own noun, it is the title's only counting word, and no subset
+# word appears. "Only one option meets the deadline", "Two key risks could derail it", "Two options fit, one
+# does not" and "three months" count part of the rows or something else, so a check would refuse good titles
+# and cost a repair call (release review of Slice 125).
+_COUNT_WORDS = {w: n for n, w in enumerate(("zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+                                            "nine", "ten", "eleven", "twelve"))}
+_ROW_NOUNS = {
+    "options": r"options?|ways?|paths?|choices?|routes?|alternatives?|approaches?|directions?|plans?|scenarios?",
+    "kpis": r"measures?|metrics?|kpis?|indicators?|targets?|signals?",
+    "risks": r"risks?|threats?|dangers?",
+}
+_COUNTED_RE = {key: re.compile(r"^\s*(?:(?:the|these|all|there\s+are)\s+)?(" + "|".join(_COUNT_WORDS) + r")\s+(?:"
+                               + nouns + r")\b", re.IGNORECASE) for key, nouns in _ROW_NOUNS.items()}
+_ANY_COUNT_RE = re.compile(r"\b(?:" + "|".join(_COUNT_WORDS) + r")\b", re.IGNORECASE)
+_SUBSET_RE = re.compile(r"\b(?:only|other|others|rest|remaining|top|key|main|first|biggest|most|least|than|of|both)\b",
+                        re.IGNORECASE)
+
+
+def title_count_problems(titles, content):
+    """A title that opens by counting all its rows ("Three paths exist...") must count them right."""
+    problems = []
+    for key, pattern in _COUNTED_RE.items():
+        rows, title = content.get(key), titles.get(key)
+        if not isinstance(title, str) or not isinstance(rows, list):
+            continue
+        m = pattern.match(title)
+        if m is None or len(_ANY_COUNT_RE.findall(title)) != 1 or _SUBSET_RE.search(title):
+            continue
+        said = _COUNT_WORDS[m.group(1).lower()]
+        if said != len(rows):
+            problems.append(f"titles.{key} says {m.group(0).strip()!r} but there are {len(rows)} {key}; "
+                            f"make the count match or leave the number out")
+    return problems
+
+
 def _count_problem(name, value, lo, hi):
     if not isinstance(value, list) or not lo <= len(value) <= hi:
         return [f"{name} must have {lo} to {hi} entries"]
@@ -752,6 +805,7 @@ def verify_content(content, client_text):
         for key in TITLE_KEYS:
             if not _is_sentence(titles[key]):
                 problems.append(f"titles.{key} must be an action title: a sentence of 4 to 20 words")
+        problems += title_count_problems(titles, content)
 
     tree = content.get("issue_tree")
     problems += _count_problem("issue_tree", tree, 2, 5)

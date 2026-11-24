@@ -24,6 +24,19 @@ No generator owned the hero's spec figure. It had been typed by hand and was
 frozen since about Slice 49. It now has its own `site_counts.py` pattern,
 generated from the same `count_specs()` as the evidence card.
 
+## 2026-11-23 — Slice 125: deck quality from the first passing live deck
+
+The only issues in the first passing live deck that code can check without
+refusing good work are title counts ("Three paths" over four options): now a
+check with a repair message, kept narrow after its release review showed a
+wider one refused ordinary subset titles ("Two key risks could derail the
+plan"); some wrong counts in other phrasings still pass. The rest (deadline fit, unsupported timing or
+proportion claims, verdict strength, putting a cost on the problem, describing
+the client in its own words) are prompt rules: a check such as "a verdict needs
+a figure" would have refused the churn worked example's sound evidence from the
+client's words. Whether the rules change the live model's output is measured
+only by a paid run.
+
 ## 2026-11-23 — The third paid test passed (Management Consulting Analyst)
 
 After Slice 121 was deployed (main 3dbdde6), the owner ran the third paid test

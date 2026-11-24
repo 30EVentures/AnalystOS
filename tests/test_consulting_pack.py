@@ -500,5 +500,52 @@ class ReviewOfPr99Test(unittest.TestCase):
                 self.assertTrue(c.number_problems("t", bad, self.FIGURES), bad)
 
 
+class DeckQualityTest(unittest.TestCase):
+    """Slice 125: the mistakes a reader caught in the first passing live deck."""
+
+    def test_a_title_count_must_match_its_rows(self):
+        rows = {"options": [1, 2, 3, 4], "kpis": [1, 2, 3, 4, 5], "risks": [1, 2, 3, 4, 5]}
+        wrong = {"options": "Three paths exist: invest in retention, invest in sales, or split the budget.",
+                 "kpis": "Six metrics track whether churn returns to its prior level without price cuts."}
+        problems = c.title_count_problems(wrong, rows)
+        self.assertEqual(len(problems), 2, problems)
+        self.assertIn("'Three paths' but there are 4 options", problems[0])
+        for fine in ({"options": "Four ways to respond, and only one fits the limits."},
+                     {"risks": "Five risks could blunt the retention program if left unmanaged."},
+                     {"options": "Two of the paths are cheap; one needs hires."},
+                     {"kpis": "Track the measures monthly so the board sees progress early."}):
+            with self.subTest(fine=fine):
+                self.assertEqual(c.title_count_problems(fine, rows), [])
+        # Release review of Slice 125: ordinary titles that count part of the rows are never refused.
+        subsets = {"options": ("Only one option meets the deadline.", "Two options fit the constraints, one does not.",
+                               "One path clearly beats the other two.", "Two options survive and two do not.",
+                               "A third path combines the first two options.", "Choose between two paths to profit."),
+                   "risks": ("The top two risks are cash and churn.", "Two key risks could derail the plan.",
+                             "One risk outweighs all the others.", "Two execution risks and one market risk matter most."),
+                   "kpis": ("Two leading indicators will show progress first.",
+                            "Track one metric weekly and the others monthly.", "Three KPIs plus one guardrail show progress.")}
+        for key, titles in subsets.items():
+            for title in titles:
+                with self.subTest(subset=title):
+                    self.assertEqual(c.title_count_problems({key: title}, rows), [])
+
+    def test_a_wrong_count_is_refused_then_fixed_on_the_repair_request(self):
+        first = copy.deepcopy(RESPONSE)
+        first["titles"]["options"] = "Four paths exist: a retention program, new sales, or a split budget."
+        problems = c.verify_content(first, CLIENT_TEXT)
+        self.assertTrue(any("titles.options says 'Four paths'" in p for p in problems), problems)
+        replay = ReplayClient([first, RESPONSE])
+        spec = c.build_deck_spec(ENGAGEMENT, CATALOG, client=replay)
+        self.assertEqual(spec["attempts"], 2)
+        self.assertIn("make the count match", replay.requests[1]["messages"][0]["content"])
+
+    def test_the_prompt_carries_the_quality_rules(self):
+        prompt = c.system_prompt(next(r for r in CATALOG["roles"] if r["id"] == "management-consulting-analyst"))
+        for rule in ("Put a cost on the problem", "Fit the plan to the client's deadline",
+                     "Claim only what the client's text supports", "mixed or indirect evidence is untested",
+                     "A number word in a title must match the rows under it"):
+            with self.subTest(rule=rule):
+                self.assertIn(rule, prompt)
+
 if __name__ == "__main__":
     unittest.main()

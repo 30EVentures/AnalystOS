@@ -52,7 +52,9 @@ def generated_files():
               f"- [OpenAPI 3.1]({BASE}/api/v1/openapi.json): every endpoint, request and response",
               f"- [API index]({BASE}/api/v1): machine-readable list of endpoints and limits",
               f"- [Role catalog]({BASE}/api/v2/catalog): every role you can hire, its limits, how it was tested, and its questions",
-              f"- `POST {BASE}/api/v2/engagements`: hire a role for one problem (access code required; each request is a paid model call)",
+              f"- `POST {BASE}/api/v2/engagements`: hire a role for one problem (access code required; each request is a paid model call). "
+              "The response is the role's format (its catalog `delivers_today`): .pptx, .docx or .xlsx, named in the "
+              "`X-AnalystOS-Format` header; with `?format=json` it is `output` {format, media_type, filename, base64}",
               f"- [{GUIDES[0][1]}]({BASE}/docs/{GUIDES[0][0]}): {GUIDES[0][2]}", ""]
     lines += ["## Verifying a report", "",
               f"- [{GUIDES[1][1]}]({BASE}/docs/{GUIDES[1][0]}): {GUIDES[1][2]}",

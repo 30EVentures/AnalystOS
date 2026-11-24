@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AnalystOS: specialist work, ready when you need it</title>
-<meta name="description" content="Hire a specialist for one problem and get finished work you can use (a memo, a workbook or a deck), with every number traced to your own words or a calculation it shows. 73 roles; people and agents hire the same way.">
+<meta name="description" content="Hire a specialist for one problem and get finished work you can use (a memo, a workbook or a deck), with every number traced to your own words, a calculation it shows, or a labelled assumption. 73 roles; people and agents hire the same way.">
 <link rel="api-catalog" href="https://analystos.dev/.well-known/api-catalog">
 <link rel="alternate" type="text/plain" href="https://analystos.dev/llms.txt" title="llms.txt">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -173,7 +173,7 @@ footer a{color:var(--muted)}
       <span class="ready">Output ready when you need it</span>
       <h1>Specialist work, ready the moment you need it.</h1>
       <p class="roles">Consultant &middot; FP&amp;A analyst &middot; Paralegal &middot; Recruiter &middot; Data analyst &middot; Claims adjuster &middot; and 67 more</p>
-      <p class="sub">Describe the problem. Get back finished work you can put in front of a CEO or a board (a memo, a workbook or a deck), with every number traced to your own words or a calculation it shows.</p>
+      <p class="sub">Describe the problem. Get back finished work (a memo, a workbook or a deck), answer first, with every number traced to your own words, a calculation it shows, or a labelled assumption.</p>
       <div class="actions">
         <a class="btn" href="hire.html">Hire a specialist</a>
         <a class="btn ghost" href="#samples">See sample output</a>
@@ -211,7 +211,7 @@ footer a{color:var(--muted)}
   <p class="muted lead">Pick a family. Preview what one of its specialists delivered, download the real file, or hire that role.</p>
   <p class="today"><strong>Each family delivers in its own format:</strong> a Word memo for legal, research, audit, HR, insurance and financial crime; an Excel workbook with live formulas for finance, accounting and data; a deck for consulting, content, sales and software. Work each role writes itself (drafts, job posts, journal entries) comes next.</p>
   <div class="fams" role="tablist" aria-label="Role families" id="fams"></div>
-  <div class="explorer" id="explorer" hidden>
+  <div class="explorer" id="explorer" role="tabpanel" hidden>
     <div class="who">
       <p class="eyebrow" id="exFamily"></p>
       <h3 id="exRole"></h3>
@@ -302,15 +302,15 @@ footer a{color:var(--muted)}
   function show(i) {
     current = i; page = 0;
     var s = data[i];
-    Array.prototype.forEach.call(fams.children, function (b, k) { b.setAttribute('aria-selected', k === i ? 'true' : 'false'); });
+    Array.prototype.forEach.call(fams.children, function (b, k) {
+      b.setAttribute('aria-selected', k === i ? 'true' : 'false'); b.tabIndex = k === i ? 0 : -1;
+    });
+    box.setAttribute('aria-labelledby', 'tab-' + s.family.id);
     document.getElementById('exFamily').textContent = s.family.title;
     document.getElementById('exRole').textContent = s.role.title;
     document.getElementById('exProblem').textContent = s.problem;
     document.getElementById('exBoundary').textContent = s.role.boundary;
-    var planned = s.role.deliverables.filter(function (d) { return d !== 'deck'; });
-    document.getElementById('exToday').textContent = 'Delivers today: a verified analysis deck.' +
-      (planned.length ? ' Its own ' + (planned.length > 1 ? planned.slice(0, -1).join(', ') + ' and ' + planned[planned.length - 1]
-        : planned[0]) + (planned.length > 1 ? ' are' : ' is') + ' on the roadmap.' : '');
+    document.getElementById('exToday').textContent = s.delivers;  // built from the role's format
     document.getElementById('exHire').href = 'hire.html?role=' + encodeURIComponent(s.role.id);
     var kind = {memo: 'Word memo', workbook: 'Excel workbook', deck: 'PowerPoint deck'}[s.format] || s.format;
     var dl = document.getElementById('exDeck'); dl.href = s.file; dl.textContent = 'Download this ' + s.format;
@@ -324,11 +324,19 @@ footer a{color:var(--muted)}
   function step(d) { var n = data[current].slides.length; page = (page + d + n) % n; drawSlide(); }
   document.getElementById('exPrev').addEventListener('click', function () { step(-1); });
   document.getElementById('exNext').addEventListener('click', function () { step(1); });
-  box.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') step(-1); if (e.key === 'ArrowRight') step(1); });
+  document.querySelector('.viewer').addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowLeft') step(-1); if (e.key === 'ArrowRight') step(1);
+  });
+  fams.addEventListener('keydown', function (e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    var next = (current + (e.key === 'ArrowRight' ? 1 : -1) + data.length) % data.length;
+    show(next); fams.children[next].focus(); e.preventDefault();
+  });
   fetch('samples/samples.json').then(function (r) { return r.json(); }).then(function (doc) {
     data = doc.samples;
     data.forEach(function (s, i) {
       var b = el('button', 'fam', s.family.title); b.type = 'button'; b.setAttribute('role', 'tab');
+      b.setAttribute('aria-controls', 'explorer'); b.id = 'tab-' + s.family.id;
       b.addEventListener('click', function () { show(i); }); fams.appendChild(b);
     });
     var start = data.findIndex(function (s) { return s.family.id === 'consulting'; });

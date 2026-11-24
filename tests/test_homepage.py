@@ -82,6 +82,7 @@ class RoleExplorerTest(unittest.TestCase):
                 role = next(r for r in catalog["roles"] if r["id"] == sample["role"]["id"])
                 self.assertEqual(sample["format"], formats.format_of(role)["name"])  # Slice 124: the role's own format
                 self.assertTrue(sample["file"].endswith("." + formats.format_of(role)["extension"]))
+                self.assertIn(build_samples.DELIVERS[sample["format"]], sample["delivers"])  # matches the download
                 self.assertEqual([s["kind"] for s in sample["slides"]], ["summary", "finding", "recommendation", "sources"])
 
     def test_every_number_shown_is_the_verified_value(self):
@@ -136,6 +137,8 @@ class RoleExplorerTest(unittest.TestCase):
             self.assertNotIn(unsafe, script)
         self.assertIn("textContent", script)
         self.assertIn("encodeURIComponent(s.role.id)", script)
+        self.assertIn("textContent = s.delivers", script)
+        self.assertNotIn("a verified analysis deck", script)  # never hard-coded again
 
 
 if __name__ == "__main__":

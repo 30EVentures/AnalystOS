@@ -176,6 +176,46 @@ class WorkbookTest(unittest.TestCase):
         self.assertIn("Background", heads)
 
 
+class InjectionTest(unittest.TestCase):
+    """Slice 124 review: text that starts with "=" must never become a live Excel formula."""
+
+    def test_text_starting_with_an_equals_sign_stays_text(self):
+        directory = ROOT / "fixtures" / "roles" / "finance-modeling"
+        client = json.loads((directory / "client.json").read_text())
+        response = json.loads((directory / "response.json").read_text())
+        payload = '=HYPERLINK("https://example.invalid/x","Open the source")'
+        response["risks"][0]["risk"] = payload
+        response["risks"][0]["mitigation"] = "=PI()*ROWS(B:B)"
+        response["key_question"] = '=HYPERLINK("https://example.invalid/leak","What should change?")'
+        record = eng.new_engagement(engagement_id="5a" * 16, created="2026-11-23T00:00:00Z",
+                                    requested_by=client["requested_by"], problem=client["problem"],
+                                    roles=client["roles"], catalog=CATALOG)
+        for qid, text in client["answers"].items():
+            record = eng.answer(record, qid, text)
+        record, _ = eng.accept(record, CATALOG)
+        spec = c.build_deck_spec(record, CATALOG, client=ReplayClient([response]))
+        data = render_workbook(spec, record, CATALOG)
+        wb = load_workbook(io.BytesIO(data))
+        computed = {f["id"] for f in spec["content"]["figures"] if f["basis"] == "computed"}
+        formulas = []
+        for ws in wb.worksheets:
+            for row in ws.iter_rows():
+                for cell in row:
+                    if cell.data_type == "f":
+                        formulas.append((ws.title, cell.coordinate))
+        inputs = wb["Inputs"]
+        expected = {("Inputs", f"C{r}") for r in range(2, inputs.max_row + 1)
+                    if inputs.cell(row=r, column=1).value in computed}
+        self.assertEqual(set(formulas), expected)
+        self.assertEqual(wb["Risks"]["A2"].value, payload)  # kept, but as text
+        self.assertEqual(wb["Risks"]["A2"].data_type, "s")
+        import zipfile
+        with zipfile.ZipFile(io.BytesIO(data)) as z:
+            sheets = "".join(z.read(n).decode() for n in z.namelist() if n.startswith("xl/worksheets/"))
+        self.assertNotIn("HYPERLINK", re.sub(r"<is>.*?</is>|<v>.*?</v>", "", sheets))
+        self.assertNotIn("PI()", re.sub(r"<is>.*?</is>|<v>.*?</v>", "", sheets))
+
+
 class RefusalTest(unittest.TestCase):
     def test_both_formats_refuse_what_they_cannot_reverify(self):
         spec, record = BUILT["churn-clinics"]

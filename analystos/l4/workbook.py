@@ -79,6 +79,25 @@ def _sheet(wb, title, header, rows, widths):
     return ws
 
 
+def _only_our_formulas(wb, own):
+    """Store every text cell as text (Slice 124 review): openpyxl turns any string that starts
+    with "=" into a live formula, so model- or client-written text such as
+    '=HYPERLINK("...")' would otherwise run in Excel. Only the calculation cells this module
+    wrote (``own``) stay formulas."""
+    for ws in wb.worksheets:
+        for row in ws.iter_rows():
+            for cell in row:
+                if (ws.title, cell.coordinate) in own:
+                    continue
+                if isinstance(cell.value, str) and cell.data_type == "f":
+                    cell.data_type = "s"
+
+
+def _count_format(value):
+    """A count or plain number: whole numbers without a trailing point (Slice 124 review)."""
+    return "#,##0" if float(value).is_integer() else "#,##0.##"
+
+
 def render_workbook(spec, engagement, catalog=None):
     """Excel (.xlsx) bytes for a deck spec, or ValueError. See the module docstring."""
     role = deck.checked_role(spec, engagement, catalog)
@@ -114,6 +133,7 @@ def render_workbook(spec, engagement, catalog=None):
         inputs.append(["Ref", "Figure", "Value", "Shown as", "Basis", "Where it comes from"])
         for cell in inputs[1]:
             cell.font, cell.fill = HEAD_FONT, HEAD_FILL
+        own = set()  # the Inputs cells that hold the formulas written here; nothing else may be a formula
         row_of = {}
         for i, fig in enumerate(content["figures"], start=2):
             row_of[fig["id"]] = i
@@ -128,9 +148,11 @@ def render_workbook(spec, engagement, catalog=None):
                 value, where = fig["value"], f"Assumption: {_plain(fig['rationale'], figures)}"
             inputs.append([fig["id"], fig["label"], value, deck.format_value(fig), BASIS[fig["basis"]], where])
             cell = inputs.cell(row=r, column=3)
-            cell.number_format = NUMBER_FORMATS.get(fig["unit"], "General")
+            cell.number_format = (_count_format(fig["value"]) if fig["unit"] in ("count", "other")
+                                  else NUMBER_FORMATS.get(fig["unit"], "General"))
             if fig["basis"] == "computed":
                 cell.fill = CALC_FILL
+                own.add(("Inputs", cell.coordinate))
         for col, width in zip("ABCDEF", (6, 44, 16, 14, 12, 70)):
             inputs.column_dimensions[col].width = width
         for row in inputs.iter_rows(min_row=2):
@@ -156,6 +178,8 @@ def render_workbook(spec, engagement, catalog=None):
                (40, 70))
         _sheet(wb, "Risks", ["Risk", "Mitigation"],
                [[_plain(r["risk"], figures), _plain(r["mitigation"], figures)] for r in content["risks"]], (55, 55))
+
+        _only_our_formulas(wb, own)
 
         props = wb.properties
         props.title = content["key_question"][:250]

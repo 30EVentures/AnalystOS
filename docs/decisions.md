@@ -24,6 +24,22 @@ No generator owned the hero's spec figure. It had been typed by hand and was
 frozen since about Slice 49. It now has its own `site_counts.py` pattern,
 generated from the same `count_specs()` as the evidence card.
 
+## 2026-11-23 — The third paid test passed (Management Consulting Analyst)
+
+After Slice 121 was deployed (main 3dbdde6), the owner ran the third paid test
+with his explicit yes (at most $0.28): the live model's content passed
+verification and the deck downloaded. Checked locally, with no model call, from
+the downloaded file (15 slides, spec sha256 da0e3cbd...): every figure is the
+client's own words or a stated calculation (4% to 7% churn, 104% to 96% net
+revenue retention, 8 points, 60%, 15%, 70%, 850 x $1,200 = $1,020,000 a month)
+and no slide carries an untraced number. Quality issues a reader would catch,
+not caught by the checks: title count words that disagree with the rows
+("three paths" over four options, "six metrics" over five), a roadmap that runs
+past the five-week deadline, timing and proportion claims the data does not
+support, price refuted where the evidence is mixed, no cost put on the churn,
+and the company called mid-sized. One passing run is not an evaluation: the
+catalog keeps eval.method "mock" for the role; pages say "one run".
+
 ## 2026-11-23 — Slices 122-124: a short homepage, and each role in its own format
 
 The owner chose a short homepage (mock A, "specialist" rather than "analyst";

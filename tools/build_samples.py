@@ -129,12 +129,26 @@ def page_data(family, role, client, spec, catalog, fmt):
         "problem": short(client["problem"]),
         "file": f"samples/{family['id']}.{fmt['extension']}",
         "format": fmt["name"],
+        "delivers": delivers_line(role, fmt),
         "slide_count": deck.slide_count(spec),
         "figure_count": len(spec["content"]["figures"]),
         "slides": slides,
         "others": [{"id": r["id"], "title": r["title"], "deliverables": r["deliverables"]}
                    for r in family_roles if r["id"] != role["id"]],
     }
+
+
+DELIVERS = {"memo": "a verified Word memo", "workbook": "a verified Excel workbook with live formulas",
+            "deck": "a verified PowerPoint deck"}
+
+
+def delivers_line(role, fmt):
+    """What the role delivers today, from its format (Slice 124 review: never hard-coded)."""
+    planned = [d for d in role["deliverables"] if d != fmt["name"]]
+    line = f"Delivers today: {DELIVERS[fmt['name']]}."
+    if planned:
+        line += " Also planned: " + ", ".join(planned) + "."
+    return line
 
 
 def _source(fig):

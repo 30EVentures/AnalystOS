@@ -257,6 +257,7 @@ def render_memo(spec, engagement, catalog=None):
         props = doc.core_properties
         props.title = content["key_question"][:250]
         props.author = "AnalystOS"
+        props.last_modified_by = "AnalystOS"
         props.subject = role["title"]
         props.keywords = f"{deck.SPEC_FORMAT}; engagement {spec['engagement_id']}; spec sha256 {deck.spec_digest(spec)}"
         buffer = io.BytesIO()

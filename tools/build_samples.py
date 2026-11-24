@@ -124,7 +124,8 @@ def _work_payload(item, figures):
     elif kind == "code":
         lines = item["code"].splitlines()
         out.update({"language": work_products.LANGUAGE_NAMES[item["language"]],
-                    "purpose": segments(item["purpose"], figures), "lines": lines[:14], "more": max(0, len(lines) - 14)})
+                    "purpose": segments(item["purpose"], figures),
+                    "lines": lines if len(lines) <= 18 else lines[:14], "more": 0 if len(lines) <= 18 else len(lines) - 14})
     return out
 
 

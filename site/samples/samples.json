@@ -3888,9 +3888,10 @@
        "    )",
        "    return {row.widget_id: row.total for row in rows}",
        "",
-       "# Migration to review before running: index the filter column."
+       "# Migration to review before running: index the filter column.",
+       "# CREATE INDEX CONCURRENTLY idx_events_customer ON events (customer_id);"
       ],
-      "more": 1
+      "more": 0
      }
     },
     {

@@ -109,6 +109,9 @@ footer a{color:var(--muted)}
 .rchip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .rchip .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--tick);margin-right:6px;vertical-align:1px}
 .rchip[aria-pressed="true"] .dot{background:var(--bg)}
+.rchip.borrow{color:var(--muted);border-style:dashed}
+.rchip.borrow[aria-pressed="true"]{color:var(--bg)}
+.borrowed{border:1px dashed var(--muted);border-radius:8px;padding:7px 10px;margin:0 0 10px;font-size:13px;color:var(--ink);background:var(--paper)}
 .shared{background:var(--bg);border-radius:8px;padding:8px 10px}
 .wk p{margin:0 0 7px}
 .wk .src td:first-child{white-space:normal}
@@ -217,7 +220,7 @@ footer a{color:var(--muted)}
 
 <section class="band" id="samples">
   <h2>See what a specialist produces</h2>
-  <p class="muted lead">Pick a family. Preview what one of its specialists delivered, download the real file, or hire that role.</p>
+  <p class="muted lead">Pick a family, then a role. Preview what that specialist delivered, download the real file, or hire the role.</p>
   <p class="today"><strong>Each family delivers in its own format:</strong> a Word memo for legal, research, audit, HR, insurance and financial crime; an Excel workbook with live formulas for finance, accounting and data; a deck for consulting, content, sales and software. Roles whose job is writing or tracking also deliver that work inside it: drafts, registers, case files, reconciliations, plans or draft code.</p>
   <div class="fams" role="tablist" aria-label="Role families" id="fams"></div>
   <div class="explorer" id="explorer" role="tabpanel" hidden>
@@ -236,6 +239,7 @@ footer a{color:var(--muted)}
       <div class="others"><p class="fine" style="margin:0 0 6px">Roles in this family (<span class="dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--tick)"></span> has its own sample):</p><div class="rolechips" id="exRoles"></div></div>
     </div>
     <div class="viewer">
+      <p class="borrowed" id="exBorrowed" hidden></p>
       <div class="slide big" id="exSlide" aria-live="polite"></div>
       <div class="pager">
         <button type="button" class="pg" id="exPrev" aria-label="Previous slide">&larr;</button>
@@ -304,16 +308,18 @@ footer a{color:var(--muted)}
       w.steps.forEach(function (st) { var tr = el('tr'); cell(tr, st.when); tr.appendChild(rich(el('td'), st.task)); cell(tr, st.owner); pt.appendChild(tr); });
       box.appendChild(pt);
     } else if (w.kind === 'code') {
-      box.appendChild(rich(el('div', 'fine', w.language + ' \u00b7 '), w.purpose));
+      box.appendChild(rich(el('div', 'fine'), w.purpose));
       box.appendChild(el('div', 'fine', 'Draft: not run or reviewed.'));
-      box.appendChild(el('pre', null, w.lines.join('\n') + (w.more ? '\n\u2026 ' + w.more + ' more lines in the file' : '')));
+      box.appendChild(el('pre', null, w.lines.join('\n') + (w.more ? '\n\u2026 ' + w.more + (w.more === 1 ? ' more line' : ' more lines') + ' in the file' : '')));
     }
     return box;
   }
   function drawSlide() {
     var sample = shown, s = sample.slides[page];
     slideEl.textContent = '';
-    slideEl.appendChild(el('div', 'h', s.heading));
+    var mine = !role || role.id === sample.role.id;
+    var heading = s.kind === 'work' && !mine ? 'Work by the ' + sample.role.title : s.heading;
+    slideEl.appendChild(el('div', 'h', heading));
     slideEl.appendChild(rich(el('div', 't'), s.title || (s.work ? s.work.title : [])));
     if (s.kind === 'work') {
       slideEl.appendChild(drawWork(s.work));
@@ -344,7 +350,7 @@ footer a{color:var(--muted)}
       var c = s.counts;
       slideEl.appendChild(el('div', 'fine', c.client + ' from the client\u2019s words \u00b7 ' + c.computed + ' calculated \u00b7 ' + c.assumption + ' labelled assumptions'));
     }
-    whereEl.textContent = (page + 1) + ' of ' + sample.slides.length + ' \u00b7 ' + s.heading;
+    whereEl.textContent = (page + 1) + ' of ' + sample.slides.length + ' \u00b7 ' + heading;
   }
   function pick(r) {
     // A role shows its own sample when it has one; otherwise its family's, and says so.
@@ -356,9 +362,10 @@ footer a{color:var(--muted)}
     document.getElementById('exBoundary').textContent = r.boundary;
     document.getElementById('exToday').textContent = r.delivers;  // built from the role's format
     document.getElementById('exHire').href = 'hire.html?role=' + encodeURIComponent(r.id);
-    var shared = document.getElementById('exShared');
-    shared.hidden = r.own_sample;
+    var shared = document.getElementById('exShared'), borrowed = document.getElementById('exBorrowed');
+    shared.hidden = borrowed.hidden = r.own_sample;
     shared.textContent = r.own_sample ? '' : 'No sample of its own yet: this is the family\u2019s example, written for the ' + fam.role.title + '.';
+    borrowed.textContent = r.own_sample ? '' : 'Showing the ' + fam.role.title + '\u2019s sample. The ' + r.title + ' has no sample of its own yet.';
     var kind = {memo: 'Word memo', workbook: 'Excel workbook', deck: 'PowerPoint deck'}[shown.format] || shown.format;
     var dl = document.getElementById('exDeck'); dl.href = shown.file; dl.textContent = 'Download this ' + shown.format;
     document.getElementById('exCount').textContent = 'The full ' + kind + ': ' + shown.figure_count + ' figures, each traced' +
@@ -378,7 +385,7 @@ footer a{color:var(--muted)}
     document.getElementById('exFamily').textContent = s.family.title;
     var chips = document.getElementById('exRoles'); chips.textContent = '';
     s.roles.forEach(function (r) {
-      var b = el('button', 'rchip'); b.type = 'button'; b.dataset.role = r.id;
+      var b = el('button', r.own_sample ? 'rchip' : 'rchip borrow'); b.type = 'button'; b.dataset.role = r.id;
       if (r.own_sample) b.appendChild(el('span', 'dot'));
       b.appendChild(document.createTextNode(r.title));
       b.addEventListener('click', function () { pick(r); }); chips.appendChild(b);

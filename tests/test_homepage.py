@@ -165,6 +165,26 @@ class RoleSamplesTest(unittest.TestCase):
     def test_the_page_says_when_a_role_is_shown_on_its_familys_example(self):
         self.assertIn("No sample of its own yet: this is the family", PAGE)
         self.assertIn("own[r.id] || fam", PAGE)
+        self.assertIn("'Work by the ' + sample.role.title", PAGE)  # a borrowed work page is never "the role's own"
+
+    def test_published_files_name_only_analystos(self):
+        from docx import Document
+        from openpyxl import load_workbook
+        from pptx import Presentation
+        for path in sorted((SITE / "samples").rglob("*")):
+            if path.suffix == ".pptx":
+                props = Presentation(str(path)).core_properties
+                people = (props.author, props.last_modified_by)
+            elif path.suffix == ".docx":
+                props = Document(str(path)).core_properties
+                people = (props.author, props.last_modified_by)
+            elif path.suffix == ".xlsx":
+                props = load_workbook(str(path)).properties
+                people = (props.creator, props.lastModifiedBy)
+            else:
+                continue
+            with self.subTest(file=path.name):
+                self.assertEqual(people, ("AnalystOS", "AnalystOS"))
 
     def test_it_says_which_format_each_family_delivers(self):
         # Slice 124: the statement must match the catalog's formats, family by family.

@@ -588,13 +588,11 @@ def slide_count(spec):
     return sum(sources if s["kind"] == "sources" else 1 for s in spec["slides"])
 
 
-def render_deck(spec, engagement, catalog=None):
-    """PowerPoint bytes for a deck spec, or ValueError.
-
-    Trusts nothing in the spec it can derive: the client's text is recomputed from
-    the engagement (which must be valid and accepted, and the spec's), the role's
-    title comes from the catalog, and the content is re-verified and the slides
-    rebuilt before anything is drawn. Any drawing error is a ValueError."""
+def checked_role(spec, engagement, catalog=None):
+    """The catalog role for ``spec``, or ValueError. Every renderer (deck, memo, workbook)
+    calls this first (Slice 123): the content is re-verified, the client's text is
+    recomputed from the engagement (which must be valid, accepted and the spec's), and
+    the role must be one the engagement asked for."""
     catalog = catalog if catalog is not None else load_catalog()
     problems = check_deck_spec(spec)
     if problems:
@@ -608,7 +606,17 @@ def render_deck(spec, engagement, catalog=None):
     roles = {r["id"]: r for r in catalog["roles"]}
     if spec["role"] not in roles or spec["role"] not in engagement["roles"]:
         raise ValueError("refusing to render: the role is not one this engagement asked for")
-    role = roles[spec["role"]]
+    return roles[spec["role"]]
+
+
+def render_deck(spec, engagement, catalog=None):
+    """PowerPoint bytes for a deck spec, or ValueError.
+
+    Trusts nothing in the spec it can derive: the client's text is recomputed from
+    the engagement (which must be valid and accepted, and the spec's), the role's
+    title comes from the catalog, and the content is re-verified and the slides
+    rebuilt before anything is drawn. Any drawing error is a ValueError."""
+    role = checked_role(spec, engagement, catalog)
     drawn = dict(spec, _role_title=role["title"], _boundary=role["boundary"],
                  _human_decides=list(role.get("human_decides", [])), _gated_actions=list(role.get("gated_actions", [])))
     token = _FIGURES.set({f["id"]: f for f in spec["content"]["figures"]})

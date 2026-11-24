@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AnalystOS: specialist work, ready when you need it</title>
-<meta name="description" content="Hire a specialist for one problem and get a finished deck you can use, with every number traced to your own words or a calculation it shows. 73 roles; people and agents hire the same way.">
+<meta name="description" content="Hire a specialist for one problem and get finished work you can use (a memo, a workbook or a deck), with every number traced to your own words or a calculation it shows. 73 roles; people and agents hire the same way.">
 <link rel="api-catalog" href="https://analystos.dev/.well-known/api-catalog">
 <link rel="alternate" type="text/plain" href="https://analystos.dev/llms.txt" title="llms.txt">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -173,7 +173,7 @@ footer a{color:var(--muted)}
       <span class="ready">Output ready when you need it</span>
       <h1>Specialist work, ready the moment you need it.</h1>
       <p class="roles">Consultant &middot; FP&amp;A analyst &middot; Paralegal &middot; Recruiter &middot; Data analyst &middot; Claims adjuster &middot; and 67 more</p>
-      <p class="sub">Describe the problem. Get back a finished deck you can put in front of a CEO or a board, with every number traced to your own words or a calculation it shows.</p>
+      <p class="sub">Describe the problem. Get back finished work you can put in front of a CEO or a board (a memo, a workbook or a deck), with every number traced to your own words or a calculation it shows.</p>
       <div class="actions">
         <a class="btn" href="hire.html">Hire a specialist</a>
         <a class="btn ghost" href="#samples">See sample output</a>
@@ -202,14 +202,14 @@ footer a{color:var(--muted)}
   <div class="steps" id="how">
     <div class="step"><h3>1. Describe it</h3><p class="muted">The problem, the decision and the deadline, in your own words.</p></div>
     <div class="step"><h3>2. Every number is checked</h3><p class="muted">Nothing is delivered until each figure traces to you or a shown calculation.</p></div>
-    <div class="step"><h3>3. Use it</h3><p class="muted">Download a finished deck: answer first, charts, plan, risks and sources.</p></div>
+    <div class="step"><h3>3. Use it</h3><p class="muted">Download it in the format the role&rsquo;s work is read in: a memo, a workbook with live formulas, or a deck. Answer first, sources last.</p></div>
   </div>
 </section>
 
 <section class="band" id="samples">
   <h2>See what a specialist produces</h2>
-  <p class="muted lead">Pick a family. Flip through a real deck from one of its specialists, download it, or hire that role.</p>
-  <p class="today"><strong>Today, every role delivers the same kind of output:</strong> a verified analysis deck for its problem. Role-specific outputs (a memo for legal and research, a workbook for finance, drafts for content) are being built next.</p>
+  <p class="muted lead">Pick a family. Preview what one of its specialists delivered, download the real file, or hire that role.</p>
+  <p class="today"><strong>Each family delivers in its own format:</strong> a Word memo for legal, research, audit, HR, insurance and financial crime; an Excel workbook with live formulas for finance, accounting and data; a deck for consulting, content, sales and software. Work each role writes itself (drafts, job posts, journal entries) comes next.</p>
   <div class="fams" role="tablist" aria-label="Role families" id="fams"></div>
   <div class="explorer" id="explorer" hidden>
     <div class="who">
@@ -220,7 +220,7 @@ footer a{color:var(--muted)}
       <p class="fine" id="exToday"></p>
       <div class="actions">
         <a class="btn" id="exHire" href="hire.html">Hire this role</a>
-        <a class="btn ghost" id="exDeck" href="#" download>Download this deck</a>
+        <a class="btn ghost" id="exDeck" href="#" download>Download this sample</a>
       </div>
       <p class="fine" id="exCount"></p>
       <div class="others" id="exOthersWrap"><p class="fine" style="margin:0 0 6px">Other roles in this family:</p><div id="exOthers"></div></div>
@@ -234,7 +234,7 @@ footer a{color:var(--muted)}
       </div>
     </div>
   </div>
-  <noscript><p>Sample decks: <a href="samples/consulting.pptx">Consulting</a>, <a href="samples/finance-modeling.pptx">Finance and modeling</a>, <a href="samples/legal-contracts-procurement.pptx">Legal, contracts and procurement</a>, and one for every family in <a href="samples/samples.json">samples.json</a>.</p></noscript>
+  <noscript><p>Samples: <a href="samples/consulting.pptx">Consulting (deck)</a>, <a href="samples/finance-modeling.xlsx">Finance and modeling (workbook)</a>, <a href="samples/legal-contracts-procurement.docx">Legal, contracts and procurement (memo)</a>, and one for every family in <a href="samples/samples.json">samples.json</a>.</p></noscript>
   <p class="fine" style="margin-top:12px">Each sample is a worked example for a synthetic client, verified and drawn by AnalystOS. Roles in the same family share one example.</p>
 </section>
 
@@ -312,8 +312,10 @@ footer a{color:var(--muted)}
       (planned.length ? ' Its own ' + (planned.length > 1 ? planned.slice(0, -1).join(', ') + ' and ' + planned[planned.length - 1]
         : planned[0]) + (planned.length > 1 ? ' are' : ' is') + ' on the roadmap.' : '');
     document.getElementById('exHire').href = 'hire.html?role=' + encodeURIComponent(s.role.id);
-    document.getElementById('exDeck').href = s.deck;
-    document.getElementById('exCount').textContent = 'The full deck: ' + s.slide_count + ' slides, ' + s.figure_count + ' figures, each traced.';
+    var kind = {memo: 'Word memo', workbook: 'Excel workbook', deck: 'PowerPoint deck'}[s.format] || s.format;
+    var dl = document.getElementById('exDeck'); dl.href = s.file; dl.textContent = 'Download this ' + s.format;
+    document.getElementById('exCount').textContent = 'The full ' + kind + ': ' + s.figure_count + ' figures, each traced' +
+      (s.format === 'workbook' ? '; calculations are live formulas.' : s.format === 'deck' ? ', ' + s.slide_count + ' slides.' : '.');
     var others = document.getElementById('exOthers'); others.textContent = '';
     s.others.forEach(function (o) { var a = el('a', null, o.title); a.href = 'hire.html?role=' + encodeURIComponent(o.id); others.appendChild(a); });
     document.getElementById('exOthersWrap').hidden = !s.others.length;

@@ -17,7 +17,8 @@
     ]
    },
    "problem": "We make premium dog food and sell it through pet stores. We want to know whether a direct subscription in Denver is worth testing.",
-   "deck": "samples/research-reporting.pptx",
+   "file": "samples/research-reporting.docx",
+   "format": "memo",
    "slide_count": 12,
    "figure_count": 7,
    "slides": [
@@ -324,7 +325,8 @@
     ]
    },
    "problem": "We are a B2B SaaS company selling scheduling software to mid-sized clinics. Our monthly logo churn went from 4% to 7% in two quarters and we don't know why.",
-   "deck": "samples/consulting.pptx",
+   "file": "samples/consulting.pptx",
+   "format": "deck",
    "slide_count": 14,
    "figure_count": 15,
    "slides": [
@@ -682,7 +684,8 @@
     ]
    },
    "problem": "Our quarterly operating expenses were $2.4 million against a budget of $2.1 million. We need to explain the overrun to the board and forecast next quarter.",
-   "deck": "samples/finance-modeling.pptx",
+   "file": "samples/finance-modeling.xlsx",
+   "format": "workbook",
    "slide_count": 13,
    "figure_count": 11,
    "slides": [
@@ -1036,7 +1039,8 @@
     ]
    },
    "problem": "Our online store's conversion rate fell from 3.2% to 2.5% last month. We need to know where in the funnel customers drop off.",
-   "deck": "samples/data-analytics.pptx",
+   "file": "samples/data-analytics.xlsx",
+   "format": "workbook",
    "slide_count": 13,
    "figure_count": 9,
    "slides": [
@@ -1367,7 +1371,8 @@
     ]
    },
    "problem": "Our bank balance and our ledger cash balance do not agree at month end. The bank shows $84,200 and the ledger shows $79,950.",
-   "deck": "samples/accounting-operations.pptx",
+   "file": "samples/accounting-operations.xlsx",
+   "format": "workbook",
    "slide_count": 13,
    "figure_count": 9,
    "slides": [
@@ -1704,7 +1709,8 @@
     ]
    },
    "problem": "We want an internal audit of employee expense claims. Last year we paid 4,800 claims and we suspect approvals are weak.",
-   "deck": "samples/risk-audit-controls.pptx",
+   "file": "samples/risk-audit-controls.docx",
+   "format": "memo",
    "slide_count": 12,
    "figure_count": 7,
    "slides": [
@@ -2014,7 +2020,8 @@
     ]
    },
    "problem": "Our card fraud alerts have grown and analysts cannot keep up. We had 3,000 alerts last month.",
-   "deck": "samples/financial-crime.pptx",
+   "file": "samples/financial-crime.docx",
+   "format": "memo",
    "slide_count": 12,
    "figure_count": 7,
    "slides": [
@@ -2328,7 +2335,8 @@
     ]
    },
    "problem": "Our cloud hosting contract renews next month at $240,000 a year. We want to know whether to renegotiate or switch.",
-   "deck": "samples/legal-contracts-procurement.pptx",
+   "file": "samples/legal-contracts-procurement.docx",
+   "format": "memo",
    "slide_count": 12,
    "figure_count": 8,
    "slides": [
@@ -2654,7 +2662,8 @@
     ]
    },
    "problem": "Our customer newsletter's open rate fell from 38% to 24% this year. We want a content plan to win readers back.",
-   "deck": "samples/content-communications.pptx",
+   "file": "samples/content-communications.pptx",
+   "format": "deck",
    "slide_count": 12,
    "figure_count": 7,
    "slides": [
@@ -2974,7 +2983,8 @@
     ]
    },
    "problem": "New hires take too long to become productive. Our onboarding takes 10 weeks on average and we want to cut it.",
-   "deck": "samples/people-hr.pptx",
+   "file": "samples/people-hr.docx",
+   "format": "memo",
    "slide_count": 12,
    "figure_count": 5,
    "slides": [
@@ -3262,7 +3272,8 @@
     ]
    },
    "problem": "Our customer dashboard takes 6.5 seconds to load and customers complain. We want it under 2 seconds.",
-   "deck": "samples/software-it.pptx",
+   "file": "samples/software-it.pptx",
+   "format": "deck",
    "slide_count": 12,
    "figure_count": 6,
    "slides": [
@@ -3554,7 +3565,8 @@
     ]
    },
    "problem": "We need help preparing a water damage claim file. The policyholder claims $18,000 for a burst pipe.",
-   "deck": "samples/insurance.pptx",
+   "file": "samples/insurance.docx",
+   "format": "memo",
    "slide_count": 12,
    "figure_count": 6,
    "slides": [
@@ -3857,7 +3869,8 @@
     ]
    },
    "problem": "We sell scheduling software to dental clinics. Our outbound emails get a 1.5% reply rate and we need more meetings.",
-   "deck": "samples/sales-customer-coordination.pptx",
+   "file": "samples/sales-customer-coordination.pptx",
+   "format": "deck",
    "slide_count": 12,
    "figure_count": 7,
    "slides": [

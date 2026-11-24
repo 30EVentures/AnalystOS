@@ -24,6 +24,20 @@ No generator owned the hero's spec figure. It had been typed by hand and was
 frozen since about Slice 49. It now has its own `site_counts.py` pattern,
 generated from the same `count_specs()` as the evidence card.
 
+## 2026-11-23 — Slices 122-124: a short homepage, and each role in its own format
+
+The owner chose a short homepage (mock A, "specialist" rather than "analyst";
+"expert" rejected because the roles are entry-level and licensed work stays with
+a qualified person); the old long page moved unchanged to details.html with its
+disclosures. Its role explorer showed that every role delivered the same kind of
+deck, which the owner called out. Phase 1 of role-specific outputs (Slice 123)
+renders the same verified content as a Word memo or an Excel workbook whose
+calculations are live formulas, behind the same re-verification guard as the
+deck; Slice 124 wires them in by family (memo 28 roles, workbook 26, deck 19).
+No change to the model call or its checks. Phase 2, work each role writes itself
+(drafts, job posts, journal entries, technical plans), is next and needs new
+content fields, checks and worked examples.
+
 ## 2026-11-23 — Slice 121: the second paid test failed on two words; say where
 
 The second paid test of Management Consulting Analyst (owner's run, at most

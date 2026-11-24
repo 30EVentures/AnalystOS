@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hire an AnalystOS role</title>
-<meta name="description" content="Describe a business problem, pick one of 73 entry-level roles, and get a verified deck in which every number is traced to your own words, a stated calculation or a labelled assumption.">
+<meta name="description" content="Describe a business problem, pick one of 73 entry-level roles, and get verified work (a memo, workbook or deck) in which every number is traced to your own words, a stated calculation or a labelled assumption.">
 <link rel="canonical" href="https://analyst-os-phi.vercel.app/hire.html">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%232F5CE0%22>▸</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -152,7 +152,7 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
 <main>
   <div class="wrap">
     <h1>Hire an AnalystOS role</h1>
-    <p class="lede">Describe the problem, pick the role, answer a few scoping questions, and get back a deck. Every number in it is printed from a figure traced to your own words, a stated calculation, or a labelled assumption.</p>
+    <p class="lede">Describe the problem, pick the role, answer a few scoping questions, and get back finished work in the format the role's work is read in: a memo, a workbook with live formulas, or a deck. Every number in it is printed from a figure traced to your own words, a stated calculation, or a labelled assumption.</p>
     <p class="roles-note" id="roles-note">Loading roles…</p>
 
     <form id="hire-form" class="form-card" autocomplete="off">
@@ -170,8 +170,8 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
         <label for="code">Access code</label>
         <input type="password" id="code" required>
       </div>
-      <p class="fine">Price: to be determined. Nothing is charged on this page. Today every role delivers a verified analysis deck, not its native work product. No role has been tested on the live model yet; each role says whether its worked example was written for it or for a related role.</p>
-      <button class="btn" type="submit" id="go">Get the deck</button>
+      <p class="fine">Price: to be determined. Nothing is charged on this page. Each role delivers verified analysis as a memo, workbook or deck, not yet its own native work product (drafts, job posts, journal entries). Every role is tested on a worked example; one role, Management Consulting Analyst, has also passed a run on the live model.</p>
+      <button class="btn" type="submit" id="go">Get the work</button>
       <div class="result" id="result" role="status" aria-live="polite"></div>
     </form>
   </div>
@@ -202,7 +202,9 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
     if (role.boundary === 'human-decides') parts.push('Prepares the decision; a qualified person decides: ' + role.human_decides.join('; ') + '.');
     else if (role.boundary === 'approval-gated') parts.push('Drafts only; you approve before anything happens: ' + role.gated_actions.join('; ') + '.');
     else parts.push('Delivers analysis; acts on nothing.');
-    parts.push(role.tested === 'live' ? 'Tested on the live model.' : role.tested === 'mock' ? 'Tested on a worked example written for this role, not yet on the live model.' : 'Tested on a worked example written for a related role in the same family, not yet on the live model.');
+    var kinds = {'verified-memo': 'a Word memo', 'verified-workbook': 'an Excel workbook with live formulas', 'verified-deck': 'a PowerPoint deck'};
+    parts.push('Delivers ' + (kinds[role.delivers_today] || 'a PowerPoint deck') + '.');
+    parts.push(role.tested === 'live' ? 'Tested on the live model.' : role.tested === 'mock' ? 'Tested on a worked example written for this role.' : 'Tested on a worked example written for a related role in the same family.');
     meta.textContent = parts.join(' ');
   }
   function showQuestions(role) {
@@ -247,7 +249,10 @@ footer .fine{font-family:var(--font-mono);font-size:.76rem;color:var(--faint);li
                             requested_by: {kind: 'person', ref: 'hire-page'}})
     }).then(function (r) {
       if (r.ok) return r.blob().then(function (b) {
-        var a = el('a', {'href': URL.createObjectURL(b), 'download': 'analystos-' + roleSel.value + '.pptx'}, 'Download the deck');
+        var kind = r.headers.get('X-AnalystOS-Format') || 'deck';
+        var named = /filename="([^"]+)"/.exec(r.headers.get('Content-Disposition') || '');
+        var ext = {memo: 'docx', workbook: 'xlsx', deck: 'pptx'}[kind] || 'pptx';
+        var a = el('a', {'href': URL.createObjectURL(b), 'download': named ? named[1] : 'analystos-' + roleSel.value + '.' + ext}, 'Download the ' + kind);
         result.className = 'result ok'; result.textContent = 'Done. '; result.appendChild(a);
       });
       return r.json().then(function (j) {

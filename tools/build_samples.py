@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Build the homepage's sample decks and the data its role explorer draws (Slice 122).
+"""Build the homepage's samples and the data its role explorer draws (Slices 122, 124).
 
-    python3 tools/build_samples.py          # write site/samples/<family>.pptx and samples.json
+    python3 tools/build_samples.py          # write site/samples/<family>.<pptx|docx|xlsx> and samples.json
     python3 tools/build_samples.py --check  # exit 1 if anything served is not this build
 
 One worked example per role family (fixtures/roles/<family>, and the churn example for
@@ -22,11 +22,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from docx import Document  # noqa: E402
+from openpyxl import load_workbook  # noqa: E402
 from pptx import Presentation  # noqa: E402
 
 from analystos.catalog import load_catalog  # noqa: E402
 from analystos.l3 import engagement as eng  # noqa: E402
-from analystos.l4 import deck  # noqa: E402
+from analystos.l4 import deck, formats  # noqa: E402
 from analystos.packs import consulting  # noqa: E402
 from analystos.packs.replay import ReplayClient  # noqa: E402
 
@@ -58,7 +60,8 @@ def build_one(directory, catalog):
         raise SystemExit(f"{directory.name}: the sample engagement is not accepted: " + "; ".join(problems))
     response = json.loads((directory / "response.json").read_text())
     spec = consulting.build_deck_spec(record, catalog, client=ReplayClient([response]))
-    return client, spec, deck.render_deck(spec, record, catalog)
+    data, fmt = formats.render(spec, record, catalog)  # the role's own format (Slice 124)
+    return client, spec, data, fmt
 
 
 def segments(text, figures):
@@ -87,7 +90,7 @@ def short(text, limit=240):
     return first_two[:limit].rsplit(" ", 1)[0] + "…"
 
 
-def page_data(family, role, client, spec, catalog):
+def page_data(family, role, client, spec, catalog, fmt):
     figures = {f["id"]: f for f in spec["content"]["figures"]}
     by_kind = {}
     for s in spec["slides"]:
@@ -124,7 +127,8 @@ def page_data(family, role, client, spec, catalog):
         "role": {"id": role["id"], "title": role["title"], "boundary": BOUNDARY[role["boundary"]],
                  "deliverables": role["deliverables"]},
         "problem": short(client["problem"]),
-        "deck": f"samples/{family['id']}.pptx",
+        "file": f"samples/{family['id']}.{fmt['extension']}",
+        "format": fmt["name"],
         "slide_count": deck.slide_count(spec),
         "figure_count": len(spec["content"]["figures"]),
         "slides": slides,
@@ -147,12 +151,12 @@ def build():
     roles = {r["id"]: r for r in catalog["roles"]}
     data, decks = [], {}
     for family_id, directory in examples().items():
-        client, spec, pptx = build_one(directory, catalog)
+        client, spec, output, fmt = build_one(directory, catalog)
         role = roles[client["roles"][0]]
         if role["family"] != family_id:
             raise SystemExit(f"{directory.name}: example role {role['id']} is not in family {family_id}")
-        data.append(page_data(families[family_id], role, client, spec, catalog))
-        decks[family_id] = (spec, pptx)
+        data.append(page_data(families[family_id], role, client, spec, catalog, fmt))
+        decks[family_id] = (spec, output, fmt)
     order = [f["id"] for f in catalog["families"]]
     data.sort(key=lambda d: order.index(d["family"]["id"]))
     document = {"format": "analystos-samples/1",
@@ -160,6 +164,15 @@ def build():
                         "no model call. Values are printed exactly as in each deck.",
                 "samples": data}
     return document, decks
+
+
+def _keywords(path):
+    """The spec digest each format records in its document properties."""
+    if path.suffix == ".pptx":
+        return Presentation(str(path)).core_properties.keywords or ""
+    if path.suffix == ".docx":
+        return Document(str(path)).core_properties.keywords or ""
+    return load_workbook(str(path)).properties.keywords or ""
 
 
 def render_json(document):
@@ -174,18 +187,22 @@ def main(argv=None):
         stale = []
         if not (OUT / "samples.json").is_file() or (OUT / "samples.json").read_text(encoding="utf-8") != text:
             stale.append("samples.json")
-        for family_id, (spec, _) in decks.items():
-            path = OUT / f"{family_id}.pptx"
-            keywords = Presentation(str(path)).core_properties.keywords if path.is_file() else ""
+        for family_id, (spec, _, fmt) in decks.items():
+            path = OUT / f"{family_id}.{fmt['extension']}"
+            keywords = _keywords(path) if path.is_file() else ""
             if f"spec sha256 {deck.spec_digest(spec)}" not in (keywords or ""):
                 stale.append(path.name)
         print("stale: " + ", ".join(stale) + " - run python3 tools/build_samples.py" if stale else "samples are current")
         return 1 if stale else 0
     OUT.mkdir(parents=True, exist_ok=True)
-    for family_id, (_, pptx) in decks.items():
-        (OUT / f"{family_id}.pptx").write_bytes(pptx)
+    keep = {f"{family_id}.{fmt['extension']}" for family_id, (_, _, fmt) in decks.items()} | {"samples.json"}
+    for old in OUT.iterdir():
+        if old.name not in keep:
+            old.unlink()  # a family whose format changed leaves no stale file behind
+    for family_id, (_, output, fmt) in decks.items():
+        (OUT / f"{family_id}.{fmt['extension']}").write_bytes(output)
     (OUT / "samples.json").write_text(text, encoding="utf-8")
-    print(f"wrote {len(decks)} decks and samples.json")
+    print(f"wrote {len(decks)} samples and samples.json")
     return 0
 
 

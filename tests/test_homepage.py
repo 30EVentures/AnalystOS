@@ -10,7 +10,7 @@ import unittest
 from pathlib import Path
 
 from analystos.catalog import load_catalog
-from analystos.l4 import deck
+from analystos.l4 import deck, formats
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
@@ -34,7 +34,7 @@ class HomepageTest(unittest.TestCase):
             self.assertIn(family["title"], PAGE)
 
     def test_the_slide_preview_shows_the_sample_decks_verified_figures(self):
-        spec, _ = DECKS["consulting"]
+        spec = DECKS["consulting"][0]
         figures = {f["id"]: f for f in spec["content"]["figures"]}
         preview = re.search(r'<div class="slide".*?</figure>', PAGE, re.S).group(0)
         for value, fid in re.findall(r'<span class="n">([^<]+)</span><span class="ref">(F\d+)</span>', preview):
@@ -78,12 +78,15 @@ class RoleExplorerTest(unittest.TestCase):
         self.assertEqual([s["family"]["id"] for s in DOC["samples"]], [f["id"] for f in catalog["families"]])
         for sample in DOC["samples"]:
             with self.subTest(family=sample["family"]["id"]):
-                self.assertTrue((SITE / sample["deck"]).is_file())
+                self.assertTrue((SITE / sample["file"]).is_file())
+                role = next(r for r in catalog["roles"] if r["id"] == sample["role"]["id"])
+                self.assertEqual(sample["format"], formats.format_of(role)["name"])  # Slice 124: the role's own format
+                self.assertTrue(sample["file"].endswith("." + formats.format_of(role)["extension"]))
                 self.assertEqual([s["kind"] for s in sample["slides"]], ["summary", "finding", "recommendation", "sources"])
 
     def test_every_number_shown_is_the_verified_value(self):
         for sample in DOC["samples"]:
-            spec, _ = DECKS[sample["family"]["id"]]
+            spec = DECKS[sample["family"]["id"]][0]
             figures = {f["id"]: f for f in spec["content"]["figures"]}
             shown = []
 
@@ -116,10 +119,16 @@ class RoleExplorerTest(unittest.TestCase):
             with self.subTest(family=family):
                 self.assertEqual(sorted(ids), sorted(r for r, v in roles.items() if v["family"] == family))
 
-    def test_it_says_plainly_that_every_role_delivers_the_same_kind_of_output(self):
-        # The owner noticed every sample is the same kind of deck; until role-specific outputs ship, say so.
-        self.assertIn("Today, every role delivers the same kind of output:", PAGE)
+    def test_it_says_which_format_each_family_delivers(self):
+        # Slice 124: the statement must match the catalog's formats, family by family.
+        catalog = load_catalog()
+        statement = re.search(r'<p class="today">(.*?)</p>', PAGE, re.S).group(1)
+        names = {"memo": "Word memo", "workbook": "Excel workbook", "deck": "deck for"}
+        for fmt, phrase in names.items():
+            self.assertIn(phrase, statement)
         self.assertIn("Roles in the same family share one example.", PAGE)
+        families = {f["id"] for f in catalog["families"]}
+        self.assertEqual(set(formats.FAMILY_FORMAT), families)
 
     def test_the_page_never_parses_html_from_the_data(self):
         script = re.search(r"<script>(.*?)</script>", PAGE, re.S).group(1)

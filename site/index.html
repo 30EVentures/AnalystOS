@@ -92,7 +92,35 @@ footer{border-top:1px solid var(--line);margin-top:64px;padding:22px 0 40px;font
 footer a{color:var(--muted)}
 .more{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:12px}
 
+.lead{margin:-4px 0 16px}
+.fams{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;margin-bottom:16px}
+.fam{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 14px;font:500 14.5px var(--sans);
+  white-space:nowrap;cursor:pointer}
+.fam[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.explorer{display:grid;grid-template-columns:.85fr 1.15fr;gap:28px;align-items:start;background:var(--paper);border:1px solid var(--line);
+  border-radius:16px;padding:24px}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--tick);margin:0 0 6px}
+.who h3{font-size:24px;margin-bottom:12px}
+.asked{font-size:15.5px}
+.others{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.others a{display:inline-block;font-size:13.5px;margin:0 10px 6px 0;color:var(--muted)}
+.viewer .slide.big{aspect-ratio:auto;min-height:340px;overflow:visible;font-size:13.5px;background:var(--bg)}
+.slide .h{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.bars{display:flex;align-items:flex-end;gap:14px;height:120px;margin-top:auto;padding:0 4px;border-bottom:1px solid var(--line)}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.bar i{display:block;width:70%;background:var(--tick);border-radius:4px 4px 0 0;min-height:3px}
+.bar i.a{background:var(--muted)}
+.bar b{font-size:12.5px;margin-bottom:3px}
+.barl{display:flex;gap:14px;padding:4px 4px 0;font-size:10.5px;color:var(--muted)}
+.barl span{flex:1;text-align:center}
+.src{width:100%;border-collapse:collapse;font-size:11.5px}
+.src td{border-top:1px solid var(--line);padding:4px 6px 4px 0;vertical-align:top}
+.src td:first-child{color:var(--muted);white-space:nowrap}
+.pager{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+.pg{border:1px solid var(--line);background:var(--paper);border-radius:999px;width:40px;height:40px;cursor:pointer;font-size:17px;color:var(--ink)}
+
 @media (max-width:820px){
+  .explorer{grid-template-columns:1fr;padding:18px}
   .hero .cols,.steps{grid-template-columns:1fr}
   .topin{flex-wrap:wrap;row-gap:6px}
   .links{order:3;flex:1 0 100%;margin:0 -11px}
@@ -127,7 +155,7 @@ footer a{color:var(--muted)}
     <a class="brand" href="/">Analyst<span>OS</span></a>
     <nav class="links" aria-label="Sections">
       <a href="#how">How it works</a>
-      <a href="#sample">Sample deck</a>
+      <a href="#samples">Samples</a>
       <a href="#roles">Roles</a>
       <a href="llms.txt">For agents</a>
       <a href="details.html">Full details</a>
@@ -147,7 +175,7 @@ footer a{color:var(--muted)}
       <p class="sub">Describe the problem. Get back a finished deck you can put in front of a CEO or a board, with every number traced to your own words or a calculation it shows.</p>
       <div class="actions">
         <a class="btn" href="hire.html">Hire a specialist</a>
-        <a class="btn ghost" href="samples/sample-consulting-deck.pptx" download>See a sample deck</a>
+        <a class="btn ghost" href="#samples">See sample output</a>
       </div>
       <p class="fine" style="margin-top:14px">73 roles in 13 families. Price: to be determined. Agents can hire through the API.</p>
     </div>
@@ -177,6 +205,37 @@ footer a{color:var(--muted)}
   </div>
 </section>
 
+<section class="band" id="samples">
+  <h2>See what a specialist produces</h2>
+  <p class="muted lead">Pick a family. Flip through a real deck from one of its specialists, download it, or hire that role.</p>
+  <div class="fams" role="tablist" aria-label="Role families" id="fams"></div>
+  <div class="explorer" id="explorer" hidden>
+    <div class="who">
+      <p class="eyebrow" id="exFamily"></p>
+      <h3 id="exRole"></h3>
+      <p class="asked"><span class="muted">The client asked:</span> <span id="exProblem"></span></p>
+      <p class="fine" id="exBoundary"></p>
+      <p class="fine" id="exToday"></p>
+      <div class="actions">
+        <a class="btn" id="exHire" href="hire.html">Hire this role</a>
+        <a class="btn ghost" id="exDeck" href="#" download>Download this deck</a>
+      </div>
+      <p class="fine" id="exCount"></p>
+      <div class="others" id="exOthersWrap"><p class="fine" style="margin:0 0 6px">Other roles in this family:</p><div id="exOthers"></div></div>
+    </div>
+    <div class="viewer">
+      <div class="slide big" id="exSlide" aria-live="polite"></div>
+      <div class="pager">
+        <button type="button" class="pg" id="exPrev" aria-label="Previous slide">&larr;</button>
+        <span class="fine" id="exWhere"></span>
+        <button type="button" class="pg" id="exNext" aria-label="Next slide">&rarr;</button>
+      </div>
+    </div>
+  </div>
+  <noscript><p>Sample decks: <a href="samples/consulting.pptx">Consulting</a>, <a href="samples/finance-modeling.pptx">Finance and modeling</a>, <a href="samples/legal-contracts-procurement.pptx">Legal, contracts and procurement</a>, and one for every family in <a href="samples/samples.json">samples.json</a>.</p></noscript>
+  <p class="fine" style="margin-top:12px">Each sample is a worked example for a synthetic client, verified and drawn by AnalystOS. Today every role delivers a verified analysis deck; its other work products are on the roadmap.</p>
+</section>
+
 <section class="band" id="roles">
   <h2>Hire for any of 13 families</h2>
   <a class="chip" href="hire.html">Research and reporting</a><a class="chip" href="hire.html">Consulting</a><a class="chip" href="hire.html">Finance and modeling</a><a class="chip" href="hire.html">Data and analytics</a><a class="chip" href="hire.html">Accounting and finance operations</a><a class="chip" href="hire.html">Risk, audit and controls</a><a class="chip" href="hire.html">Financial crime</a><a class="chip" href="hire.html">Legal, contracts and procurement</a><a class="chip" href="hire.html">Content and communications</a><a class="chip" href="hire.html">People and HR</a><a class="chip" href="hire.html">Software and IT</a><a class="chip" href="hire.html">Insurance</a><a class="chip" href="hire.html">Sales, customer and coordination</a>
@@ -188,6 +247,91 @@ footer a{color:var(--muted)}
 </section>
 
 </main>
+
+<script>
+(function () {
+  // Builds the role explorer from samples/samples.json with textContent only: no HTML is ever parsed from the data.
+  var fams = document.getElementById('fams'), box = document.getElementById('explorer');
+  var slideEl = document.getElementById('exSlide'), whereEl = document.getElementById('exWhere');
+  var data = [], current = 0, page = 0;
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function rich(parent, segs) {
+    segs.forEach(function (s) {
+      if (s.t != null) parent.appendChild(document.createTextNode(s.t));
+      else { parent.appendChild(el('span', 'n', s.v)); parent.appendChild(el('span', 'ref', s.ref)); }
+    });
+    return parent;
+  }
+  function bullets(list) { var ul = el('ul'); list.forEach(function (b) { ul.appendChild(rich(el('li'), b)); }); return ul; }
+  function drawSlide() {
+    var sample = data[current], s = sample.slides[page];
+    slideEl.textContent = '';
+    slideEl.appendChild(el('div', 'h', s.heading));
+    slideEl.appendChild(rich(el('div', 't'), s.title || []));
+    if (s.kind === 'summary') {
+      slideEl.appendChild(bullets(s.bullets));
+      var tiles = el('div', 'tiles');
+      s.tiles.forEach(function (t) { var d = el('div', 'tile'); d.appendChild(el('b', null, t.v)); d.appendChild(el('span', null, t.label + ' \u00b7 ' + t.basis)); tiles.appendChild(d); });
+      slideEl.appendChild(tiles);
+    } else if (s.kind === 'finding') {
+      slideEl.appendChild(bullets(s.bullets));
+      slideEl.appendChild(rich(el('div', 'fine'), s.chart.title));
+      var bars = el('div', 'bars'), labels = el('div', 'barl');
+      s.chart.bars.forEach(function (b) {
+        var col = el('div', 'bar'); col.appendChild(el('b', null, b.v));
+        var bar = el('i', b.assumption ? 'a' : null); bar.style.height = Math.max(3, Math.round(b.share * 100)) + '%';
+        col.appendChild(bar); bars.appendChild(col); labels.appendChild(el('span', null, b.label));
+      });
+      slideEl.appendChild(bars); slideEl.appendChild(labels);
+    } else if (s.kind === 'recommendation') {
+      slideEl.appendChild(bullets(s.bullets));
+    } else if (s.kind === 'sources') {
+      var table = el('table', 'src');
+      s.rows.forEach(function (r) {
+        var tr = el('tr'); tr.appendChild(el('td', null, r.ref)); tr.appendChild(el('td', null, r.label));
+        tr.appendChild(el('td', 'n', r.v)); tr.appendChild(rich(el('td'), r.source)); table.appendChild(tr);
+      });
+      slideEl.appendChild(table);
+      var c = s.counts;
+      slideEl.appendChild(el('div', 'fine', c.client + ' from the client\u2019s words \u00b7 ' + c.computed + ' calculated \u00b7 ' + c.assumption + ' labelled assumptions'));
+    }
+    whereEl.textContent = (page + 1) + ' of ' + sample.slides.length + ' \u00b7 ' + s.heading;
+  }
+  function show(i) {
+    current = i; page = 0;
+    var s = data[i];
+    Array.prototype.forEach.call(fams.children, function (b, k) { b.setAttribute('aria-selected', k === i ? 'true' : 'false'); });
+    document.getElementById('exFamily').textContent = s.family.title;
+    document.getElementById('exRole').textContent = s.role.title;
+    document.getElementById('exProblem').textContent = s.problem;
+    document.getElementById('exBoundary').textContent = s.role.boundary;
+    var planned = s.role.deliverables.filter(function (d) { return d !== 'deck'; });
+    document.getElementById('exToday').textContent = 'Delivers today: a verified analysis deck.' +
+      (planned.length ? ' Its own ' + (planned.length > 1 ? planned.slice(0, -1).join(', ') + ' and ' + planned[planned.length - 1]
+        : planned[0]) + (planned.length > 1 ? ' are' : ' is') + ' on the roadmap.' : '');
+    document.getElementById('exHire').href = 'hire.html?role=' + encodeURIComponent(s.role.id);
+    document.getElementById('exDeck').href = s.deck;
+    document.getElementById('exCount').textContent = 'The full deck: ' + s.slide_count + ' slides, ' + s.figure_count + ' figures, each traced.';
+    var others = document.getElementById('exOthers'); others.textContent = '';
+    s.others.forEach(function (o) { var a = el('a', null, o.title); a.href = 'hire.html?role=' + encodeURIComponent(o.id); others.appendChild(a); });
+    document.getElementById('exOthersWrap').hidden = !s.others.length;
+    drawSlide();
+  }
+  function step(d) { var n = data[current].slides.length; page = (page + d + n) % n; drawSlide(); }
+  document.getElementById('exPrev').addEventListener('click', function () { step(-1); });
+  document.getElementById('exNext').addEventListener('click', function () { step(1); });
+  box.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') step(-1); if (e.key === 'ArrowRight') step(1); });
+  fetch('samples/samples.json').then(function (r) { return r.json(); }).then(function (doc) {
+    data = doc.samples;
+    data.forEach(function (s, i) {
+      var b = el('button', 'fam', s.family.title); b.type = 'button'; b.setAttribute('role', 'tab');
+      b.addEventListener('click', function () { show(i); }); fams.appendChild(b);
+    });
+    var start = data.findIndex(function (s) { return s.family.id === 'consulting'; });
+    box.hidden = false; show(start < 0 ? 0 : start);
+  }).catch(function () { fams.textContent = 'The samples could not be loaded; every deck is listed in samples/samples.json.'; });
+})();
+</script>
 
 <footer>
   <div class="wrap">

@@ -2,6 +2,7 @@
 slide preview shows the sample deck's verified figures, the sample deck is current, every
 link it carries is served, and it says no price has been set."""
 
+import json
 import re
 import subprocess
 import sys
@@ -15,7 +16,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
 PAGE = (SITE / "index.html").read_text(encoding="utf-8")
 sys.path.insert(0, str(ROOT / "tools"))
-import build_sample_deck  # noqa: E402
+import build_samples  # noqa: E402
+
+DOC, DECKS = build_samples.build()
 
 
 class HomepageTest(unittest.TestCase):
@@ -31,7 +34,7 @@ class HomepageTest(unittest.TestCase):
             self.assertIn(family["title"], PAGE)
 
     def test_the_slide_preview_shows_the_sample_decks_verified_figures(self):
-        spec, _ = build_sample_deck.build()
+        spec, _ = DECKS["consulting"]
         figures = {f["id"]: f for f in spec["content"]["figures"]}
         preview = re.search(r'<div class="slide".*?</figure>', PAGE, re.S).group(0)
         for value, fid in re.findall(r'<span class="n">([^<]+)</span><span class="ref">(F\d+)</span>', preview):
@@ -40,8 +43,8 @@ class HomepageTest(unittest.TestCase):
         self.assertGreaterEqual(len(re.findall(r'class="ref">F\d+', preview)), 4)
         self.assertIn(f"2 / {deck.slide_count(spec)}", preview)
 
-    def test_the_sample_deck_is_current(self):
-        result = subprocess.run([sys.executable, str(ROOT / "tools" / "build_sample_deck.py"), "--check"],
+    def test_the_samples_are_current(self):
+        result = subprocess.run([sys.executable, str(ROOT / "tools" / "build_samples.py"), "--check"],
                                 capture_output=True, text=True, cwd=ROOT)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
@@ -65,6 +68,60 @@ class HomepageTest(unittest.TestCase):
     def test_it_says_no_price_has_been_set(self):
         self.assertIn("Price: to be determined.", PAGE)
         self.assertNotRegex(PAGE, r"(?i)per (engagement )?hour|/hr\b|free trial")
+
+
+class RoleExplorerTest(unittest.TestCase):
+    """The explorer shows one worked example per family, every number as its deck prints it."""
+
+    def test_every_family_has_a_sample_deck(self):
+        catalog = load_catalog()
+        self.assertEqual([s["family"]["id"] for s in DOC["samples"]], [f["id"] for f in catalog["families"]])
+        for sample in DOC["samples"]:
+            with self.subTest(family=sample["family"]["id"]):
+                self.assertTrue((SITE / sample["deck"]).is_file())
+                self.assertEqual([s["kind"] for s in sample["slides"]], ["summary", "finding", "recommendation", "sources"])
+
+    def test_every_number_shown_is_the_verified_value(self):
+        for sample in DOC["samples"]:
+            spec, _ = DECKS[sample["family"]["id"]]
+            figures = {f["id"]: f for f in spec["content"]["figures"]}
+            shown = []
+
+            def walk(node):
+                if isinstance(node, dict):
+                    if "v" in node and "ref" in node:
+                        shown.append((node["v"], node["ref"]))
+                    for value in node.values():
+                        walk(value)
+                elif isinstance(node, list):
+                    for value in node:
+                        walk(value)
+            walk(sample["slides"])
+            with self.subTest(family=sample["family"]["id"]):
+                self.assertGreater(len(shown), 5)
+                for value, ref in shown:
+                    self.assertEqual(value, deck.format_value(figures[ref]), ref)
+
+    def test_no_text_segment_carries_a_raw_tag_or_markup(self):
+        text = json.dumps(DOC, ensure_ascii=False)
+        self.assertNotRegex(text, r"\[F\d+\]")
+        self.assertNotIn("<", text)
+
+    def test_hire_links_name_real_roles_in_the_family(self):
+        catalog = load_catalog()
+        roles = {r["id"]: r for r in catalog["roles"]}
+        for sample in DOC["samples"]:
+            family = sample["family"]["id"]
+            ids = [sample["role"]["id"]] + [o["id"] for o in sample["others"]]
+            with self.subTest(family=family):
+                self.assertEqual(sorted(ids), sorted(r for r, v in roles.items() if v["family"] == family))
+
+    def test_the_page_never_parses_html_from_the_data(self):
+        script = re.search(r"<script>(.*?)</script>", PAGE, re.S).group(1)
+        for unsafe in ("innerHTML", "outerHTML", "insertAdjacentHTML", "document.write", "eval("):
+            self.assertNotIn(unsafe, script)
+        self.assertIn("textContent", script)
+        self.assertIn("encodeURIComponent(s.role.id)", script)
 
 
 if __name__ == "__main__":

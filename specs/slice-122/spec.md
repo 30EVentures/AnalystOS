@@ -19,19 +19,30 @@ person).
    works, privacy and known limits"), with its disclosures intact; its counts
    generator, studio chrome and tests follow it; `llms.txt` points its trust
    link there; the sitemap lists it.
-3. `site/samples/sample-consulting-deck.pptx`: the churn worked example (a
-   synthetic client) run through the real pipeline with a replayed answer, no
-   model call; built by `tools/build_sample_deck.py`, `--check` compares the
-   deck's spec digest.
+3. Sample output (the owner: "make the sample output way better, allow someone
+   to funnel through some of the roles and what they produce"): a "See what a
+   specialist produces" explorer. Pick one of the 13 families; see its worked
+   example's role, the client's problem, what it delivers today, and four of its
+   slides (the answer, a finding with its chart, the recommendation, where every
+   number comes from); download that deck or hire the role (`hire.html?role=`),
+   or any other role in the family. `tools/build_samples.py` runs each family's
+   worked example (a synthetic client) through the real pipeline with a replayed
+   answer, no model call, and writes `site/samples/<family>.pptx` and
+   `samples.json`, every number a separate segment printed as the deck prints it;
+   the page builds it with textContent only. `--check` compares spec digests and
+   the JSON.
 4. Agent-native: the head keeps the api-catalog and llms.txt links; the footer
    links llms.txt and the role catalog JSON.
 
 ## Done when
 
-1. The homepage's role and family counts equal the catalog's; its slide preview
+1. The explorer covers every family, shows only verified values (each equal to
+   its deck's format_value), carries no raw tag or markup, links only real roles
+   of the family, and never parses HTML from the data; the samples are current.
+2. The homepage's role and family counts equal the catalog's; its slide preview
    shows exactly the sample deck's verified figures; the sample deck is current;
    every link it carries is served; it says "Price: to be determined." and makes
    no other pricing claim (`tests/test_homepage.py`).
-2. Every disclosure test that guarded the old homepage passes on `details.html`.
-3. Full suite OK; `tools/refresh.py --check` clean; Flashy fence holds; the
+3. Every disclosure test that guarded the old homepage passes on `details.html`.
+4. Full suite OK; `tools/refresh.py --check` clean; Flashy fence holds; the
    owner sees the page locally before anything is pushed.

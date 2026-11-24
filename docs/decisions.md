@@ -24,6 +24,17 @@ No generator owned the hero's spec figure. It had been typed by hand and was
 frozen since about Slice 49. It now has its own `site_counts.py` pattern,
 generated from the same `count_specs()` as the evidence card.
 
+## 2026-11-23 — Slice 121: the second paid test failed on two words; say where
+
+The second paid test of Management Consulting Analyst (owner's run, at most
+$0.28) failed with 2 problems, down from 40: one assumption's rationale repeated
+the client's "doubled" and used a percent without a figure tag. Every figure,
+quote and calculation passed; the rule held and nothing was delivered. The
+repair request did not fix it because the message said what was wrong but not
+where, and the prompt never said the rule covers rationales. Every number
+problem now quotes the offending words and the fix, and the prompt says the rule
+holds in every text field. What is accepted is unchanged.
+
 ## 2026-11-23 — Slice 120: the release review of PR #100 failed it; close it before the second paid test
 
 The owner merged PR #100 (Slice 119) before its fresh-context release review

@@ -150,7 +150,11 @@ Figures - this is checked by code, and content that breaks it is rejected:
   Do not add a unit, currency, sign or scale next to a tag ("[F2]%", "$[F6]",
   "[F3] million", "minus [F11]" are rejected): the figure's unit carries them.
   Do not write quantities in words ("seventy percent", "doubled", "a quarter
-  of", "fourteen stores"): make them figures. Allowed without a tag: counting
+  of", "fourteen stores"): make them figures. This holds in every text
+  field, including each assumption's rationale and the recommendation's
+  rationale: no digits, no "%" or "percent", no "doubled" or "half". To use a
+  client's number there, define a client figure and write its tag; otherwise
+  rephrase without a quantity ("rose sharply", "most of"). Allowed without a tag: counting
   words up to twelve ("two hires", never digits), labels Q1-Q4, H1-H2, FY with a
   year, B2B, and a year after a time word ("since 2019", "by 2027"). Use every figure you define.
 - The key question, branch names, option names, KPI names, chart labels and
@@ -309,13 +313,27 @@ def number_problems(where, text, figures, client_years=frozenset()):
             problems.append(f"{where}: [{m.group(1)}] must have a space or punctuation on both sides")
     stripped, digits = _numeric_left(text, client_years)
     if digits:
-        problems.append(f"{where}: write numbers only as figure tags; found {digits[:20]!r}")
-    if _LOOSE_UNIT_RE.search(stripped):
-        problems.append(f"{where}: a percent or currency mark without a figure tag")
+        problems.append(f"{where}: write numbers only as figure tags; found {digits[:20]!r} in "
+                        f"{_near(text, re.search(r'[0-9]', text))}: define a figure and write its tag, or remove it")
+    loose = _LOOSE_UNIT_RE.search(stripped)
+    if loose:
+        problems.append(f"{where}: a percent or currency mark without a figure tag in "
+                        f"{_near(text, re.search(re.escape(loose.group(0)), text))}: use a figure tag, or remove it")
     for token in find_numbers(stripped):
         if token.value is None:
-            problems.append(f"{where}: {token.text.strip()!r} is a quantity in words or symbols; make it a figure")
+            word = token.text.strip()
+            problems.append(f"{where}: {word!r} is a quantity in words or symbols; make it a figure and tag it, or "
+                            f"rephrase without a quantity (e.g. 'rose sharply'), in "
+                            f"{_near(text, re.search(re.escape(word), text))}")
     return problems
+
+
+def _near(text, match):
+    """The words around ``match`` in ``text``, so the model sees exactly what to change (Slice 121)."""
+    if match is None:
+        return "this text"
+    start, end = max(0, match.start() - 40), min(len(text), match.end() + 40)
+    return '"' + ("…" if start else "") + " ".join(text[start:end].split()) + ("…" if end < len(text) else "") + '"'
 
 
 def label_problems(where, text, client_years=frozenset()):

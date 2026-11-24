@@ -455,5 +455,35 @@ class SecondReviewTest(unittest.TestCase):
         self.assertEqual(normalize({"figures": figures, "answer": "[F3]"})["figures"][2]["value"], "59.5 clinics")
 
 
+class SecondPaidTestTest(unittest.TestCase):
+    """Slice 121: the second paid test failed on two problems in one assumption's rationale, which the repair
+    request did not fix: the message said what was wrong but not where. Messages now quote the words."""
+
+    def test_the_problem_names_the_words_and_the_fix(self):
+        text = "Support tickets per account doubled after the March release, so a few percent is realistic."
+        problems = c.number_problems("figures[9].rationale", text, {})
+        self.assertEqual(len(problems), 2, problems)
+        self.assertTrue(any("'doubled'" in p and "doubled after the March" in p and "rephrase" in p for p in problems))
+        self.assertTrue(any("percent or currency mark" in p and "a few percent" in p for p in problems))
+
+    def test_the_repair_request_carries_the_words(self):
+        base = ROOT / "fixtures" / "consulting" / "churn-clinics"
+        record = accepted_engagement(base)
+        correct = json.loads((base / "response.json").read_text())
+        first = copy.deepcopy(correct)
+        assumption = next(f for f in first["figures"] if f["basis"] == "assumption")
+        assumption["rationale"] = "Support tickets per account doubled after the March release, so a few percent is realistic."
+        replay = ReplayClient([first, correct])
+        spec = c.build_deck_spec(record, CATALOG, client=replay)
+        self.assertEqual(spec["attempts"], 2)
+        repair = replay.requests[1]["messages"][0]["content"]
+        self.assertIn("doubled after the March", repair)
+        self.assertIn("rephrase without a quantity", repair)
+
+    def test_the_prompt_says_rationales_follow_the_rule(self):
+        self.assertIn("including each assumption's rationale", c.system_prompt(
+            next(r for r in CATALOG["roles"] if r["id"] == "management-consulting-analyst")))
+
+
 if __name__ == "__main__":
     unittest.main()

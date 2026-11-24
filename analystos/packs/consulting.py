@@ -707,9 +707,12 @@ def _chart_problems(where, chart, figures):
     return problems
 
 
-# A counting word in a title must match the rows it introduces (Slice 125: the first live deck said "Three
-# paths exist" over four options and "Six metrics" over five). Only a count attached to the rows' own noun is
-# checked, so "only one fits" or "three months" are not counts of rows.
+# A title that counts all its rows must count them right (Slice 125: the first live deck said "Three paths
+# exist" over four options and "Six metrics track..." over five). Only that phrasing is checked: the title opens
+# with the count directly followed by the rows' own noun, it is the title's only counting word, and no subset
+# word appears. "Only one option meets the deadline", "Two key risks could derail it", "Two options fit, one
+# does not" and "three months" count part of the rows or something else, so a check would refuse good titles
+# and cost a repair call (release review of Slice 125).
 _COUNT_WORDS = {w: n for n, w in enumerate(("zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
                                             "nine", "ten", "eleven", "twelve"))}
 _ROW_NOUNS = {
@@ -717,22 +720,27 @@ _ROW_NOUNS = {
     "kpis": r"measures?|metrics?|kpis?|indicators?|targets?|signals?",
     "risks": r"risks?|threats?|dangers?",
 }
-_COUNTED_RE = {key: re.compile(r"\b(" + "|".join(_COUNT_WORDS) + r")\s+(?:(?!of\b|the\b)[a-z-]+\s+){0,2}?(?:" + nouns + r")\b",
-                               re.IGNORECASE) for key, nouns in _ROW_NOUNS.items()}
+_COUNTED_RE = {key: re.compile(r"^\s*(?:(?:the|these|all|there\s+are)\s+)?(" + "|".join(_COUNT_WORDS) + r")\s+(?:"
+                               + nouns + r")\b", re.IGNORECASE) for key, nouns in _ROW_NOUNS.items()}
+_ANY_COUNT_RE = re.compile(r"\b(?:" + "|".join(_COUNT_WORDS) + r")\b", re.IGNORECASE)
+_SUBSET_RE = re.compile(r"\b(?:only|other|others|rest|remaining|top|key|main|first|biggest|most|least|than|of|both)\b",
+                        re.IGNORECASE)
 
 
 def title_count_problems(titles, content):
-    """A title that counts its rows ("three options") must count them right."""
+    """A title that opens by counting all its rows ("Three paths exist...") must count them right."""
     problems = []
     for key, pattern in _COUNTED_RE.items():
-        rows = content.get(key)
-        if not isinstance(titles.get(key), str) or not isinstance(rows, list):
+        rows, title = content.get(key), titles.get(key)
+        if not isinstance(title, str) or not isinstance(rows, list):
             continue
-        for m in pattern.finditer(titles[key]):
-            said = _COUNT_WORDS[m.group(1).lower()]
-            if said != len(rows):
-                problems.append(f"titles.{key} says {m.group(0)!r} but there are {len(rows)} {key}; "
-                                f"make the count match or leave the number out")
+        m = pattern.match(title)
+        if m is None or len(_ANY_COUNT_RE.findall(title)) != 1 or _SUBSET_RE.search(title):
+            continue
+        said = _COUNT_WORDS[m.group(1).lower()]
+        if said != len(rows):
+            problems.append(f"titles.{key} says {m.group(0).strip()!r} but there are {len(rows)} {key}; "
+                            f"make the count match or leave the number out")
     return problems
 
 

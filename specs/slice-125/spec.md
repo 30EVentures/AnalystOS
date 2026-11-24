@@ -12,10 +12,16 @@ memos and workbooks, which draw the same content.
 
 ## What changes
 
-1. **Code check:** a counting word in the options, measures or risks title that
-   is attached to those rows' own noun ("three options", "six metrics", "five
-   risks") must equal the number of rows; the repair request says how to fix it.
-   "Only one fits", "two of the paths" and "three months" are not row counts.
+1. **Code check, deliberately narrow:** an options, measures or risks title that
+   opens by counting all its rows ("Three paths exist...", "Six metrics
+   track...") must count them right; the repair request says how to fix it. It
+   applies only when the count opens the title, is directly followed by the rows'
+   noun, is the title's only counting word, and no subset word appears ("only",
+   "other", "top", "key", "first", "most", "of", ...). The release review showed a
+   wider check refused ordinary titles ("Two key risks could derail the plan",
+   "Only one option meets the deadline"), each a paid repair call. Accepted
+   misses: "There are three realistic options" or "Three strategic options" over
+   four rows pass.
 2. **Prompt quality rules:** put a cost on the problem as a computed figure when
    the client's numbers allow; fit the roadmap to the client's deadline; claim no
    timing or proportion the text does not support and describe the client only in

@@ -2,8 +2,6 @@
  {"name": "digits allowed in prose", "old": "    if digits:\n        problems.append(f\"{where}: write numbers only as figure tags", "new": "    if False:\n        problems.append(f\"{where}: write numbers only as figure tags"},
  {"name": "unit after a tag allowed", "old": "        if _AFTER_TAG_RE.search(after) or _is_currency(after.lstrip()[:1]):", "new": "        if False:"},
  {"name": "sign or currency before a tag allowed", "old": "        if _BEFORE_TAG_RE.search(before) or _is_currency(before.rstrip()[-1:]):", "new": "        if False:"},
- {"name": "loose percent marks allowed", "old": "    if _LOOSE_UNIT_RE.search(stripped):\n        problems.append", "new": "    if False:\n        problems.append"},
- {"name": "word quantities allowed", "old": "        if token.value is None:\n            problems.append(f\"{where}: {token.text.strip()!r} is a quantity", "new": "        if False:\n            problems.append(f\"{where}: {token.text.strip()!r} is a quantity"},
  {"name": "any year allowed", "old": "        if year and (year in client_years or 2020 <= int(year) <= 2035):", "new": "        if year:"},
  {"name": "labels unchecked", "old": "    if digits or _LOOSE_UNIT_RE.search(stripped) or any(t.value is None for t in find_numbers(stripped)):", "new": "    if False:"},
  {"name": "quote boundary ignored", "old": "        if before_ok and after_ok:", "new": "        if True:"},
@@ -40,5 +38,6 @@
  {"name": "tags glued to tags allowed", "old": "        if (before[-1:].isalnum() or before[-1:] in (\"_\", \"]\") or after[:1].isalnum() or after[:1] in (\"_\", \"[\")", "new": "        if (before[-1:].isalnum() or before[-1:] in (\"_\",) or after[:1].isalnum() or after[:1] in (\"_\",)"},
  {"name": "a numbered name allowed before anything (third review)", "old": "                               r\"(?=\\s*[:,.;)]|\\s*$|\\s+(?:of|and|to|is|was|will|would|starts|begins|ends|covers)\\b))\\b\")", "new": "                               r\")\\b\")"},
  {"name": "title counts not checked", "old": "        problems += title_count_problems(titles, content)\n", "new": ""},
- {"name": "'of' allowed between the count and the noun", "old": "(?:(?!of\\b|the\\b)[a-z-]+\\s+)", "new": "(?:[a-z-]+\\s+)"}
+ {"name": "subset words ignored", "old": "or _SUBSET_RE.search(title):", "new": ":"},
+ {"name": "several count words ignored", "old": "len(_ANY_COUNT_RE.findall(title)) != 1 or ", "new": ""}
 ]

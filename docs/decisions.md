@@ -28,7 +28,9 @@ generated from the same `count_specs()` as the evidence card.
 
 The only issues in the first passing live deck that code can check without
 refusing good work are title counts ("Three paths" over four options): now a
-check with a repair message. The rest (deadline fit, unsupported timing or
+check with a repair message, kept narrow after its release review showed a
+wider one refused ordinary subset titles ("Two key risks could derail the
+plan"); some wrong counts in other phrasings still pass. The rest (deadline fit, unsupported timing or
 proportion claims, verdict strength, putting a cost on the problem, describing
 the client in its own words) are prompt rules: a check such as "a verdict needs
 a figure" would have refused the churn worked example's sound evidence from the

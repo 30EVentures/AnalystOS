@@ -19,13 +19,13 @@ class PagesMatchTheSourceTest(unittest.TestCase):
                 text = page.read_text(encoding="utf-8")
                 self.assertEqual(studio_chrome.stale(text), [], "run: python3 tools/studio_chrome.py")
 
-    def test_each_page_has_exactly_one_bar_one_css_block_and_one_footer_line(self):
+    def test_each_page_has_exactly_one_bar_one_css_block_and_one_footer(self):
         for page in studio_chrome.PAGES:
             with self.subTest(page=page.name):
                 text = page.read_text(encoding="utf-8")
                 self.assertEqual(text.count('class="studio-bar"'), 1)
                 self.assertEqual(text.count("/* studio:css:start */"), 1)
-                self.assertEqual(text.count('class="studio-foot"'), 1)
+                self.assertEqual(text.count('<footer class="af">'), 1)
 
     def test_the_bar_is_the_first_thing_in_the_body(self):
         for page in studio_chrome.PAGES:
@@ -40,12 +40,22 @@ class TheBlocksAreHonestAndSelfContainedTest(unittest.TestCase):
         self.bar = studio_chrome.render_bar()
         self.foot = studio_chrome.render_footer()
 
-    def test_every_studio_link_goes_to_the_canonical_domain(self):
+    def test_every_studio_link_goes_to_the_canonical_host_and_product_links_stay_on_this_site(self):
         for html in (self.bar, self.foot):
             hrefs = re.findall(r'href="([^"]+)"', html)
             self.assertTrue(hrefs)
             for href in hrefs:
-                self.assertTrue(href.startswith("https://30eventures.com"), href)
+                self.assertFalse(href.startswith("https://30eventures.com"), f"bare host: {href}")
+                if href.startswith("http"):
+                    self.assertTrue(href.startswith("https://www.30eventures.com/"), href)
+                else:
+                    self.assertTrue(href.startswith("/"), href)
+
+    def test_the_footer_product_links_point_at_files_that_exist(self):
+        for href in re.findall(r'href="(/[^"#?]*)', self.foot):
+            if href == "/" or href.startswith("/api/"):
+                continue                                   # the API is served by the app, not a file under site/
+            self.assertTrue((ROOT / "site" / href.lstrip("/")).exists(), f"{href} has no file under site/")
 
     def test_no_script_no_external_request_no_inline_handlers(self):
         blob = self.bar + self.foot + studio_chrome.CSS
@@ -62,6 +72,27 @@ class TheBlocksAreHonestAndSelfContainedTest(unittest.TestCase):
     def test_the_bar_is_hidden_in_print_and_collapses_on_phones(self):
         self.assertIn("@media print{.studio-bar{display:none}}", studio_chrome.CSS)
         self.assertIn("@media (max-width:640px)", studio_chrome.CSS)
+
+
+class FooterNoteTest(unittest.TestCase):
+    def test_a_pages_own_fine_print_survives_regeneration(self):
+        page = "<!-- studio:footer:start -->\n" + studio_chrome.render_footer("<p>KEEP ME</p>") + "\n<!-- studio:footer:end -->"
+        text = "/* studio:css:start */\n/* studio:css:end */<!-- studio:bar:start --><!-- studio:bar:end -->" + page
+        once, problems = studio_chrome.apply(text)
+        self.assertEqual(problems, [])
+        self.assertIn("<p>KEEP ME</p>", once)
+        twice, _ = studio_chrome.apply(once)
+        self.assertEqual(once, twice)
+
+    def test_the_real_pages_keep_their_notes(self):
+        for name, needle in (("details.html", "Statuses reflect"), ("upload.html", "private preview"), ("hire.html", "private preview")):
+            self.assertIn(needle, (ROOT / "site" / name).read_text(encoding="utf-8"), name)
+
+    def test_the_footer_states_the_status_plainly(self):
+        foot = studio_chrome.render_footer()
+        self.assertIn("Not for confidential documents yet", foot)
+        for overreach in ("production-ready", "enterprise", "SOC 2 certified", "compliant"):
+            self.assertNotIn(overreach, foot)
 
 
 class ApplyTest(unittest.TestCase):

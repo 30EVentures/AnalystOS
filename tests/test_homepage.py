@@ -116,6 +116,11 @@ class RoleExplorerTest(unittest.TestCase):
             with self.subTest(family=family):
                 self.assertEqual(sorted(ids), sorted(r for r, v in roles.items() if v["family"] == family))
 
+    def test_it_says_plainly_that_every_role_delivers_the_same_kind_of_output(self):
+        # The owner noticed every sample is the same kind of deck; until role-specific outputs ship, say so.
+        self.assertIn("Today, every role delivers the same kind of output:", PAGE)
+        self.assertIn("Roles in the same family share one example.", PAGE)
+
     def test_the_page_never_parses_html_from_the_data(self):
         script = re.search(r"<script>(.*?)</script>", PAGE, re.S).group(1)
         for unsafe in ("innerHTML", "outerHTML", "insertAdjacentHTML", "document.write", "eval("):

@@ -92,7 +92,8 @@ footer{border-top:1px solid var(--line);margin-top:64px;padding:22px 0 40px;font
 footer a{color:var(--muted)}
 .more{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:12px}
 
-.lead{margin:-4px 0 16px}
+.lead{margin:-4px 0 10px}
+.today{background:var(--paper);border-left:3px solid var(--tick);border-radius:6px;padding:10px 14px;margin:0 0 16px;font-size:15.5px}
 .fams{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;margin-bottom:16px}
 .fam{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 14px;font:500 14.5px var(--sans);
   white-space:nowrap;cursor:pointer}
@@ -208,6 +209,7 @@ footer a{color:var(--muted)}
 <section class="band" id="samples">
   <h2>See what a specialist produces</h2>
   <p class="muted lead">Pick a family. Flip through a real deck from one of its specialists, download it, or hire that role.</p>
+  <p class="today"><strong>Today, every role delivers the same kind of output:</strong> a verified analysis deck for its problem. Role-specific outputs (a memo for legal and research, a workbook for finance, drafts for content) are being built next.</p>
   <div class="fams" role="tablist" aria-label="Role families" id="fams"></div>
   <div class="explorer" id="explorer" hidden>
     <div class="who">
@@ -233,7 +235,7 @@ footer a{color:var(--muted)}
     </div>
   </div>
   <noscript><p>Sample decks: <a href="samples/consulting.pptx">Consulting</a>, <a href="samples/finance-modeling.pptx">Finance and modeling</a>, <a href="samples/legal-contracts-procurement.pptx">Legal, contracts and procurement</a>, and one for every family in <a href="samples/samples.json">samples.json</a>.</p></noscript>
-  <p class="fine" style="margin-top:12px">Each sample is a worked example for a synthetic client, verified and drawn by AnalystOS. Today every role delivers a verified analysis deck; its other work products are on the roadmap.</p>
+  <p class="fine" style="margin-top:12px">Each sample is a worked example for a synthetic client, verified and drawn by AnalystOS. Roles in the same family share one example.</p>
 </section>
 
 <section class="band" id="roles">

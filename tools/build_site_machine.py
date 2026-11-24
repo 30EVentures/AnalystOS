@@ -52,7 +52,9 @@ def generated_files():
               f"- [OpenAPI 3.1]({BASE}/api/v1/openapi.json): every endpoint, request and response",
               f"- [API index]({BASE}/api/v1): machine-readable list of endpoints and limits",
               f"- [Role catalog]({BASE}/api/v2/catalog): every role you can hire, its limits, how it was tested, and its questions",
-              f"- `POST {BASE}/api/v2/engagements`: hire a role for one problem (access code required; each request is a paid model call)",
+              f"- `POST {BASE}/api/v2/engagements`: hire a role for one problem (access code required; each request is a paid model call). "
+              "The response is the role's format (its catalog `delivers_today`): .pptx, .docx or .xlsx, named in the "
+              "`X-AnalystOS-Format` header; with `?format=json` it is `output` {format, media_type, filename, base64}",
               f"- [{GUIDES[0][1]}]({BASE}/docs/{GUIDES[0][0]}): {GUIDES[0][2]}", ""]
     lines += ["## Verifying a report", "",
               f"- [{GUIDES[1][1]}]({BASE}/docs/{GUIDES[1][0]}): {GUIDES[1][2]}",
@@ -67,7 +69,7 @@ def generated_files():
               _guide_line("mesh-identity.md"),
               _guide_line("aao.md"), ""]
     lines += ["## Limits, stated plainly", "",
-              f"- [Trust and known limits]({BASE}/#trust): what leaves your environment, what is and is not checked",
+              f"- [Trust and known limits]({BASE}/details.html#trust): what leaves your environment, what is and is not checked",
               "- Every figure is proven; only some relationships between figures are checked",
               "- Sealing proves a report was built from the sealed facts, not that the facts are the important ones", ""]
     lines += ["## Optional", "",
@@ -81,7 +83,7 @@ def generated_files():
         full += [f"<!-- source: {BASE}/docs/{name} -->", "", (ROOT / "docs" / name).read_text(encoding="utf-8").rstrip(), "", "---", ""]
     out["llms-full.txt"] = "\n".join(full)
 
-    urls = [f"{BASE}/", f"{BASE}/upload.html", f"{BASE}/hire.html", f"{BASE}/llms.txt", f"{BASE}/llms-full.txt",
+    urls = [f"{BASE}/", f"{BASE}/details.html", f"{BASE}/upload.html", f"{BASE}/hire.html", f"{BASE}/llms.txt", f"{BASE}/llms-full.txt",
             f"{BASE}/api/v1/openapi.json"] + [f"{BASE}/docs/{n}" for n, _, _ in GUIDES]
     out["sitemap.xml"] = (
         '<?xml version="1.0" encoding="UTF-8"?>\n'

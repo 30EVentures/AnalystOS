@@ -39,7 +39,7 @@ EVAL_METHODS = ("mock", "mock-family", "live")
 # The owner's decision, 2026-11-23: no price has been set for any role yet; pricing is to be determined.
 PRICE_TBD = "tbd"
 # What a role delivers today, as opposed to its native deliverables (which may not exist yet).
-DELIVERS_TODAY = ("verified-deck",)
+DELIVERS_TODAY = ("verified-deck", "verified-memo", "verified-workbook")  # Slice 124: analystos/l4/formats.py
 _ROLE_KEYS = {
     "id", "title", "family", "wave", "boundary", "deliverables", "status", "eval",
     "rate_cents_per_engagement_hour", "human_decides", "gated_actions", "delivers_today",

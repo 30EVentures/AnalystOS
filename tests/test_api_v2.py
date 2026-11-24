@@ -79,6 +79,30 @@ class ApiV2Test(unittest.TestCase):
         self.assertGreaterEqual(len(prs.slides), 12)
         self.assertEqual(len(self.replays[0].requests), 1)
 
+    def test_each_role_gets_its_family_format(self):  # Slice 124
+        from docx import Document
+        from openpyxl import load_workbook
+        for family, mime, opener in (("legal-contracts-procurement", "wordprocessingml", Document),
+                                     ("finance-modeling", "spreadsheetml", load_workbook)):
+            case = ROOT / "fixtures" / "roles" / family
+            client = json.loads((case / "client.json").read_text())
+            self.responses = [json.loads((case / "response.json").read_text())]
+            with self.subTest(family=family):
+                response = self.post({"role": client["roles"][0], "problem": client["problem"],
+                                      "answers": dict(client["answers"]), "requested_by": client["requested_by"]})
+                self.assertEqual(response.status_code, 200, response.get_data()[:300])
+                self.assertIn(mime, response.mimetype)
+                self.assertEqual(response.headers["X-AnalystOS-Format"], "memo" if family.startswith("legal") else "workbook")
+                self.assertIn(".docx" if family.startswith("legal") else ".xlsx", response.headers["Content-Disposition"])
+                opener(io.BytesIO(response.get_data()))
+                json_response = self.post({"role": client["roles"][0], "problem": client["problem"],
+                                           "answers": dict(client["answers"]), "requested_by": client["requested_by"]},
+                                          query="?format=json")
+                output = json_response.get_json()["output"]
+                self.assertEqual(output["format"], "memo" if family.startswith("legal") else "workbook")
+                self.assertNotIn("deck_base64", json_response.get_json())
+                opener(io.BytesIO(__import__("base64").b64decode(output["base64"])))
+
     def test_agents_can_ask_for_the_spec(self):
         response = self.post(body(requested_by={"kind": "agent", "ref": "buyer-agent-7"}), query="?format=json")
         self.assertEqual(response.status_code, 200)

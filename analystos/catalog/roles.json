@@ -1,6 +1,6 @@
 {
  "format": "analystos-role-catalog/1",
- "description": "Every role AnalystOS offers, for hire by people and agents. Price: to be determined; no price has been set for any role (rate_cents_per_engagement_hour = 'tbd'). A role is 'available' only with a recorded passing evaluation; eval.method says how it was run: 'mock' = a worked example written for this role and checked in a working session, with no model call; 'mock-family' = the same, but the worked example was written for another role in this role's family, not for this one; 'live' = the production model. Today every role delivers a verified analysis deck (delivers_today), not its native work product. See specs/slice-108, slice-117.",
+ "description": "Every role AnalystOS offers, for hire by people and agents. Price: to be determined; no price has been set for any role (rate_cents_per_engagement_hour = 'tbd'). A role is 'available' only with a recorded passing evaluation; eval.method says how it was run: 'mock' = a worked example written for this role and checked in a working session, with no model call; 'mock-family' = the same, but the worked example was written for another role in this role's family, not for this one; 'live' = the production model. Each role delivers the verified analysis in the format its family reads (delivers_today: verified-deck, verified-memo or verified-workbook), not yet its own native work product. See specs/slice-108, slice-117.",
  "statuses": [
   "planned",
   "built",
@@ -132,7 +132,7 @@
    "human_decides": [
     "any rating or price target distributed to investors, by a registered research analyst"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "market-research-analyst",
@@ -151,7 +151,7 @@
     "method": "mock"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "policy-analyst-research-assistant",
@@ -170,7 +170,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "regulatory-change-analyst",
@@ -189,7 +189,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "esg-sustainability-reporting-analyst",
@@ -208,7 +208,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "management-consulting-analyst",
@@ -381,7 +381,7 @@
    "human_decides": [
     "whether to extend credit, and on what terms"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "investment-banking-analyst",
@@ -400,7 +400,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "financial-advisory-transaction-services-analyst",
@@ -419,7 +419,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "fpa-analyst",
@@ -438,7 +438,7 @@
     "method": "mock"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "corporate-finance-analyst",
@@ -457,7 +457,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "treasury-analyst",
@@ -476,7 +476,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "pricing-analyst",
@@ -495,7 +495,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "real-estate-analyst",
@@ -514,7 +514,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "market-risk-analyst",
@@ -533,7 +533,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "model-validation-analyst",
@@ -555,7 +555,7 @@
    "human_decides": [
     "the validation opinion, signed by a qualified validator independent of the model's owner"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "actuarial-analyst",
@@ -577,7 +577,7 @@
    "human_decides": [
     "any actuarial opinion or reserve sign-off, by a credentialed actuary"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "data-bi-analyst",
@@ -596,7 +596,7 @@
     "method": "mock"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "sales-operations-analyst",
@@ -615,7 +615,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "revenue-operations-analyst",
@@ -634,7 +634,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "product-analyst-associate-product-manager",
@@ -653,7 +653,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "supply-chain-logistics-analyst",
@@ -672,7 +672,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "demand-planning-analyst",
@@ -691,7 +691,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "hr-analyst-people-analytics",
@@ -713,7 +713,7 @@
    "human_decides": [
     "any hiring, promotion, pay or termination decision the analysis informs"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "staff-accountant-bookkeeper",
@@ -735,7 +735,7 @@
    "gated_actions": [
     "posting a journal entry to the client's ledger"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "accounts-payable-receivable-clerk",
@@ -758,7 +758,7 @@
     "releasing a payment that the client's authorised approver has approved (approving it stays human)",
     "sending a collection notice"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "payroll-specialist",
@@ -781,7 +781,7 @@
     "running payroll",
     "filing payroll taxes"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "tax-associate",
@@ -803,7 +803,7 @@
    "human_decides": [
     "signing or filing any return, by a qualified preparer"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "fund-accountant",
@@ -825,7 +825,7 @@
    "gated_actions": [
     "striking or publishing a NAV"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "trade-support-middle-office-analyst",
@@ -847,7 +847,7 @@
    "gated_actions": [
     "amending or cancelling a booked trade"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "operations-analyst-banking-capital-markets",
@@ -869,7 +869,7 @@
    "gated_actions": [
     "any change to a client account or a settlement instruction"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "regulatory-reporting-analyst",
@@ -891,7 +891,7 @@
    "human_decides": [
     "submitting a return to a regulator"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-workbook"
   },
   {
    "id": "audit-associate-external-audit",
@@ -913,7 +913,7 @@
    "human_decides": [
     "any audit conclusion or opinion, by the licensed engagement team"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "internal-audit-associate",
@@ -932,7 +932,7 @@
     "method": "mock"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "operational-risk-analyst",
@@ -951,7 +951,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "third-party-vendor-risk-analyst",
@@ -970,7 +970,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "information-security-grc-analyst",
@@ -989,7 +989,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "privacy-data-protection-analyst",
@@ -1008,7 +1008,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "cybersecurity-analyst-junior",
@@ -1027,7 +1027,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "compliance-aml-kyc-analyst",
@@ -1050,7 +1050,7 @@
     "onboarding or exiting a customer",
     "whether to file a suspicious activity report"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "fraud-analyst",
@@ -1071,7 +1071,7 @@
    "human_decides": [
     "the disposition of each alert or case"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "sanctions-screening-analyst",
@@ -1092,7 +1092,7 @@
    "human_decides": [
     "clearing or escalating each potential match"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "financial-crime-investigator-junior",
@@ -1114,7 +1114,7 @@
    "human_decides": [
     "any finding of wrongdoing and any regulatory filing"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "forensic-investigations-analyst",
@@ -1136,7 +1136,7 @@
    "human_decides": [
     "any conclusion about who did what"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "paralegal-contracts-administrator",
@@ -1158,7 +1158,7 @@
    "human_decides": [
     "any legal advice or position, by a licensed lawyer"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "contract-procurement-analyst",
@@ -1177,7 +1177,7 @@
     "method": "mock"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "legal-operations-analyst",
@@ -1196,7 +1196,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "procurement-assistant",
@@ -1219,7 +1219,7 @@
     "issuing a purchase order",
     "sending a request to a supplier"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "grants-administrator",
@@ -1238,7 +1238,7 @@
     "method": "mock-family"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "content-writer-copywriter",
@@ -1361,7 +1361,7 @@
     "sending a message to a candidate",
     "booking an interview"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "talent-acquisition-associate",
@@ -1384,7 +1384,7 @@
     "screening a candidate in or out",
     "any offer"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "compensation-and-benefits-analyst",
@@ -1406,7 +1406,7 @@
    "human_decides": [
     "any individual's pay or benefits decision"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "learning-and-development-coordinator",
@@ -1425,7 +1425,7 @@
     "method": "mock"
    },
    "rate_cents_per_engagement_hour": "tbd",
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "junior-software-developer",
@@ -1507,7 +1507,7 @@
    "human_decides": [
     "paying, settling or denying a claim, by a licensed adjuster"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "underwriting-assistant",
@@ -1529,7 +1529,7 @@
    "human_decides": [
     "accepting, pricing or declining a risk, by an underwriter"
    ],
-   "delivers_today": "verified-deck"
+   "delivers_today": "verified-memo"
   },
   {
    "id": "sales-development-representative-sdr",

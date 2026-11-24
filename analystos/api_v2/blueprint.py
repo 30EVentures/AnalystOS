@@ -21,7 +21,8 @@ from flask import Blueprint, Response, jsonify, request
 
 from analystos.catalog import load_catalog
 from analystos.l3 import engagement as eng
-from analystos.l4.deck import render_deck, spec_digest
+from analystos.l4.deck import spec_digest
+from analystos.l4 import formats
 from analystos.packs import consulting
 
 bp = Blueprint("analystos_v2", __name__, url_prefix="/api/v2")
@@ -114,7 +115,7 @@ def create_engagement():
     try:
         client = client_factory() if client_factory else None
         spec = consulting.build_deck_spec(accepted, cat, client=client)
-        data = render_deck(spec, accepted, cat)
+        data, fmt = formats.render(spec, accepted, cat)
     except consulting.VerificationFailed as exc:
         return _err(502, "not_verified", f"the work could not be verified, so nothing was delivered "
                     f"({len(exc.problems)} problems)", problems=exc.problems[:100])
@@ -124,11 +125,17 @@ def create_engagement():
             return _err(503, "unavailable", message)
         return _err(502, "not_verified", "the work could not be verified, so nothing was delivered: " + message[:300])
 
+    filename = f'analystos-{spec["role"]}-{accepted["id"][:8]}.{fmt["extension"]}'
     if request.args.get("format") == "json":
-        return jsonify({"engagement": accepted, "spec": spec, "spec_sha256": spec_digest(spec),
-                        "deck_base64": base64.b64encode(data).decode("ascii")})
-    response = Response(data, mimetype=PPTX)
-    response.headers["Content-Disposition"] = f'attachment; filename="analystos-{spec["role"]}-{accepted["id"][:8]}.pptx"'
+        body = {"engagement": accepted, "spec": spec, "spec_sha256": spec_digest(spec),
+                "output": {"format": fmt["name"], "media_type": fmt["media_type"], "filename": filename,
+                           "base64": base64.b64encode(data).decode("ascii")}}
+        if fmt["name"] == "deck":
+            body["deck_base64"] = body["output"]["base64"]  # kept for clients written before Slice 124
+        return jsonify(body)
+    response = Response(data, mimetype=fmt["media_type"])
+    response.headers["Content-Disposition"] = f'attachment; filename="{filename}"'
+    response.headers["X-AnalystOS-Format"] = fmt["name"]
     response.headers["X-AnalystOS-Engagement"] = accepted["id"]
     response.headers["X-AnalystOS-Spec-Sha256"] = spec_digest(spec)
     return response

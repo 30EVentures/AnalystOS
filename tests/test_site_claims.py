@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 SITE = Path(__file__).resolve().parents[1] / "site"
-INDEX = (SITE / "index.html").read_text(encoding="utf-8")
+INDEX = (SITE / "details.html").read_text(encoding="utf-8")  # the full page since Slice 122
 UPLOAD = (SITE / "upload.html").read_text(encoding="utf-8")
 
 

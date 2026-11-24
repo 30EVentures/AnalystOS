@@ -1,0 +1,4171 @@
+{
+ "format": "analystos-samples/1",
+ "note": "Worked examples for synthetic clients, verified and drawn by AnalystOS with a replayed answer; no model call. Values are printed exactly as in each deck.",
+ "samples": [
+  {
+   "family": {
+    "id": "research-reporting",
+    "title": "Research and reporting"
+   },
+   "role": {
+    "id": "market-research-analyst",
+    "title": "Market Research Analyst",
+    "boundary": "Delivers analysis; acts on nothing.",
+    "deliverables": [
+     "brief",
+     "deck"
+    ]
+   },
+   "problem": "We make premium dog food and sell it through pet stores. We want to know whether a direct subscription in Denver is worth testing.",
+   "file": "samples/research-reporting.docx",
+   "format": "memo",
+   "delivers": "Delivers today: a verified Word memo. Also planned: brief, deck.",
+   "slide_count": 12,
+   "figure_count": 7,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Fund a small Denver test: about "
+      },
+      {
+       "v": "456,000",
+       "ref": "F4"
+      },
+      {
+       "t": " households own a dog, and even a "
+      },
+      {
+       "v": "5%",
+       "ref": "F5"
+      },
+      {
+       "t": " premium share would be a market of about "
+      },
+      {
+       "v": "$1,482,000",
+       "ref": "F7"
+      },
+      {
+       "t": " a month."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Denver has about "
+       },
+       {
+        "v": "1,200,000",
+        "ref": "F1"
+       },
+       {
+        "t": " households, and "
+       },
+       {
+        "v": "38%",
+        "ref": "F2"
+       },
+       {
+        "t": " of them own a dog."
+       }
+      ],
+      [
+       {
+        "t": "If "
+       },
+       {
+        "v": "5%",
+        "ref": "F5"
+       },
+       {
+        "t": " of dog-owning households bought premium food direct, that is about "
+       },
+       {
+        "v": "22,800",
+        "ref": "F6"
+       },
+       {
+        "t": " households."
+       }
+      ],
+      [
+       {
+        "t": "At today's average spend of "
+       },
+       {
+        "v": "$65",
+        "ref": "F3"
+       },
+       {
+        "t": " a month, that market is worth about "
+       },
+       {
+        "v": "$1,482,000",
+        "ref": "F7"
+       },
+       {
+        "t": " a month."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "456,000",
+       "ref": "F4",
+       "label": "Dog-owning households in metro Denver",
+       "basis": "calculated"
+      },
+      {
+       "v": "5%",
+       "ref": "F5",
+       "label": "Dog owners who would buy premium food direct",
+       "basis": "assumption"
+      },
+      {
+       "v": "$1,482,000",
+       "ref": "F7",
+       "label": "Potential monthly market",
+       "basis": "calculated"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "The dog-owning market in Denver is large on its own."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "About "
+       },
+       {
+        "v": "456,000",
+        "ref": "F4"
+       },
+       {
+        "t": " Denver households own a dog."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Most dog owners may never buy premium food direct."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Dog households",
+        "v": "456,000",
+        "ref": "F4",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Premium buyers, assumed",
+        "v": "22,800",
+        "ref": "F6",
+        "share": 0.05,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Run a small paid test before building a full direct channel."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Paid local test"
+       }
+      ],
+      [
+       {
+        "t": "It measures the one number the case depends on before any large spend."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Households in metro Denver",
+       "v": "1,200,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “about 1,200,000 households”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Households that own a dog",
+       "v": "38%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “38% of households own a dog”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Average monthly spend per customer",
+       "v": "$65",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “spend on average $65 a month”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Dog-owning households in metro Denver",
+       "v": "456,000",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F1 × F2 ÷ 100"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Dog owners who would buy premium food direct",
+       "v": "5%",
+       "basis": "assumption",
+       "source": [
+        {
+         "t": "Assumption: A planning share for direct premium buyers; the test replaces it with a measured rate."
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Potential direct premium households",
+       "v": "22,800",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F4 × F5 ÷ 100"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 3,
+      "computed": 3,
+      "assumption": 1
+     }
+    }
+   ],
+   "others": [
+    {
+     "id": "financial-equity-research-analyst",
+     "title": "Financial / Equity Research Analyst",
+     "deliverables": [
+      "report",
+      "workbook"
+     ]
+    },
+    {
+     "id": "policy-analyst-research-assistant",
+     "title": "Policy Analyst / Research Assistant",
+     "deliverables": [
+      "brief",
+      "memo"
+     ]
+    },
+    {
+     "id": "regulatory-change-analyst",
+     "title": "Regulatory Change Analyst",
+     "deliverables": [
+      "brief",
+      "register"
+     ]
+    },
+    {
+     "id": "esg-sustainability-reporting-analyst",
+     "title": "ESG / Sustainability Reporting Analyst",
+     "deliverables": [
+      "report",
+      "workbook"
+     ]
+    }
+   ]
+  },
+  {
+   "family": {
+    "id": "consulting",
+    "title": "Consulting"
+   },
+   "role": {
+    "id": "management-consulting-analyst",
+    "title": "Management Consulting Analyst",
+    "boundary": "Delivers analysis; acts on nothing.",
+    "deliverables": [
+     "deck"
+    ]
+   },
+   "problem": "We are a B2B SaaS company selling scheduling software to mid-sized clinics. Our monthly logo churn went from 4% to 7% in two quarters and we don't know why.",
+   "file": "samples/consulting.pptx",
+   "format": "deck",
+   "delivers": "Delivers today: a verified PowerPoint deck.",
+   "slide_count": 14,
+   "figure_count": 15,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Put next year's money into retention, aimed at small clinics: churn rose from "
+      },
+      {
+       "v": "4%",
+       "ref": "F1"
+      },
+      {
+       "t": " to "
+      },
+      {
+       "v": "7%",
+       "ref": "F2"
+      },
+      {
+       "t": " after the March release, and the extra churn costs "
+      },
+      {
+       "v": "$30,600",
+       "ref": "F14"
+      },
+      {
+       "t": " of monthly recurring revenue every month."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Monthly logo churn rose by "
+       },
+       {
+        "v": "3 pts",
+        "ref": "F11"
+       },
+       {
+        "t": ", and net revenue retention fell from "
+       },
+       {
+        "v": "104%",
+        "ref": "F3"
+       },
+       {
+        "t": " to "
+       },
+       {
+        "v": "96%",
+        "ref": "F4"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "Clinics with fewer than ten staff make up "
+       },
+       {
+        "v": "70%",
+        "ref": "F8"
+       },
+       {
+        "t": " of churned logos; they onboard alone and hit the March release hardest."
+       }
+      ],
+      [
+       {
+        "t": "Price is what churned clients say, but a discount saves only "
+       },
+       {
+        "v": "15%",
+        "ref": "F9"
+       },
+       {
+        "t": " of cancellations, so price is the stated reason rather than the cause."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "4%",
+       "ref": "F1",
+       "label": "Monthly logo churn, two quarters ago",
+       "basis": "client data"
+      },
+      {
+       "v": "7%",
+       "ref": "F2",
+       "label": "Monthly logo churn, now",
+       "basis": "client data"
+      },
+      {
+       "v": "$30,600",
+       "ref": "F14",
+       "label": "Monthly recurring revenue lost each month to the extra churn",
+       "basis": "calculated"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "Small clinics drive the increase, not the customer base as a whole."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Clinics with fewer than ten staff are "
+       },
+       {
+        "v": "70%",
+        "ref": "F8"
+       },
+       {
+        "t": " of churned logos."
+       }
+      ],
+      [
+       {
+        "t": "At "
+       },
+       {
+        "v": "7%",
+        "ref": "F2"
+       },
+       {
+        "t": " churn the company loses about "
+       },
+       {
+        "v": "60",
+        "ref": "F12"
+       },
+       {
+        "t": " clinics a month."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Monthly logo churn rose sharply in two quarters."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Two quarters ago",
+        "v": "4%",
+        "ref": "F1",
+        "share": 0.5714,
+        "assumption": false
+       },
+       {
+        "label": "Now",
+        "v": "7%",
+        "ref": "F2",
+        "share": 1.0,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Fund a small-clinic retention program before adding sales capacity."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Small-clinic retention program"
+       }
+      ],
+      [
+       {
+        "t": "It targets the segment behind "
+       },
+       {
+        "v": "70%",
+        "ref": "F8"
+       },
+       {
+        "t": " of churned logos, attacks the effort problem the March release created, needs no engineering in Q1, and fits within two hires; new sales would refill a base that is losing "
+       },
+       {
+        "v": "$30,600",
+        "ref": "F14"
+       },
+       {
+        "t": " of monthly recurring revenue each month."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Monthly logo churn, two quarters ago",
+       "v": "4%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “went from 4%”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Monthly logo churn, now",
+       "v": "7%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “to 7% in two quarters”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Net revenue retention, two quarters ago",
+       "v": "104%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “fell from 104%”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Net revenue retention, now",
+       "v": "96%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “to 96% over the same period”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Customers",
+       "v": "850",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “We have 850 customers”"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Average revenue per customer per month",
+       "v": "$1,200",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “paying on average $1,200 per month”"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 10,
+      "computed": 4,
+      "assumption": 1
+     }
+    }
+   ],
+   "others": [
+    {
+     "id": "business-analyst",
+     "title": "Business Analyst",
+     "deliverables": [
+      "brief",
+      "deck"
+     ]
+    },
+    {
+     "id": "risk-advisory-associate",
+     "title": "Risk Advisory Associate",
+     "deliverables": [
+      "deck",
+      "register"
+     ]
+    },
+    {
+     "id": "technology-consulting-analyst",
+     "title": "Technology Consulting Analyst",
+     "deliverables": [
+      "deck",
+      "brief"
+     ]
+    },
+    {
+     "id": "regulatory-compliance-advisory-associate",
+     "title": "Regulatory / Compliance Advisory Associate",
+     "deliverables": [
+      "deck",
+      "register"
+     ]
+    },
+    {
+     "id": "process-improvement-operations-consulting-analyst",
+     "title": "Process Improvement / Operations Consulting Analyst",
+     "deliverables": [
+      "deck",
+      "workbook"
+     ]
+    },
+    {
+     "id": "data-and-analytics-consulting-analyst",
+     "title": "Data & Analytics Consulting Analyst",
+     "deliverables": [
+      "deck",
+      "workbook"
+     ]
+    },
+    {
+     "id": "digital-assets-blockchain-advisory-associate",
+     "title": "Digital Assets / Blockchain Advisory Associate",
+     "deliverables": [
+      "deck",
+      "brief"
+     ]
+    }
+   ]
+  },
+  {
+   "family": {
+    "id": "finance-modeling",
+    "title": "Finance and modeling"
+   },
+   "role": {
+    "id": "fpa-analyst",
+    "title": "Financial Planning & Analysis (FP&A) Analyst",
+    "boundary": "Delivers analysis; acts on nothing.",
+    "deliverables": [
+     "workbook",
+     "memo"
+    ]
+   },
+   "problem": "Our quarterly operating expenses were $2.4 million against a budget of $2.1 million. We need to explain the overrun to the board and forecast next quarter.",
+   "file": "samples/finance-modeling.xlsx",
+   "format": "workbook",
+   "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: memo.",
+   "slide_count": 13,
+   "figure_count": 11,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "The overrun is a contractor problem: of the "
+      },
+      {
+       "v": "$300,000",
+       "ref": "F7"
+      },
+      {
+       "t": " over budget, "
+      },
+      {
+       "v": "$250,000",
+       "ref": "F8"
+      },
+      {
+       "t": " came from contractors, so manage that line rather than cutting across the board."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Operating expenses were "
+       },
+       {
+        "v": "$2,400,000",
+        "ref": "F1"
+       },
+       {
+        "t": " against a budget of "
+       },
+       {
+        "v": "$2,100,000",
+        "ref": "F2"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "Contractors explain about "
+       },
+       {
+        "v": "83.3%",
+        "ref": "F10"
+       },
+       {
+        "t": " of the overrun."
+       }
+      ],
+      [
+       {
+        "t": "Travel came in "
+       },
+       {
+        "v": "$20,000",
+        "ref": "F9"
+       },
+       {
+        "t": " under budget, and headcount matched budget."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "$300,000",
+       "ref": "F7",
+       "label": "Total overrun",
+       "basis": "calculated"
+      },
+      {
+       "v": "$250,000",
+       "ref": "F8",
+       "label": "Contractor overrun",
+       "basis": "calculated"
+      },
+      {
+       "v": "$2,400,000",
+       "ref": "F1",
+       "label": "Operating expenses this quarter",
+       "basis": "client data"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "Contractor spend explains almost all of the overrun."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Contractors ran "
+       },
+       {
+        "v": "$250,000",
+        "ref": "F8"
+       },
+       {
+        "t": " over their plan."
+       }
+      ],
+      [
+       {
+        "t": "That is about "
+       },
+       {
+        "v": "83.3%",
+        "ref": "F10"
+       },
+       {
+        "t": " of the total overrun."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Contractor spend far exceeded its plan."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Plan",
+        "v": "$350,000",
+        "ref": "F4",
+        "share": 0.5833,
+        "assumption": false
+       },
+       {
+        "label": "Actual",
+        "v": "$600,000",
+        "ref": "F3",
+        "share": 1.0,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Manage contractor spend directly instead of cutting every line."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Targeted contractor plan"
+       }
+      ],
+      [
+       {
+        "t": "It addresses the line behind "
+       },
+       {
+        "v": "$250,000",
+        "ref": "F8"
+       },
+       {
+        "t": " of the overrun without cutting lines that are on plan."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Operating expenses this quarter",
+       "v": "$2,400,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “operating expenses were $2.4 million”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Operating budget this quarter",
+       "v": "$2,100,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “against a budget of $2.1 million”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Contractor spend",
+       "v": "$600,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “Contractor spend was $600,000”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Contractor plan",
+       "v": "$350,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “against a plan of $350,000”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Travel spend",
+       "v": "$180,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “Travel was $180,000”"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Travel budget",
+       "v": "$200,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “against $200,000”"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 6,
+      "computed": 4,
+      "assumption": 1
+     }
+    }
+   ],
+   "others": [
+    {
+     "id": "credit-analyst",
+     "title": "Credit Analyst",
+     "deliverables": [
+      "workbook",
+      "memo"
+     ]
+    },
+    {
+     "id": "investment-banking-analyst",
+     "title": "Investment Banking Analyst",
+     "deliverables": [
+      "workbook",
+      "deck"
+     ]
+    },
+    {
+     "id": "financial-advisory-transaction-services-analyst",
+     "title": "Financial Advisory / Transaction Services Analyst",
+     "deliverables": [
+      "workbook",
+      "report"
+     ]
+    },
+    {
+     "id": "corporate-finance-analyst",
+     "title": "Corporate Finance Analyst",
+     "deliverables": [
+      "workbook",
+      "memo"
+     ]
+    },
+    {
+     "id": "treasury-analyst",
+     "title": "Treasury Analyst",
+     "deliverables": [
+      "workbook",
+      "memo"
+     ]
+    },
+    {
+     "id": "pricing-analyst",
+     "title": "Pricing Analyst",
+     "deliverables": [
+      "workbook",
+      "memo"
+     ]
+    },
+    {
+     "id": "real-estate-analyst",
+     "title": "Real Estate Analyst",
+     "deliverables": [
+      "workbook",
+      "memo"
+     ]
+    },
+    {
+     "id": "market-risk-analyst",
+     "title": "Market Risk Analyst",
+     "deliverables": [
+      "workbook",
+      "report"
+     ]
+    },
+    {
+     "id": "model-validation-analyst",
+     "title": "Model Validation Analyst",
+     "deliverables": [
+      "report",
+      "workbook"
+     ]
+    },
+    {
+     "id": "actuarial-analyst",
+     "title": "Actuarial Analyst",
+     "deliverables": [
+      "workbook",
+      "memo"
+     ]
+    }
+   ]
+  },
+  {
+   "family": {
+    "id": "data-analytics",
+    "title": "Data and analytics"
+   },
+   "role": {
+    "id": "data-bi-analyst",
+    "title": "Data / BI Analyst",
+    "boundary": "Delivers analysis; acts on nothing.",
+    "deliverables": [
+     "workbook",
+     "report"
+    ]
+   },
+   "problem": "Our online store's conversion rate fell from 3.2% to 2.5% last month. We need to know where in the funnel customers drop off.",
+   "file": "samples/data-analytics.xlsx",
+   "format": "workbook",
+   "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: report.",
+   "slide_count": 13,
+   "figure_count": 9,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Start with the mobile funnel: conversion fell from "
+      },
+      {
+       "v": "3.2%",
+       "ref": "F1"
+      },
+      {
+       "t": " to "
+      },
+      {
+       "v": "2.5%",
+       "ref": "F2"
+      },
+      {
+       "t": ", about "
+      },
+      {
+       "v": "1,400",
+       "ref": "F9"
+      },
+      {
+       "t": " fewer orders last month, and mobile carries "
+      },
+      {
+       "v": "70%",
+       "ref": "F5"
+      },
+      {
+       "t": " of sessions."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Conversion fell by "
+       },
+       {
+        "v": "0.7 pts",
+        "ref": "F6"
+       },
+       {
+        "t": " in a month."
+       }
+      ],
+      [
+       {
+        "t": "At last month's "
+       },
+       {
+        "v": "200,000",
+        "ref": "F3"
+       },
+       {
+        "t": " sessions, that is about "
+       },
+       {
+        "v": "1,400",
+        "ref": "F9"
+       },
+       {
+        "t": " lost orders."
+       }
+      ],
+      [
+       {
+        "t": "Mobile is "
+       },
+       {
+        "v": "70%",
+        "ref": "F5"
+       },
+       {
+        "t": " of sessions, so a mobile problem would explain the most."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "3.2%",
+       "ref": "F1",
+       "label": "Conversion rate, before",
+       "basis": "client data"
+      },
+      {
+       "v": "2.5%",
+       "ref": "F2",
+       "label": "Conversion rate, last month",
+       "basis": "client data"
+      },
+      {
+       "v": "1,400",
+       "ref": "F9",
+       "label": "Orders lost to the fall in conversion",
+       "basis": "calculated"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "The drop costs a meaningful number of orders every month."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "About "
+       },
+       {
+        "v": "6,400",
+        "ref": "F8"
+       },
+       {
+        "t": " orders at the old rate became "
+       },
+       {
+        "v": "5,000",
+        "ref": "F7"
+       },
+       {
+        "t": "."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Orders fell from the old conversion rate to the new one."
+       }
+      ],
+      "bars": [
+       {
+        "label": "At the old rate",
+        "v": "6,400",
+        "ref": "F8",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Last month",
+        "v": "5,000",
+        "ref": "F7",
+        "share": 0.7812,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Analyse and fix the mobile funnel first."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Mobile funnel analysis"
+       }
+      ],
+      [
+       {
+        "t": "It targets the device behind "
+       },
+       {
+        "v": "70%",
+        "ref": "F5"
+       },
+       {
+        "t": " of sessions and costs little before anything is rebuilt."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Conversion rate, before",
+       "v": "3.2%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “conversion rate fell from 3.2%”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Conversion rate, last month",
+       "v": "2.5%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “to 2.5% last month”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Sessions last month",
+       "v": "200,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “We had 200,000 sessions last month”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Sessions that reached a product page",
+       "v": "40%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “40% of sessions reached a product page”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Mobile share of sessions",
+       "v": "70%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “Mobile is 70% of sessions”"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Fall in conversion",
+       "v": "0.7 pts",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F1 − F2"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 5,
+      "computed": 4,
+      "assumption": 0
+     }
+    }
+   ],
+   "others": [
+    {
+     "id": "sales-operations-analyst",
+     "title": "Sales Operations Analyst",
+     "deliverables": [
+      "workbook",
+      "report"
+     ]
+    },
+    {
+     "id": "revenue-operations-analyst",
+     "title": "Revenue Operations Analyst",
+     "deliverables": [
+      "workbook",
+      "report"
+     ]
+    },
+    {
+     "id": "product-analyst-associate-product-manager",
+     "title": "Product Analyst / Associate Product Manager",
+     "deliverables": [
+      "report",
+      "brief"
+     ]
+    },
+    {
+     "id": "supply-chain-logistics-analyst",
+     "title": "Supply Chain / Logistics Analyst",
+     "deliverables": [
+      "workbook",
+      "report"
+     ]
+    },
+    {
+     "id": "demand-planning-analyst",
+     "title": "Demand Planning Analyst",
+     "deliverables": [
+      "workbook",
+      "report"
+     ]
+    },
+    {
+     "id": "hr-analyst-people-analytics",
+     "title": "HR Analyst (People Analytics)",
+     "deliverables": [
+      "workbook",
+      "report"
+     ]
+    }
+   ]
+  },
+  {
+   "family": {
+    "id": "accounting-operations",
+    "title": "Accounting and finance operations"
+   },
+   "role": {
+    "id": "staff-accountant-bookkeeper",
+    "title": "Staff Accountant / Bookkeeper",
+    "boundary": "Drafts only; you approve before anything happens.",
+    "deliverables": [
+     "reconciliation",
+     "workbook"
+    ]
+   },
+   "problem": "Our bank balance and our ledger cash balance do not agree at month end. The bank shows $84,200 and the ledger shows $79,950.",
+   "file": "samples/accounting-operations.xlsx",
+   "format": "workbook",
+   "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: reconciliation.",
+   "slide_count": 13,
+   "figure_count": 9,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Prepare one entry for the controller to approve: recording the missing "
+      },
+      {
+       "v": "$5,500",
+       "ref": "F5"
+      },
+      {
+       "t": " payment brings the ledger to "
+      },
+      {
+       "v": "$85,450",
+       "ref": "F8"
+      },
+      {
+       "t": ", matching the adjusted bank balance."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "The bank shows "
+       },
+       {
+        "v": "$84,200",
+        "ref": "F1"
+       },
+       {
+        "t": " and the ledger "
+       },
+       {
+        "v": "$79,950",
+        "ref": "F2"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "After deposits in transit and uncleared cheques, the bank balance is "
+       },
+       {
+        "v": "$85,450",
+        "ref": "F7"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "Recording the missing "
+       },
+       {
+        "v": "$5,500",
+        "ref": "F5"
+       },
+       {
+        "t": " payment closes the gap to "
+       },
+       {
+        "v": "$0",
+        "ref": "F9"
+       },
+       {
+        "t": "."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "$5,500",
+       "ref": "F5",
+       "label": "Unrecorded customer payment",
+       "basis": "client data"
+      },
+      {
+       "v": "$85,450",
+       "ref": "F8",
+       "label": "Ledger balance after the missing payment",
+       "basis": "calculated"
+      },
+      {
+       "v": "$84,200",
+       "ref": "F1",
+       "label": "Bank statement balance",
+       "basis": "client data"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "Deposits in transit and uncleared cheques explain only part of the gap."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Deposits in transit add "
+       },
+       {
+        "v": "$3,100",
+        "ref": "F3"
+       },
+       {
+        "t": " to the bank side."
+       }
+      ],
+      [
+       {
+        "t": "Uncleared cheques take "
+       },
+       {
+        "v": "$1,850",
+        "ref": "F4"
+       },
+       {
+        "t": " off it."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Timing items move the bank balance only slightly."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Bank statement",
+        "v": "$84,200",
+        "ref": "F1",
+        "share": 0.9854,
+        "assumption": false
+       },
+       {
+        "label": "Adjusted bank",
+        "v": "$85,450",
+        "ref": "F7",
+        "share": 1.0,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Record the missing payment and leave timing items to clear."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Record the payment"
+       }
+      ],
+      [
+       {
+        "t": "It explains the whole gap with evidence, leaving a difference of "
+       },
+       {
+        "v": "$0",
+        "ref": "F9"
+       },
+       {
+        "t": ", where a write-off would hide it."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Bank statement balance",
+       "v": "$84,200",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “The bank shows $84,200”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Ledger cash balance",
+       "v": "$79,950",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “the ledger shows $79,950”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Deposits in transit",
+       "v": "$3,100",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “There are $3,100 of deposits in transit”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Uncleared cheques",
+       "v": "$1,850",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “$1,850 of uncleared cheques”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Unrecorded customer payment",
+       "v": "$5,500",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “A $5,500 customer payment”"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Bank balance plus deposits in transit",
+       "v": "$87,300",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F1 + F3"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 5,
+      "computed": 4,
+      "assumption": 0
+     }
+    }
+   ],
+   "others": [
+    {
+     "id": "accounts-payable-receivable-clerk",
+     "title": "Accounts Payable / Receivable Clerk",
+     "deliverables": [
+      "reconciliation",
+      "draft"
+     ]
+    },
+    {
+     "id": "payroll-specialist",
+     "title": "Payroll Specialist",
+     "deliverables": [
+      "reconciliation",
+      "workbook"
+     ]
+    },
+    {
+     "id": "tax-associate",
+     "title": "Tax Associate",
+     "deliverables": [
+      "workbook",
+      "memo"
+     ]
+    },
+    {
+     "id": "fund-accountant",
+     "title": "Fund Accountant",
+     "deliverables": [
+      "reconciliation",
+      "report"
+     ]
+    },
+    {
+     "id": "trade-support-middle-office-analyst",
+     "title": "Trade Support / Middle Office Analyst",
+     "deliverables": [
+      "reconciliation",
+      "case-file"
+     ]
+    },
+    {
+     "id": "operations-analyst-banking-capital-markets",
+     "title": "Operations Analyst (Banking / Capital Markets)",
+     "deliverables": [
+      "reconciliation",
+      "report"
+     ]
+    },
+    {
+     "id": "regulatory-reporting-analyst",
+     "title": "Regulatory Reporting Analyst",
+     "deliverables": [
+      "report",
+      "workbook"
+     ]
+    }
+   ]
+  },
+  {
+   "family": {
+    "id": "risk-audit-controls",
+    "title": "Risk, audit and controls"
+   },
+   "role": {
+    "id": "internal-audit-associate",
+    "title": "Internal Audit Associate",
+    "boundary": "Delivers analysis; acts on nothing.",
+    "deliverables": [
+     "workbook",
+     "report"
+    ]
+   },
+   "problem": "We want an internal audit of employee expense claims. Last year we paid 4,800 claims and we suspect approvals are weak.",
+   "file": "samples/risk-audit-controls.docx",
+   "format": "memo",
+   "delivers": "Delivers today: a verified Word memo. Also planned: workbook, report.",
+   "slide_count": 12,
+   "figure_count": 7,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Tighten approvals: "
+      },
+      {
+       "v": "15%",
+       "ref": "F5"
+      },
+      {
+       "t": " of sampled claims had no manager approval, which across the year suggests about "
+      },
+      {
+       "v": "720",
+       "ref": "F7"
+      },
+      {
+       "t": " claims paid without one."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "The audit tested a sample of "
+       },
+       {
+        "v": "120",
+        "ref": "F2"
+       },
+       {
+        "t": " claims from "
+       },
+       {
+        "v": "4,800",
+        "ref": "F1"
+       },
+       {
+        "t": " paid."
+       }
+      ],
+      [
+       {
+        "v": "15%",
+        "ref": "F5"
+       },
+       {
+        "t": " had no manager approval and "
+       },
+       {
+        "v": "5%",
+        "ref": "F6"
+       },
+       {
+        "t": " exceeded the policy limit."
+       }
+      ],
+      [
+       {
+        "t": "If the sample holds, about "
+       },
+       {
+        "v": "720",
+        "ref": "F7"
+       },
+       {
+        "t": " claims were paid without approval last year."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "15%",
+       "ref": "F5",
+       "label": "Sampled claims with no approval",
+       "basis": "calculated"
+      },
+      {
+       "v": "720",
+       "ref": "F7",
+       "label": "Claims likely paid without approval, if the sample holds",
+       "basis": "calculated"
+      },
+      {
+       "v": "120",
+       "ref": "F2",
+       "label": "Claims sampled",
+       "basis": "client data"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "The approval control fails often enough to matter."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "v": "15%",
+        "ref": "F5"
+       },
+       {
+        "t": " of sampled claims had no manager approval."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Missing approvals are more common than limit breaches."
+       }
+      ],
+      "bars": [
+       {
+        "label": "No approval",
+        "v": "15%",
+        "ref": "F5",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Over the limit",
+        "v": "5%",
+        "ref": "F6",
+        "share": 0.3333,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Block payment of any claim without a recorded approval."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: System approval block"
+       }
+      ],
+      [
+       {
+        "t": "It prevents the failure behind "
+       },
+       {
+        "v": "15%",
+        "ref": "F5"
+       },
+       {
+        "t": " of sampled claims instead of finding it afterwards."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Claims paid last year",
+       "v": "4,800",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “we paid 4,800 claims”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Claims sampled",
+       "v": "120",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “In a sample of 120 claims”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Sampled claims with no manager approval",
+       "v": "18",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “18 had no manager approval”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Sampled claims over the policy limit",
+       "v": "6",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “6 exceeded the policy limit”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Sampled claims with no approval",
+       "v": "15%",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F3 ÷ F2 × 100"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Sampled claims over the limit",
+       "v": "5%",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F4 ÷ F2 × 100"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 4,
+      "computed": 3,
+      "assumption": 0
+     }
+    }
+   ],
+   "others": [
+    {
+     "id": "audit-associate-external-audit",
+     "title": "Audit Associate (External Audit)",
+     "deliverables": [
+      "workbook",
+      "register"
+     ]
+    },
+    {
+     "id": "operational-risk-analyst",
+     "title": "Operational Risk Analyst",
+     "deliverables": [
+      "register",
+      "report"
+     ]
+    },
+    {
+     "id": "third-party-vendor-risk-analyst",
+     "title": "Third-Party / Vendor Risk Analyst",
+     "deliverables": [
+      "register",
+      "report"
+     ]
+    },
+    {
+     "id": "information-security-grc-analyst",
+     "title": "Information Security / GRC Analyst",
+     "deliverables": [
+      "register",
+      "report"
+     ]
+    },
+    {
+     "id": "privacy-data-protection-analyst",
+     "title": "Privacy / Data Protection Analyst",
+     "deliverables": [
+      "register",
+      "report"
+     ]
+    },
+    {
+     "id": "cybersecurity-analyst-junior",
+     "title": "Cybersecurity Analyst (junior)",
+     "deliverables": [
+      "report",
+      "case-file"
+     ]
+    }
+   ]
+  },
+  {
+   "family": {
+    "id": "financial-crime",
+    "title": "Financial crime"
+   },
+   "role": {
+    "id": "fraud-analyst",
+    "title": "Fraud Analyst",
+    "boundary": "Prepares the decision; a qualified person decides.",
+    "deliverables": [
+     "case-file"
+    ]
+   },
+   "problem": "Our card fraud alerts have grown and analysts cannot keep up. We had 3,000 alerts last month.",
+   "file": "samples/financial-crime.docx",
+   "format": "memo",
+   "delivers": "Delivers today: a verified Word memo. Also planned: case-file.",
+   "slide_count": 12,
+   "figure_count": 7,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Prepare a risk-ranked queue for the fraud manager: alerts exceed capacity by "
+      },
+      {
+       "v": "800",
+       "ref": "F5"
+      },
+      {
+       "t": " a month, and the unreviewed alerts likely hide about "
+      },
+      {
+       "v": "32",
+       "ref": "F6"
+      },
+      {
+       "t": " real frauds worth about "
+      },
+      {
+       "v": "$28,800",
+       "ref": "F7"
+      },
+      {
+       "t": "."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Alerts reached "
+       },
+       {
+        "v": "3,000",
+        "ref": "F1"
+       },
+       {
+        "t": " last month against capacity of "
+       },
+       {
+        "v": "2,200",
+        "ref": "F2"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "At a "
+       },
+       {
+        "v": "4%",
+        "ref": "F3"
+       },
+       {
+        "t": " fraud rate, the backlog likely holds about "
+       },
+       {
+        "v": "32",
+        "ref": "F6"
+       },
+       {
+        "t": " real frauds."
+       }
+      ],
+      [
+       {
+        "t": "Each confirmed fraud costs about "
+       },
+       {
+        "v": "$900",
+        "ref": "F4"
+       },
+       {
+        "t": ", so the backlog carries about "
+       },
+       {
+        "v": "$28,800",
+        "ref": "F7"
+       },
+       {
+        "t": " of exposure."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "800",
+       "ref": "F5",
+       "label": "Alerts left unreviewed per month",
+       "basis": "calculated"
+      },
+      {
+       "v": "32",
+       "ref": "F6",
+       "label": "Likely real frauds among unreviewed alerts",
+       "basis": "calculated"
+      },
+      {
+       "v": "$28,800",
+       "ref": "F7",
+       "label": "Likely fraud loss in unreviewed alerts",
+       "basis": "calculated"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "More alerts arrive each month than analysts can close."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Alerts exceed capacity by "
+       },
+       {
+        "v": "800",
+        "ref": "F5"
+       },
+       {
+        "t": " a month."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Monthly alerts exceed what analysts can close."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Alerts",
+        "v": "3,000",
+        "ref": "F1",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Closed",
+        "v": "2,200",
+        "ref": "F2",
+        "share": 0.7333,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Rank alerts by risk so the fraud manager reviews the riskiest first."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Risk-ranked queue"
+       }
+      ],
+      [
+       {
+        "t": "It puts the riskiest of the "
+       },
+       {
+        "v": "800",
+        "ref": "F5"
+       },
+       {
+        "t": " excess alerts first without new hires; every disposition stays with the fraud manager."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Alerts last month",
+       "v": "3,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “We had 3,000 alerts last month”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Alerts analysts close per month",
+       "v": "2,200",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “Analysts close about 2,200 alerts a month”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Alerts that are real fraud",
+       "v": "4%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “4% of alerts turn out to be real fraud”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Average confirmed fraud loss",
+       "v": "$900",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “The average confirmed fraud loss is $900”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Alerts left unreviewed per month",
+       "v": "800",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F1 − F2"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Likely real frauds among unreviewed alerts",
+       "v": "32",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F5 × F3 ÷ 100"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 4,
+      "computed": 3,
+      "assumption": 0
+     }
+    }
+   ],
+   "others": [
+    {
+     "id": "compliance-aml-kyc-analyst",
+     "title": "Compliance / AML / KYC Analyst",
+     "deliverables": [
+      "case-file",
+      "register"
+     ]
+    },
+    {
+     "id": "sanctions-screening-analyst",
+     "title": "Sanctions Screening Analyst",
+     "deliverables": [
+      "case-file"
+     ]
+    },
+    {
+     "id": "financial-crime-investigator-junior",
+     "title": "Financial Crime Investigator (junior)",
+     "deliverables": [
+      "case-file",
+      "report"
+     ]
+    },
+    {
+     "id": "forensic-investigations-analyst",
+     "title": "Forensic / Investigations Analyst",
+     "deliverables": [
+      "case-file",
+      "report"
+     ]
+    }
+   ]
+  },
+  {
+   "family": {
+    "id": "legal-contracts-procurement",
+    "title": "Legal, contracts and procurement"
+   },
+   "role": {
+    "id": "contract-procurement-analyst",
+    "title": "Contract / Procurement Analyst",
+    "boundary": "Delivers analysis; acts on nothing.",
+    "deliverables": [
+     "register",
+     "memo"
+    ]
+   },
+   "problem": "Our cloud hosting contract renews next month at $240,000 a year. We want to know whether to renegotiate or switch.",
+   "file": "samples/legal-contracts-procurement.docx",
+   "format": "memo",
+   "delivers": "Delivers today: a verified Word memo. Also planned: register.",
+   "slide_count": 12,
+   "figure_count": 8,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Renegotiate rather than switch this year: the competitor saves "
+      },
+      {
+       "v": "$42,000",
+       "ref": "F5"
+      },
+      {
+       "t": " a year, but migration costs "
+      },
+      {
+       "v": "$60,000",
+       "ref": "F4"
+      },
+      {
+       "t": ", so use the quote as leverage."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "The renewal costs "
+       },
+       {
+        "v": "$240,000",
+        "ref": "F1"
+       },
+       {
+        "t": " a year against a competitor quote of "
+       },
+       {
+        "v": "$198,000",
+        "ref": "F2"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "Switching saves "
+       },
+       {
+        "v": "$42,000",
+        "ref": "F5"
+       },
+       {
+        "t": " a year but costs "
+       },
+       {
+        "v": "$60,000",
+        "ref": "F4"
+       },
+       {
+        "t": " to migrate."
+       }
+      ],
+      [
+       {
+        "t": "The contract's "
+       },
+       {
+        "v": "5%",
+        "ref": "F3"
+       },
+       {
+        "t": " increase would lift next year to "
+       },
+       {
+        "v": "$252,000",
+        "ref": "F8"
+       },
+       {
+        "t": "."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "$42,000",
+       "ref": "F5",
+       "label": "Annual saving from switching",
+       "basis": "calculated"
+      },
+      {
+       "v": "$60,000",
+       "ref": "F4",
+       "label": "One-time migration cost",
+       "basis": "client data"
+      },
+      {
+       "v": "$240,000",
+       "ref": "F1",
+       "label": "Renewal price per year",
+       "basis": "client data"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "Switching saves money every year but costs more in the first."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "The annual saving is "
+       },
+       {
+        "v": "$42,000",
+        "ref": "F5"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "After migration, the first year costs "
+       },
+       {
+        "v": "$18,000",
+        "ref": "F6"
+       },
+       {
+        "t": " more than staying."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "The competitor is cheaper than the renewal price."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Renewal",
+        "v": "$240,000",
+        "ref": "F1",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Competitor",
+        "v": "$198,000",
+        "ref": "F2",
+        "share": 0.825,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Use the competitor quote to renegotiate before switching."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Renegotiate with the quote"
+       }
+      ],
+      [
+       {
+        "t": "It can capture much of the "
+       },
+       {
+        "v": "$42,000",
+        "ref": "F5"
+       },
+       {
+        "t": " saving without the "
+       },
+       {
+        "v": "$60,000",
+        "ref": "F4"
+       },
+       {
+        "t": " migration cost; general counsel reviews any contract change."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Renewal price per year",
+       "v": "$240,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “renews next month at $240,000 a year”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Competitor quote per year",
+       "v": "$198,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “A competitor quoted $198,000 a year”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Annual price increase allowed",
+       "v": "5%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “allows a 5% annual price increase”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "One-time migration cost",
+       "v": "$60,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “Migration would cost about $60,000 one time”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Annual saving from switching",
+       "v": "$42,000",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F1 − F2"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Extra cost of switching in the first year",
+       "v": "$18,000",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F4 − F5"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 4,
+      "computed": 4,
+      "assumption": 0
+     }
+    }
+   ],
+   "others": [
+    {
+     "id": "paralegal-contracts-administrator",
+     "title": "Paralegal / Contracts Administrator",
+     "deliverables": [
+      "draft",
+      "register"
+     ]
+    },
+    {
+     "id": "legal-operations-analyst",
+     "title": "Legal Operations Analyst",
+     "deliverables": [
+      "report",
+      "workbook"
+     ]
+    },
+    {
+     "id": "procurement-assistant",
+     "title": "Procurement Assistant",
+     "deliverables": [
+      "draft",
+      "workbook"
+     ]
+    },
+    {
+     "id": "grants-administrator",
+     "title": "Grants Administrator",
+     "deliverables": [
+      "draft",
+      "workbook"
+     ]
+    }
+   ]
+  },
+  {
+   "family": {
+    "id": "content-communications",
+    "title": "Content and communications"
+   },
+   "role": {
+    "id": "content-writer-copywriter",
+    "title": "Content Writer / Copywriter",
+    "boundary": "Delivers analysis; acts on nothing.",
+    "deliverables": [
+     "draft"
+    ]
+   },
+   "problem": "Our customer newsletter's open rate fell from 38% to 24% this year. We want a content plan to win readers back.",
+   "file": "samples/content-communications.pptx",
+   "format": "deck",
+   "delivers": "Delivers today: a verified PowerPoint deck. Also planned: draft.",
+   "slide_count": 12,
+   "figure_count": 7,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Make practical how-to pieces the core of the newsletter: they open at "
+      },
+      {
+       "v": "41%",
+       "ref": "F4"
+      },
+      {
+       "t": " against "
+      },
+      {
+       "v": "24%",
+       "ref": "F2"
+      },
+      {
+       "t": " overall, which would mean about "
+      },
+      {
+       "v": "4,920",
+       "ref": "F7"
+      },
+      {
+       "t": " readers per issue instead of "
+      },
+      {
+       "v": "2,880",
+       "ref": "F6"
+      },
+      {
+       "t": "."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Open rates fell by "
+       },
+       {
+        "v": "14 pts",
+        "ref": "F5"
+       },
+       {
+        "t": " this year."
+       }
+      ],
+      [
+       {
+        "t": "How-to issues open at "
+       },
+       {
+        "v": "41%",
+        "ref": "F4"
+       },
+       {
+        "t": ", well above today's "
+       },
+       {
+        "v": "24%",
+        "ref": "F2"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "Across "
+       },
+       {
+        "v": "12,000",
+        "ref": "F3"
+       },
+       {
+        "t": " subscribers, that is the difference between about "
+       },
+       {
+        "v": "2,880",
+        "ref": "F6"
+       },
+       {
+        "t": " and "
+       },
+       {
+        "v": "4,920",
+        "ref": "F7"
+       },
+       {
+        "t": " readers."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "41%",
+       "ref": "F4",
+       "label": "Open rate of how-to issues",
+       "basis": "client data"
+      },
+      {
+       "v": "24%",
+       "ref": "F2",
+       "label": "Open rate, now",
+       "basis": "client data"
+      },
+      {
+       "v": "4,920",
+       "ref": "F7",
+       "label": "Readers per issue at the how-to rate",
+       "basis": "calculated"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "Practical how-to content outperforms everything else."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "How-to issues opened at "
+       },
+       {
+        "v": "41%",
+        "ref": "F4"
+       },
+       {
+        "t": "."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "How-to issues open far more often than the average issue."
+       }
+      ],
+      "bars": [
+       {
+        "label": "All issues now",
+        "v": "24%",
+        "ref": "F2",
+        "share": 0.5854,
+        "assumption": false
+       },
+       {
+        "label": "How-to issues",
+        "v": "41%",
+        "ref": "F4",
+        "share": 1.0,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Lead every issue with practical how-to content."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: How-to first"
+       }
+      ],
+      [
+       {
+        "t": "It builds on the only content already opening at "
+       },
+       {
+        "v": "41%",
+        "ref": "F4"
+       },
+       {
+        "t": " and needs no redesign."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Open rate, last year",
+       "v": "38%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “open rate fell from 38%”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Open rate, now",
+       "v": "24%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “to 24% this year”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Subscribers",
+       "v": "12,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “We send to 12,000 subscribers”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Open rate of how-to issues",
+       "v": "41%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “had a 41% open rate”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Fall in open rate",
+       "v": "14 pts",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F1 − F2"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Readers per issue now",
+       "v": "2,880",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F3 × F2 ÷ 100"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 4,
+      "computed": 3,
+      "assumption": 0
+     }
+    }
+   ],
+   "others": [
+    {
+     "id": "seo-sem-specialist",
+     "title": "SEO / SEM Specialist",
+     "deliverables": [
+      "report",
+      "draft"
+     ]
+    },
+    {
+     "id": "social-media-coordinator",
+     "title": "Social Media Coordinator",
+     "deliverables": [
+      "draft"
+     ]
+    },
+    {
+     "id": "corporate-communications-coordinator",
+     "title": "Corporate Communications Coordinator",
+     "deliverables": [
+      "draft",
+      "brief"
+     ]
+    },
+    {
+     "id": "technical-writer",
+     "title": "Technical Writer",
+     "deliverables": [
+      "draft"
+     ]
+    }
+   ]
+  },
+  {
+   "family": {
+    "id": "people-hr",
+    "title": "People and HR"
+   },
+   "role": {
+    "id": "learning-and-development-coordinator",
+    "title": "Learning & Development Coordinator",
+    "boundary": "Delivers analysis; acts on nothing.",
+    "deliverables": [
+     "plan",
+     "draft"
+    ]
+   },
+   "problem": "New hires take too long to become productive. Our onboarding takes 10 weeks on average and we want to cut it.",
+   "file": "samples/people-hr.docx",
+   "format": "memo",
+   "delivers": "Delivers today: a verified Word memo. Also planned: plan, draft.",
+   "slide_count": 12,
+   "figure_count": 5,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Give every new hire a buddy: buddied hires reach full productivity in "
+      },
+      {
+       "v": "7",
+       "ref": "F3"
+      },
+      {
+       "t": " weeks against "
+      },
+      {
+       "v": "10",
+       "ref": "F1"
+      },
+      {
+       "t": ", about "
+      },
+      {
+       "v": "180",
+       "ref": "F5"
+      },
+      {
+       "t": " productive weeks gained a year."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Onboarding takes "
+       },
+       {
+        "v": "10",
+        "ref": "F1"
+       },
+       {
+        "t": " weeks on average."
+       }
+      ],
+      [
+       {
+        "t": "Hires with a buddy got there in "
+       },
+       {
+        "v": "7",
+        "ref": "F3"
+       },
+       {
+        "t": " weeks, "
+       },
+       {
+        "v": "3",
+        "ref": "F4"
+       },
+       {
+        "t": " weeks sooner."
+       }
+      ],
+      [
+       {
+        "t": "Across "
+       },
+       {
+        "v": "60",
+        "ref": "F2"
+       },
+       {
+        "t": " hires a year, that is about "
+       },
+       {
+        "v": "180",
+        "ref": "F5"
+       },
+       {
+        "t": " weeks."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "7",
+       "ref": "F3",
+       "label": "Weeks to full productivity with a buddy",
+       "basis": "client data"
+      },
+      {
+       "v": "10",
+       "ref": "F1",
+       "label": "Weeks to full productivity, average",
+       "basis": "client data"
+      },
+      {
+       "v": "180",
+       "ref": "F5",
+       "label": "Productive weeks gained per year",
+       "basis": "calculated"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "Hires with a buddy become productive noticeably sooner."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Buddied hires reached full productivity in "
+       },
+       {
+        "v": "7",
+        "ref": "F3"
+       },
+       {
+        "t": " weeks."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Buddied hires become productive sooner than the average."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Average",
+        "v": "10",
+        "ref": "F1",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "With a buddy",
+        "v": "7",
+        "ref": "F3",
+        "share": 0.7,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Pair every new hire with a trained buddy."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Buddy program"
+       }
+      ],
+      [
+       {
+        "t": "It scales the practice that already cut onboarding to "
+       },
+       {
+        "v": "7",
+        "ref": "F3"
+       },
+       {
+        "t": " weeks."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Weeks to full productivity, average",
+       "v": "10",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “Our onboarding takes 10 weeks”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Hires per year",
+       "v": "60",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “We hire about 60 people a year”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Weeks to full productivity with a buddy",
+       "v": "7",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “reached full productivity in 7 weeks”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Weeks saved per hire",
+       "v": "3",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F1 − F3"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Productive weeks gained per year",
+       "v": "180",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F2 × F4"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 3,
+      "computed": 2,
+      "assumption": 0
+     }
+    }
+   ],
+   "others": [
+    {
+     "id": "recruiting-coordinator",
+     "title": "Recruiting Coordinator",
+     "deliverables": [
+      "draft",
+      "plan"
+     ]
+    },
+    {
+     "id": "talent-acquisition-associate",
+     "title": "Talent Acquisition Associate",
+     "deliverables": [
+      "brief",
+      "draft"
+     ]
+    },
+    {
+     "id": "compensation-and-benefits-analyst",
+     "title": "Compensation & Benefits Analyst",
+     "deliverables": [
+      "workbook",
+      "memo"
+     ]
+    }
+   ]
+  },
+  {
+   "family": {
+    "id": "software-it",
+    "title": "Software and IT"
+   },
+   "role": {
+    "id": "junior-software-developer",
+    "title": "Junior Software Developer",
+    "boundary": "Delivers analysis; acts on nothing.",
+    "deliverables": [
+     "code"
+    ]
+   },
+   "problem": "Our customer dashboard takes 6.5 seconds to load and customers complain. We want it under 2 seconds.",
+   "file": "samples/software-it.pptx",
+   "format": "deck",
+   "delivers": "Delivers today: a verified PowerPoint deck. Also planned: code.",
+   "slide_count": 12,
+   "figure_count": 6,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Fix the database query first: it takes "
+      },
+      {
+       "v": "4.8",
+       "ref": "F3"
+      },
+      {
+       "t": " of the page's "
+      },
+      {
+       "v": "6.5",
+       "ref": "F1"
+      },
+      {
+       "t": " seconds, about "
+      },
+      {
+       "v": "73.8%",
+       "ref": "F6"
+      },
+      {
+       "t": " of the load time."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "The dashboard loads in "
+       },
+       {
+        "v": "6.5",
+        "ref": "F1"
+       },
+       {
+        "t": " seconds against a goal of "
+       },
+       {
+        "v": "2",
+        "ref": "F2"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "The database query alone takes "
+       },
+       {
+        "v": "4.8",
+        "ref": "F3"
+       },
+       {
+        "t": " seconds."
+       }
+      ],
+      [
+       {
+        "t": "Everything else, including "
+       },
+       {
+        "v": "40",
+        "ref": "F4"
+       },
+       {
+        "t": " API calls, takes about "
+       },
+       {
+        "v": "1.7",
+        "ref": "F5"
+       },
+       {
+        "t": " seconds."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "4.8",
+       "ref": "F3",
+       "label": "Database query time, seconds",
+       "basis": "client data"
+      },
+      {
+       "v": "6.5",
+       "ref": "F1",
+       "label": "Dashboard load time, seconds",
+       "basis": "client data"
+      },
+      {
+       "v": "73.8%",
+       "ref": "F6",
+       "label": "Query share of load time",
+       "basis": "calculated"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "One database query accounts for most of the load time."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "The query takes "
+       },
+       {
+        "v": "4.8",
+        "ref": "F3"
+       },
+       {
+        "t": " seconds of the total."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "The query takes most of the total load time."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Database query",
+        "v": "4.8",
+        "ref": "F3",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Everything else",
+        "v": "1.7",
+        "ref": "F5",
+        "share": 0.3542,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Optimise the slow database query before anything else."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Optimise the query"
+       }
+      ],
+      [
+       {
+        "t": "It targets about "
+       },
+       {
+        "v": "73.8%",
+        "ref": "F6"
+       },
+       {
+        "t": " of the load time and keeps the data fresh."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Dashboard load time, seconds",
+       "v": "6.5",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “takes 6.5 seconds to load”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Target load time, seconds",
+       "v": "2",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “We want it under 2 seconds”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Database query time, seconds",
+       "v": "4.8",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “the database query takes 4.8 seconds”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Separate API calls per page load",
+       "v": "40",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “The page makes 40 separate API calls”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Load time outside the query, seconds",
+       "v": "1.7",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F1 − F3"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Query share of load time",
+       "v": "73.8%",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F3 ÷ F1 × 100"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 4,
+      "computed": 2,
+      "assumption": 0
+     }
+    }
+   ],
+   "others": [
+    {
+     "id": "qa-test-analyst",
+     "title": "QA / Test Analyst",
+     "deliverables": [
+      "code",
+      "report"
+     ]
+    },
+    {
+     "id": "it-help-desk-technical-support-specialist",
+     "title": "IT Help Desk / Technical Support Specialist",
+     "deliverables": [
+      "draft",
+      "case-file"
+     ]
+    }
+   ]
+  },
+  {
+   "family": {
+    "id": "insurance",
+    "title": "Insurance"
+   },
+   "role": {
+    "id": "claims-adjuster",
+    "title": "Claims Adjuster",
+    "boundary": "Prepares the decision; a qualified person decides.",
+    "deliverables": [
+     "case-file",
+     "workbook"
+    ]
+   },
+   "problem": "We need help preparing a water damage claim file. The policyholder claims $18,000 for a burst pipe.",
+   "file": "samples/insurance.docx",
+   "format": "memo",
+   "delivers": "Delivers today: a verified Word memo. Also planned: case-file, workbook.",
+   "slide_count": 12,
+   "figure_count": 6,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Prepare the file for the adjuster to decide: the claim of "
+      },
+      {
+       "v": "$18,000",
+       "ref": "F1"
+      },
+      {
+       "t": " exceeds the repair estimate of "
+      },
+      {
+       "v": "$14,500",
+       "ref": "F3"
+      },
+      {
+       "t": " by "
+      },
+      {
+       "v": "$3,500",
+       "ref": "F5"
+      },
+      {
+       "t": ", and the reporting delay needs checking against the policy."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "The policyholder claims "
+       },
+       {
+        "v": "$18,000",
+        "ref": "F1"
+       },
+       {
+        "t": " against a repair estimate of "
+       },
+       {
+        "v": "$14,500",
+        "ref": "F3"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "After the "
+       },
+       {
+        "v": "$1,000",
+        "ref": "F2"
+       },
+       {
+        "t": " deductible, the estimate supports "
+       },
+       {
+        "v": "$13,500",
+        "ref": "F6"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "The leak was reported "
+       },
+       {
+        "v": "3",
+        "ref": "F4"
+       },
+       {
+        "t": " days after it started, which the adjuster should check against the policy terms."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "$18,000",
+       "ref": "F1",
+       "label": "Amount claimed",
+       "basis": "client data"
+      },
+      {
+       "v": "$14,500",
+       "ref": "F3",
+       "label": "Repair estimate",
+       "basis": "client data"
+      },
+      {
+       "v": "$3,500",
+       "ref": "F5",
+       "label": "Claim above the estimate",
+       "basis": "calculated"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "The documented loss is lower than the amount claimed."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "The claim exceeds the estimate by "
+       },
+       {
+        "v": "$3,500",
+        "ref": "F5"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "The estimate less the deductible is "
+       },
+       {
+        "v": "$13,500",
+        "ref": "F6"
+       },
+       {
+        "t": "."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "The claim is higher than the repair estimate."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Claimed",
+        "v": "$18,000",
+        "ref": "F1",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Estimate",
+        "v": "$14,500",
+        "ref": "F3",
+        "share": 0.8056,
+        "assumption": false
+       },
+       {
+        "label": "After deductible",
+        "v": "$13,500",
+        "ref": "F6",
+        "share": 0.75,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Ask the adjuster to decide on the documented estimate."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Settle on the estimate"
+       }
+      ],
+      [
+       {
+        "t": "The documented estimate supports "
+       },
+       {
+        "v": "$13,500",
+        "ref": "F6"
+       },
+       {
+        "t": "; the adjuster decides once the delay is checked against the policy."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Amount claimed",
+       "v": "$18,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “claims $18,000”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Policy deductible",
+       "v": "$1,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “a $1,000 deductible”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Repair estimate",
+       "v": "$14,500",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “The repair estimate is $14,500”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Days between the leak and the report",
+       "v": "3",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “reported the leak 3 days after it started”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Claim above the estimate",
+       "v": "$3,500",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F1 − F3"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Estimate after the deductible",
+       "v": "$13,500",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F3 − F2"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 4,
+      "computed": 2,
+      "assumption": 0
+     }
+    }
+   ],
+   "others": [
+    {
+     "id": "underwriting-assistant",
+     "title": "Underwriting Assistant",
+     "deliverables": [
+      "case-file",
+      "workbook"
+     ]
+    }
+   ]
+  },
+  {
+   "family": {
+    "id": "sales-customer-coordination",
+    "title": "Sales, customer and coordination"
+   },
+   "role": {
+    "id": "sales-development-representative-sdr",
+    "title": "Sales Development Representative (SDR)",
+    "boundary": "Drafts only; you approve before anything happens.",
+    "deliverables": [
+     "brief",
+     "draft"
+    ]
+   },
+   "problem": "We sell scheduling software to dental clinics. Our outbound emails get a 1.5% reply rate and we need more meetings.",
+   "file": "samples/sales-customer-coordination.pptx",
+   "format": "deck",
+   "delivers": "Delivers today: a verified PowerPoint deck. Also planned: brief, draft.",
+   "slide_count": 12,
+   "figure_count": 7,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Focus outreach on larger clinics: they reply at "
+      },
+      {
+       "v": "4%",
+       "ref": "F3"
+      },
+      {
+       "t": " against "
+      },
+      {
+       "v": "1.5%",
+       "ref": "F1"
+      },
+      {
+       "t": " overall, so messages written for them go to the sales manager for approval first."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "The list replies at "
+       },
+       {
+        "v": "1.5%",
+        "ref": "F1"
+       },
+       {
+        "t": ", about "
+       },
+       {
+        "v": "30",
+        "ref": "F5"
+       },
+       {
+        "t": " replies a month."
+       }
+      ],
+      [
+       {
+        "t": "Larger clinics reply at "
+       },
+       {
+        "v": "4%",
+        "ref": "F3"
+       },
+       {
+        "t": " and make up "
+       },
+       {
+        "v": "30%",
+        "ref": "F4"
+       },
+       {
+        "t": " of the list."
+       }
+      ],
+      [
+       {
+        "t": "The "
+       },
+       {
+        "v": "600",
+        "ref": "F6"
+       },
+       {
+        "t": " larger clinics emailed each month would produce about "
+       },
+       {
+        "v": "24",
+        "ref": "F7"
+       },
+       {
+        "t": " replies at their rate."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "4%",
+       "ref": "F3",
+       "label": "Reply rate, larger clinics",
+       "basis": "client data"
+      },
+      {
+       "v": "1.5%",
+       "ref": "F1",
+       "label": "Reply rate, whole list",
+       "basis": "client data"
+      },
+      {
+       "v": "30",
+       "ref": "F5",
+       "label": "Replies per month now",
+       "basis": "calculated"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "Larger clinics reply far more often than the list overall."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Larger clinics reply at "
+       },
+       {
+        "v": "4%",
+        "ref": "F3"
+       },
+       {
+        "t": " against "
+       },
+       {
+        "v": "1.5%",
+        "ref": "F1"
+       },
+       {
+        "t": " overall."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Larger clinics reply far more often than the list overall."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Whole list",
+        "v": "1.5%",
+        "ref": "F1",
+        "share": 0.375,
+        "assumption": false
+       },
+       {
+        "label": "Larger clinics",
+        "v": "4%",
+        "ref": "F3",
+        "share": 1.0,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Prioritise larger clinics with a message written for them."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Larger-clinic focus"
+       }
+      ],
+      [
+       {
+        "t": "It concentrates effort where replies run at "
+       },
+       {
+        "v": "4%",
+        "ref": "F3"
+       },
+       {
+        "t": "; every message is drafted for the sales manager to approve before sending."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Reply rate, whole list",
+       "v": "1.5%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “get a 1.5% reply rate”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Clinics emailed per month",
+       "v": "2,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “We email 2,000 clinics a month”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Reply rate, larger clinics",
+       "v": "4%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “reply at 4%”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Larger clinics, share of the list",
+       "v": "30%",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “About 30% of our list”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Replies per month now",
+       "v": "30",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F2 × F1 ÷ 100"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Larger clinics emailed per month",
+       "v": "600",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F2 × F4 ÷ 100"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 4,
+      "computed": 3,
+      "assumption": 0
+     }
+    }
+   ],
+   "others": [
+    {
+     "id": "customer-success-associate",
+     "title": "Customer Success Associate",
+     "deliverables": [
+      "report",
+      "draft"
+     ]
+    },
+    {
+     "id": "project-program-coordinator",
+     "title": "Project / Program Coordinator",
+     "deliverables": [
+      "plan",
+      "report"
+     ]
+    }
+   ]
+  }
+ ]
+}

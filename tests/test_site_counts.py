@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 import site_counts  # noqa: E402
 
-PAGE = (ROOT / "site" / "index.html").read_text(encoding="utf-8")
+PAGE = (ROOT / "site" / "details.html").read_text(encoding="utf-8")  # counts live on the full page (Slice 122)
 
 
 class HomepageCountsAreTrueTest(unittest.TestCase):

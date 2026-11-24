@@ -13,6 +13,7 @@ from pathlib import Path
 
 from analystos.catalog import FORMAT, load_catalog, summary, validate_catalog
 from analystos.catalog.validate import MAX_RATE_CENTS
+from analystos.l4.formats import FAMILY_FORMAT
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -121,7 +122,7 @@ class TheRealCatalogTest(unittest.TestCase):
                 self.assertEqual(role["eval"]["method"], "mock" if role["id"] in own else "mock-family")
                 self.assertTrue((ROOT / role["eval"]["set"]).is_dir(), role["eval"]["set"])
                 self.assertEqual(role["rate_cents_per_engagement_hour"], "tbd")
-                self.assertEqual(role["delivers_today"], "verified-deck")
+                self.assertEqual(role["delivers_today"], FAMILY_FORMAT[role["family"]])  # Slice 124
 
     def test_thirteen_families_and_the_wave_split(self):
         self.assertEqual(len(CATALOG["families"]), 13)

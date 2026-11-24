@@ -1,6 +1,6 @@
 """Keep the homepage's test and spec counts true (Slice 69).
 
-    python3 tools/site_counts.py            # rewrite the figures in site/index.html
+    python3 tools/site_counts.py            # rewrite the figures in site/details.html
     python3 tools/site_counts.py --check    # exit 1 if any is stale
 
 Tests are counted by *discovering* the suite (nothing is run); specs are the
@@ -20,7 +20,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PAGE = ROOT / "site" / "index.html"
+PAGE = ROOT / "site" / "details.html"  # the full page; the homepage carries no counts (Slice 122)
 
 # (name, regex with one group around the number to replace, kind)
 PATTERNS = [

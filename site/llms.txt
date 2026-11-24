@@ -7,7 +7,7 @@
 - [OpenAPI 3.1](https://analystos.dev/api/v1/openapi.json): every endpoint, request and response
 - [API index](https://analystos.dev/api/v1): machine-readable list of endpoints and limits
 - [Role catalog](https://analystos.dev/api/v2/catalog): every role you can hire, its limits, how it was tested, and its questions
-- `POST https://analystos.dev/api/v2/engagements`: hire a role for one problem (access code required; each request is a paid model call)
+- `POST https://analystos.dev/api/v2/engagements`: hire a role for one problem (access code required; each request is a paid model call). The response is the role's format (its catalog `delivers_today`): .pptx, .docx or .xlsx, named in the `X-AnalystOS-Format` header; with `?format=json` it is `output` {format, media_type, filename, base64}
 - [API guide](https://analystos.dev/docs/api.md): Endpoints, auth, configuration and limits of /api/v1
 
 ## Verifying a report
@@ -25,7 +25,7 @@
 
 ## Limits, stated plainly
 
-- [Trust and known limits](https://analystos.dev/#trust): what leaves your environment, what is and is not checked
+- [Trust and known limits](https://analystos.dev/details.html#trust): what leaves your environment, what is and is not checked
 - Every figure is proven; only some relationships between figures are checked
 - Sealing proves a report was built from the sealed facts, not that the facts are the important ones
 

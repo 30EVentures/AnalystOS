@@ -132,3 +132,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 118 | the website: hire any of the 73 roles | [spec](slice-118/spec.md) |
 | 119 | survive the live model's natural writing (first paid test failed) | [spec](slice-119/spec.md) |
 | 120 | close the release review of PR #100 before the second paid test | [spec](slice-120/spec.md) |
+| 121 | problem messages that say where (second paid test) | [spec](slice-121/spec.md) |

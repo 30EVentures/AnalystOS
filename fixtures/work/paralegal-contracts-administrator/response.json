@@ -1,5 +1,5 @@
 {
- "answer": "Put the [F4] contracts that need written notice in front of counsel first: [F2] contracts worth [F3] a year renew automatically this quarter.",
+ "answer": "Put the [F4] contracts that need written notice in front of counsel first: [F2] contracts worth [F3] a year renew automatically before the end of next quarter.",
  "exec_summary": [
   "[F2] of [F1] supplier contracts renew automatically before the end of next quarter, [F5] of the total.",
   "They are worth [F3] a year.",
@@ -10,7 +10,7 @@
  "key_question": "Which automatic renewals need action before their notice windows close?",
  "titles": {
   "situation": "Supplier contracts are about to renew automatically.",
-  "options": "Two ways to handle this quarter's renewals.",
+  "options": "Two ways to handle the coming renewals.",
   "recommendation": "Review the notice contracts with counsel first.",
   "roadmap": "Clear the notice deadlines first, then the rest.",
   "kpis": "Two measures show no renewal slips through.",
@@ -77,7 +77,7 @@
  "issue_tree": [
   {
    "branch": "What renews",
-   "finding": "A large share of contracts renew this quarter.",
+   "finding": "A large share of contracts renew before the end of next quarter.",
    "points": [
     "[F2] contracts worth [F3] a year renew automatically."
    ],
@@ -89,7 +89,7 @@
    ],
    "so_what": "Each owner should confirm whether to renew, renegotiate or cancel.",
    "chart": {
-    "title": "Many supplier contracts renew this quarter.",
+    "title": "Many supplier contracts renew before the end of next quarter.",
     "figure_ids": [
      "F1",
      "F2"
@@ -175,7 +175,7 @@
  "work": [
   {
    "kind": "register",
-   "title": "Automatic renewal register: this quarter",
+   "title": "Automatic renewal register: renewals before the end of next quarter",
    "rows": [
     {
      "item": "Renewals needing written notice to cancel: [F4].",
@@ -208,7 +208,7 @@
     "We refer to our agreement with you, which renews automatically unless notice is given.",
     "This letter gives notice that we do not wish the agreement to renew at the end of its current term.",
     "Please confirm receipt of this notice in writing.",
-    "Signed by an authorised signatory after legal review."
+    "Yours faithfully, for and on behalf of the company."
    ]
   }
  ]

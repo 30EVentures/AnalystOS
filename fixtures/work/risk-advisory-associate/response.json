@@ -3,7 +3,7 @@
  "exec_summary": [
   "[F2] of [F1] critical suppliers have no tested exit plan, [F5] of the total.",
   "[F3] of them support payments, where an outage costs about [F4] an hour.",
-  "The other [F6] support less urgent services."
+  "The other [F6] support other critical services."
  ],
  "situation": "A firm that depends on critical suppliers and must show it could replace them.",
  "complication": "Many critical suppliers have exit plans that have never been tested.",

@@ -135,19 +135,20 @@
   {
    "horizon": "First 30 days",
    "actions": [
-    "Reset passwords and review sign-ins for the exposed accounts once the security lead decides."
+    "Reset passwords and review sign-ins for the exposed accounts once the security lead decides.",
+    "Check devices of staff who only clicked."
    ]
   },
   {
    "horizon": "Days 31-60",
    "actions": [
-    "Check devices of staff who only clicked."
+    "Run a phishing awareness refresher for the teams that clicked most."
    ]
   },
   {
    "horizon": "Days 61-90",
    "actions": [
-    "Run a phishing awareness refresher for the teams that clicked most."
+    "Run a follow-up phishing test and compare clicks."
    ]
   }
  ],
@@ -182,7 +183,7 @@
    ],
    "evidence": [
     "The email gateway's flag and click records for the week.",
-    "The fake page's reported password submissions."
+    "The client's count of staff who entered passwords."
    ],
    "open_questions": [
     "Has any exposed account signed in from an unusual place since?",

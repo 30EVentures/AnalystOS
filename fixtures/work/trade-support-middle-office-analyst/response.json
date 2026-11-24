@@ -141,7 +141,7 @@
  ],
  "recommendation": {
   "option": "Chase and book",
-  "rationale": "It clears all of the [F5] break with the least change to the books; the operations manager approves every booking."
+  "rationale": "It explains all of the [F5] break: booking the fee clears [F4], and the failed sale of [F3] stays a reconciling item until it settles; the operations manager approves every booking."
  },
  "roadmap": [
   {
@@ -190,6 +190,7 @@
    "subject": "Failed sale and unbooked fee in the fund's cash break",
    "facts": [
     "Our system shows [F1] of fund cash and the custodian shows [F2].",
+    "Our system counts the failed sale's proceeds as cash although the custodian has not received them.",
     "A sale of [F3] failed to settle at the custodian.",
     "The custodian charged a fee of [F4] that our system does not show."
    ],

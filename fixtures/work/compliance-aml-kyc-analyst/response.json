@@ -1,9 +1,9 @@
 {
- "answer": "Work the overdue files in risk order, high-risk first: [F3] high-risk files are overdue and today's pace needs [F6] to clear the backlog.",
+ "answer": "Work the overdue files in risk order, high-risk first: [F3] high-risk files are overdue, and the backlog alone equals [F6] of the team's capacity.",
  "exec_summary": [
   "[F2] of [F1] files due this year are overdue, [F5] of the total.",
   "[F3] of the overdue files are high-risk customers, [F7] of the overdue files.",
-  "At about [F4] refreshes a month, clearing the overdue files takes [F6]."
+  "At about [F4] refreshes a month, the overdue files equal [F6] of capacity, before any new files fall due."
  ],
  "situation": "A bank whose KYC team refreshes customer due diligence on a schedule.",
  "complication": "Many of this year's refreshes are already overdue, including high-risk customers.",
@@ -63,7 +63,7 @@
   },
   {
    "id": "F6",
-   "label": "Months to clear the overdue files",
+   "label": "Overdue files in months of team capacity",
    "value": 3,
    "unit": "months",
    "basis": "computed",
@@ -95,8 +95,8 @@
    ],
    "hypotheses": [
     {
-     "text": "The team can catch up without changing order.",
-     "verdict": "refuted"
+     "text": "Today's pace alone will clear the backlog.",
+     "verdict": "untested"
     }
    ],
    "so_what": "The order of work decides where risk sits while the backlog clears.",
@@ -117,7 +117,7 @@
    "finding": "Many overdue files are high-risk customers.",
    "points": [
     "[F3] overdue files are high-risk.",
-    "Clearing all overdue files takes [F6] at today's pace."
+    "The overdue files alone equal [F6] of today's capacity."
    ],
    "hypotheses": [
     {
@@ -204,7 +204,7 @@
      "action": "Work the rest of the queue by due date."
     },
     {
-     "item": "Time to clear at today's pace: [F6].",
+     "item": "Overdue files equal [F6] of today's capacity, before new files fall due.",
      "rating": "medium",
      "owner": "Compliance manager",
      "status": "open",
@@ -221,8 +221,8 @@
     "The team completes about [F4] refreshes a month."
    ],
    "evidence": [
-    "The KYC system's list of overdue files by risk rating.",
-    "The team's monthly completion count."
+    "The client's count of overdue files by risk rating.",
+    "The client's monthly completion count."
    ],
    "open_questions": [
     "Have any overdue high-risk customers had unusual activity since their due date?"

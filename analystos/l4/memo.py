@@ -100,8 +100,7 @@ def source_text(fig, figures):
     return f"Assumption: {_plain(fig['rationale'], figures)}"
 
 
-EFFECT_TEXT = {"add_to_a": "adds to side A", "subtract_from_a": "comes off side A",
-               "add_to_b": "adds to side B", "subtract_from_b": "comes off side B"}
+EFFECT_TEXT = deck.EFFECT_TEXT  # one wording in memo, deck and workbook
 
 
 def _work(doc, item, figures):

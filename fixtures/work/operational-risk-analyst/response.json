@@ -112,7 +112,7 @@
    "hypotheses": [
     {
      "text": "The breach came from one large event.",
-     "verdict": "refuted"
+     "verdict": "untested"
     }
    ],
    "so_what": "The committee needs a plan to bring losses back within appetite.",
@@ -227,11 +227,11 @@
      "action": "Check whether more events or better reporting drove the rise."
     },
     {
-     "item": "Events outside manual payments are spread across several processes.",
-     "rating": "low",
+     "item": "Loss events outside manual payments: causes not yet analysed.",
+     "rating": "medium",
      "owner": "Operational risk lead",
      "status": "open",
-     "action": "Review their causes again at quarter end."
+     "action": "Analyse their causes before the next risk committee."
     }
    ]
   }

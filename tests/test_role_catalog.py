@@ -120,6 +120,13 @@ class TheRealCatalogTest(unittest.TestCase):
             with self.subTest(role=role["id"]):
                 self.assertEqual(role["status"], "available")
                 self.assertEqual(role["eval"]["method"], "mock" if role["id"] in own else "mock-family")
+                if role["eval"]["method"] == "mock":  # Slice 127 review: its set is its own example
+                    set_dir = ROOT / role["eval"]["set"]
+                    named = set()
+                    for found in [set_dir / "client.json", *set_dir.glob("*/client.json")]:
+                        if found.is_file():
+                            named.update(json.loads(found.read_text())["roles"])
+                    self.assertIn(role["id"], named)
                 self.assertTrue((ROOT / role["eval"]["set"]).is_dir(), role["eval"]["set"])
                 self.assertEqual(role["rate_cents_per_engagement_hour"], "tbd")
                 self.assertEqual(role["delivers_today"], FAMILY_FORMAT[role["family"]])  # Slice 124

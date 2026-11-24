@@ -31,6 +31,11 @@ ROOT = Path(__file__).resolve().parents[1]
 CATALOG = load_catalog()
 ROLES = {r["id"]: r for r in CATALOG["roles"]}
 EXAMPLES = sorted(d for d in (ROOT / "fixtures" / "work").iterdir() if d.is_dir())
+# A draft that reads as already acted on: sent, emailed, posted, booked, filed or signed (Slice 127 review).
+_ACTED = r"(?:sent|emailed|posted|booked|filed|signed|submitted)"
+DONE = re.compile(r"\b(?:has|have|had|was|were)\s+(?:already\s+)?(?:been\s+)?" + _ACTED + r"\b"
+                  r"|\b(?:we|i)\s+(?:have\s+)?(?:already\s+)?" + _ACTED + r"\s+(?:this|it|both|these|the\s+(?:notice|entries|entry|letter|email))\b"
+                  r"|\b(?:we|i)\s+" + _ACTED + r"\s+it\b", re.I)
 
 
 def load(directory):
@@ -120,22 +125,29 @@ class WorkExamplesTest(unittest.TestCase):
                     seen += 1
         self.assertEqual(seen, 2)
 
-    def test_approval_gated_drafts_are_written_for_approval_not_as_sent(self):
+    def test_drafts_are_written_for_approval_and_never_read_as_done(self):
         seen = 0
         for directory in EXAMPLES:
             _, response = load(directory)
-            if ROLES[directory.name]["boundary"] != "approval-gated":
-                continue
+            boundary = ROLES[directory.name]["boundary"]
             for item in response["work"]:
                 if item["kind"] != "draft":
                     continue
                 with self.subTest(example=directory.name):
-                    self.assertIn("approve", item["for"])
-                    body = " ".join(item["body"]).lower()
-                    for sent in ("we have sent this", "has been sent", "was sent to you"):
-                        self.assertNotIn(sent, body)
+                    if boundary == "approval-gated":
+                        self.assertIn("approve", item["for"])
+                    elif boundary == "human-decides":
+                        self.assertRegex(item["for"], r"approve|review")
+                    body = " ".join(item["body"])
+                    self.assertIsNone(DONE.search(body), body)
                     seen += 1
-        self.assertEqual(seen, 2)
+        self.assertEqual(seen, 3)
+
+    def test_the_done_pattern_catches_the_review_examples(self):
+        for text in ("This notice has been sent and signed.", "We have already emailed this to you and posted both entries.",
+                     "The entries were booked.", "We filed it yesterday.", "I sent this to the supplier."):
+            self.assertIsNotNone(DONE.search(text), text)
+        self.assertIsNone(DONE.search("We sent a payment of [F4] on the last day of the month."))
 
     def test_case_files_ask_a_qualified_person(self):
         for directory in EXAMPLES:

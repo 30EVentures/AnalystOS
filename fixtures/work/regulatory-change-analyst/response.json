@@ -185,7 +185,7 @@
      "action": "Draft updated policies for outside review first."
     },
     {
-     "item": "Other affected policies: [F1] in total, [F5] of the library.",
+     "item": "All affected policies: [F1], [F5] of the library.",
      "rating": "medium",
      "owner": "Compliance policy lead",
      "status": "open",

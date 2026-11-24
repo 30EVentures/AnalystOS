@@ -5759,7 +5759,7 @@
         ],
         "rating": "medium",
         "owner": "Audit associate",
-        "status": "in progress"
+        "status": "open"
        },
        {
         "item": [
@@ -5913,7 +5913,7 @@
      "bullets": [
       [
        {
-        "t": "We handle "
+        "t": "The retailer handles "
        },
        {
         "v": "3,000",
@@ -6175,7 +6175,7 @@
    "format": "memo",
    "delivers": "Delivers today: a verified Word memo. Also planned: workbook.",
    "slide_count": 14,
-   "figure_count": 12,
+   "figure_count": 14,
    "slides": [
     {
      "kind": "summary",
@@ -6189,21 +6189,21 @@
        "ref": "F4"
       },
       {
-       "t": " below market, and turnover costs about "
+       "t": " below market, and turnover above the company rate cost about "
       },
       {
-       "v": "$640,000",
-       "ref": "F12"
+       "v": "$256,000",
+       "ref": "F14"
       },
       {
-       "t": " a year against "
+       "t": " last year against a rough "
       },
       {
        "v": "$960,000",
        "ref": "F6"
       },
       {
-       "t": " to close the gap."
+       "t": " to move everyone."
       }
      ],
      "bullets": [
@@ -6235,7 +6235,7 @@
       ],
       [
        {
-        "t": "Closing that gap for all "
+        "t": "As a rough sizing, closing the median gap for all "
        },
        {
         "v": "80",
@@ -6287,15 +6287,15 @@
        "basis": "calculated"
       },
       {
-       "v": "$640,000",
-       "ref": "F12",
-       "label": "Cost of engineer turnover last year",
+       "v": "$256,000",
+       "ref": "F14",
+       "label": "Cost of turnover above the company rate",
        "basis": "calculated"
       },
       {
        "v": "$960,000",
        "ref": "F6",
-       "label": "Cost to bring every engineer to the market median",
+       "label": "Rough cost to bring every engineer to the median (headcount times median gap)",
        "basis": "calculated"
       }
      ]
@@ -6344,7 +6344,7 @@
       ],
       "bars": [
        {
-        "label": "Our median",
+        "label": "Engineer median",
         "v": "$108,000",
         "ref": "F1",
         "share": 0.9,
@@ -6376,21 +6376,21 @@
       ],
       [
        {
-        "t": "Turnover cost about "
+        "t": "Turnover above the company rate, the part pay could plausibly reduce, cost about "
        },
        {
-        "v": "$640,000",
-        "ref": "F12"
+        "v": "$256,000",
+        "ref": "F14"
        },
        {
-        "t": " last year against "
+        "t": " last year against a rough "
        },
        {
         "v": "$960,000",
         "ref": "F6"
        },
        {
-        "t": " to close the gap for everyone, so targeting is the better use of budget; the head of people decides each person's pay."
+        "t": " to move everyone, so a targeted adjustment fits the budget better; the head of people decides each person's pay."
        }
       ]
      ]
@@ -6456,7 +6456,7 @@
       },
       {
        "ref": "F6",
-       "label": "Cost to bring every engineer to the market median",
+       "label": "Rough cost to bring every engineer to the median (headcount times median gap)",
        "v": "$960,000",
        "basis": "computed",
        "source": [
@@ -6468,7 +6468,7 @@
      ],
      "counts": {
       "client": 6,
-      "computed": 6,
+      "computed": 8,
       "assumption": 0
      }
     }
@@ -6898,7 +6898,7 @@
    "format": "deck",
    "delivers": "Delivers today: a verified PowerPoint deck, with its draft inside. Also planned: brief.",
    "slide_count": 13,
-   "figure_count": 7,
+   "figure_count": 8,
    "slides": [
     {
      "kind": "summary",
@@ -6912,21 +6912,28 @@
        "ref": "F4"
       },
       {
-       "t": " staff without email: a named email reaches "
+       "t": " staff without email: a named email would reach about "
       },
       {
-       "v": "980",
+       "v": "686",
        "ref": "F7"
       },
       {
-       "t": " readers against "
+       "t": " of the "
       },
       {
-       "v": "490",
+       "v": "980",
        "ref": "F6"
       },
       {
-       "t": " for the intranet."
+       "t": " email holders, against about "
+      },
+      {
+       "v": "490",
+       "ref": "F8"
+      },
+      {
+       "t": " readers for the last intranet post."
       }
      ],
      "bullets": [
@@ -6951,11 +6958,11 @@
         "ref": "F2"
        },
        {
-        "t": ", about "
+        "t": " of staff, about "
        },
        {
         "v": "490",
-        "ref": "F6"
+        "ref": "F8"
        },
        {
         "t": " people."
@@ -6970,10 +6977,17 @@
         "ref": "F3"
        },
        {
-        "t": ", about "
+        "t": "; across the "
        },
        {
         "v": "980",
+        "ref": "F6"
+       },
+       {
+        "t": " staff with email that is about "
+       },
+       {
+        "v": "686",
         "ref": "F7"
        },
        {
@@ -6989,15 +7003,15 @@
        "basis": "client data"
       },
       {
-       "v": "980",
+       "v": "686",
        "ref": "F7",
-       "label": "Employees reached at the named email rate",
+       "label": "Email holders reached at the named email rate",
        "basis": "calculated"
       },
       {
-       "v": "490",
+       "v": "980",
        "ref": "F6",
-       "label": "Employees reached at the intranet rate",
+       "label": "Employees with company email",
        "basis": "calculated"
       }
      ]
@@ -7109,12 +7123,12 @@
        ],
        [
         {
-         "t": "Hello everyone, I want to tell you about a change to how your benefits are run. From the start of the new plan year, a new provider will look after our health and wellbeing benefits."
+         "t": "Hello everyone, I want to tell you about a change to how your benefits are run. From {start date for the head of people to confirm}, a new provider, {provider name to confirm}, will run our employee benefits."
         }
        ],
        [
         {
-         "t": "Your cover is not being cut. You will get a new member card and a new website to manage your benefits, and you will need to confirm your choices during enrolment."
+         "t": "{What stays the same and what changes for employees, for the head of people to confirm.} You will need to confirm your choices during enrolment."
         }
        ],
        [
@@ -7191,19 +7205,19 @@
       },
       {
        "ref": "F6",
-       "label": "Employees reached at the intranet rate",
-       "v": "490",
+       "label": "Employees with company email",
+       "v": "980",
        "basis": "computed",
        "source": [
         {
-         "t": "Calculated: F1 × F2 ÷ 100"
+         "t": "Calculated: F1 − F4"
         }
        ]
       }
      ],
      "counts": {
       "client": 4,
-      "computed": 3,
+      "computed": 4,
       "assumption": 0
      }
     }
@@ -7228,25 +7242,25 @@
    "format": "workbook",
    "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: memo.",
    "slide_count": 13,
-   "figure_count": 11,
+   "figure_count": 13,
    "slides": [
     {
      "kind": "summary",
      "heading": "The answer first",
      "title": [
       {
-       "t": "Fund the packing line first: it returns "
+       "t": "Fund the packing line first, subject to an NPV check: it pays back in "
       },
       {
-       "v": "33.3%",
-       "ref": "F9"
+       "v": "3",
+       "ref": "F12"
       },
       {
-       "t": " a year on its cost against "
+       "t": " years against "
       },
       {
-       "v": "20%",
-       "ref": "F10"
+       "v": "5",
+       "ref": "F13"
       },
       {
        "t": " for the racking, and both cannot fit in the "
@@ -7281,25 +7295,18 @@
       ],
       [
        {
-        "t": "The packing line returns "
+        "t": "The packing line pays back in "
        },
        {
-        "v": "33.3%",
-        "ref": "F9"
+        "v": "3",
+        "ref": "F12"
        },
        {
-        "t": " a year and the racking "
+        "t": " years and the racking in "
        },
        {
-        "v": "20%",
-        "ref": "F10"
-       },
-       {
-        "t": ", both above the hurdle of "
-       },
-       {
-        "v": "15%",
-        "ref": "F6"
+        "v": "5",
+        "ref": "F13"
        },
        {
         "t": "."
@@ -7320,15 +7327,15 @@
      ],
      "tiles": [
       {
-       "v": "33.3%",
-       "ref": "F9",
-       "label": "Packing line annual return on cost",
+       "v": "3",
+       "ref": "F12",
+       "label": "Packing line payback in years",
        "basis": "calculated"
       },
       {
-       "v": "20%",
-       "ref": "F10",
-       "label": "Racking annual return on cost",
+       "v": "5",
+       "ref": "F13",
+       "label": "Racking payback in years",
        "basis": "calculated"
       },
       {
@@ -7420,28 +7427,28 @@
       ],
       [
        {
-        "t": "It returns "
+        "t": "It pays back in "
        },
        {
-        "v": "33.3%",
-        "ref": "F9"
+        "v": "3",
+        "ref": "F12"
        },
        {
-        "t": " against "
+        "t": " years against "
        },
        {
-        "v": "20%",
-        "ref": "F10"
+        "v": "5",
+        "ref": "F13"
        },
        {
-        "t": " for the racking, fits the budget with "
+        "t": " for the racking and fits the budget with "
        },
        {
         "v": "$600,000",
         "ref": "F11"
        },
        {
-        "t": " to spare, and the racking still clears the hurdle for next year; the CFO decides."
+        "t": " to spare; an NPV at the hurdle rate, once asset lives are known, should confirm the choice before the CFO decides."
        }
       ]
      ]
@@ -7519,7 +7526,7 @@
      ],
      "counts": {
       "client": 6,
-      "computed": 5,
+      "computed": 7,
       "assumption": 0
      }
     }
@@ -7539,7 +7546,7 @@
      "memo"
     ]
    },
-   "problem": "A regional food distributor has asked us for a $2,000,000 term loan to buy delivery trucks. Its EBITDA last year was $1,800,000.",
+   "problem": "A chain of dental clinics has asked us for a $2,000,000 term loan to buy imaging equipment. Its EBITDA last year was $1,800,000.",
    "file": "samples/roles/credit-analyst.xlsx",
    "format": "workbook",
    "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: memo.",
@@ -7551,7 +7558,7 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "The borrower can carry the loan on last year's numbers: debt service cover would be "
+       "t": "The borrower can carry the loan on last year's numbers: using EBITDA as a stand-in for cash available for debt service, cover would be "
       },
       {
        "v": "2.00x",
@@ -7571,14 +7578,14 @@
      "bullets": [
       [
        {
-        "t": "EBITDA of "
+        "t": "Using EBITDA of "
        },
        {
         "v": "$1,800,000",
         "ref": "F2"
        },
        {
-        "t": " would have to cover total debt service of "
+        "t": " as a stand-in for cash available for debt service, it would have to cover total debt service of "
        },
        {
         "v": "$900,000",
@@ -7869,30 +7876,30 @@
      "draft"
     ]
    },
-   "problem": "Our largest customer, a regional distributor, renews next quarter and their active users fell from 250 to 150 this year.",
+   "problem": "Our largest customer, a wholesale business, renews next quarter and their active users fell from 250 to 150 this year.",
    "file": "samples/roles/customer-success-associate.pptx",
    "format": "deck",
    "delivers": "Delivers today: a verified PowerPoint deck, with its draft inside. Also planned: report.",
    "slide_count": 15,
-   "figure_count": 9,
+   "figure_count": 10,
    "slides": [
     {
      "kind": "summary",
      "heading": "The answer first",
      "title": [
       {
-       "t": "Open the renewal with a check-in and reporting help, for the customer success manager to approve: active users fell "
+       "t": "Open the renewal with a check-in and reporting help, for the customer success manager to approve: active users fell by "
       },
       {
-       "v": "-40%",
-       "ref": "F7"
+       "v": "40%",
+       "ref": "F8"
       },
       {
        "t": " and the customer pays about "
       },
       {
        "v": "$38,400",
-       "ref": "F9"
+       "ref": "F10"
       },
       {
        "t": " a year for unused seats."
@@ -7915,11 +7922,18 @@
         "ref": "F2"
        },
        {
-        "t": ", down "
+        "t": ", a fall of "
        },
        {
-        "v": "-40%",
+        "v": "100",
         "ref": "F7"
+       },
+       {
+        "t": " users or "
+       },
+       {
+        "v": "40%",
+        "ref": "F8"
        },
        {
         "t": "."
@@ -7954,14 +7968,14 @@
       [
        {
         "v": "100",
-        "ref": "F8"
+        "ref": "F9"
        },
        {
         "t": " seats sit unused, worth about "
        },
        {
         "v": "$38,400",
-        "ref": "F9"
+        "ref": "F10"
        },
        {
         "t": " a year."
@@ -7970,14 +7984,14 @@
      ],
      "tiles": [
       {
-       "v": "-40%",
-       "ref": "F7",
-       "label": "Change in active users",
+       "v": "40%",
+       "ref": "F8",
+       "label": "Fall in active users as a share of the start",
        "basis": "calculated"
       },
       {
        "v": "$38,400",
-       "ref": "F9",
+       "ref": "F10",
        "label": "Annual spend on unused seats",
        "basis": "calculated"
       },
@@ -8062,7 +8076,7 @@
        },
        {
         "v": "$38,400",
-        "ref": "F9"
+        "ref": "F10"
        },
        {
         "t": " of unused spend before renewal talks; the customer success manager approves every message."
@@ -8188,7 +8202,7 @@
      ],
      "counts": {
       "client": 5,
-      "computed": 4,
+      "computed": 5,
       "assumption": 0
      }
     }
@@ -8546,7 +8560,7 @@
        "ref": "F5"
       },
       {
-       "t": " would save about "
+       "t": " would save up to "
       },
       {
        "v": "$240,000",
@@ -8590,7 +8604,7 @@
       ],
       [
        {
-        "t": "Holding back "
+        "t": "The chain held back "
        },
        {
         "v": "3",
@@ -8604,7 +8618,7 @@
         "ref": "F8"
        },
        {
-        "t": " of the chain, showed the method works."
+        "t": " of the chain, but never repeated the test."
        }
       ]
      ],
@@ -8624,7 +8638,7 @@
       {
        "v": "$240,000",
        "ref": "F6",
-       "label": "Yearly saving at the target",
+       "label": "Yearly saving at the target, upper bound",
        "basis": "calculated"
       }
      ]
@@ -8659,7 +8673,7 @@
         "ref": "F5"
        },
        {
-        "t": " cut on promotions that do not pay off saves about "
+        "t": " cut on promotions that do not pay off saves up to "
        },
        {
         "v": "$240,000",
@@ -8710,7 +8724,7 @@
       ],
       [
        {
-        "t": "It gives a fair read of lift with data the chain already has and targets about "
+        "t": "It gives a fair read of lift with data the chain already has and targets up to "
        },
        {
         "v": "$240,000",
@@ -8783,7 +8797,7 @@
       },
       {
        "ref": "F6",
-       "label": "Yearly saving at the target",
+       "label": "Yearly saving at the target, upper bound",
        "v": "$240,000",
        "basis": "computed",
        "source": [
@@ -8827,7 +8841,7 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Fix the forecast bias before next season is locked: summer was over-forecast by "
+       "t": "Add a check against recent sales before next season's forecast is locked: summer was over-forecast by "
       },
       {
        "v": "25%",
@@ -9507,7 +9521,7 @@
         "ref": "F2"
        },
        {
-        "t": " of our "
+        "t": " of the business's "
        },
        {
         "v": "12",
@@ -9687,7 +9701,7 @@
      "rows": [
       {
        "ref": "F1",
-       "label": "Sites we operate",
+       "label": "Sites operated",
        "v": "12",
        "basis": "client",
        "source": [
@@ -9851,7 +9865,7 @@
       ],
       [
        {
-        "t": "On our view of "
+        "t": "On diligence-adjusted EBITDA of "
        },
        {
         "v": "$4,350,000",
@@ -9978,7 +9992,7 @@
       ],
       [
        {
-        "t": "Each adjustment is backed by the seller's own accounts, and together they remove "
+        "t": "The seller's figure still counts all three items, and removing them avoids "
        },
        {
         "v": "$6,800,000",
@@ -10045,7 +10059,7 @@
        "basis": "client",
        "source": [
         {
-         "t": "Client's words: “a general manager at $200,000”"
+         "t": "Client's words: “general manager at $200,000”"
         }
        ]
       },
@@ -10301,7 +10315,7 @@
       "kind": "case_file",
       "title": [
        {
-        "t": "Case file: Restaurant customer: cash deposits under the reporting threshold"
+        "t": "Case file: Restaurant customer: many cash deposits, each under the same amount"
        }
       ],
       "facts": [
@@ -10403,7 +10417,7 @@
       },
       {
        "ref": "F3",
-       "label": "Reporting threshold per deposit",
+       "label": "Amount each deposit stayed under",
        "v": "$10,000",
        "basis": "client",
        "source": [
@@ -10468,7 +10482,7 @@
      "workbook"
     ]
    },
-   "problem": "We are reviewing a listed packaging maker for our research coverage. Its latest annual report shows revenue of $880 million, up from $800 million the year before.",
+   "problem": "We are reviewing a listed maker of kitchen appliances for our research coverage. Its latest annual report shows revenue of $880 million, up from $800 million the year before.",
    "file": "samples/roles/financial-equity-research-analyst.docx",
    "format": "memo",
    "delivers": "Delivers today: a verified Word memo. Also planned: report, workbook.",
@@ -10480,7 +10494,14 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "The company is growing but earning less on each sale and carrying more debt: revenue rose "
+       "t": "The company is growing but earning less on each sale and carries net debt of "
+      },
+      {
+       "v": "4.00x",
+       "ref": "F10"
+      },
+      {
+       "t": " operating profit: revenue rose "
       },
       {
        "v": "10%",
@@ -10494,14 +10515,7 @@
        "ref": "F7"
       },
       {
-       "t": " and net debt reached "
-      },
-      {
-       "v": "4.00x",
-       "ref": "F10"
-      },
-      {
-       "t": " operating profit. It merits a full review before the registered analyst sets any rating or price target."
+       "t": ". It merits a full review before the registered analyst sets any rating or price target."
       }
      ],
      "bullets": [
@@ -10579,6 +10593,12 @@
      ],
      "tiles": [
       {
+       "v": "4.00x",
+       "ref": "F10",
+       "label": "Net debt to operating profit",
+       "basis": "calculated"
+      },
+      {
        "v": "10%",
        "ref": "F5",
        "label": "Revenue growth",
@@ -10588,12 +10608,6 @@
        "v": "9%",
        "ref": "F7",
        "label": "Operating margin this year",
-       "basis": "calculated"
-      },
-      {
-       "v": "4.00x",
-       "ref": "F10",
-       "label": "Net debt to operating profit",
        "basis": "calculated"
       }
      ]
@@ -10693,14 +10707,14 @@
       ],
       [
        {
-        "t": "Margins fell by "
+        "t": "The margin changed by "
        },
        {
         "v": "-3 pts",
         "ref": "F8"
        },
        {
-        "t": " while debt reached "
+        "t": " and net debt is "
        },
        {
         "v": "4.00x",
@@ -11151,7 +11165,7 @@
      "report"
     ]
    },
-   "problem": "Our fund accounting system shows cash of $3,482,000 for the fund, but the custodian statement shows $3,617,500. We strike the net asset value tonight.",
+   "problem": "Our fund's draft net asset value tonight is $40,000,000, but our independent check of the fund's net assets comes to $39,900,000. The fund has 2,000,000 shares in issue.",
    "file": "samples/roles/fund-accountant.xlsx",
    "format": "workbook",
    "delivers": "Delivers today: a verified Excel workbook with live formulas, with its reconciliation inside. Also planned: report.",
@@ -11163,38 +11177,52 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Three unbooked custodian items explain the whole "
+       "t": "A stale bond price and an under-accrued fee explain the whole "
       },
       {
-       "v": "$135,500",
-       "ref": "F6"
+       "v": "$100,000",
+       "ref": "F5"
       },
       {
-       "t": " cash break: book them for the fund controller's approval before the net asset value is struck."
+       "t": " gap; correcting both for the fund controller's approval moves the value per share from "
+      },
+      {
+       "v": "20",
+       "ref": "F8"
+      },
+      {
+       "t": " to "
+      },
+      {
+       "v": "20",
+       "ref": "F9"
+      },
+      {
+       "t": " before the strike."
       }
      ],
      "bullets": [
       [
        {
-        "t": "Our system shows "
+        "t": "The draft value is "
        },
        {
-        "v": "$3,482,000",
+        "v": "$40,000,000",
         "ref": "F1"
        },
        {
-        "t": " of cash against the custodian's "
+        "t": " against an independent check of "
        },
        {
-        "v": "$3,617,500",
+        "v": "$39,900,000",
         "ref": "F2"
        },
        {
-        "t": ", a break of "
+        "t": ", a gap of "
        },
        {
-        "v": "$135,500",
-        "ref": "F6"
+        "v": "$100,000",
+        "ref": "F5"
        },
        {
         "t": "."
@@ -11202,54 +11230,47 @@
       ],
       [
        {
-        "t": "A dividend of "
+        "t": "A bond still at last week's price overstates the draft by "
        },
        {
-        "v": "$41,500",
+        "v": "$90,000",
         "ref": "F3"
        },
        {
-        "t": " and a subscription of "
-       },
-       {
-        "v": "$120,000",
-        "ref": "F4"
-       },
-       {
-        "t": " are at the custodian but not booked."
+        "t": "."
        }
       ],
       [
        {
-        "t": "The custodian paid the "
+        "t": "The management fee accrual is short by "
        },
        {
-        "v": "$26,000",
-        "ref": "F5"
+        "v": "$10,000",
+        "ref": "F4"
        },
        {
-        "t": " audit fee we still show as accrued."
+        "t": "."
        }
       ]
      ],
      "tiles": [
       {
-       "v": "$135,500",
-       "ref": "F6",
-       "label": "Cash break",
+       "v": "$100,000",
+       "ref": "F5",
+       "label": "Gap between draft and check",
        "basis": "calculated"
       },
       {
-       "v": "$3,482,000",
-       "ref": "F1",
-       "label": "Fund cash in our system",
-       "basis": "client data"
+       "v": "20",
+       "ref": "F8",
+       "label": "Draft value per share in dollars",
+       "basis": "calculated"
       },
       {
-       "v": "$3,617,500",
-       "ref": "F2",
-       "label": "Fund cash at the custodian",
-       "basis": "client data"
+       "v": "20",
+       "ref": "F9",
+       "label": "Corrected value per share in dollars",
+       "basis": "calculated"
       }
      ]
     },
@@ -11258,56 +11279,42 @@
      "heading": "A finding, with its chart",
      "title": [
       {
-       "t": "Cash has arrived at the custodian that we have not booked."
+       "t": "One bond still carries last week's price."
       }
      ],
      "bullets": [
       [
        {
-        "t": "The dividend of "
+        "t": "At today's independent price the bond is worth "
        },
        {
-        "v": "$41,500",
+        "v": "$90,000",
         "ref": "F3"
        },
        {
-        "t": " and the subscription of "
-       },
-       {
-        "v": "$120,000",
-        "ref": "F4"
-       },
-       {
-        "t": " total "
-       },
-       {
-        "v": "$161,500",
-        "ref": "F7"
-       },
-       {
-        "t": "."
+        "t": " less."
        }
       ]
      ],
      "chart": {
       "title": [
        {
-        "t": "Cash in our system and at the custodian."
+        "t": "Draft value and the independent check."
        }
       ],
       "bars": [
        {
-        "label": "Our system",
-        "v": "$3,482,000",
+        "label": "Draft",
+        "v": "$40,000,000",
         "ref": "F1",
-        "share": 0.9625,
+        "share": 1.0,
         "assumption": false
        },
        {
-        "label": "Custodian",
-        "v": "$3,617,500",
+        "label": "Independent check",
+        "v": "$39,900,000",
         "ref": "F2",
-        "share": 1.0,
+        "share": 0.9975,
         "assumption": false
        }
       ]
@@ -11318,25 +11325,25 @@
      "heading": "The recommendation",
      "title": [
       {
-       "t": "Book all three items for approval before the strike."
+       "t": "Correct both items for approval before the strike."
       }
      ],
      "bullets": [
       [
        {
-        "t": "Recommended: Book all three"
+        "t": "Recommended: Correct and strike"
        }
       ],
       [
        {
-        "t": "It clears the whole "
+        "t": "It removes the whole "
        },
        {
-        "v": "$135,500",
-        "ref": "F6"
+        "v": "$100,000",
+        "ref": "F5"
        },
        {
-        "t": " break before the strike and keeps the subscription out of tonight's value; the fund controller approves the entries and the strike."
+        "t": " overstatement before any investor deals at the wrong price; the fund controller approves the entries and the strike."
        }
       ]
      ]
@@ -11348,59 +11355,47 @@
       "kind": "reconciliation",
       "title": [
        {
-        "t": "Reconciliation: Fund cash against the custodian before the strike"
+        "t": "Reconciliation: Draft net asset value against the independent check"
        }
       ],
       "lines": [
        {
-        "label": "Fund cash in our system",
-        "v": "$3,482,000",
+        "label": "Draft net asset value",
+        "v": "$40,000,000",
         "ref": "F1",
         "effect": "side A"
        },
        {
-        "label": "Dividend received, not booked",
-        "v": "$41,500",
+        "label": "Bond overstatement from the stale price",
+        "v": "$90,000",
         "ref": "F3",
-        "effect": "adds to side A"
-       },
-       {
-        "label": "Subscription received for tomorrow's dealing",
-        "v": "$120,000",
-        "ref": "F4",
-        "effect": "adds to side A"
-       },
-       {
-        "label": "Audit fee paid by the custodian",
-        "v": "$26,000",
-        "ref": "F5",
         "effect": "comes off side A"
        },
        {
-        "label": "Fund cash at the custodian",
-        "v": "$3,617,500",
+        "label": "Management fee under-accrual",
+        "v": "$10,000",
+        "ref": "F4",
+        "effect": "comes off side A"
+       },
+       {
+        "label": "Independent check of net assets",
+        "v": "$39,900,000",
         "ref": "F2",
         "effect": "side B"
        }
       ],
       "entries": [
        {
-        "debit": "Cash at custodian",
-        "credit": "Dividends receivable",
-        "v": "$41,500",
+        "debit": "Unrealised loss on investments",
+        "credit": "Investments at fair value",
+        "v": "$90,000",
         "ref": "F3"
        },
        {
-        "debit": "Cash at custodian",
-        "credit": "Subscriptions received in advance",
-        "v": "$120,000",
+        "debit": "Management fee expense",
+        "credit": "Accrued management fee",
+        "v": "$10,000",
         "ref": "F4"
-       },
-       {
-        "debit": "Accrued audit fee",
-        "credit": "Cash at custodian",
-        "v": "$26,000",
-        "ref": "F5"
        }
       ]
      }
@@ -11411,74 +11406,74 @@
      "rows": [
       {
        "ref": "F1",
-       "label": "Fund cash in our system",
-       "v": "$3,482,000",
+       "label": "Draft net asset value",
+       "v": "$40,000,000",
        "basis": "client",
        "source": [
         {
-         "t": "Client's words: “shows cash of $3,482,000”"
+         "t": "Client's words: “draft net asset value tonight is $40,000,000”"
         }
        ]
       },
       {
        "ref": "F2",
-       "label": "Fund cash at the custodian",
-       "v": "$3,617,500",
+       "label": "Independent check of net assets",
+       "v": "$39,900,000",
        "basis": "client",
        "source": [
         {
-         "t": "Client's words: “the custodian statement shows $3,617,500”"
+         "t": "Client's words: “comes to $39,900,000”"
         }
        ]
       },
       {
        "ref": "F3",
-       "label": "Dividend received, not booked",
-       "v": "$41,500",
+       "label": "Bond overstatement from the stale price",
+       "v": "$90,000",
        "basis": "client",
        "source": [
         {
-         "t": "Client's words: “A dividend of $41,500”"
+         "t": "Client's words: “worth $90,000 less”"
         }
        ]
       },
       {
        "ref": "F4",
-       "label": "Subscription received for tomorrow's dealing",
-       "v": "$120,000",
+       "label": "Management fee under-accrual",
+       "v": "$10,000",
        "basis": "client",
        "source": [
         {
-         "t": "Client's words: “A subscription of $120,000”"
+         "t": "Client's words: “understates the accrual by $10,000”"
         }
        ]
       },
       {
        "ref": "F5",
-       "label": "Audit fee paid by the custodian",
-       "v": "$26,000",
-       "basis": "client",
+       "label": "Gap between draft and check",
+       "v": "$100,000",
+       "basis": "computed",
        "source": [
         {
-         "t": "Client's words: “the $26,000 audit fee”"
+         "t": "Calculated: F1 − F2"
         }
        ]
       },
       {
        "ref": "F6",
-       "label": "Cash break",
-       "v": "$135,500",
+       "label": "Gap explained by the two items",
+       "v": "$100,000",
        "basis": "computed",
        "source": [
         {
-         "t": "Calculated: F2 − F1"
+         "t": "Calculated: F3 + F4"
         }
        ]
       }
      ],
      "counts": {
-      "client": 6,
-      "computed": 4,
+      "client": 5,
+      "computed": 5,
       "assumption": 0
      }
     }
@@ -11510,7 +11505,7 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Report the program as on track: "
+       "t": "Report progress and spending plainly: "
       },
       {
        "v": "80%",
@@ -11524,7 +11519,7 @@
        "ref": "F5"
       },
       {
-       "t": " of the grant spent, and any budget moves stay within the "
+       "t": " of the grant spent, and any budget move is checked against the "
       },
       {
        "v": "$25,000",
@@ -11731,14 +11726,14 @@
          "ref": "F3"
         },
         {
-         "t": ", which is "
+         "t": " for the year, which is "
         },
         {
          "v": "80%",
          "ref": "F7"
         },
         {
-         "t": " of the year's goal. Tutoring sessions continue each week at every site."
+         "t": " of the goal. {How tutoring is delivered and any highlights, for the program lead to add.}"
         }
        ],
        [
@@ -11771,19 +11766,19 @@
          "ref": "F8"
         },
         {
-         "t": " will fund tutor time, reading materials and family sessions for the rest of the year."
+         "t": " will fund {planned uses of the remaining funds, for the program lead to confirm against the budget tracker}."
         }
        ],
        [
         {
-         "t": "Budget lines. We expect small moves between budget lines as tutoring hours rise. Any move will stay within the "
+         "t": "Budget lines. {Any planned moves between budget lines, for the executive director to confirm, or a line saying none are planned.} Any move will stay within the "
         },
         {
          "v": "$25,000",
          "ref": "F9"
         },
         {
-         "t": " the grant agreement allows, and we will ask you first before any larger change."
+         "t": " the funder allows without approval, and we will ask you before any larger change."
         }
        ],
        [
@@ -11920,7 +11915,7 @@
        "ref": "F10"
       },
       {
-       "t": " in replacement costs; shift scheduling is the main reason leavers gave, so prepare a scheduling policy review for the HR director to decide."
+       "t": " in replacement costs; shift scheduling is the main reason last year's leavers gave, so prepare a scheduling policy review for the HR director to decide."
       }
      ],
      "bullets": [
@@ -11978,7 +11973,7 @@
         "ref": "F5"
        },
        {
-        "t": " leavers, or "
+        "t": " of last year's leavers, or "
        },
        {
         "v": "50%",
@@ -12112,14 +12107,14 @@
       ],
       [
        {
-        "t": "Shift scheduling is the main reason for "
+        "t": "Shift scheduling was the main reason for "
        },
        {
         "v": "50%",
         "ref": "F11"
        },
        {
-        "t": " of leavers, and the extra turnover costs about "
+        "t": " of last year's leavers, and the extra turnover costs about "
        },
        {
         "v": "$216,000",
@@ -12229,7 +12224,7 @@
    "format": "memo",
    "delivers": "Delivers today: a verified Word memo, with its register inside. Also planned: report.",
    "slide_count": 15,
-   "figure_count": 9,
+   "figure_count": 10,
    "slides": [
     {
      "kind": "summary",
@@ -12257,14 +12252,14 @@
        "ref": "F7"
       },
       {
-       "t": ", and access reviews cover "
+       "t": ", and "
       },
       {
-       "v": "70%",
-       "ref": "F3"
+       "v": "6",
+       "ref": "F10"
       },
       {
-       "t": " of critical systems."
+       "t": " critical systems had no access review."
       }
      ],
      "bullets": [
@@ -12330,7 +12325,14 @@
         "ref": "F3"
        },
        {
-        "t": "."
+        "t": "; "
+       },
+       {
+        "v": "6",
+        "ref": "F10"
+       },
+       {
+        "t": " remain."
        }
       ]
      ],
@@ -12476,7 +12478,7 @@
         ],
         "rating": "high",
         "owner": "Infrastructure manager",
-        "status": "in progress"
+        "status": "open"
        },
        {
         "item": [
@@ -12484,11 +12486,18 @@
           "t": "Critical systems without an access review this year: "
          },
          {
-          "v": "70%",
-          "ref": "F3"
+          "v": "6",
+          "ref": "F10"
          },
          {
-          "t": " reviewed."
+          "t": " of "
+         },
+         {
+          "v": "20",
+          "ref": "F1"
+         },
+         {
+          "t": "."
          }
         ],
         "rating": "medium",
@@ -12571,7 +12580,7 @@
      ],
      "counts": {
       "client": 6,
-      "computed": 3,
+      "computed": 4,
       "assumption": 0
      }
     }
@@ -12591,7 +12600,7 @@
      "deck"
     ]
    },
-   "problem": "The owners of a family-owned packaging manufacturer have received an offer of $96 million for the business. Its EBITDA last year was $12 million.",
+   "problem": "The owners of a family-owned maker of industrial pumps have received an offer of $96 million for the business. Its EBITDA last year was $12 million.",
    "file": "samples/roles/investment-banking-analyst.xlsx",
    "format": "workbook",
    "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: deck.",
@@ -13563,7 +13572,7 @@
        "t": "The book breaks its rate limit: a rise of "
       },
       {
-       "v": "1 pts",
+       "v": "1 pt",
        "ref": "F3"
       },
       {
@@ -13625,7 +13634,7 @@
         "t": " if rates rise by "
        },
        {
-        "v": "1 pts",
+        "v": "1 pt",
         "ref": "F3"
        },
        {
@@ -13673,7 +13682,7 @@
      ],
      "tiles": [
       {
-       "v": "1 pts",
+       "v": "1 pt",
        "ref": "F3",
        "label": "Rate rise in the policy test",
        "basis": "client data"
@@ -13713,7 +13722,7 @@
         "t": ", so a rise of "
        },
        {
-        "v": "1 pts",
+        "v": "1 pt",
         "ref": "F3"
        },
        {
@@ -13835,7 +13844,7 @@
       {
        "ref": "F3",
        "label": "Rate rise in the policy test",
-       "v": "1 pts",
+       "v": "1 pt",
        "basis": "client",
        "source": [
         {
@@ -13914,7 +13923,7 @@
        "t": "The model under-predicted defaults by "
       },
       {
-       "v": "1 pts",
+       "v": "1 pt",
        "ref": "F6"
       },
       {
@@ -13948,7 +13957,7 @@
         "t": ", a gap of "
        },
        {
-        "v": "1 pts",
+        "v": "1 pt",
         "ref": "F6"
        },
        {
@@ -14003,7 +14012,7 @@
      ],
      "tiles": [
       {
-       "v": "1 pts",
+       "v": "1 pt",
        "ref": "F6",
        "label": "Gap between actual and predicted",
        "basis": "calculated"
@@ -14036,7 +14045,7 @@
         "t": "The gap of "
        },
        {
-        "v": "1 pts",
+        "v": "1 pt",
         "ref": "F6"
        },
        {
@@ -14067,7 +14076,7 @@
        },
        {
         "label": "Actual gap",
-        "v": "1 pts",
+        "v": "1 pt",
         "ref": "F6",
         "share": 1.0,
         "assumption": false
@@ -14094,7 +14103,7 @@
         "t": "A gap of "
        },
        {
-        "v": "1 pts",
+        "v": "1 pt",
         "ref": "F6"
        },
        {
@@ -14179,7 +14188,7 @@
       {
        "ref": "F6",
        "label": "Gap between actual and predicted",
-       "v": "1 pts",
+       "v": "1 pt",
        "basis": "computed",
        "source": [
         {
@@ -14656,7 +14665,7 @@
      "bullets": [
       [
        {
-        "t": "Our ledger shows "
+        "t": "The bank's ledger shows "
        },
        {
         "v": "$8,940,000",
@@ -14728,7 +14737,7 @@
       {
        "v": "$8,940,000",
        "ref": "F1",
-       "label": "Nostro balance in our ledger",
+       "label": "Nostro balance in the bank's ledger",
        "basis": "client data"
       }
      ]
@@ -14758,7 +14767,7 @@
         "ref": "F4"
        },
        {
-        "t": " overstate our ledger."
+        "t": " overstate the bank's ledger."
        }
       ],
       [
@@ -14777,12 +14786,12 @@
      "chart": {
       "title": [
        {
-        "t": "Nostro balance in our ledger and at the correspondent."
+        "t": "Nostro balance in the ledger and at the correspondent."
        }
       ],
       "bars": [
        {
-        "label": "Our ledger",
+        "label": "Ledger",
         "v": "$8,940,000",
         "ref": "F1",
         "share": 1.0,
@@ -14845,7 +14854,7 @@
       ],
       "lines": [
        {
-        "label": "Nostro balance in our ledger",
+        "label": "Nostro balance in the bank's ledger",
         "v": "$8,940,000",
         "ref": "F1",
         "effect": "side A"
@@ -14903,7 +14912,7 @@
      "rows": [
       {
        "ref": "F1",
-       "label": "Nostro balance in our ledger",
+       "label": "Nostro balance in the bank's ledger",
        "v": "$8,940,000",
        "basis": "client",
        "source": [
@@ -16110,7 +16119,14 @@
      "bullets": [
       [
        {
-        "t": "The cut from "
+        "t": "Price changes by "
+       },
+       {
+        "v": "-10%",
+        "ref": "F6"
+       },
+       {
+        "t": ", from "
        },
        {
         "v": "$800",
@@ -16124,14 +16140,7 @@
         "ref": "F2"
        },
        {
-        "t": " is a discount of "
-       },
-       {
-        "v": "-10%",
-        "ref": "F6"
-       },
-       {
-        "t": " on price."
+        "t": "."
        }
       ],
       [
@@ -16212,7 +16221,7 @@
      "bullets": [
       [
        {
-        "t": "Price falls by "
+        "t": "Price changes by "
        },
        {
         "v": "-10%",
@@ -16427,7 +16436,7 @@
        "ref": "F5"
       },
       {
-       "t": " records past retention, and fix the subject access process that answered "
+       "t": " records past retention unless a reason to keep them applies, such as an open claim, and fix the subject access process that answered "
       },
       {
        "v": "15%",
@@ -16653,7 +16662,7 @@
         ],
         "rating": "medium",
         "owner": "Customer service manager",
-        "status": "in progress"
+        "status": "open"
        }
       ]
      }
@@ -16751,7 +16760,7 @@
      "workbook"
     ]
    },
-   "problem": "We are a regional distributor. Our warehouse ships 2,400 orders a day, but only 1,800 leave the same day.",
+   "problem": "We are a hospital group. Our accounts payable team receives 5,000 supplier invoices a month, and only 3,500 are approved within our payment terms.",
    "file": "samples/roles/process-improvement-operations-consulting-analyst.pptx",
    "format": "deck",
    "delivers": "Delivers today: a verified PowerPoint deck. Also planned: workbook.",
@@ -16763,128 +16772,115 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Cut walking and packing waits: they take "
-      },
-      {
-       "v": "40%",
-       "ref": "F6"
-      },
-      {
-       "t": " and "
-      },
-      {
-       "v": "25%",
-       "ref": "F8"
-      },
-      {
-       "t": " of each order's time, and fixing them is the route from "
+       "t": "Attack waiting time first: invoices spend "
       },
       {
        "v": "75%",
-       "ref": "F3"
+       "ref": "F8"
       },
       {
-       "t": " same-day shipping to the "
+       "t": " of their approval time in approvers' inboxes, and late approval costs "
+      },
+      {
+       "v": "$14,000",
+       "ref": "F11"
+      },
+      {
+       "t": " a month in late fees. Whether this alone reaches the "
       },
       {
        "v": "95%",
-       "ref": "F9"
+       "ref": "F4"
       },
       {
-       "t": " target."
+       "t": " target is untested."
       }
      ],
      "bullets": [
       [
        {
-        "t": "The warehouse ships "
-       },
-       {
-        "v": "1,800",
+        "v": "3,500",
         "ref": "F2"
        },
        {
         "t": " of "
        },
        {
-        "v": "2,400",
+        "v": "5,000",
         "ref": "F1"
        },
        {
-        "t": " orders a day the same day, "
+        "t": " invoices a month are approved within terms, "
        },
        {
-        "v": "75%",
+        "v": "70%",
         "ref": "F3"
        },
        {
-        "t": "."
-       }
-      ],
-      [
-       {
-        "t": "Each order takes "
-       },
-       {
-        "v": "120",
-        "ref": "F4"
-       },
-       {
-        "t": " minutes; walking takes "
-       },
-       {
-        "v": "48",
-        "ref": "F5"
-       },
-       {
-        "t": " and packing waits "
-       },
-       {
-        "v": "30",
-        "ref": "F7"
-       },
-       {
-        "t": "."
-       }
-      ],
-      [
-       {
-        "t": "The same-day target of "
+        "t": ", against a target of "
        },
        {
         "v": "95%",
+        "ref": "F4"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "An invoice takes "
+       },
+       {
+        "v": "24",
+        "ref": "F6"
+       },
+       {
+        "t": " days to approve, "
+       },
+       {
+        "v": "18",
+        "ref": "F7"
+       },
+       {
+        "t": " of them waiting in inboxes."
+       }
+      ],
+      [
+       {
+        "v": "1,200",
         "ref": "F9"
        },
        {
-        "t": " is "
+        "t": " invoices a month, "
        },
        {
-        "v": "20 pts",
+        "v": "24%",
         "ref": "F10"
        },
        {
-        "t": " above today."
+        "t": ", have no purchase order and need an approver found by email."
        }
       ]
      ],
      "tiles": [
       {
-       "v": "40%",
-       "ref": "F6",
-       "label": "Share of order time spent walking",
-       "basis": "calculated"
-      },
-      {
-       "v": "25%",
-       "ref": "F8",
-       "label": "Share of order time waiting to pack",
-       "basis": "calculated"
-      },
-      {
        "v": "75%",
-       "ref": "F3",
-       "label": "Same-day shipping rate",
+       "ref": "F8",
+       "label": "Share of approval time spent waiting",
        "basis": "calculated"
+      },
+      {
+       "v": "$14,000",
+       "ref": "F11",
+       "label": "Monthly supplier late fees",
+       "basis": "client data"
+      },
+      {
+       "v": "95%",
+       "ref": "F4",
+       "label": "Target share approved within terms",
+       "basis": "client data"
       }
      ]
     },
@@ -16893,54 +16889,53 @@
      "heading": "A finding, with its chart",
      "title": [
       {
-       "t": "Walking is the largest share of order time."
+       "t": "Invoices spend most of their approval time waiting in inboxes."
       }
      ],
      "bullets": [
       [
        {
-        "t": "Walking takes "
+        "v": "18",
+        "ref": "F7"
        },
        {
-        "v": "48",
-        "ref": "F5"
+        "t": " of "
        },
        {
-        "t": " minutes of each order, "
-       },
-       {
-        "v": "40%",
+        "v": "24",
         "ref": "F6"
        },
        {
-        "t": " of the time."
-       }
-      ],
-      [
+        "t": " days are spent waiting, "
+       },
        {
-        "t": "Pickers pick one order at a time across the whole warehouse."
+        "v": "75%",
+        "ref": "F8"
+       },
+       {
+        "t": " of the time."
        }
       ]
      ],
      "chart": {
       "title": [
        {
-        "t": "Share of order time by activity."
+        "t": "Approval within terms now and the target."
        }
       ],
       "bars": [
        {
-        "label": "Walking",
-        "v": "40%",
-        "ref": "F6",
-        "share": 1.0,
+        "label": "Now",
+        "v": "70%",
+        "ref": "F3",
+        "share": 0.7368,
         "assumption": false
        },
        {
-        "label": "Packing wait",
-        "v": "25%",
-        "ref": "F8",
-        "share": 0.625,
+        "label": "Target",
+        "v": "95%",
+        "ref": "F4",
+        "share": 1.0,
         "assumption": false
        }
       ]
@@ -16951,32 +16946,32 @@
      "heading": "The recommendation",
      "title": [
       {
-       "t": "Batch picking and balance the packing bench."
+       "t": "Set approval rules with escalation to cut waiting."
       }
      ],
      "bullets": [
       [
        {
-        "t": "Recommended: Batch and rebalance"
+        "t": "Recommended: Rules and escalation"
        }
       ],
       [
        {
-        "t": "It targets both walking at "
+        "t": "It targets waiting, which is "
        },
        {
-        "v": "40%",
-        "ref": "F6"
-       },
-       {
-        "t": " and packing waits at "
-       },
-       {
-        "v": "25%",
+        "v": "75%",
         "ref": "F8"
        },
        {
-        "t": " without a new building; the operations director decides."
+        "t": " of approval time, and the "
+       },
+       {
+        "v": "$14,000",
+        "ref": "F11"
+       },
+       {
+        "t": " monthly late fees without a new system; the finance director decides."
        }
       ]
      ]
@@ -16987,30 +16982,30 @@
      "rows": [
       {
        "ref": "F1",
-       "label": "Orders shipped a day",
-       "v": "2,400",
+       "label": "Supplier invoices a month",
+       "v": "5,000",
        "basis": "client",
        "source": [
         {
-         "t": "Client's words: “ships 2,400 orders a day”"
+         "t": "Client's words: “receives 5,000 supplier invoices a month”"
         }
        ]
       },
       {
        "ref": "F2",
-       "label": "Orders leaving the same day",
-       "v": "1,800",
+       "label": "Invoices approved within terms",
+       "v": "3,500",
        "basis": "client",
        "source": [
         {
-         "t": "Client's words: “only 1,800 leave the same day”"
+         "t": "Client's words: “only 3,500 are approved within our payment terms”"
         }
        ]
       },
       {
        "ref": "F3",
-       "label": "Same-day shipping rate",
-       "v": "75%",
+       "label": "Share approved within terms",
+       "v": "70%",
        "basis": "computed",
        "source": [
         {
@@ -17020,41 +17015,41 @@
       },
       {
        "ref": "F4",
-       "label": "Minutes from release to dispatch",
-       "v": "120",
+       "label": "Target share approved within terms",
+       "v": "95%",
        "basis": "client",
        "source": [
         {
-         "t": "Client's words: “an order takes 120 minutes”"
-        }
-       ]
-      },
-      {
-       "ref": "F5",
-       "label": "Minutes walking between aisles",
-       "v": "48",
-       "basis": "client",
-       "source": [
-        {
-         "t": "Client's words: “takes 48 minutes of that”"
+         "t": "Client's words: “Approve 95% of invoices”"
         }
        ]
       },
       {
        "ref": "F6",
-       "label": "Share of order time spent walking",
-       "v": "40%",
-       "basis": "computed",
+       "label": "Average days from receipt to approval",
+       "v": "24",
+       "basis": "client",
        "source": [
         {
-         "t": "Calculated: F5 ÷ F4 × 100"
+         "t": "Client's words: “takes 24 days on average”"
+        }
+       ]
+      },
+      {
+       "ref": "F7",
+       "label": "Days waiting in approvers' inboxes",
+       "v": "18",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “18 days are spent waiting”"
         }
        ]
       }
      ],
      "counts": {
-      "client": 6,
-      "computed": 4,
+      "client": 7,
+      "computed": 3,
       "assumption": 0
      }
     }
@@ -17086,7 +17081,7 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Invite several suppliers to quote for recycled paper delivered to every office: at today's price the annual cost of "
+       "t": "Draft a request for quotes for the procurement manager to approve, inviting several suppliers to quote for recycled paper delivered to every office: at today's price the annual cost of "
       },
       {
        "v": "$108,000",
@@ -17106,7 +17101,7 @@
      "bullets": [
       [
        {
-        "t": "We buy about "
+        "t": "The business buys about "
        },
        {
         "v": "20,000",
@@ -17290,7 +17285,7 @@
          "ref": "F1"
         },
         {
-         "t": " reams a year of standard office copy paper. We would like recycled paper, delivered to each of our offices."
+         "t": " reams a year of standard office copy paper. We would like recycled paper, delivered to each of our offices: {list of office addresses to confirm}."
         }
        ],
        [
@@ -17305,7 +17300,7 @@
        ],
        [
         {
-         "t": "We will compare all quotes on the same basis. Reply to this email with your quote and any questions."
+         "t": "We will compare all quotes on the same basis. Please reply to this email with your quote and any questions by {reply-by date to confirm}."
         }
        ],
        [
@@ -18331,11 +18326,14 @@
       "language": "Python",
       "purpose": [
        {
-        "t": "Draft automated tests for discount codes at checkout, for the engineering lead to review."
+        "t": "Draft automated tests for discount codes at checkout, for the engineering lead to review. Module, function and discount code names are placeholders to match to the real checkout code."
        }
       ],
       "lines": [
        "# Draft: tests for discount codes at checkout. Not run or reviewed.",
+       "# Placeholders: checkout.pricing, Cart, DiscountError, apply_discount and the codes",
+       "# SAVE10 (ten percent off), SUMMER (expired) and TENOFF (fixed amount off) must be",
+       "# matched to the real code and test data.",
        "from datetime import date",
        "import pytest",
        "from checkout.pricing import Cart, DiscountError, apply_discount",
@@ -18344,13 +18342,10 @@
        "def test_percent_code_reduces_total():",
        "    cart = apply_discount(make_cart(10000), \"SAVE10\", today=date(2026, 1, 15))",
        "    assert cart.total_cents == 9000",
-       "def test_percent_code_rounds_to_whole_cents():",
-       "    cart = apply_discount(make_cart(999), \"SAVE10\", today=date(2026, 1, 15))",
-       "    assert cart.total_cents == 899",
-       "def test_expired_code_is_rejected():",
-       "    with pytest.raises(DiscountError):"
+       "def test_percent_code_rounds_half_up_to_whole_cents():",
+       "    # Expected rule, to confirm: round half a cent up. 995 less ten percent is 895.5."
       ],
-      "more": 8
+      "more": 12
      }
     },
     {
@@ -18794,29 +18789,29 @@
    "file": "samples/roles/recruiting-coordinator.docx",
    "format": "memo",
    "delivers": "Delivers today: a verified Word memo, with its draft and plan inside.",
-   "slide_count": 14,
-   "figure_count": 7,
+   "slide_count": 15,
+   "figure_count": 9,
    "slides": [
     {
      "kind": "summary",
      "heading": "The answer first",
      "title": [
       {
-       "t": "Ask the customer service manager to approve more panel hours and a confirmation and reminder message: "
+       "t": "Ask the customer service manager to approve more panel hours and the invitation: "
       },
       {
        "v": "60",
        "ref": "F2"
       },
       {
-       "t": " candidates need interviews but only "
+       "t": " candidates need interviews, but the free manager hours fit only "
       },
       {
-       "v": "40",
-       "ref": "F3"
+       "v": "20",
+       "ref": "F7"
       },
       {
-       "t": " hours are free."
+       "t": " panels."
       }
      ],
      "bullets": [
@@ -18840,7 +18835,7 @@
        },
        {
         "v": "5",
-        "ref": "F7"
+        "ref": "F9"
        },
        {
         "t": " per role."
@@ -18848,18 +18843,32 @@
       ],
       [
        {
-        "t": "Managers have "
+        "t": "Each panel uses "
+       },
+       {
+        "v": "2",
+        "ref": "F4"
+       },
+       {
+        "t": " managers, so "
        },
        {
         "v": "40",
         "ref": "F3"
        },
        {
-        "t": " interview hours free, which leaves "
+        "t": " free manager hours fit "
        },
        {
         "v": "20",
-        "ref": "F6"
+        "ref": "F7"
+       },
+       {
+        "t": " panels and leave "
+       },
+       {
+        "v": "40",
+        "ref": "F8"
        },
        {
         "t": " candidates without a slot."
@@ -18871,14 +18880,14 @@
        },
        {
         "v": "20%",
-        "ref": "F4"
+        "ref": "F5"
        },
        {
         "t": " of booked candidates did not show up, about "
        },
        {
         "v": "12",
-        "ref": "F5"
+        "ref": "F6"
        },
        {
         "t": " at this volume."
@@ -18893,10 +18902,10 @@
        "basis": "client data"
       },
       {
-       "v": "40",
-       "ref": "F3",
-       "label": "Free interview hours",
-       "basis": "client data"
+       "v": "20",
+       "ref": "F7",
+       "label": "One-hour panels the free hours fit",
+       "basis": "calculated"
       },
       {
        "v": "12",
@@ -18917,18 +18926,37 @@
      "bullets": [
       [
        {
-        "t": "Each interview takes one hour, so "
+        "t": "Reading the free hours as manager hours, "
        },
        {
         "v": "40",
         "ref": "F3"
        },
        {
-        "t": " hours leave "
+        "t": " hours with "
+       },
+       {
+        "v": "2",
+        "ref": "F4"
+       },
+       {
+        "t": " managers a panel fit "
        },
        {
         "v": "20",
-        "ref": "F6"
+        "ref": "F7"
+       },
+       {
+        "t": " one-hour panels."
+       }
+      ],
+      [
+       {
+        "t": "That leaves "
+       },
+       {
+        "v": "40",
+        "ref": "F8"
        },
        {
         "t": " candidates without a slot."
@@ -18938,7 +18966,7 @@
      "chart": {
       "title": [
        {
-        "t": "Screened candidates against free interview hours."
+        "t": "Screened candidates against the panels the free hours fit."
        }
       ],
       "bars": [
@@ -18950,10 +18978,10 @@
         "assumption": false
        },
        {
-        "label": "Free hours",
-        "v": "40",
-        "ref": "F3",
-        "share": 0.6667,
+        "label": "Panels that fit",
+        "v": "20",
+        "ref": "F7",
+        "share": 0.3333,
         "assumption": false
        }
       ]
@@ -19014,8 +19042,8 @@
           "t": "Ask more managers to join panels so "
          },
          {
-          "v": "20",
-          "ref": "F6"
+          "v": "40",
+          "ref": "F8"
          },
          {
           "t": " more candidates can be seen."
@@ -19040,10 +19068,10 @@
         "owner": "Recruiting coordinator"
        },
        {
-        "when": "The day before each interview",
+        "when": "Before the first panel",
         "task": [
          {
-          "t": "Send the approved reminder to each booked candidate."
+          "t": "Draft a short reminder for the manager to approve, then send it the day before each interview once approved."
          }
         ],
         "owner": "Recruiting coordinator"
@@ -19079,12 +19107,12 @@
        ],
        [
         {
-         "t": "The interview lasts about an hour, with two of our team managers. You will talk through how you help customers and work through a short example call together."
+         "t": "The interview lasts about an hour, with two of our team managers. {Interview format, for the customer service manager to confirm.}"
         }
        ],
        [
         {
-         "t": "Please reply with your choice of the slots below, or tell us if none of them work and we will find another time."
+         "t": "Please reply with your choice of these slots: {first slot}, {second slot}, {third slot}. If none of them work, tell us and we will find another time."
         }
        ],
        [
@@ -19128,7 +19156,7 @@
       },
       {
        "ref": "F3",
-       "label": "Free interview hours",
+       "label": "Free manager interview hours",
        "v": "40",
        "basis": "client",
        "source": [
@@ -19139,6 +19167,17 @@
       },
       {
        "ref": "F4",
+       "label": "Managers on each panel",
+       "v": "2",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “with 2 managers”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
        "label": "No-show rate last round",
        "v": "20%",
        "basis": "client",
@@ -19149,31 +19188,20 @@
        ]
       },
       {
-       "ref": "F5",
+       "ref": "F6",
        "label": "Likely no-shows this round",
        "v": "12",
        "basis": "computed",
        "source": [
         {
-         "t": "Calculated: F2 × F4 ÷ 100"
-        }
-       ]
-      },
-      {
-       "ref": "F6",
-       "label": "Candidates without an interview slot",
-       "v": "20",
-       "basis": "computed",
-       "source": [
-        {
-         "t": "Calculated: F2 − F3"
+         "t": "Calculated: F2 × F5 ÷ 100"
         }
        ]
       }
      ],
      "counts": {
-      "client": 4,
-      "computed": 3,
+      "client": 5,
+      "computed": 4,
       "assumption": 0
      }
     }
@@ -19553,7 +19581,7 @@
    "file": "samples/roles/regulatory-compliance-advisory-associate.pptx",
    "format": "deck",
    "delivers": "Delivers today: a verified PowerPoint deck, with its register inside.",
-   "slide_count": 14,
+   "slide_count": 15,
    "figure_count": 10,
    "slides": [
     {
@@ -19561,7 +19589,7 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Make the income check impossible to skip and review past loans without one: "
+       "t": "Flag and fix only the loans that skip the income check until the app makes it mandatory, then review past loans without one: "
       },
       {
        "v": "12.5%",
@@ -19709,25 +19737,32 @@
      "heading": "The recommendation",
      "title": [
       {
-       "t": "Make the income check mandatory and review past loans."
+       "t": "Flag skipped checks now and make the field mandatory."
       }
      ],
      "bullets": [
       [
        {
-        "t": "Recommended: Enforce and review"
+        "t": "Recommended: Flag and enforce"
        }
       ],
       [
        {
-        "t": "It stops about "
+        "t": "It targets the estimated "
        },
        {
         "v": "200",
         "ref": "F10"
        },
        {
-        "t": " unchecked loans a month at the source and deals with harm on past loans; the head of compliance decides."
+        "t": " loans a month that skip the check instead of all "
+       },
+       {
+        "v": "1,600",
+        "ref": "F9"
+       },
+       {
+        "t": ", so lending team leaders can carry it and the two compliance staff can review past loans; the head of compliance decides."
        }
       ]
      ]
@@ -19781,7 +19816,7 @@
          }
         ],
         "rating": "high",
-        "owner": "Head of collections",
+        "owner": "Head of compliance",
         "status": "open"
        },
        {
@@ -19799,7 +19834,7 @@
         ],
         "rating": "medium",
         "owner": "Head of compliance",
-        "status": "in progress"
+        "status": "open"
        },
        {
         "item": [
@@ -19919,28 +19954,28 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "The return overstates the capital ratio by "
+       "t": "The return's ratio is "
       },
       {
        "v": "1.4 pts",
        "ref": "F6"
       },
       {
-       "t": ": a portfolio with a blank risk weight was left out. Corrected, the ratio is "
+       "t": " above finance's because a portfolio with a blank risk weight was left out. On finance's figures the ratio is "
       },
       {
        "v": "12.6%",
        "ref": "F5"
       },
       {
-       "t": ", still "
+       "t": ", "
       },
       {
        "v": "2.1 pts",
        "ref": "F10"
       },
       {
-       "t": " above the minimum; the head of regulatory reporting decides on submission."
+       "t": " above the minimum; the head of regulatory reporting should confirm the portfolio's risk weight before the re-run, and decides on submission."
       }
      ],
      "bullets": [
@@ -20013,7 +20048,7 @@
       {
        "v": "1.4 pts",
        "ref": "F6",
-       "label": "Overstatement of the ratio",
+       "label": "Gap between the return's ratio and finance's",
        "basis": "calculated"
       },
       {
@@ -20025,7 +20060,7 @@
       {
        "v": "2.1 pts",
        "ref": "F10",
-       "label": "Headroom over the minimum",
+       "label": "Headroom over the minimum on finance's figures",
        "basis": "calculated"
       }
      ]
@@ -20095,13 +20130,13 @@
      "heading": "The recommendation",
      "title": [
       {
-       "t": "Fix the risk weight and re-run the return for review."
+       "t": "Confirm the risk weight, then re-run the return for review."
       }
      ],
      "bullets": [
       [
        {
-        "t": "Recommended: Fix and re-run"
+        "t": "Recommended: Confirm and re-run"
        }
       ],
       [
@@ -20113,7 +20148,7 @@
         "ref": "F6"
        },
        {
-        "t": " overstatement at the source and leaves a clean audit trail; the head of regulatory reporting reviews and decides on submission."
+        "t": " gap at the source and leaves a clean audit trail; the head of regulatory reporting confirms the risk weight, reviews the re-run and decides on submission."
        }
       ]
      ]
@@ -20179,7 +20214,7 @@
       },
       {
        "ref": "F6",
-       "label": "Overstatement of the ratio",
+       "label": "Gap between the return's ratio and finance's",
        "v": "1.4 pts",
        "basis": "computed",
        "source": [
@@ -20223,28 +20258,28 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Retention, not acquisition, is the bigger leak: churn of "
+       "t": "Churn is the likely lever, to be confirmed: it took "
       },
       {
        "v": "$1,200,000",
        "ref": "F4"
       },
       {
-       "t": " wiped out "
+       "t": ", equal to "
       },
       {
        "v": "40%",
        "ref": "F10"
       },
       {
-       "t": " of new revenue, and the shortfall to plan was "
+       "t": " of new revenue won and more than the "
       },
       {
        "v": "$700,000",
        "ref": "F9"
       },
       {
-       "t": "."
+       "t": " shortfall, but splitting the miss between acquisition and churn needs the plan's own assumptions for each."
       }
      ],
      "bullets": [
@@ -20283,19 +20318,19 @@
         "ref": "F5"
        },
        {
-        "t": "."
-       }
-      ],
-      [
-       {
-        "t": "Churn is larger than the whole "
+        "t": ", a shortfall of "
        },
        {
         "v": "$700,000",
         "ref": "F9"
        },
        {
-        "t": " shortfall."
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "The plan gives only a net figure, so which side fell short needs its assumptions for gross new revenue and churn."
        }
       ]
      ],
@@ -20325,75 +20360,68 @@
      "heading": "A finding, with its chart",
      "title": [
       {
-       "t": "New business brought in more than the plan's net figure."
+       "t": "Churn took away a large share of new revenue won."
       }
      ],
      "bullets": [
       [
        {
-        "t": "Of "
+        "t": "Churn of "
        },
        {
-        "v": "4,000",
-        "ref": "F1"
+        "v": "$1,200,000",
+        "ref": "F4"
        },
        {
-        "t": " leads, "
+        "t": " was "
        },
        {
-        "v": "200",
-        "ref": "F2"
+        "v": "40%",
+        "ref": "F10"
        },
        {
-        "t": " became customers, a rate of "
-       },
-       {
-        "v": "5%",
-        "ref": "F6"
-       },
-       {
-        "t": "."
+        "t": " of new revenue won."
        }
       ],
       [
        {
-        "t": "They added "
+        "t": "Churn is larger than the whole "
        },
        {
-        "v": "$3,000,000",
-        "ref": "F7"
+        "v": "$700,000",
+        "ref": "F9"
        },
        {
-        "t": " of recurring revenue, more than the "
-       },
-       {
-        "v": "$2,500,000",
-        "ref": "F5"
-       },
-       {
-        "t": " plan."
+        "t": " shortfall to plan."
        }
       ]
      ],
      "chart": {
       "title": [
        {
-        "t": "New revenue won was above the net plan before churn."
+        "t": "Churn took a large share of the new revenue won."
        }
       ],
       "bars": [
-       {
-        "label": "Net plan",
-        "v": "$2,500,000",
-        "ref": "F5",
-        "share": 0.8333,
-        "assumption": false
-       },
        {
         "label": "New revenue won",
         "v": "$3,000,000",
         "ref": "F7",
         "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Churn",
+        "v": "$1,200,000",
+        "ref": "F4",
+        "share": 0.4,
+        "assumption": false
+       },
+       {
+        "label": "Net new revenue",
+        "v": "$1,800,000",
+        "ref": "F8",
+        "share": 0.6,
         "assumption": false
        }
       ]
@@ -20404,13 +20432,13 @@
      "heading": "The recommendation",
      "title": [
       {
-       "t": "Put next year's first effort into reducing churn."
+       "t": "Confirm the split against the plan, then likely focus on churn."
       }
      ],
      "bullets": [
       [
        {
-        "t": "Recommended: Retention first"
+        "t": "Recommended: Confirm the split, then retention"
        }
       ],
       [
@@ -20422,14 +20450,14 @@
         "ref": "F4"
        },
        {
-        "t": " is larger than the "
+        "t": " is larger than the whole "
        },
        {
         "v": "$700,000",
         "ref": "F9"
        },
        {
-        "t": " shortfall, so cutting it closes the gap faster than buying more leads; the chief revenue officer decides."
+        "t": " shortfall, so it is the likely lever, but the plan's own assumptions must confirm which side missed before effort shifts; the chief revenue officer decides."
        }
       ]
      ]
@@ -21456,7 +21484,7 @@
        ],
        [
         {
-         "t": "The remaining open matches have a date of birth on file and are ready for review."
+         "t": "The remaining open matches have a date of birth on file."
         }
        ]
       ],
@@ -21572,21 +21600,21 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Shift budget from branded keywords and fix the main page title, for the marketing manager's approval: cost per lead rose "
+       "t": "Test lower branded bids and fix the main page title, for the marketing manager's approval: cost per lead rose "
       },
       {
        "v": "25%",
        "ref": "F5"
       },
       {
-       "t": " and we pay "
+       "t": ", and "
       },
       {
        "v": "$6,000",
        "ref": "F3"
       },
       {
-       "t": " a month for searches that already name us."
+       "t": " a month goes on searches that already name the business."
       }
      ],
      "bullets": [
@@ -21713,7 +21741,7 @@
      "chart": {
       "title": [
        {
-        "t": "Cost per lead rose this year."
+        "t": "Cost per lead rose from its earlier level."
        }
       ],
       "bars": [
@@ -21739,7 +21767,7 @@
      "heading": "The recommendation",
      "title": [
       {
-       "t": "Rebalance branded spend and fix the main page title."
+       "t": "Test lower branded bids and fix the main page title."
       }
      ],
      "bullets": [
@@ -21776,22 +21804,27 @@
       "paras": [
        [
         {
-         "t": "Page title: Online Booking Software for Clinics | Fewer No-Shows, Fuller Diaries"
+         "t": "Items in curly braces are product claims or offers for the marketing manager to confirm, or cut, before anything is published."
         }
        ],
        [
         {
-         "t": "Meta description: Let patients book, move and cancel appointments online, day or night. Automatic reminders cut no-shows. Set up in an afternoon."
+         "t": "Page title: Online Booking Software for Clinics | {Main benefit to confirm}"
         }
        ],
        [
         {
-         "t": "Search ad one. Headline: Online Booking for Clinics. Second headline: Patients Book Themselves. Description: Fill your diary without phone tag. Reminders, waiting lists and easy rescheduling."
+         "t": "Meta description: Let patients book their appointments online instead of calling the front desk. {Confirm which features to name, such as reminders or rescheduling.}"
         }
        ],
        [
         {
-         "t": "Search ad two. Headline: Cut Clinic No-Shows. Second headline: Automatic Text Reminders. Description: Online booking that patients actually use. See how it works with a free demo."
+         "t": "Search ad one. Headline: Online Booking for Clinics. Second headline: Patients Book Themselves. Description: Online booking software for clinic managers. Patients choose a time online, and your team spends less time on the phone."
+        }
+       ],
+       [
+        {
+         "t": "Search ad two. Headline: Clinic Booking Software. Second headline: {Offer to confirm, such as a demo}. Description: Simple online booking built for clinics. {One confirmed feature to name here.}"
         }
        ]
       ]
@@ -21935,10 +21968,10 @@
         "ref": "F2"
        },
        {
-        "t": ", down "
+        "t": ", a fall of "
        },
        {
-        "v": "-2 pts",
+        "v": "2 pts",
         "ref": "F5"
        },
        {
@@ -22114,22 +22147,22 @@
       "paras": [
        [
         {
-         "t": "Post one, photo of the new team behind the counter: Meet the crew behind our newest café. They've been practising their latte art all week and can't wait to pour you one. Say hi when you visit."
+         "t": "Post one, photo of the new team behind the counter: Meet the crew behind our newest café. They can't wait to make your first coffee here. Say hi when you visit."
         }
        ],
        [
         {
-         "t": "Post two, behind-the-scenes video of the fit-out: Shelves up, grinder in, first test shots pulled. Our new café is nearly ready and we wanted you to see it before anyone else."
+         "t": "Post two, behind-the-scenes video of the fit-out: Our new café is nearly ready, and we wanted you to see it first."
         }
        ],
        [
         {
-         "t": "Post three, close-up of the head barista: Meet the head barista at our new spot. Ask for the house blend and a story about where the beans come from."
+         "t": "Post three, close-up of the head barista: Meet the head barista at our new spot. Come in and ask for their favourite on the menu."
         }
        ],
        [
         {
-         "t": "Post four, opening day: Doors open today. Come in, grab a coffee and meet the team. Tag a friend you'd bring along."
+         "t": "Post four, opening day: Doors open today at {address to confirm}. Come in, grab a coffee and meet the team. Tag a friend you'd bring along."
         }
        ]
       ]
@@ -22186,11 +22219,11 @@
       {
        "ref": "F5",
        "label": "Fall in engagement",
-       "v": "-2 pts",
+       "v": "2 pts",
        "basis": "computed",
        "source": [
         {
-         "t": "Calculated: F2 − F1"
+         "t": "Calculated: F1 − F2"
         }
        ]
       },
@@ -22240,7 +22273,7 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Fix dispatch at the main warehouse first: it caused "
+       "t": "Fix dispatch at the main warehouse first: "
       },
       {
        "v": "75%",
@@ -22254,7 +22287,7 @@
        "ref": "F8"
       },
       {
-       "t": " late deliveries, which cost about "
+       "t": " late deliveries left it late, and late deliveries cost about "
       },
       {
        "v": "$126,000",
@@ -22319,9 +22352,6 @@
       ],
       [
        {
-        "t": "Late departures from the main warehouse caused "
-       },
-       {
         "v": "2,100",
         "ref": "F4"
        },
@@ -22333,7 +22363,7 @@
         "ref": "F9"
        },
        {
-        "t": "."
+        "t": ", left the main warehouse late."
        }
       ]
      ],
@@ -22443,14 +22473,11 @@
       ],
       [
        {
-        "t": "Warehouse delays caused "
-       },
-       {
         "v": "75%",
         "ref": "F9"
        },
        {
-        "t": " of late deliveries, which cost about "
+        "t": " of late deliveries left the warehouse late, and late deliveries cost about "
        },
        {
         "v": "$126,000",
@@ -22789,22 +22816,22 @@
        ],
        [
         {
-         "t": "You will build and look after the pipelines that bring data from our products into our warehouse, so analysts and product teams can trust what they see."
+         "t": "You will build and maintain our data pipelines. {One or two sentences on the team and the data you will work with, for the hiring manager to confirm.}"
         }
        ],
        [
         {
-         "t": "What you need: strong SQL; experience building data pipelines in Python; experience with a cloud data warehouse; good habits around testing and version control; and the ability to explain data problems to people who are not engineers."
+         "t": "What you need: {essential requirement one}; {essential requirement two}; {essential requirement three}; {essential requirement four}; {essential requirement five}. The hiring manager fills these in from the essentials."
         }
        ],
        [
         {
-         "t": "Nice to have: experience with workflow schedulers, streaming data, infrastructure as code, or data modelling for reporting. If you have some of these, great; if not, we will help you learn."
+         "t": "Nice to have: {the other requirements from today's post, as the hiring manager lists them}. You do not need all of these to apply."
         }
        ],
        [
         {
-         "t": "How to apply: send your CV and a few lines on a pipeline you built and what you would do differently now. We read every application."
+         "t": "How to apply: send your CV and a few lines on a data pipeline you built and what you would do differently now."
         }
        ]
       ]
@@ -22907,36 +22934,43 @@
    "file": "samples/roles/tax-associate.xlsx",
    "format": "workbook",
    "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: memo.",
-   "slide_count": 13,
-   "figure_count": 9,
+   "slide_count": 14,
+   "figure_count": 11,
    "slides": [
     {
      "kind": "summary",
      "heading": "The answer first",
      "title": [
       {
-       "t": "On our numbers taxable income is about "
-      },
-      {
-       "v": "$2,280,000",
-       "ref": "F5"
-      },
-      {
-       "t": " and tax about "
+       "t": "On these numbers current tax is about "
       },
       {
        "v": "$478,800",
        "ref": "F7"
       },
       {
-       "t": ", so about "
+       "t": ", leaving about "
       },
       {
        "v": "$78,800",
        "ref": "F9"
       },
       {
-       "t": " remains due after estimated payments; the outside preparer reviews these positions and signs and files the return."
+       "t": " due after estimated payments, and deferred tax of about "
+      },
+      {
+       "v": "$37,800",
+       "ref": "F10"
+      },
+      {
+       "t": " brings the total tax expense to about "
+      },
+      {
+       "v": "$516,600",
+       "ref": "F11"
+      },
+      {
+       "t": "; the outside preparer reviews these positions and signs and files the return."
       }
      ],
      "bullets": [
@@ -22994,7 +23028,7 @@
         "ref": "F6"
        },
        {
-        "t": ", tax is about "
+        "t": ", current tax is about "
        },
        {
         "v": "$478,800",
@@ -23021,21 +23055,21 @@
      ],
      "tiles": [
       {
-       "v": "$2,280,000",
-       "ref": "F5",
-       "label": "Taxable income",
-       "basis": "calculated"
-      },
-      {
        "v": "$478,800",
        "ref": "F7",
-       "label": "Tax on taxable income",
+       "label": "Current tax on taxable income",
        "basis": "calculated"
       },
       {
        "v": "$78,800",
        "ref": "F9",
-       "label": "Tax still due",
+       "label": "Current tax still due",
+       "basis": "calculated"
+      },
+      {
+       "v": "$37,800",
+       "ref": "F10",
+       "label": "Deferred tax on the depreciation timing difference",
        "basis": "calculated"
       }
      ]
@@ -23121,7 +23155,14 @@
         "ref": "F9"
        },
        {
-        "t": " balance early; the preparer decides the positions, signs and files."
+        "t": " balance and the "
+       },
+       {
+        "v": "$37,800",
+        "ref": "F10"
+       },
+       {
+        "t": " deferred tax early; the preparer decides the positions, signs and files."
        }
       ]
      ]
@@ -23199,7 +23240,7 @@
      ],
      "counts": {
       "client": 5,
-      "computed": 4,
+      "computed": 6,
       "assumption": 0
      }
     }
@@ -23427,17 +23468,22 @@
       "paras": [
        [
         {
+         "t": "Check against the current screen: menu names, report names and button positions below are placeholders for the support manager to confirm before publishing."
+        }
+       ],
+       [
+        {
          "t": "You can export any report to a spreadsheet file to share it or work with the numbers yourself."
         }
        ],
        [
         {
-         "t": "To export a report: open Reports from the main menu. Choose the report you want, such as Sales by Customer. Set the date range and any filters, then select Apply. Select Export in the top right corner and choose Spreadsheet. The file downloads to your computer."
+         "t": "To export a report: open {Reports menu name} from the main menu. Choose the report you want, such as {a common report}. Set the date range and any filters, then select {Apply button name}. Select {Export button and its position} and choose the spreadsheet option. The file downloads to your computer."
         }
        ],
        [
         {
-         "t": "If the Export button is greyed out, run the report first by selecting Apply. Export only works on a report that has results."
+         "t": "If the export button is greyed out, run the report first. {Confirm that export needs a report with results.}"
         }
        ],
        [
@@ -23563,7 +23609,7 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Move to the cloud suite: over the comparison period it costs about "
+       "t": "Recommend the cloud suite: over the comparison period it costs about "
       },
       {
        "v": "$228,000",
@@ -23584,7 +23630,7 @@
        "ref": "F9"
       },
       {
-       "t": " budget, and the cloud removes the hand patching behind last year's outages."
+       "t": " budget, and it ends hand patching, which may be behind last year's outages but is untested."
       }
      ],
      "bullets": [
@@ -23751,7 +23797,7 @@
      "heading": "The recommendation",
      "title": [
       {
-       "t": "Move to the cloud suite."
+       "t": "Move to the cloud suite if the managing partner agrees."
       }
      ],
      "bullets": [
@@ -23872,14 +23918,14 @@
    "format": "memo",
    "delivers": "Delivers today: a verified Word memo, with its register inside. Also planned: report.",
    "slide_count": 15,
-   "figure_count": 9,
+   "figure_count": 11,
    "slides": [
     {
      "kind": "summary",
      "heading": "The answer first",
      "title": [
       {
-       "t": "Approve the vendor only with conditions: it met "
+       "t": "Approve the vendor only with conditions: reading the policy's 'met' as fully met, it met "
       },
       {
        "v": "80%",
@@ -23893,7 +23939,7 @@
        "ref": "F8"
       },
       {
-       "t": " our policy requires, and the gaps include encryption of stored data for "
+       "t": " required, and the gaps include encryption of stored data for "
       },
       {
        "v": "120,000",
@@ -23951,14 +23997,14 @@
       ],
       [
        {
-        "t": "It did not meet "
+        "t": "Counting partly met controls too gives "
        },
        {
-        "v": "6",
-        "ref": "F6"
+        "v": "92.5%",
+        "ref": "F11"
        },
        {
-        "t": " controls, including encryption and a tested recovery plan."
+        "t": ", which would pass; this memo does not count them, because a partly met control still leaves its gap open."
        }
       ]
      ],
@@ -23988,7 +24034,7 @@
      "heading": "A finding, with its chart",
      "title": [
       {
-       "t": "The vendor falls short of our policy for critical vendors."
+       "t": "Counting fully met controls only, the vendor falls short of policy."
       }
      ],
      "bullets": [
@@ -24035,22 +24081,29 @@
      "chart": {
       "title": [
        {
-        "t": "Controls met against policy."
+        "t": "Controls met against policy, by reading."
        }
       ],
       "bars": [
        {
-        "label": "Vendor",
+        "label": "Fully met",
         "v": "80%",
         "ref": "F4",
-        "share": 0.8889,
+        "share": 0.8649,
+        "assumption": false
+       },
+       {
+        "label": "With partly met",
+        "v": "92.5%",
+        "ref": "F11",
+        "share": 1.0,
         "assumption": false
        },
        {
         "label": "Policy",
         "v": "90%",
         "ref": "F8",
-        "share": 1.0,
+        "share": 0.973,
         "assumption": false
        }
       ]
@@ -24072,14 +24125,14 @@
       ],
       [
        {
-        "t": "It closes the gaps that expose "
+        "t": "Whichever way partly met controls are counted, the unmet controls expose "
        },
        {
         "v": "120,000",
         "ref": "F1"
        },
        {
-        "t": " customer records while keeping the outsourcing plan; the vendor risk committee decides."
+        "t": " customer records and must close first; the vendor risk committee decides."
        }
       ]
      ]
@@ -24140,7 +24193,7 @@
         ],
         "rating": "medium",
         "owner": "Third-party risk lead",
-        "status": "in progress"
+        "status": "open"
        },
        {
         "item": [
@@ -24242,7 +24295,7 @@
      ],
      "counts": {
       "client": 6,
-      "computed": 3,
+      "computed": 5,
       "assumption": 0
      }
     }
@@ -24698,7 +24751,7 @@
        "ref": "F9"
       },
       {
-       "t": ", so the board should choose now between drawing it and cutting burn."
+       "t": ", so the CFO should choose now between drawing it and cutting burn."
       }
      ],
      "bullets": [
@@ -24904,7 +24957,7 @@
         "ref": "F7"
        },
        {
-        "t": "; cutting burn extends it without interest cost, and the facility still adds liquidity up to "
+        "t": "; cutting burn extends it without adding debt, and the facility still adds liquidity up to "
        },
        {
         "v": "$4,900,000",
@@ -25021,7 +25074,7 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Prepare the file for the underwriter with the referral flagged: the value of "
+       "t": "Refer the full file to a senior underwriter, as the guidelines require: the value of "
       },
       {
        "v": "$4,250,000",
@@ -25081,7 +25134,7 @@
         "ref": "F3"
        },
        {
-        "t": " of the floor area, short of the full cover our guidelines need."
+        "t": " of the floor area, short of the full cover the insurer's guidelines need."
        }
       ],
       [
@@ -25190,25 +25243,25 @@
      "heading": "The recommendation",
      "title": [
       {
-       "t": "Put the full file to the underwriter with the referral flagged."
+       "t": "Refer the full file to a senior underwriter, as the guidelines require."
       }
      ],
      "bullets": [
       [
        {
-        "t": "Recommended: Full file with referral flag"
+        "t": "Recommended: Refer with a full file"
        }
       ],
       [
        {
-        "t": "It lets the underwriter act this week with the sprinkler gap at "
+        "t": "The guidelines refer this risk because sprinklers cover only "
        },
        {
         "v": "60%",
         "ref": "F3"
        },
        {
-        "t": " in plain view; the underwriter decides, and a senior underwriter decides any referred risk."
+        "t": " of the floor, and a full file lets the senior underwriter decide this week; the senior underwriter accepts, prices or declines it."
        }
       ]
      ]
@@ -25275,7 +25328,7 @@
       ],
       "for_decision": [
        {
-        "t": "Should the underwriter accept, price or decline the warehouse, or refer it to a senior underwriter because sprinkler cover is partial?"
+        "t": "Should the senior underwriter, to whom the guidelines refer this risk because sprinkler cover is partial, accept, price or decline it?"
        }
       ]
      }

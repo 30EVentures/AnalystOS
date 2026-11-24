@@ -1,18 +1,18 @@
 {
- "answer": "The return overstates the capital ratio by [F6]: a portfolio with a blank risk weight was left out. Corrected, the ratio is [F5], still [F10] above the minimum; the head of regulatory reporting decides on submission.",
+ "answer": "The return's ratio is [F6] above finance's because a portfolio with a blank risk weight was left out. On finance's figures the ratio is [F5], [F10] above the minimum; the head of regulatory reporting should confirm the portfolio's risk weight before the re-run, and decides on submission.",
  "exec_summary": [
   "Core capital of [F1] over the return's risk-weighted assets of [F2] gives [F4].",
   "Over finance's [F3], it gives [F5].",
   "The gap in risk-weighted assets is [F8], the size of the [F7] portfolio left out.",
-  "The corrected ratio is [F10] above the [F9] minimum."
+  "On finance's figures the ratio is [F10] above the [F9] minimum."
  ],
  "situation": "A bank preparing its quarterly capital return for the regulator.",
  "complication": "The return and finance disagree on the capital ratio days before it is due.",
  "key_question": "Why does the return's capital ratio differ from finance's, and is it ready to submit?",
  "titles": {
-  "situation": "The return overstates the capital ratio.",
+  "situation": "The return's capital ratio is above finance's.",
   "options": "Two ways to correct the return before submission.",
-  "recommendation": "Fix the risk weight and re-run the return for review.",
+  "recommendation": "Confirm the risk weight, then re-run the return for review.",
   "roadmap": "Correct this return, then stop blank risk weights recurring.",
   "kpis": "Two measures show the return is right.",
   "risks": "The main risk is submitting a wrong ratio."
@@ -68,7 +68,7 @@
   },
   {
    "id": "F6",
-   "label": "Overstatement of the ratio",
+   "label": "Gap between the return's ratio and finance's",
    "value": 1.4,
    "unit": "points",
    "basis": "computed",
@@ -108,7 +108,7 @@
   },
   {
    "id": "F10",
-   "label": "Headroom over the minimum",
+   "label": "Headroom over the minimum on finance's figures",
    "value": 2.1,
    "unit": "points",
    "basis": "computed",
@@ -160,27 +160,27 @@
      "verdict": "untested"
     }
    ],
-   "so_what": "Fixing the risk weight should bring the return to finance's figure."
+   "so_what": "Once its risk weight is confirmed, the portfolio can be added and the return re-run."
   },
   {
    "branch": "Compliance",
-   "finding": "The corrected ratio still meets the minimum.",
+   "finding": "On finance's figures the ratio still meets the minimum.",
    "points": [
-    "The corrected ratio is [F10] above the minimum of [F9]."
+    "On finance's figures the ratio is [F10] above the minimum of [F9]."
    ],
    "hypotheses": [
     {
-     "text": "The bank breaches its minimum.",
+     "text": "On finance's figures, the bank breaches its minimum.",
      "verdict": "refuted"
     }
    ],
-   "so_what": "The correction lowers headroom but does not breach the requirement."
+   "so_what": "The correction is likely to lower headroom; the re-run will confirm by how much."
   }
  ],
  "options": [
   {
-   "name": "Fix and re-run",
-   "description": "Set the portfolio's risk weight, re-run the return and reconcile it to finance.",
+   "name": "Confirm and re-run",
+   "description": "Confirm the portfolio's risk weight, set it, re-run the return and reconcile it to finance.",
    "effort": "low"
   },
   {
@@ -190,14 +190,15 @@
   }
  ],
  "recommendation": {
-  "option": "Fix and re-run",
-  "rationale": "It corrects the [F6] overstatement at the source and leaves a clean audit trail; the head of regulatory reporting reviews and decides on submission."
+  "option": "Confirm and re-run",
+  "rationale": "It corrects the [F6] gap at the source and leaves a clean audit trail; the head of regulatory reporting confirms the risk weight, reviews the re-run and decides on submission."
  },
  "roadmap": [
   {
    "horizon": "First 30 days",
    "actions": [
-    "Set the risk weight, re-run the return and hand it to the head of regulatory reporting before the due date."
+    "Ask the head of regulatory reporting to confirm the portfolio's risk weight.",
+    "Re-run the return and hand it over for review before the due date."
    ]
   },
   {
@@ -216,7 +217,7 @@
  "kpis": [
   {
    "name": "Gap between the return and finance's ratio",
-   "target": "Nothing at submission"
+   "target": "Nothing at submission, or explained"
   },
   {
    "name": "Exposures with a blank risk weight",
@@ -230,7 +231,7 @@
   },
   {
    "risk": "The re-run misses the due date.",
-   "mitigation": "Start the re-run as soon as the weight is set."
+   "mitigation": "Start the re-run as soon as the weight is confirmed."
   }
  ]
 }

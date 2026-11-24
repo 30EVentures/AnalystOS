@@ -1,5 +1,5 @@
 {
- "answer": "Fix the forecast bias before next season is locked: summer was over-forecast by [F7], costing [F8], and winter under-forecast by [F10], leaving stores out of stock.",
+ "answer": "Add a check against recent sales before next season's forecast is locked: summer was over-forecast by [F7], costing [F8], and winter under-forecast by [F10], leaving stores out of stock.",
  "exec_summary": [
   "Summer forecast [F1] units against sales of [F2], an excess of [F6].",
   "That over-forecast of [F7] cost about [F8] to hold and mark down.",

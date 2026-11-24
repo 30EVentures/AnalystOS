@@ -1,17 +1,18 @@
 {
- "answer": "Make the income check impossible to skip and review past loans without one: [F3] of sampled loans had no verified income, and those loans are in arrears far more often.",
+ "answer": "Flag and fix only the loans that skip the income check until the app makes it mandatory, then review past loans without one: [F3] of sampled loans had no verified income, and those loans are in arrears far more often.",
  "exec_summary": [
   "[F2] of [F1] sampled loans had no income verification, [F3] of the sample.",
   "[F5] of those loans are in arrears, against [F8] of loans with a check.",
-  "At about [F9] loans a month, that rate means about [F10] new loans a month without a check."
+  "At about [F9] loans a month, that rate means about [F10] new loans a month without a check.",
+  "Checking only those loans, rather than every loan, fits a team of two compliance staff."
  ],
  "situation": "An online lender whose rules and policy require verified income on every loan.",
  "complication": "Staff can skip the income check, and many sampled loans have none.",
  "key_question": "Does the lender meet the verified-income requirement, and what must change?",
  "titles": {
   "situation": "The lender's income checks have a gap.",
-  "options": "Two ways to close the gap.",
-  "recommendation": "Make the income check mandatory and review past loans.",
+  "options": "Two ways to close the gap until the app changes.",
+  "recommendation": "Flag skipped checks now and make the field mandatory.",
   "roadmap": "Stop new gaps first, then review past loans.",
   "kpis": "Two measures show the gap is closed.",
   "risks": "The main risk is customers harmed by unaffordable loans."
@@ -155,29 +156,44 @@
      "With check"
     ]
    }
+  },
+  {
+   "branch": "Capacity",
+   "finding": "The fix must fit a small compliance team.",
+   "points": [
+    "The lender writes about [F9] loans a month.",
+    "About [F10] a month are estimated to skip the check."
+   ],
+   "hypotheses": [
+    {
+     "text": "Lending team leaders can verify the flagged loans.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Targeting flagged loans keeps the interim fix within the team's reach."
   }
  ],
  "options": [
   {
-   "name": "Enforce and review",
-   "description": "Make income verification mandatory and review every past loan without it.",
+   "name": "Flag and enforce",
+   "description": "List loans written without verified income each day for lending team leaders to verify, and make the field mandatory in the next app release.",
    "effort": "medium"
   },
   {
-   "name": "Manual sign-off",
-   "description": "Have a second person confirm income on each loan until the app changes.",
-   "effort": "medium"
+   "name": "Second check on every loan",
+   "description": "Have a second person in lending confirm income on every loan until the app changes.",
+   "effort": "high"
   }
  ],
  "recommendation": {
-  "option": "Enforce and review",
-  "rationale": "It stops about [F10] unchecked loans a month at the source and deals with harm on past loans; the head of compliance decides."
+  "option": "Flag and enforce",
+  "rationale": "It targets the estimated [F10] loans a month that skip the check instead of all [F9], so lending team leaders can carry it and the two compliance staff can review past loans; the head of compliance decides."
  },
  "roadmap": [
   {
    "horizon": "First 30 days",
    "actions": [
-    "Require a second-person income check on every new loan until the app release.",
+    "Start a daily list of loans written without verified income for lending team leaders to verify.",
     "Present the findings to the board risk committee within the six weeks."
    ]
   },
@@ -190,7 +206,7 @@
   {
    "horizon": "Days 61-90",
    "actions": [
-    "Review past loans without a check, starting with those in arrears."
+    "Have the compliance staff review past loans without a check, starting with those in arrears."
    ]
   }
  ],
@@ -207,7 +223,7 @@
  "risks": [
   {
    "risk": "The app release slips.",
-   "mitigation": "Keep the second-person check until the release is live."
+   "mitigation": "Keep the daily list running until the release is live."
   },
   {
    "risk": "Reviews find customers were harmed.",
@@ -224,20 +240,20 @@
      "rating": "high",
      "owner": "Head of lending operations",
      "status": "open",
-     "action": "Add a second-person income check until the app makes the field mandatory."
+     "action": "Send a daily list of loans without verified income to lending team leaders to verify."
     },
     {
      "item": "Loans without a check: [F5] in arrears against [F8] with a check.",
      "rating": "high",
-     "owner": "Head of collections",
+     "owner": "Head of compliance",
      "status": "open",
-     "action": "Review loans without a check in arrears first for affordability."
+     "action": "Have the compliance staff review loans without a check in arrears first."
     },
     {
      "item": "About [F10] new loans a month at risk while the gap stays open.",
      "rating": "medium",
      "owner": "Head of compliance",
-     "status": "in progress",
+     "status": "open",
      "action": "Report weekly counts of unchecked loans until the app release."
     },
     {

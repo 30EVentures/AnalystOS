@@ -1,42 +1,43 @@
 {
- "answer": "Cut walking and packing waits: they take [F6] and [F8] of each order's time, and fixing them is the route from [F3] same-day shipping to the [F9] target.",
+ "answer": "Attack waiting time first: invoices spend [F8] of their approval time in approvers' inboxes, and late approval costs [F11] a month in late fees. Whether this alone reaches the [F4] target is untested.",
  "exec_summary": [
-  "The warehouse ships [F2] of [F1] orders a day the same day, [F3].",
-  "Each order takes [F4] minutes; walking takes [F5] and packing waits [F7].",
-  "The same-day target of [F9] is [F10] above today."
+  "[F2] of [F1] invoices a month are approved within terms, [F3], against a target of [F4].",
+  "An invoice takes [F6] days to approve, [F7] of them waiting in inboxes.",
+  "[F9] invoices a month, [F10], have no purchase order and need an approver found by email.",
+  "Late payments cost [F11] a month in supplier late fees."
  ],
- "situation": "A regional distributor whose warehouse ships orders daily.",
- "complication": "Many orders miss same-day dispatch, and overtime has helped only a little.",
- "key_question": "Where does order time go in the warehouse, and what would lift same-day shipping?",
+ "situation": "A hospital group whose accounts payable team routes supplier invoices to budget holders by email.",
+ "complication": "Many invoices miss payment terms, the group pays late fees, and reminders helped only a little.",
+ "key_question": "Where does invoice approval time go, and what would lift approval within terms?",
  "titles": {
-  "situation": "Many orders miss same-day dispatch.",
-  "options": "Two ways to lift same-day shipping.",
-  "recommendation": "Batch picking and balance the packing bench.",
-  "roadmap": "Cut walking first, then fix packing waits.",
-  "kpis": "Two measures show the warehouse is faster.",
-  "risks": "The main risk is moving the bottleneck to packing."
+  "situation": "Many invoices are approved after payment terms.",
+  "options": "Two ways to speed up invoice approval.",
+  "recommendation": "Set approval rules with escalation to cut waiting.",
+  "roadmap": "Change the rules first, then measure against the target.",
+  "kpis": "Two measures show approval is faster.",
+  "risks": "The main risk is approvers rubber-stamping invoices."
  },
  "figures": [
   {
    "id": "F1",
-   "label": "Orders shipped a day",
-   "value": 2400,
+   "label": "Supplier invoices a month",
+   "value": 5000,
    "unit": "count",
    "basis": "client",
-   "quote": "ships 2,400 orders a day"
+   "quote": "receives 5,000 supplier invoices a month"
   },
   {
    "id": "F2",
-   "label": "Orders leaving the same day",
-   "value": 1800,
+   "label": "Invoices approved within terms",
+   "value": 3500,
    "unit": "count",
    "basis": "client",
-   "quote": "only 1,800 leave the same day"
+   "quote": "only 3,500 are approved within our payment terms"
   },
   {
    "id": "F3",
-   "label": "Same-day shipping rate",
-   "value": 75,
+   "label": "Share approved within terms",
+   "value": 70,
    "unit": "percent",
    "basis": "computed",
    "operation": "percent_of_total",
@@ -47,184 +48,191 @@
   },
   {
    "id": "F4",
-   "label": "Minutes from release to dispatch",
-   "value": 120,
-   "unit": "other",
+   "label": "Target share approved within terms",
+   "value": 95,
+   "unit": "percent",
    "basis": "client",
-   "quote": "an order takes 120 minutes"
+   "quote": "Approve 95% of invoices"
   },
   {
    "id": "F5",
-   "label": "Minutes walking between aisles",
-   "value": 48,
-   "unit": "other",
-   "basis": "client",
-   "quote": "takes 48 minutes of that"
-  },
-  {
-   "id": "F6",
-   "label": "Share of order time spent walking",
-   "value": 40,
-   "unit": "percent",
+   "label": "Gap to the target",
+   "value": 25,
+   "unit": "points",
    "basis": "computed",
-   "operation": "percent_of_total",
+   "operation": "difference",
    "inputs": [
-    "F5",
-    "F4"
+    "F4",
+    "F3"
    ]
   },
   {
-   "id": "F7",
-   "label": "Minutes waiting at the packing bench",
-   "value": 30,
+   "id": "F6",
+   "label": "Average days from receipt to approval",
+   "value": 24,
    "unit": "other",
    "basis": "client",
-   "quote": "takes 30 minutes"
+   "quote": "takes 24 days on average"
+  },
+  {
+   "id": "F7",
+   "label": "Days waiting in approvers' inboxes",
+   "value": 18,
+   "unit": "other",
+   "basis": "client",
+   "quote": "18 days are spent waiting"
   },
   {
    "id": "F8",
-   "label": "Share of order time waiting to pack",
-   "value": 25,
+   "label": "Share of approval time spent waiting",
+   "value": 75,
    "unit": "percent",
    "basis": "computed",
    "operation": "percent_of_total",
    "inputs": [
     "F7",
-    "F4"
+    "F6"
    ]
   },
   {
    "id": "F9",
-   "label": "Same-day shipping target",
-   "value": 95,
-   "unit": "percent",
+   "label": "Invoices a month without a purchase order",
+   "value": 1200,
+   "unit": "count",
    "basis": "client",
-   "quote": "Ship 95% of orders"
+   "quote": "1,200 invoices a month have no purchase order"
   },
   {
    "id": "F10",
-   "label": "Gap to the same-day target",
-   "value": 20,
-   "unit": "points",
+   "label": "Share of invoices without a purchase order",
+   "value": 24,
+   "unit": "percent",
    "basis": "computed",
-   "operation": "difference",
+   "operation": "percent_of_total",
    "inputs": [
     "F9",
-    "F3"
+    "F1"
    ]
+  },
+  {
+   "id": "F11",
+   "label": "Monthly supplier late fees",
+   "value": 14000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "cost us $14,000 a month"
   }
  ],
  "issue_tree": [
   {
-   "branch": "Picking",
-   "finding": "Walking is the largest share of order time.",
+   "branch": "Waiting",
+   "finding": "Invoices spend most of their approval time waiting in inboxes.",
    "points": [
-    "Walking takes [F5] minutes of each order, [F6] of the time.",
-    "Pickers pick one order at a time across the whole warehouse."
+    "[F7] of [F6] days are spent waiting, [F8] of the time."
    ],
    "hypotheses": [
     {
-     "text": "Batch picking would cut walking time.",
+     "text": "Approvers cannot tell which invoices are urgent.",
      "verdict": "untested"
     }
    ],
-   "so_what": "Cutting walking is the biggest single lever on order time.",
+   "so_what": "Cutting waiting is the biggest lever on approval time.",
    "chart": {
-    "title": "Share of order time by activity.",
+    "title": "Approval within terms now and the target.",
     "figure_ids": [
-     "F6",
-     "F8"
+     "F3",
+     "F4"
     ],
     "labels": [
-     "Walking",
-     "Packing wait"
+     "Now",
+     "Target"
     ]
    }
   },
   {
-   "branch": "Packing",
-   "finding": "Orders wait at the packing bench after picking.",
+   "branch": "Routing",
+   "finding": "Invoices without a purchase order have no obvious approver.",
    "points": [
-    "Packing waits take [F7] minutes, [F8] of order time."
+    "[F9] invoices a month, [F10], need an approver found by email."
    ],
    "hypotheses": [
     {
-     "text": "Packing is understaffed at peak times.",
+     "text": "These invoices are the slowest to approve.",
      "verdict": "untested"
     }
    ],
-   "so_what": "Faster picking will only help if packing keeps up."
+   "so_what": "Clear routing rules would remove the hunt for an approver."
   },
   {
-   "branch": "Overtime",
-   "finding": "Extra hours did little for same-day shipping.",
+   "branch": "Reminders",
+   "finding": "Reminder emails did little for approval times.",
    "points": [
-    "Overtime last quarter helped only a little."
+    "Reminders sent last quarter helped only a little."
    ],
    "hypotheses": [
     {
-     "text": "More hours alone will reach the target.",
+     "text": "More reminders alone will reach the target.",
      "verdict": "untested"
     }
    ],
-   "so_what": "The fix is in the process, not more hours."
+   "so_what": "The fix lies in the rules, not more emails."
   }
  ],
  "options": [
   {
-   "name": "Batch and rebalance",
-   "description": "Pick several orders per walk and move staff to packing at peaks.",
+   "name": "Rules and escalation",
+   "description": "Route each invoice by cost centre, set approval limits, and escalate invoices left waiting too long.",
    "effort": "medium"
   },
   {
-   "name": "Re-slot fast movers",
-   "description": "Move the fastest-selling items near packing to shorten walks.",
-   "effort": "medium"
+   "name": "Purchase orders first",
+   "description": "Require a purchase order for all spend except agreed exemptions.",
+   "effort": "high"
   }
  ],
  "recommendation": {
-  "option": "Batch and rebalance",
-  "rationale": "It targets both walking at [F6] and packing waits at [F8] without a new building; the operations director decides."
+  "option": "Rules and escalation",
+  "rationale": "It targets waiting, which is [F8] of approval time, and the [F11] monthly late fees without a new system; the finance director decides."
  },
  "roadmap": [
   {
    "horizon": "First 30 days",
    "actions": [
-    "Trial batch picking in one zone and time it.",
-    "Give the operations director the plan within the four weeks."
+    "Map cost centres to approvers and draft approval limits and escalation rules.",
+    "Give the finance director the plan within the four weeks."
    ]
   },
   {
    "horizon": "Days 31-60",
    "actions": [
-    "Roll batch picking out to all zones and move staff to packing at peaks."
+    "If approved, apply the rules to invoices without a purchase order first."
    ]
   },
   {
    "horizon": "Days 61-90",
    "actions": [
-    "Re-time orders and compare same-day shipping with the target."
+    "Measure approval within terms and days waiting against the target."
    ]
   }
  ],
  "kpis": [
   {
-   "name": "Same-day shipping rate",
+   "name": "Invoices approved within terms",
    "target": "Rising towards the target"
   },
   {
-   "name": "Minutes from release to dispatch",
+   "name": "Days waiting in approvers' inboxes",
    "target": "Falling every month"
   }
  ],
  "risks": [
   {
-   "risk": "Packing becomes the new bottleneck.",
-   "mitigation": "Move pickers to packing when the bench queue builds."
+   "risk": "Approvers approve without checking to beat escalation.",
+   "mitigation": "Sample approved invoices each month."
   },
   {
-   "risk": "Batching causes picking errors.",
-   "mitigation": "Check a sample of batched orders each day."
+   "risk": "Budget holders resist new approval limits.",
+   "mitigation": "Agree limits with the finance director before launch."
   }
  ]
 }

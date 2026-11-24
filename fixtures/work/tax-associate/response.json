@@ -1,13 +1,14 @@
 {
- "answer": "On our numbers taxable income is about [F5] and tax about [F7], so about [F9] remains due after estimated payments; the outside preparer reviews these positions and signs and files the return.",
+ "answer": "On these numbers current tax is about [F7], leaving about [F9] due after estimated payments, and deferred tax of about [F10] brings the total tax expense to about [F11]; the outside preparer reviews these positions and signs and files the return.",
  "exec_summary": [
   "Profit before tax of [F1] plus non-deductible entertainment of [F2] gives [F4].",
   "Extra tax depreciation of [F3] brings taxable income to [F5].",
-  "At [F6], tax is about [F7] against [F8] already paid, leaving [F9]."
+  "At [F6], current tax is about [F7] against [F8] already paid, leaving [F9].",
+  "The extra depreciation is a timing difference, so deferred tax of about [F10] is provided as well."
  ],
  "situation": "A company closing its financial year and preparing its corporate tax computation.",
  "complication": "Estimated payments made during the year do not cover the tax the computation shows.",
- "key_question": "What does the tax computation show, and what does the preparer need to review?",
+ "key_question": "What tax should be provided for, and what does the preparer need to review?",
  "titles": {
   "situation": "Taxable income differs from accounting profit.",
   "options": "Two ways to hand the computation to the preparer.",
@@ -75,7 +76,7 @@
   },
   {
    "id": "F7",
-   "label": "Tax on taxable income",
+   "label": "Current tax on taxable income",
    "value": 478800,
    "unit": "usd",
    "basis": "computed",
@@ -95,7 +96,7 @@
   },
   {
    "id": "F9",
-   "label": "Tax still due",
+   "label": "Current tax still due",
    "value": 78800,
    "unit": "usd",
    "basis": "computed",
@@ -103,6 +104,30 @@
    "inputs": [
     "F7",
     "F8"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Deferred tax on the depreciation timing difference",
+   "value": 37800,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F3",
+    "F6"
+   ]
+  },
+  {
+   "id": "F11",
+   "label": "Total tax expense",
+   "value": 516600,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "sum",
+   "inputs": [
+    "F7",
+    "F10"
    ]
   }
  ],
@@ -134,10 +159,10 @@
    }
   },
   {
-   "branch": "Tax due",
-   "finding": "Estimated payments fall short of the tax computed.",
+   "branch": "Current tax",
+   "finding": "Estimated payments fall short of the current tax computed.",
    "points": [
-    "Tax at [F6] is about [F7].",
+    "Current tax at [F6] is about [F7].",
     "Estimated payments were [F8]."
    ],
    "hypotheses": [
@@ -147,12 +172,38 @@
     }
    ],
    "so_what": "A balance of about [F9] should be provided for and planned for."
+  },
+  {
+   "branch": "Deferred tax",
+   "finding": "The extra depreciation creates a deferred tax liability.",
+   "points": [
+    "Tax depreciation runs ahead of the books by [F3].",
+    "At [F6], that gives deferred tax of about [F10]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The timing difference reverses in later years.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The provision should include deferred tax, not current tax alone.",
+   "chart": {
+    "title": "Current and deferred tax.",
+    "figure_ids": [
+     "F7",
+     "F10"
+    ],
+    "labels": [
+     "Current",
+     "Deferred"
+    ]
+   }
   }
  ],
  "options": [
   {
    "name": "Full pack",
-   "description": "Send the computation, workings and support for each adjustment.",
+   "description": "Send the computation, current and deferred tax workings and support for each adjustment.",
    "effort": "low"
   },
   {
@@ -163,7 +214,7 @@
  ],
  "recommendation": {
   "option": "Full pack",
-  "rationale": "It lets the preparer test each position quickly and shows the [F9] balance early; the preparer decides the positions, signs and files."
+  "rationale": "It lets the preparer test each position quickly and shows the [F9] balance and the [F10] deferred tax early; the preparer decides the positions, signs and files."
  },
  "roadmap": [
   {

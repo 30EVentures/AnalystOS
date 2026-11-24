@@ -1,13 +1,13 @@
 {
  "answer": "Lead the opening campaign with staff and behind-the-scenes posts, for the marketing lead's approval: they engage at [F3] against [F2] overall.",
  "exec_summary": [
-  "Engagement fell from [F1] to [F2], down [F5].",
+  "Engagement fell from [F1] to [F2], a fall of [F5].",
   "Staff and behind-the-scenes posts averaged [F3].",
   "Across [F4] followers that is about [F7] engagements a post against [F6] at today's rate."
  ],
  "situation": "A café chain that posts on Instagram for local customers.",
  "complication": "Engagement has fallen and a new location opens next month.",
- "key_question": "What should we post to make the new location's opening land on Instagram?",
+ "key_question": "What should the chain post to make the new location's opening land on Instagram?",
  "titles": {
   "situation": "Instagram engagement has fallen since spring.",
   "options": "Two ways to promote the opening on Instagram.",
@@ -52,13 +52,13 @@
   {
    "id": "F5",
    "label": "Fall in engagement",
-   "value": -2,
+   "value": 2,
    "unit": "points",
    "basis": "computed",
    "operation": "difference",
    "inputs": [
-    "F2",
-    "F1"
+    "F1",
+    "F2"
    ]
   },
   {
@@ -95,7 +95,7 @@
    ],
    "hypotheses": [
     {
-     "text": "Fewer people see our posts since spring.",
+     "text": "Fewer people see the chain's posts since spring.",
      "verdict": "untested"
     }
    ],
@@ -151,13 +151,14 @@
    "horizon": "First 30 days",
    "actions": [
     "Send the opening posts to the marketing lead for approval.",
-    "Photograph the new team and the fit-out."
+    "Photograph the new team and the fit-out.",
+    "Post the approved run-up and opening-day posts before and on the opening next month."
    ]
   },
   {
    "horizon": "Days 31-60",
    "actions": [
-    "Post the approved posts in the run-up to the opening."
+    "Keep posting staff and behind-the-scenes content after the opening."
    ]
   },
   {
@@ -193,10 +194,10 @@
    "title": "Opening week posts for the new café",
    "for": "Instagram followers, posts for the marketing lead to approve before posting",
    "body": [
-    "Post one, photo of the new team behind the counter: Meet the crew behind our newest café. They've been practising their latte art all week and can't wait to pour you one. Say hi when you visit.",
-    "Post two, behind-the-scenes video of the fit-out: Shelves up, grinder in, first test shots pulled. Our new café is nearly ready and we wanted you to see it before anyone else.",
-    "Post three, close-up of the head barista: Meet the head barista at our new spot. Ask for the house blend and a story about where the beans come from.",
-    "Post four, opening day: Doors open today. Come in, grab a coffee and meet the team. Tag a friend you'd bring along."
+    "Post one, photo of the new team behind the counter: Meet the crew behind our newest café. They can't wait to make your first coffee here. Say hi when you visit.",
+    "Post two, behind-the-scenes video of the fit-out: Our new café is nearly ready, and we wanted you to see it first.",
+    "Post three, close-up of the head barista: Meet the head barista at our new spot. Come in and ask for their favourite on the menu.",
+    "Post four, opening day: Doors open today at {address to confirm}. Come in, grab a coffee and meet the team. Tag a friend you'd bring along."
    ]
   }
  ]

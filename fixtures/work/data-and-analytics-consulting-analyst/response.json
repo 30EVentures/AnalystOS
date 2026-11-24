@@ -1,10 +1,10 @@
 {
- "answer": "Measure every promotion against held-back stores using loyalty-card data: it covers [F4] of sales, and cutting spend on promotions that do not pay off by [F5] would save about [F6] a year.",
+ "answer": "Measure every promotion against held-back stores using loyalty-card data: it covers [F4] of sales, and cutting spend on promotions that do not pay off by [F5] would save up to [F6] a year.",
  "exec_summary": [
   "The chain spends [F2] a year on about [F3] promotions.",
   "The loyalty card covers [F4] of sales, enough to measure most promotions.",
-  "Holding back [F7] stores once, [F8] of the chain, showed the method works.",
-  "The target cut of [F5] is worth about [F6] a year."
+  "The chain held back [F7] stores once, [F8] of the chain, but never repeated the test.",
+  "The target cut of [F5] is worth up to [F6] a year."
  ],
  "situation": "A regional grocery chain that plans promotions on buyers' judgment.",
  "complication": "Promotion spend is large and nobody can tell which promotions pay off.",
@@ -60,7 +60,7 @@
   },
   {
    "id": "F6",
-   "label": "Yearly saving at the target",
+   "label": "Yearly saving at the target, upper bound",
    "value": 240000,
    "unit": "usd",
    "basis": "computed",
@@ -109,7 +109,7 @@
   },
   {
    "branch": "The method",
-   "finding": "Held-back stores give a fair comparison.",
+   "finding": "Held-back stores can give a fair comparison.",
    "points": [
     "The chain once held back [F7] stores, [F8] of the chain."
    ],
@@ -126,7 +126,7 @@
    "finding": "Promotion spend is large enough to justify measurement.",
    "points": [
     "The chain spends [F2] a year on promotions.",
-    "A [F5] cut on promotions that do not pay off saves about [F6]."
+    "A [F5] cut on promotions that do not pay off saves up to [F6]."
    ],
    "hypotheses": [
     {
@@ -162,7 +162,7 @@
  ],
  "recommendation": {
   "option": "Held-back stores",
-  "rationale": "It gives a fair read of lift with data the chain already has and targets about [F6] a year; the commercial director decides which promotions to keep."
+  "rationale": "It gives a fair read of lift with data the chain already has and targets up to [F6] a year; the commercial director decides which promotions to keep."
  },
  "roadmap": [
   {

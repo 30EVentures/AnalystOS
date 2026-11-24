@@ -197,6 +197,9 @@ Quality rules (a board reader catches these):
   words in that branch clearly show it; mixed or indirect evidence is untested.
 - A number word in a title must match the rows under it: "three options" only
   over exactly three options.
+- Never put a direction word before a negative figure: "fell [F3]" with F3 at
+  -40% prints "fell -40%". Write "changed by [F3]", or define the fall as a
+  positive figure (the difference the other way round).
 
 Common mistakes that get content rejected:
 - "7% [F2]" or "[F2]%" or "$[F6]": write only "[F2]", "[F6]".
@@ -634,6 +637,33 @@ def _labels(content):
     return out
 
 
+_FALL_WORDS = ("fell", "falls", "fall", "falling", "dropped", "drops", "drop", "down", "declined", "declines",
+               "decline", "decreased", "decreases", "shrank", "shrinks", "lost", "loses", "cut", "cuts", "lower")
+_RISE_WORDS = ("rose", "rises", "rise", "rising", "grew", "grows", "grow", "up", "increased", "increases",
+               "gained", "gains", "higher")
+_SIGN_RE = re.compile(r"\b(" + "|".join(_FALL_WORDS + _RISE_WORDS) + r")\s+(?:by\s+|of\s+)?\[(F[1-9][0-9]{0,2})\]",
+                      re.IGNORECASE)
+
+
+def sign_problems(where, text, figures):
+    """A direction word right before a negative figure (Slice 129): "fell [F3]" with F3 = -40%
+    prints "fell -40%", a double negative; "rose [F3]" contradicts the sign. Refused with a fix."""
+    problems = []
+    for m in _SIGN_RE.finditer(text or ""):
+        fig = figures.get(m.group(2))
+        value = fig.get("value") if isinstance(fig, dict) else None
+        if not isinstance(value, (int, float)) or isinstance(value, bool) or value >= 0:
+            continue
+        word = m.group(1)
+        if word.lower() in _FALL_WORDS:
+            problems.append(f"{where}: '{m.group(0)}' prints a double negative because {m.group(2)} is negative; "
+                            f"write 'changed by [{m.group(2)}]' or define a positive figure (the difference the other way round)")
+        else:
+            problems.append(f"{where}: '{m.group(0)}' says it went up but {m.group(2)} is negative; say it fell, "
+                            f"with a positive figure for the size of the fall")
+    return problems
+
+
 def _texts(content):
     """Every model-written sentence that is checked for numbers, with where it sits."""
     out = []
@@ -892,11 +922,13 @@ def verify_content(content, client_text, work_kinds=None):
     for where, text in _texts(content):
         if isinstance(text, str):
             problems += number_problems(where, text, figures, years)
+            problems += sign_problems(where, text, figures)
             used.update(_TAG_RE.findall(text))
     work = content.get("work")
     problems += work_products.verify_work(work, figures, number_problems, label_problems, years, work_kinds)
-    for _, text in work_products.work_texts(work):
+    for where, text in work_products.work_texts(work):
         if isinstance(text, str):
+            problems += sign_problems(where, text, figures)
             used.update(_TAG_RE.findall(text))
     used.update(work_products.figure_ids_used(work))
     for fid in figures:

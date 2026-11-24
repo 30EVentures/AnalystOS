@@ -1,12 +1,12 @@
 {
- "answer": "Ask the customer service manager to approve more panel hours and a confirmation and reminder message: [F2] candidates need interviews but only [F3] hours are free.",
+ "answer": "Ask the customer service manager to approve more panel hours and the invitation: [F2] candidates need interviews, but the free manager hours fit only [F7] panels.",
  "exec_summary": [
-  "The team needs [F1] hires and [F2] candidates passed the phone screen, [F7] per role.",
-  "Managers have [F3] interview hours free, which leaves [F6] candidates without a slot.",
-  "Last round [F4] of booked candidates did not show up, about [F5] at this volume."
+  "The team needs [F1] hires and [F2] candidates passed the phone screen, [F9] per role.",
+  "Each panel uses [F4] managers, so [F3] free manager hours fit [F7] panels and leave [F8] candidates without a slot.",
+  "Last round [F5] of booked candidates did not show up, about [F6] at this volume."
  ],
  "situation": "An employer hiring customer service agents for a new team through panel interviews.",
- "complication": "There are more screened candidates than free interview hours, and many booked candidates do not attend.",
+ "complication": "Screened candidates outnumber the panels the free manager hours allow, and some booked candidates do not attend.",
  "key_question": "How should the panel interviews be scheduled so every screened candidate is seen in time?",
  "titles": {
   "situation": "Screened candidates outnumber free interview hours.",
@@ -35,7 +35,7 @@
   },
   {
    "id": "F3",
-   "label": "Free interview hours",
+   "label": "Free manager interview hours",
    "value": 40,
    "unit": "count",
    "basis": "client",
@@ -43,6 +43,14 @@
   },
   {
    "id": "F4",
+   "label": "Managers on each panel",
+   "value": 2,
+   "unit": "count",
+   "basis": "client",
+   "quote": "with 2 managers"
+  },
+  {
+   "id": "F5",
    "label": "No-show rate last round",
    "value": 20,
    "unit": "percent",
@@ -50,7 +58,7 @@
    "quote": "20% of booked candidates"
   },
   {
-   "id": "F5",
+   "id": "F6",
    "label": "Likely no-shows this round",
    "value": 12,
    "unit": "count",
@@ -58,23 +66,35 @@
    "operation": "percent_of",
    "inputs": [
     "F2",
+    "F5"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "One-hour panels the free hours fit",
+   "value": 20,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "ratio",
+   "inputs": [
+    "F3",
     "F4"
    ]
   },
   {
-   "id": "F6",
+   "id": "F8",
    "label": "Candidates without an interview slot",
-   "value": 20,
+   "value": 40,
    "unit": "count",
    "basis": "computed",
    "operation": "difference",
    "inputs": [
     "F2",
-    "F3"
+    "F7"
    ]
   },
   {
-   "id": "F7",
+   "id": "F9",
    "label": "Candidates per role",
    "value": 5,
    "unit": "count",
@@ -91,7 +111,8 @@
    "branch": "Interview capacity",
    "finding": "Free panel hours do not cover every screened candidate.",
    "points": [
-    "Each interview takes one hour, so [F3] hours leave [F6] candidates without a slot."
+    "Reading the free hours as manager hours, [F3] hours with [F4] managers a panel fit [F7] one-hour panels.",
+    "That leaves [F8] candidates without a slot."
    ],
    "hypotheses": [
     {
@@ -101,14 +122,14 @@
    ],
    "so_what": "The manager needs to approve more panel hours.",
    "chart": {
-    "title": "Screened candidates against free interview hours.",
+    "title": "Screened candidates against the panels the free hours fit.",
     "figure_ids": [
      "F2",
-     "F3"
+     "F7"
     ],
     "labels": [
      "Candidates",
-     "Free hours"
+     "Panels that fit"
     ]
    }
   },
@@ -116,7 +137,7 @@
    "branch": "Attendance",
    "finding": "Missed interviews waste scarce panel hours.",
    "points": [
-    "Last round [F4] of booked candidates did not show, about [F5] this round."
+    "Last round [F5] of booked candidates did not show, about [F6] this round."
    ],
    "hypotheses": [
     {
@@ -197,7 +218,7 @@
     },
     {
      "when": "This week",
-     "task": "Ask more managers to join panels so [F6] more candidates can be seen.",
+     "task": "Ask more managers to join panels so [F8] more candidates can be seen.",
      "owner": "Customer service manager",
      "done_when": "Enough panel hours are confirmed for every candidate."
     },
@@ -208,10 +229,10 @@
      "done_when": "Every candidate has a confirmed slot."
     },
     {
-     "when": "The day before each interview",
-     "task": "Send the approved reminder to each booked candidate.",
+     "when": "Before the first panel",
+     "task": "Draft a short reminder for the manager to approve, then send it the day before each interview once approved.",
      "owner": "Recruiting coordinator",
-     "done_when": "Every booked candidate has a reminder."
+     "done_when": "The reminder is approved and goes to every booked candidate."
     },
     {
      "when": "After the last panel",
@@ -227,8 +248,8 @@
    "for": "Screened candidates, email for the customer service manager to approve before sending",
    "body": [
     "Hello, thank you for speaking with us. We would like to invite you to a panel interview for the customer service agent role.",
-    "The interview lasts about an hour, with two of our team managers. You will talk through how you help customers and work through a short example call together.",
-    "Please reply with your choice of the slots below, or tell us if none of them work and we will find another time.",
+    "The interview lasts about an hour, with two of our team managers. {Interview format, for the customer service manager to confirm.}",
+    "Please reply with your choice of these slots: {first slot}, {second slot}, {third slot}. If none of them work, tell us and we will find another time.",
     "We will send a reminder the day before. If your plans change, just reply to this email so we can offer the slot to someone else.",
     "We look forward to meeting you. The recruiting team."
    ]

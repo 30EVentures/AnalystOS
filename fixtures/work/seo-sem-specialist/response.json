@@ -1,5 +1,5 @@
 {
- "answer": "Shift budget from branded keywords and fix the main page title, for the marketing manager's approval: cost per lead rose [F5] and we pay [F3] a month for searches that already name us.",
+ "answer": "Test lower branded bids and fix the main page title, for the marketing manager's approval: cost per lead rose [F5], and [F3] a month goes on searches that already name the business.",
  "exec_summary": [
   "Paid search spend is [F1] a month.",
   "Cost per lead rose from [F4] to [F2], up [F5].",
@@ -7,13 +7,13 @@
   "Branded keywords take [F3], [F6] of spend."
  ],
  "situation": "A software business selling online booking to clinics through paid and organic search.",
- "complication": "Paid leads cost more each month, and the main product page wastes its ranking with a weak title.",
- "key_question": "Which search changes would lower our cost per lead?",
+ "complication": "Paid leads now cost more than before, and the main product page wastes its ranking with a weak title.",
+ "key_question": "Which search changes would lower the client's cost per lead?",
  "titles": {
   "situation": "Paid search leads are getting more expensive.",
   "options": "Two ways to lower the cost of a lead.",
-  "recommendation": "Rebalance branded spend and fix the main page title.",
-  "roadmap": "Fix the title and ads first, then rebalance spend.",
+  "recommendation": "Test lower branded bids and fix the main page title.",
+  "roadmap": "Fix the title and ads first, then test branded bids.",
   "kpis": "Two measures show search is getting cheaper per lead.",
   "risks": "The main risk is losing branded leads to competitors."
  },
@@ -97,13 +97,13 @@
    ],
    "hypotheses": [
     {
-     "text": "Competitors bid up our core terms.",
+     "text": "Competitors bid up the client's core terms.",
      "verdict": "untested"
     }
    ],
    "so_what": "Without changes the same budget buys fewer leads.",
    "chart": {
-    "title": "Cost per lead rose this year.",
+    "title": "Cost per lead rose from its earlier level.",
     "figure_ids": [
      "F4",
      "F2"
@@ -116,13 +116,13 @@
   },
   {
    "branch": "Branded spend",
-   "finding": "A large slice of spend goes on searches that already name us.",
+   "finding": "A large slice of spend goes on searches that already name the business.",
    "points": [
     "Branded keywords take [F3], [F6] of spend."
    ],
    "hypotheses": [
     {
-     "text": "Branded searchers would find us through organic results anyway.",
+     "text": "Branded searchers would find the business through organic results anyway.",
      "verdict": "untested"
     }
    ],
@@ -132,7 +132,7 @@
    "branch": "The main page title",
    "finding": "The main product page wastes its ranking on a weak title.",
    "points": [
-    "The page ranks for our core term but its title is just the word Home."
+    "The page ranks for the client's core term, but its title is just the word Home."
    ],
    "hypotheses": [
     {
@@ -205,10 +205,11 @@
    "title": "Main product page title, description and search ads",
    "for": "The marketing manager to approve before publishing",
    "body": [
-    "Page title: Online Booking Software for Clinics | Fewer No-Shows, Fuller Diaries",
-    "Meta description: Let patients book, move and cancel appointments online, day or night. Automatic reminders cut no-shows. Set up in an afternoon.",
-    "Search ad one. Headline: Online Booking for Clinics. Second headline: Patients Book Themselves. Description: Fill your diary without phone tag. Reminders, waiting lists and easy rescheduling.",
-    "Search ad two. Headline: Cut Clinic No-Shows. Second headline: Automatic Text Reminders. Description: Online booking that patients actually use. See how it works with a free demo."
+    "Items in curly braces are product claims or offers for the marketing manager to confirm, or cut, before anything is published.",
+    "Page title: Online Booking Software for Clinics | {Main benefit to confirm}",
+    "Meta description: Let patients book their appointments online instead of calling the front desk. {Confirm which features to name, such as reminders or rescheduling.}",
+    "Search ad one. Headline: Online Booking for Clinics. Second headline: Patients Book Themselves. Description: Online booking software for clinic managers. Patients choose a time online, and your team spends less time on the phone.",
+    "Search ad two. Headline: Clinic Booking Software. Second headline: {Offer to confirm, such as a demo}. Description: Simple online booking built for clinics. {One confirmed feature to name here.}"
    ]
   }
  ]

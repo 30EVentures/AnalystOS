@@ -6,7 +6,7 @@
   "Only [F3] of readers rate the current article helpful."
  ],
  "situation": "An invoicing software business whose support team answers customer tickets.",
- "complication": "Customers cannot export reports from the help article alone, so they raise tickets.",
+ "complication": "Export questions are a large share of tickets, and few readers rate the current export article helpful.",
  "key_question": "What help content would let customers export reports without contacting support?",
  "titles": {
   "situation": "Export questions fill the support queue.",
@@ -179,9 +179,10 @@
    "title": "Export a report to a spreadsheet",
    "for": "Customers using the invoicing software, help article for the support manager to review",
    "body": [
+    "Check against the current screen: menu names, report names and button positions below are placeholders for the support manager to confirm before publishing.",
     "You can export any report to a spreadsheet file to share it or work with the numbers yourself.",
-    "To export a report: open Reports from the main menu. Choose the report you want, such as Sales by Customer. Set the date range and any filters, then select Apply. Select Export in the top right corner and choose Spreadsheet. The file downloads to your computer.",
-    "If the Export button is greyed out, run the report first by selecting Apply. Export only works on a report that has results.",
+    "To export a report: open {Reports menu name} from the main menu. Choose the report you want, such as {a common report}. Set the date range and any filters, then select {Apply button name}. Select {Export button and its position} and choose the spreadsheet option. The file downloads to your computer.",
+    "If the export button is greyed out, run the report first. {Confirm that export needs a report with results.}",
     "If the file opens with all the data in one column, open your spreadsheet program first and use its import option, choosing comma as the separator.",
     "If some invoices are missing, check the date range and filters. The export includes only what the report shows on screen.",
     "Still stuck? Contact support from the Help menu and tell us which report you were exporting."

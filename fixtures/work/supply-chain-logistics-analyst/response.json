@@ -1,11 +1,11 @@
 {
- "answer": "Fix dispatch at the main warehouse first: it caused [F9] of last quarter's [F8] late deliveries, which cost about [F10].",
+ "answer": "Fix dispatch at the main warehouse first: [F9] of last quarter's [F8] late deliveries left it late, and late deliveries cost about [F10].",
  "exec_summary": [
   "On-time delivery fell from [F1] to [F2], a fall of [F6].",
   "Of [F3] deliveries, [F8] were late, costing about [F10].",
-  "Late departures from the main warehouse caused [F4] of them, or [F9]."
+  "[F4] of them, or [F9], left the main warehouse late."
  ],
- "situation": "A distributor delivering to stores from a main warehouse.",
+ "situation": "A business delivering to its stores from a main warehouse.",
  "complication": "On-time delivery fell sharply in one quarter, and late deliveries carry re-delivery costs and penalties.",
  "key_question": "Why did on-time delivery fall, and where should the fix start?",
  "titles": {
@@ -147,7 +147,7 @@
   },
   {
    "branch": "Where lateness starts",
-   "finding": "Most late deliveries start at the main warehouse.",
+   "finding": "Most late deliveries left the main warehouse late.",
    "points": [
     "[F4] late deliveries left the warehouse late, [F9] of the total."
    ],
@@ -189,7 +189,7 @@
  ],
  "recommendation": {
   "option": "Fix warehouse dispatch",
-  "rationale": "Warehouse delays caused [F9] of late deliveries, which cost about [F10] last quarter; the head of logistics decides."
+  "rationale": "[F9] of late deliveries left the warehouse late, and late deliveries cost about [F10] last quarter; the head of logistics decides."
  },
  "roadmap": [
   {

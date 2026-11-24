@@ -7,13 +7,13 @@
   "kind": "person",
   "ref": "example-client"
  },
- "problem": "The owners of a family-owned packaging manufacturer have received an offer of $96 million for the business. Its EBITDA last year was $12 million.",
+ "problem": "The owners of a family-owned maker of industrial pumps have received an offer of $96 million for the business. Its EBITDA last year was $12 million.",
  "answers": {
   "common.decision": "Whether to accept the offer or counter; the owners decide.",
   "common.deadline": "The buyer wants an answer in three weeks.",
   "common.audience": "The owners and their board.",
-  "common.materials": "Comparable packaging deals traded at 9.5x EBITDA. The company carries net debt of $18 million, which would be repaid from the sale proceeds.",
+  "common.materials": "Comparable industrial pump deals traded at 9.5x EBITDA. The company carries net debt of $18 million, which would be repaid from the sale proceeds.",
   "finance-modeling.purpose": "Value the business against comparable deals and show what the owners would receive.",
-  "finance-modeling.data": "Last year's financial statements and a list of comparable packaging deals, in US dollars."
+  "finance-modeling.data": "Last year's financial statements and a list of comparable industrial pump deals, in US dollars."
  }
 }

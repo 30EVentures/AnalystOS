@@ -1,10 +1,10 @@
 {
- "answer": "Fund a targeted market adjustment for engineers in the pay review, for the head of people to decide case by case: pay sits [F4] below market, and turnover costs about [F12] a year against [F6] to close the gap.",
+ "answer": "Fund a targeted market adjustment for engineers in the pay review, for the head of people to decide case by case: pay sits [F4] below market, and turnover above the company rate cost about [F14] last year against a rough [F6] to move everyone.",
  "exec_summary": [
   "Median engineer pay is [F1] against a market median of [F2], [F4] below.",
-  "Closing that gap for all [F5] engineers would cost about [F6] a year.",
+  "As a rough sizing, closing the median gap for all [F5] engineers would cost about [F6] a year.",
   "Engineer turnover was [F7] against [F8] for the company, [F9] higher.",
-  "About [F10] engineers left, costing about [F12] to replace."
+  "About [F10] engineers left, costing about [F12] to replace; about [F13] of them, costing about [F14], were above the company rate."
  ],
  "situation": "An employer reviewing engineering pay against the market ahead of its annual pay review.",
  "complication": "Engineers are paid below market and leave faster than the rest of the company.",
@@ -68,7 +68,7 @@
   },
   {
    "id": "F6",
-   "label": "Cost to bring every engineer to the market median",
+   "label": "Rough cost to bring every engineer to the median (headcount times median gap)",
    "value": 960000,
    "unit": "usd",
    "basis": "computed",
@@ -137,6 +137,30 @@
     "F10",
     "F11"
    ]
+  },
+  {
+   "id": "F13",
+   "label": "Engineer leavers above the company rate",
+   "value": 6.4,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F5",
+    "F9"
+   ]
+  },
+  {
+   "id": "F14",
+   "label": "Cost of turnover above the company rate",
+   "value": 256000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F13",
+    "F11"
+   ]
   }
  ],
  "issue_tree": [
@@ -160,7 +184,7 @@
      "F2"
     ],
     "labels": [
-     "Our median",
+     "Engineer median",
      "Market median"
     ]
    }
@@ -170,7 +194,8 @@
    "finding": "Engineers leave faster than the rest of the company.",
    "points": [
     "Turnover was [F7] against [F8].",
-    "Replacing leavers cost about [F12]."
+    "Replacing leavers cost about [F12].",
+    "Turnover above the company rate cost about [F14]."
    ],
    "hypotheses": [
     {
@@ -178,16 +203,16 @@
      "verdict": "untested"
     }
    ],
-   "so_what": "Turnover already costs a large share of what closing the gap would.",
+   "so_what": "Only turnover above the company rate is plausibly linked to pay.",
    "chart": {
-    "title": "Turnover cost against the full cost of closing the gap.",
+    "title": "Excess turnover cost against the rough cost of moving everyone to market.",
     "figure_ids": [
-     "F12",
+     "F14",
      "F6"
     ],
     "labels": [
-     "Turnover cost",
-     "Full gap cost"
+     "Excess turnover cost",
+     "Rough full gap cost"
     ]
    }
   },
@@ -195,7 +220,7 @@
    "branch": "Cost of closing the gap",
    "finding": "Closing the gap for everyone would be costly.",
    "points": [
-    "Bringing all [F5] engineers to market would cost about [F6] a year."
+    "A rough sizing puts moving all [F5] engineers to market at about [F6] a year."
    ],
    "hypotheses": [
     {
@@ -225,7 +250,7 @@
  ],
  "recommendation": {
   "option": "Targeted adjustment",
-  "rationale": "Turnover cost about [F12] last year against [F6] to close the gap for everyone, so targeting is the better use of budget; the head of people decides each person's pay."
+  "rationale": "Turnover above the company rate, the part pay could plausibly reduce, cost about [F14] last year against a rough [F6] to move everyone, so a targeted adjustment fits the budget better; the head of people decides each person's pay."
  },
  "roadmap": [
   {

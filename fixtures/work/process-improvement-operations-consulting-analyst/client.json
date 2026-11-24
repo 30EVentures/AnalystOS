@@ -7,14 +7,14 @@
   "kind": "person",
   "ref": "example-client"
  },
- "problem": "We are a regional distributor. Our warehouse ships 2,400 orders a day, but only 1,800 leave the same day.",
+ "problem": "We are a hospital group. Our accounts payable team receives 5,000 supplier invoices a month, and only 3,500 are approved within our payment terms. Late payments cost us $14,000 a month in supplier late fees.",
  "answers": {
-  "common.decision": "Which changes to make in the warehouse; the operations director decides.",
+  "common.decision": "Which changes to make to invoice approval; the finance director decides.",
   "common.deadline": "A plan in four weeks.",
-  "common.audience": "The operations director and the warehouse manager.",
-  "common.materials": "A time study found an order takes 120 minutes from release to dispatch. Walking between aisles takes 48 minutes of that, and waiting at the packing bench takes 30 minutes.",
-  "consulting.current-state": "Pickers pick one order at a time and walk the whole warehouse for each. We added overtime last quarter, which helped a little.",
-  "consulting.success": "Ship 95% of orders the same day.",
-  "consulting.constraints": "No new building; budget for minor layout changes only."
+  "common.audience": "The finance director and the accounts payable manager.",
+  "common.materials": "An invoice takes 24 days on average from receipt to approval. Of that, 18 days are spent waiting in approvers' inboxes. 1,200 invoices a month have no purchase order, so the team has to find the right approver by email.",
+  "consulting.current-state": "Invoices are routed by email to budget holders. We sent reminder emails last quarter, which helped a little.",
+  "consulting.success": "Approve 95% of invoices within payment terms.",
+  "consulting.constraints": "No new finance system this year; changes to approval rules are allowed."
  }
 }

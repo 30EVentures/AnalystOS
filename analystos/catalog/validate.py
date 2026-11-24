@@ -33,8 +33,8 @@ _TOP_KEYS = {"format", "description", "statuses", "boundaries", "waves", "famili
 _EVAL_KEYS = {"set", "passed", "method"}
 # How a role's evaluation was run: "mock" = a worked example written for this role and
 # checked in a working session (no model call); "mock-family" = the same, but the example
-# was written for another role in its family (Slice 119: the honest label for 60 of the
-# 73 roles); "live" = the production model on the eval set.
+# was written for another role in its family (Slice 119; since Slice 129 every role has its
+# own example, so this stays only for a role added later); "live" = the production model.
 EVAL_METHODS = ("mock", "mock-family", "live")
 # The owner's decision, 2026-11-23: no price has been set for any role yet; pricing is to be determined.
 PRICE_TBD = "tbd"

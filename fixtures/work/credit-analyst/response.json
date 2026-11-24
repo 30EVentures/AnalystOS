@@ -1,15 +1,15 @@
 {
- "answer": "The borrower can carry the loan on last year's numbers: debt service cover would be [F7] against a policy floor of [F5]; the credit committee decides whether to lend and on what terms.",
+ "answer": "The borrower can carry the loan on last year's numbers: using EBITDA as a stand-in for cash available for debt service, cover would be [F7] against a policy floor of [F5]; the credit committee decides whether to lend and on what terms.",
  "exec_summary": [
-  "EBITDA of [F2] would have to cover total debt service of [F6] once the loan is added.",
+  "Using EBITDA of [F2] as a stand-in for cash available for debt service, it would have to cover total debt service of [F6] once the loan is added.",
   "That gives cover of [F7], well above the policy floor of [F5].",
   "EBITDA could fall by [F9], or [F10], before cover reaches the floor."
  ],
- "situation": "A regional food distributor asking for a term loan to buy delivery trucks.",
+ "situation": "A chain of dental clinics asking for a term loan to buy imaging equipment.",
  "complication": "The new loan adds debt service to a borrower that already carries debt, so the committee needs to know if cash flow still covers it.",
  "key_question": "Can the borrower service the new loan alongside its existing debt, and how much room is left?",
  "titles": {
-  "situation": "A food distributor wants a term loan for delivery trucks.",
+  "situation": "A dental clinic chain wants a term loan for imaging equipment.",
   "options": "Three ways to put the request to the credit committee.",
   "recommendation": "Put the loan to the committee with a cover covenant.",
   "roadmap": "Prepare the committee paper, then monitor cover after drawdown.",
@@ -158,7 +158,7 @@
      "verdict": "untested"
     }
    ],
-   "so_what": "The committee should weigh how stable the distributor's earnings are.",
+   "so_what": "The committee should weigh how stable the clinics' earnings and cash flow are.",
    "chart": {
     "title": "EBITDA sits well above the level the policy requires.",
     "figure_ids": [
@@ -226,11 +226,15 @@
  ],
  "risks": [
   {
-   "risk": "Earnings fall in a weak year for food distribution.",
+   "risk": "Earnings fall in a weak year for the clinics.",
    "mitigation": "Test cover each year and flag any fall early."
   },
   {
-   "risk": "The trucks cost more than planned and the borrower asks for more.",
+   "risk": "EBITDA overstates the cash available for debt service.",
+   "mitigation": "Ask for a cash flow statement and test cover on operating cash flow too."
+  },
+  {
+   "risk": "The equipment costs more than planned and the borrower asks for more.",
    "mitigation": "Treat any increase as a new request with fresh cover figures."
   }
  ]

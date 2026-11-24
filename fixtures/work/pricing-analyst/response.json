@@ -1,12 +1,12 @@
 {
  "answer": "Do not cut the price on sales' volume estimate: monthly gross margin would fall from [F9] to [F10], a loss of [F11], and volume would need to reach [F12] just to break even.",
  "exec_summary": [
-  "The cut from [F1] to [F2] is a discount of [F6] on price.",
+  "Price changes by [F6], from [F1] to [F2].",
   "Unit margin falls from [F7] to [F8], a much sharper fall than the price.",
   "At the expected [F5] units a month margin drops by [F11]; breaking even needs [F12] units."
  ],
  "situation": "A maker of a premium coffee machine reviewing a price cut proposed by sales.",
- "complication": "The price cut comes straight out of a thin unit margin, and the expected volume gain is not enough to replace it.",
+ "complication": "Every dollar of the price cut comes out of the unit margin, because the unit cost stays at [F3], and the expected volume gain does not replace it.",
  "key_question": "Does the proposed price cut raise or lower monthly gross margin?",
  "titles": {
   "situation": "Sales proposes a lower price on the premium machine.",
@@ -147,7 +147,7 @@
    "branch": "Effect on unit margin",
    "finding": "The price cut takes a far larger share of margin than of price.",
    "points": [
-    "Price falls by [F6], from [F1] to [F2].",
+    "Price changes by [F6], from [F1] to [F2].",
     "Unit margin falls from [F7] to [F8] because cost of [F3] does not move."
    ],
    "hypotheses": [

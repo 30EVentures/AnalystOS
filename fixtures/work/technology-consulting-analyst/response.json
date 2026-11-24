@@ -1,19 +1,19 @@
 {
- "answer": "Move to the cloud suite: over the comparison period it costs about [F7] against [F1] for new servers, both fit the [F9] budget, and the cloud removes the hand patching behind last year's outages.",
+ "answer": "Recommend the cloud suite: over the comparison period it costs about [F7] against [F1] for new servers, both fit the [F9] budget, and it ends hand patching, which may be behind last year's outages but is untested.",
  "exec_summary": [
   "New servers with support cost [F1].",
   "The cloud suite costs [F5] over [F4] plus a [F6] migration, about [F7] in all.",
   "The cloud is about [F8] cheaper, and both fit the [F9] budget.",
-  "Last year's [F10] outages point to hand patching as the bigger issue."
+  "The firm had [F10] outages last year; hand patching may be behind them, which is untested."
  ],
  "situation": "A firm whose file and email servers reach end of support next year.",
- "complication": "The servers must be replaced or retired, and hand patching has already caused outages.",
+ "complication": "The servers must be replaced or retired, and the firm had outages last year.",
  "key_question": "Should the firm replace its servers or move to a cloud office suite?",
  "titles": {
-  "situation": "Our servers reach end of support next year.",
+  "situation": "The firm's servers reach end of support next year.",
   "options": "Two ways to replace the servers.",
-  "recommendation": "Move to the cloud suite.",
-  "roadmap": "Plan the migration, move, then retire the servers.",
+  "recommendation": "Move to the cloud suite if the managing partner agrees.",
+  "roadmap": "Decide, plan the migration, then retire the servers.",
   "kpis": "Two measures show the move worked.",
   "risks": "The main risk is a disruptive migration."
  },
@@ -143,10 +143,10 @@
   },
   {
    "branch": "Risk and fit",
-   "finding": "The cloud removes the hand patching that caused outages.",
+   "finding": "The cloud ends hand patching, which may be behind the outages.",
    "points": [
-    "Our two IT staff patch the servers by hand.",
-    "We had [F10] outages last year."
+    "The firm's two IT staff patch the servers by hand.",
+    "The firm had [F10] outages last year."
    ],
    "hypotheses": [
     {
@@ -181,14 +181,14 @@
   {
    "horizon": "First 30 days",
    "actions": [
-    "Agree the migration plan and data to move with the provider.",
-    "Give the managing partner the recommendation within the six weeks."
+    "Give the managing partner the recommendation within the six weeks.",
+    "If the managing partner chooses the cloud, agree the migration plan with the provider."
    ]
   },
   {
    "horizon": "Days 31-60",
    "actions": [
-    "Move email first, then shared files, office by office."
+    "Once the move is approved, move email first, then shared files, office by office."
    ]
   },
   {

@@ -7,7 +7,7 @@
   "kind": "person",
   "ref": "example-client"
  },
- "problem": "Our largest customer, a regional distributor, renews next quarter and their active users fell from 250 to 150 this year.",
+ "problem": "Our largest customer, a wholesale business, renews next quarter and their active users fell from 250 to 150 this year.",
  "answers": {
   "common.decision": "How to approach the renewal; the customer success manager approves every customer message.",
   "common.deadline": "Before the renewal next quarter.",

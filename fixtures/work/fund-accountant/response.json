@@ -1,79 +1,71 @@
 {
- "answer": "Three unbooked custodian items explain the whole [F6] cash break: book them for the fund controller's approval before the net asset value is struck.",
+ "answer": "A stale bond price and an under-accrued fee explain the whole [F5] gap; correcting both for the fund controller's approval moves the value per share from [F8] to [F9] before the strike.",
  "exec_summary": [
-  "Our system shows [F1] of cash against the custodian's [F2], a break of [F6].",
-  "A dividend of [F3] and a subscription of [F4] are at the custodian but not booked.",
-  "The custodian paid the [F5] audit fee we still show as accrued.",
-  "Net, the three items come to [F8], the whole break."
+  "The draft value is [F1] against an independent check of [F2], a gap of [F5].",
+  "A bond still at last week's price overstates the draft by [F3].",
+  "The management fee accrual is short by [F4].",
+  "The gap is [F10] of the draft value; the fund controller approves the strike."
  ],
- "situation": "A fund whose cash is checked against the custodian before each net asset value strike.",
- "complication": "Fund cash in our system is below the custodian's, hours before the strike.",
- "key_question": "What explains the cash break, and what must be booked before the net asset value is struck?",
+ "situation": "A fund that checks its draft net asset value against an independent calculation before each strike.",
+ "complication": "The draft value is higher than the independent check hours before the strike.",
+ "key_question": "What explains the gap in the draft net asset value, and what must be corrected before the strike?",
  "titles": {
-  "situation": "Fund cash disagrees with the custodian before the strike.",
-  "options": "Two ways to handle the break before the strike.",
-  "recommendation": "Book all three items for approval before the strike.",
-  "roadmap": "Clear the break tonight, then book custodian cash daily.",
-  "kpis": "Two measures show cash is clean at each strike.",
-  "risks": "The main risk is booking the subscription into tonight's valuation."
+  "situation": "The draft net asset value is overstated.",
+  "options": "Two ways to handle the gap before the strike.",
+  "recommendation": "Correct both items for approval before the strike.",
+  "roadmap": "Correct tonight, then stop stale prices and old fee rates recurring.",
+  "kpis": "Two measures show the value is clean at each strike.",
+  "risks": "The main risk is striking on a stale price."
  },
  "figures": [
   {
    "id": "F1",
-   "label": "Fund cash in our system",
-   "value": 3482000,
+   "label": "Draft net asset value",
+   "value": 40000000,
    "unit": "usd",
    "basis": "client",
-   "quote": "shows cash of $3,482,000"
+   "quote": "draft net asset value tonight is $40,000,000"
   },
   {
    "id": "F2",
-   "label": "Fund cash at the custodian",
-   "value": 3617500,
+   "label": "Independent check of net assets",
+   "value": 39900000,
    "unit": "usd",
    "basis": "client",
-   "quote": "the custodian statement shows $3,617,500"
+   "quote": "comes to $39,900,000"
   },
   {
    "id": "F3",
-   "label": "Dividend received, not booked",
-   "value": 41500,
+   "label": "Bond overstatement from the stale price",
+   "value": 90000,
    "unit": "usd",
    "basis": "client",
-   "quote": "A dividend of $41,500"
+   "quote": "worth $90,000 less"
   },
   {
    "id": "F4",
-   "label": "Subscription received for tomorrow's dealing",
-   "value": 120000,
+   "label": "Management fee under-accrual",
+   "value": 10000,
    "unit": "usd",
    "basis": "client",
-   "quote": "A subscription of $120,000"
+   "quote": "understates the accrual by $10,000"
   },
   {
    "id": "F5",
-   "label": "Audit fee paid by the custodian",
-   "value": 26000,
-   "unit": "usd",
-   "basis": "client",
-   "quote": "the $26,000 audit fee"
-  },
-  {
-   "id": "F6",
-   "label": "Cash break",
-   "value": 135500,
+   "label": "Gap between draft and check",
+   "value": 100000,
    "unit": "usd",
    "basis": "computed",
    "operation": "difference",
    "inputs": [
-    "F2",
-    "F1"
+    "F1",
+    "F2"
    ]
   },
   {
-   "id": "F7",
-   "label": "Unbooked cash received",
-   "value": 161500,
+   "id": "F6",
+   "label": "Gap explained by the two items",
+   "value": 100000,
    "unit": "usd",
    "basis": "computed",
    "operation": "sum",
@@ -83,197 +75,199 @@
    ]
   },
   {
+   "id": "F7",
+   "label": "Shares in issue",
+   "value": 2000000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "The fund has 2,000,000 shares"
+  },
+  {
    "id": "F8",
-   "label": "Net effect of the three items",
-   "value": 135500,
-   "unit": "usd",
+   "label": "Draft value per share in dollars",
+   "value": 20,
+   "unit": "other",
    "basis": "computed",
-   "operation": "difference",
+   "operation": "ratio",
    "inputs": [
-    "F7",
-    "F5"
+    "F1",
+    "F7"
    ]
   },
   {
    "id": "F9",
-   "label": "Draft net asset value",
-   "value": 83000000,
-   "unit": "usd",
-   "basis": "client",
-   "quote": "draft net asset value is $83,000,000"
+   "label": "Corrected value per share in dollars",
+   "value": 19.95,
+   "unit": "other",
+   "basis": "computed",
+   "operation": "ratio",
+   "inputs": [
+    "F2",
+    "F7"
+   ]
   },
   {
    "id": "F10",
-   "label": "Dividend as a share of the draft net asset value",
-   "value": 0.05,
+   "label": "Gap as a share of the draft value",
+   "value": 0.25,
    "unit": "percent",
    "basis": "computed",
    "operation": "percent_of_total",
    "inputs": [
-    "F3",
-    "F9"
+    "F5",
+    "F1"
    ]
   }
  ],
  "issue_tree": [
   {
-   "branch": "Cash received",
-   "finding": "Cash has arrived at the custodian that we have not booked.",
+   "branch": "Pricing",
+   "finding": "One bond still carries last week's price.",
    "points": [
-    "The dividend of [F3] and the subscription of [F4] total [F7]."
+    "At today's independent price the bond is worth [F3] less."
    ],
    "hypotheses": [
     {
-     "text": "The dividend was already accrued as receivable.",
+     "text": "Other holdings also missed today's price.",
      "verdict": "untested"
     }
    ],
-   "so_what": "If the dividend was not accrued, the draft value is understated by [F10].",
+   "so_what": "Every holding's price date should be checked before the strike.",
    "chart": {
-    "title": "Cash in our system and at the custodian.",
+    "title": "Draft value and the independent check.",
     "figure_ids": [
      "F1",
      "F2"
     ],
     "labels": [
-     "Our system",
-     "Custodian"
+     "Draft",
+     "Independent check"
     ]
    }
   },
   {
-   "branch": "Cash paid",
-   "finding": "The custodian paid a fee we still show as owed.",
+   "branch": "Expenses",
+   "finding": "The management fee is accrued at last year's rate.",
    "points": [
-    "The audit fee of [F5] is still an accrual in our system."
+    "The accrual is short by [F4]."
    ],
    "hypotheses": [
     {
-     "text": "The fee payment changes the fund's value.",
-     "verdict": "refuted"
+     "text": "The new fee rate was never loaded into the system.",
+     "verdict": "untested"
     }
    ],
-   "so_what": "Booking the payment clears the accrual without moving the value."
+   "so_what": "The fee rate in the system needs updating, not only tonight's accrual."
   },
   {
-   "branch": "Timing",
-   "finding": "The subscription belongs to tomorrow's dealing, not tonight's value.",
+   "branch": "Per share",
+   "finding": "Both items together explain the gap and lower the value per share.",
    "points": [
-    "The subscription of [F4] arrived for tomorrow's dealing."
+    "Together the two items come to [F6], the whole gap.",
+    "The value per share moves from [F8] to [F9]."
    ],
    "hypotheses": [
     {
-     "text": "The subscription should lift tonight's value.",
-     "verdict": "refuted"
+     "text": "The two items explain the whole gap.",
+     "verdict": "supported"
     }
    ],
-   "so_what": "It is booked as received in advance, outside tonight's value."
+   "so_what": "Correcting both brings the draft to the independent check."
   }
  ],
  "options": [
   {
-   "name": "Book all three",
-   "description": "Book the dividend, the subscription received in advance and the fee payment for approval.",
+   "name": "Correct and strike",
+   "description": "Book both corrections for approval, then strike on the corrected value.",
    "effort": "low"
   },
   {
-   "name": "Strike with a note",
-   "description": "Strike tonight with the break noted and book tomorrow.",
-   "effort": "low"
+   "name": "Strike and correct later",
+   "description": "Strike on the draft and correct the value afterwards.",
+   "effort": "medium"
   }
  ],
  "recommendation": {
-  "option": "Book all three",
-  "rationale": "It clears the whole [F6] break before the strike and keeps the subscription out of tonight's value; the fund controller approves the entries and the strike."
+  "option": "Correct and strike",
+  "rationale": "It removes the whole [F5] overstatement before any investor deals at the wrong price; the fund controller approves the entries and the strike."
  },
  "roadmap": [
   {
    "horizon": "First 30 days",
    "actions": [
-    "Book the three entries tonight once the fund controller approves, before the strike.",
-    "Confirm whether the dividend was accrued."
+    "Book both corrections tonight once the fund controller approves, before the strike.",
+    "Check every holding's price date."
    ]
   },
   {
    "horizon": "Days 31-60",
    "actions": [
-    "Book custodian cash movements every day before the valuation."
+    "Update the fee rate in the fund accounting system for the fund controller's approval."
    ]
   },
   {
    "horizon": "Days 61-90",
    "actions": [
-    "Review with the fund controller any breaks still open at a strike."
+    "Review with the fund controller any gaps found at each strike."
    ]
   }
  ],
  "kpis": [
   {
-   "name": "Unexplained cash break at the strike",
+   "name": "Unexplained gap at the strike",
    "target": "Nothing"
   },
   {
-   "name": "Custodian cash movements booked the same day",
-   "target": "All of them"
+   "name": "Holdings priced on a past date at the strike",
+   "target": "None"
   }
  ],
  "risks": [
   {
-   "risk": "The subscription is counted in tonight's value.",
-   "mitigation": "Book it as received in advance for tomorrow's dealing."
+   "risk": "A stale price is missed on another holding.",
+   "mitigation": "Flag any holding whose price date is not today."
   },
   {
-   "risk": "The dividend is booked against income and a receivable.",
-   "mitigation": "Check for an existing receivable before booking."
+   "risk": "The fee correction is booked at the wrong rate.",
+   "mitigation": "Check the rate against the fund's fee terms first."
   }
  ],
  "work": [
   {
    "kind": "reconciliation",
-   "title": "Fund cash against the custodian before the strike",
+   "title": "Draft net asset value against the independent check",
    "side_a": {
-    "label": "Fund cash in our system",
+    "label": "Draft net asset value",
     "figure_id": "F1"
    },
    "side_b": {
-    "label": "Fund cash at the custodian",
+    "label": "Independent check of net assets",
     "figure_id": "F2"
    },
    "items": [
     {
-     "label": "Dividend received, not booked",
+     "label": "Bond overstatement from the stale price",
      "figure_id": "F3",
-     "effect": "add_to_a"
+     "effect": "subtract_from_a"
     },
     {
-     "label": "Subscription received for tomorrow's dealing",
+     "label": "Management fee under-accrual",
      "figure_id": "F4",
-     "effect": "add_to_a"
-    },
-    {
-     "label": "Audit fee paid by the custodian",
-     "figure_id": "F5",
      "effect": "subtract_from_a"
     }
    ],
    "entries": [
     {
-     "debit": "Cash at custodian",
-     "credit": "Dividends receivable",
+     "debit": "Unrealised loss on investments",
+     "credit": "Investments at fair value",
      "figure_id": "F3",
-     "memo": "Book the dividend of [F3]; credit income instead if it was never accrued; for the fund controller's approval."
+     "memo": "Reprice the bond to today's independent price, lowering it by [F3]; for the fund controller's approval."
     },
     {
-     "debit": "Cash at custodian",
-     "credit": "Subscriptions received in advance",
+     "debit": "Management fee expense",
+     "credit": "Accrued management fee",
      "figure_id": "F4",
-     "memo": "Book the subscription of [F4] for tomorrow's dealing; for the fund controller's approval."
-    },
-    {
-     "debit": "Accrued audit fee",
-     "credit": "Cash at custodian",
-     "figure_id": "F5",
-     "memo": "Book the custodian's payment of the audit fee of [F5]; for the fund controller's approval."
+     "memo": "Top up the management fee accrual by [F4] to the current rate; for the fund controller's approval."
     }
    ]
   }

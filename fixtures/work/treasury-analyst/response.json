@@ -1,5 +1,5 @@
 {
- "answer": "Cash lasts [F7] before the covenant floor, not the [F5] a simple runway suggests; drawing the facility would extend that to [F9], so the board should choose now between drawing it and cutting burn.",
+ "answer": "Cash lasts [F7] before the covenant floor, not the [F5] a simple runway suggests; drawing the facility would extend that to [F9], so the CFO should choose now between drawing it and cutting burn.",
  "exec_summary": [
   "Cash of [F1] at a burn of [F2] lasts [F5] in total.",
   "The covenant floor of [F4] leaves [F6] usable, or [F7] of runway.",
@@ -7,12 +7,12 @@
  ],
  "situation": "A company funding its operating losses from cash, with an undrawn bank facility.",
  "complication": "The covenant floor shortens how long the cash really lasts.",
- "key_question": "How long does our cash last within the covenant, and how should we extend it?",
+ "key_question": "How long does the cash last within the covenant, and how should the runway be extended?",
  "titles": {
   "situation": "Cash covers operations for now, but the covenant sets a floor.",
   "options": "Three ways to extend the cash runway.",
   "recommendation": "Keep the facility ready and cut burn first.",
-  "roadmap": "Decide at the board, then track runway monthly.",
+  "roadmap": "Decide before the board meets, then track runway monthly.",
   "kpis": "Two measures show whether runway is under control.",
   "risks": "The main risk is the bank changing the facility terms."
  },
@@ -141,7 +141,7 @@
   },
   {
    "branch": "Sources of more runway",
-   "finding": "The facility adds runway but at a cost, and burn is the larger lever.",
+   "finding": "The facility adds runway, and cutting burn is the other lever.",
    "points": [
     "Drawing the facility of [F3] lifts usable liquidity to [F8]."
    ],
@@ -155,7 +155,7 @@
      "verdict": "untested"
     }
    ],
-   "so_what": "The board should decide on both levers while runway is still long.",
+   "so_what": "The CFO should decide on both levers while runway is still long.",
    "chart": {
     "title": "Usable liquidity rises once the facility is drawn.",
     "figure_ids": [
@@ -188,7 +188,7 @@
  ],
  "recommendation": {
   "option": "Cut burn, keep the facility ready",
-  "rationale": "Runway to the floor is [F7]; cutting burn extends it without interest cost, and the facility still adds liquidity up to [F8] if needed; the CFO decides."
+  "rationale": "Runway to the floor is [F7]; cutting burn extends it without adding debt, and the facility still adds liquidity up to [F8] if needed; the CFO decides."
  },
  "roadmap": [
   {
@@ -201,7 +201,7 @@
   {
    "horizon": "Days 31-60",
    "actions": [
-    "Track burn monthly against any cuts the board approves."
+    "Track burn monthly against any cuts the CFO approves."
    ]
   },
   {

@@ -7,13 +7,13 @@
   "kind": "person",
   "ref": "example-client"
  },
- "problem": "We are reviewing a listed packaging maker for our research coverage. Its latest annual report shows revenue of $880 million, up from $800 million the year before. Operating profit was $79.2 million, down from $96 million.",
+ "problem": "We are reviewing a listed maker of kitchen appliances for our research coverage. Its latest annual report shows revenue of $880 million, up from $800 million the year before. Operating profit was $79.2 million, down from $96 million.",
  "answers": {
   "common.decision": "Whether the company needs a full review before we publish on it; our registered research analyst decides any rating or price target.",
   "common.deadline": "Two weeks.",
   "common.audience": "Our registered research analyst and the research head.",
   "common.materials": "Net debt at year end was $316.8 million. Management says raw material costs rose faster than selling prices during the year.",
-  "research-reporting.scope": "One listed packaging maker: its latest annual report against the year before.",
+  "research-reporting.scope": "One listed appliance maker: its latest annual report against the year before.",
   "research-reporting.sources": "The company's own annual reports only."
  }
 }

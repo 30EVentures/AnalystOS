@@ -1,5 +1,5 @@
 {
- "answer": "Stop sharing with the agency until an agreement is signed, delete or anonymise the [F5] records past retention, and fix the subject access process that answered [F3] of requests late.",
+ "answer": "Stop sharing with the agency until an agreement is signed, delete or anonymise the [F5] records past retention unless a reason to keep them applies, such as an open claim, and fix the subject access process that answered [F3] of requests late.",
  "exec_summary": [
   "[F2] of [F1] subject access requests were answered late, [F3].",
   "[F5] of [F4] customer records are past the retention period, [F6].",
@@ -14,7 +14,7 @@
   "recommendation": "Stop unprotected sharing first, then retention and requests.",
   "roadmap": "Stop the sharing now, then clean data and fix requests.",
   "kpis": "Two measures show the fixes are working.",
-  "risks": "The main risk is a complaint to the regulator."
+  "risks": "The main risks are agency misuse and deleting records still needed."
  },
  "figures": [
   {
@@ -190,7 +190,7 @@
    "mitigation": "Ask it to confirm deletion or sign an agreement."
   },
   {
-   "risk": "Records needed for claims are deleted.",
+   "risk": "Records still needed, such as for open claims, are deleted.",
    "mitigation": "Check open claims before deleting any record."
   }
  ],
@@ -217,7 +217,7 @@
      "item": "Subject access requests answered late: [F3].",
      "rating": "medium",
      "owner": "Customer service manager",
-     "status": "in progress",
+     "status": "open",
      "action": "Log each request and track it against the legal deadline."
     }
    ]

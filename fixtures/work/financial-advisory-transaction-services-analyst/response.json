@@ -3,10 +3,10 @@
  "exec_summary": [
   "The seller reports adjusted EBITDA of [F1].",
   "A one-off gain, a lost contract and the missing manager cost overstate it by [F6].",
-  "On our view of [F7], the price at [F2] falls from [F8] to [F9]."
+  "On diligence-adjusted EBITDA of [F7], the price at [F2] falls from [F8] to [F9]."
  ],
  "situation": "A buyer in diligence on a regional HVAC services company.",
- "complication": "The seller's adjusted EBITDA includes items that will not recur under new ownership.",
+ "complication": "The seller's adjusted EBITDA still counts items that will not recur under new ownership.",
  "key_question": "What are the target's sustainable earnings, and what does that mean for the price?",
  "titles": {
   "situation": "The seller's adjusted EBITDA sets the price under discussion.",
@@ -55,7 +55,7 @@
    "value": 200000,
    "unit": "usd",
    "basis": "client",
-   "quote": "a general manager at $200,000"
+   "quote": "general manager at $200,000"
   },
   {
    "id": "F6",
@@ -192,7 +192,7 @@
  ],
  "recommendation": {
   "option": "Price on adjusted EBITDA",
-  "rationale": "Each adjustment is backed by the seller's own accounts, and together they remove [F10] of overpayment; the deal lead decides the price to offer."
+  "rationale": "The seller's figure still counts all three items, and removing them avoids [F10] of overpayment; the deal lead decides the price to offer."
  },
  "roadmap": [
   {
@@ -228,7 +228,7 @@
  "risks": [
   {
    "risk": "The seller rejects the adjustments.",
-   "mitigation": "Show each one against the seller's own accounts."
+   "mitigation": "Ask the seller to show how its figure treats each of the three items."
   },
   {
    "risk": "More contracts end after closing.",

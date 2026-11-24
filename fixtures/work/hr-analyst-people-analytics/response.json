@@ -1,13 +1,13 @@
 {
- "answer": "Turnover rose from [F1] to [F2], adding about [F10] in replacement costs; shift scheduling is the main reason leavers gave, so prepare a scheduling policy review for the HR director to decide.",
+ "answer": "Turnover rose from [F1] to [F2], adding about [F10] in replacement costs; shift scheduling is the main reason last year's leavers gave, so prepare a scheduling policy review for the HR director to decide.",
  "exec_summary": [
   "Turnover rose by [F6], from about [F8] leavers to [F7].",
   "The [F9] extra leavers cost about [F10] to replace.",
-  "Shift scheduling was the main reason for [F5] leavers, or [F11]."
+  "Shift scheduling was the main reason for [F5] of last year's leavers, or [F11]."
  ],
  "situation": "A business with a large warehouse workforce working shifts.",
  "complication": "Turnover rose sharply in one year, and replacing leavers is costly.",
- "key_question": "Why did warehouse turnover rise, and what group-level change should the HR director consider?",
+ "key_question": "What did last year's leavers say made them leave, and what group-level change should the HR director consider?",
  "titles": {
   "situation": "Warehouse turnover rose sharply last year.",
   "options": "Two policy changes the HR director could consider.",
@@ -158,22 +158,26 @@
    }
   },
   {
-   "branch": "Why staff leave",
-   "finding": "Shift scheduling is the reason leavers name most.",
+   "branch": "Why last year's leavers left",
+   "finding": "Shift scheduling is the reason last year's leavers named most.",
    "points": [
-    "[F5] leavers named shift scheduling, [F11] of all leavers."
+    "[F5] leavers named shift scheduling, [F11] of last year's leavers."
    ],
    "hypotheses": [
     {
-     "text": "Shift scheduling is a major driver of turnover.",
+     "text": "Shift scheduling was the main reason for many of last year's leavers.",
      "verdict": "supported"
+    },
+    {
+     "text": "Scheduling problems explain the rise in turnover.",
+     "verdict": "untested"
     },
     {
      "text": "Pay is a bigger driver than leavers report.",
      "verdict": "untested"
     }
    ],
-   "so_what": "A scheduling policy review targets the most common reason staff give for leaving."
+   "so_what": "A scheduling policy review targets the most common reason last year's leavers gave."
   }
  ],
  "options": [
@@ -190,7 +194,7 @@
  ],
  "recommendation": {
   "option": "Scheduling policy review",
-  "rationale": "Shift scheduling is the main reason for [F11] of leavers, and the extra turnover costs about [F10]; the HR director decides any policy change."
+  "rationale": "Shift scheduling was the main reason for [F11] of last year's leavers, and the extra turnover costs about [F10]; the HR director decides any policy change."
  },
  "roadmap": [
   {

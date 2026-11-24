@@ -168,10 +168,66 @@ class WorkExamplesTest(unittest.TestCase):
                         self.assertTrue(item["for_decision"].endswith("?"))
 
 
+class DistinctTest(unittest.TestCase):
+    """Slice 129 review: every role's example is its own, never another role's renamed."""
+
+    def all_examples(self):
+        dirs = list(EXAMPLES) + [d for d in (ROOT / "fixtures" / "roles").iterdir() if d.is_dir()]
+        return dirs + [ROOT / "fixtures" / "consulting" / "churn-clinics"]
+
+    def test_every_client_problem_and_answer_is_different(self):
+        problems, answers, questions = set(), set(), set()
+        for directory in self.all_examples():
+            client, response = load(directory)
+            problems.add(client["problem"])
+            answers.add(response["answer"])
+            questions.add(response["key_question"])
+        self.assertEqual((len(problems), len(answers), len(questions)), (73, 73, 73))
+
+
 class HelperTest(unittest.TestCase):
     def test_a_blank_code_line_does_not_hide_stray_numbers(self):
         spec = {"content": {"work": [{"kind": "code", "code": "x = 1\n\ny = 2\n"}]}}
         self.assertEqual(without_code("x = 1 and 42", spec).split(), ["and", "42"])
+
+
+class SignWordTest(unittest.TestCase):
+    """Slice 129 review: "fell [F3]" with a negative F3 printed "fell -40%"."""
+
+    FIGS = {"F1": {"value": -40, "unit": "percent"}, "F2": {"value": 40, "unit": "percent"},
+            "F3": {"value": 1, "unit": "points"}}
+
+    def test_a_fall_word_before_a_negative_figure_is_refused_with_the_fix(self):
+        for text in ("Users fell [F1].", "Active users are down [F1].", "Margin fell by [F1].", "Users dropped [F1]"):
+            with self.subTest(text=text):
+                problems = c.sign_problems("answer", text, self.FIGS)
+                self.assertEqual(len(problems), 1, problems)
+                self.assertIn("double negative", problems[0])
+                self.assertIn("changed by [F1]", problems[0])
+
+    def test_a_rise_word_before_a_negative_figure_is_refused(self):
+        self.assertIn("says it went up", c.sign_problems("answer", "Users rose [F1].", self.FIGS)[0])
+
+    def test_plain_or_positive_wording_passes(self):
+        for text in ("Users fell [F2].", "Users changed by [F1].", "Users rose [F2].", "Users fell to [F1].",
+                     "The fall was [F1]."):
+            with self.subTest(text=text):
+                self.assertEqual(c.sign_problems("answer", text, self.FIGS), [])
+
+    def test_the_verifier_runs_it_on_prose_and_work(self):
+        directory = ROOT / "fixtures" / "work" / "customer-success-associate"
+        _, response = load(directory)
+        response["answer"] = "Active seats fell [F1] last quarter, so check in before the renewal."
+        response["figures"] = [{"id": "F1", "label": "x", "value": -40, "unit": "percent", "basis": "assumption",
+                                "rationale": "a test value"}] + [f for f in response["figures"] if f["id"] != "F1"]
+        problems = c.verify_content(c._normalize(response), "", None)
+        self.assertTrue(any("double negative" in p for p in problems), problems)
+
+    def test_one_point_is_singular(self):
+        from analystos.l4 import deck
+        self.assertEqual(deck.format_value({"value": 1, "unit": "points"}), "1 pt")
+        self.assertEqual(deck.format_value({"value": -1, "unit": "points"}), "-1 pt")
+        self.assertEqual(deck.format_value({"value": 2, "unit": "points"}), "2 pts")
 
 
 class CoverageTest(unittest.TestCase):

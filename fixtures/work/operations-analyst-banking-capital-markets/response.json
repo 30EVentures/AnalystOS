@@ -1,7 +1,7 @@
 {
  "answer": "The [F6] nostro break is fully explained by a mis-posted settlement, unbooked charges and an unapplied client receipt; correct them for approval, and fix the settlement instructions behind [F9] of this month's breaks.",
  "exec_summary": [
-  "Our ledger shows [F1] against the correspondent's [F2], a break of [F6].",
+  "The bank's ledger shows [F1] against the correspondent's [F2], a break of [F6].",
   "A settlement of [F3] sits on the wrong nostro and charges of [F4] are unbooked.",
   "A client receipt of [F5] is not yet applied.",
   "[F8] of this month's [F7] breaks came from instructions pointing to the wrong nostro."
@@ -10,7 +10,7 @@
  "complication": "The nostro is out by a material amount, and wrong settlement instructions keep causing breaks.",
  "key_question": "What explains today's nostro break, and what fixes the breaks that keep recurring?",
  "titles": {
-  "situation": "Our ledger and the correspondent disagree on the nostro.",
+  "situation": "The bank's ledger and the correspondent disagree on the nostro.",
   "options": "Two ways to stop the recurring breaks.",
   "recommendation": "Correct today's items and fix the settlement instructions, for approval.",
   "roadmap": "Clear today, then clean the instructions.",
@@ -20,7 +20,7 @@
  "figures": [
   {
    "id": "F1",
-   "label": "Nostro balance in our ledger",
+   "label": "Nostro balance in the bank's ledger",
    "value": 8940000,
    "unit": "usd",
    "basis": "client",
@@ -104,7 +104,7 @@
    "branch": "Today's break",
    "finding": "Three items explain the whole break.",
    "points": [
-    "The mis-posted settlement of [F3] and charges of [F4] overstate our ledger.",
+    "The mis-posted settlement of [F3] and charges of [F4] overstate the bank's ledger.",
     "The unapplied receipt of [F5] understates it."
    ],
    "hypotheses": [
@@ -115,13 +115,13 @@
    ],
    "so_what": "Booking the three items clears today's break.",
    "chart": {
-    "title": "Nostro balance in our ledger and at the correspondent.",
+    "title": "Nostro balance in the ledger and at the correspondent.",
     "figure_ids": [
      "F1",
      "F2"
     ],
     "labels": [
-     "Our ledger",
+     "Ledger",
      "Correspondent"
     ]
    }
@@ -203,7 +203,7 @@
    "kind": "reconciliation",
    "title": "US dollar nostro against the correspondent's statement",
    "side_a": {
-    "label": "Nostro balance in our ledger",
+    "label": "Nostro balance in the bank's ledger",
     "figure_id": "F1"
    },
    "side_b": {

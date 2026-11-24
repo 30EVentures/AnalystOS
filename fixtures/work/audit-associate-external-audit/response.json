@@ -13,7 +13,7 @@
   "situation": "Confirmations raised exceptions and gaps.",
   "options": "Two ways to complete the receivables testing.",
   "recommendation": "Resolve the exceptions and test the non-replies first.",
-  "roadmap": "Finish the follow-up, then let the engagement team judge.",
+  "roadmap": "Finish the follow-up before fieldwork closes, then hand over.",
   "kpis": "Two measures show the testing is complete.",
   "risks": "The main risk is concluding before exceptions are explained."
  },
@@ -186,19 +186,20 @@
    "horizon": "First 30 days",
    "actions": [
     "Ask the client to reconcile each disagreement and gather support.",
-    "Test non-replies against later cash receipts and invoices before fieldwork closes."
+    "Test non-replies against later cash receipts and invoices.",
+    "Hand the engagement manager the results before fieldwork closes, for a decision on extending the sample."
    ]
   },
   {
    "horizon": "Days 31-60",
    "actions": [
-    "Hand the engagement manager the results for a decision on extending the sample."
+    "File the working papers for the partner's review."
    ]
   },
   {
    "horizon": "Days 61-90",
    "actions": [
-    "File the working papers for the partner's review."
+    "Note what to change in next year's confirmation planning."
    ]
   }
  ],
@@ -238,7 +239,7 @@
      "item": "Balances with no reply: [F6].",
      "rating": "medium",
      "owner": "Audit associate",
-     "status": "in progress",
+     "status": "open",
      "action": "Test each against later cash receipts and invoices."
     },
     {

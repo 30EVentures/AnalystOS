@@ -1,15 +1,15 @@
 {
- "answer": "Fix remote sign-in and patching first, then finish access reviews: [F9] remote users lack multi-factor authentication, [F6] of servers miss critical patches against a limit of [F7], and access reviews cover [F3] of critical systems.",
+ "answer": "Fix remote sign-in and patching first, then finish access reviews: [F9] remote users lack multi-factor authentication, [F6] of servers miss critical patches against a limit of [F7], and [F10] critical systems had no access review.",
  "exec_summary": [
   "[F9] remote users sign in without the multi-factor authentication the policy requires.",
   "[F5] of [F4] servers miss critical patches, [F6], against a policy limit of [F7].",
-  "Access reviews were done for [F2] of [F1] critical systems, [F3]."
+  "Access reviews were done for [F2] of [F1] critical systems, [F3]; [F10] remain."
  ],
  "situation": "A business preparing for customer security audits next quarter.",
  "complication": "Three controls fall short of its own security policy.",
  "key_question": "Where do security controls fall short of policy, and what should be fixed first?",
  "titles": {
-  "situation": "Three controls fall short of our security policy.",
+  "situation": "Three controls fall short of the business's security policy.",
   "options": "Two ways to close the gaps before the audits.",
   "recommendation": "Close sign-in and patching gaps first, then access reviews.",
   "roadmap": "Fix exposure first, then complete reviews.",
@@ -100,6 +100,18 @@
    "unit": "count",
    "basis": "client",
    "quote": "300 remote users"
+  },
+  {
+   "id": "F10",
+   "label": "Critical systems without an access review this year",
+   "value": 6,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
   }
  ],
  "issue_tree": [
@@ -146,7 +158,7 @@
    "branch": "Access reviews",
    "finding": "Some critical systems had no access review this year.",
    "points": [
-    "[F2] of [F1] critical systems were reviewed, [F3]."
+    "[F2] of [F1] critical systems were reviewed, [F3]; [F10] were not."
    ],
    "hypotheses": [
     {
@@ -231,11 +243,11 @@
      "item": "Servers missing critical patches: [F6] against a limit of [F7].",
      "rating": "high",
      "owner": "Infrastructure manager",
-     "status": "in progress",
+     "status": "open",
      "action": "Patch the most exposed servers first and report weekly."
     },
     {
-     "item": "Critical systems without an access review this year: [F3] reviewed.",
+     "item": "Critical systems without an access review this year: [F10] of [F1].",
      "rating": "medium",
      "owner": "System owners",
      "status": "open",

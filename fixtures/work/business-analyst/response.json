@@ -1,7 +1,7 @@
 {
  "answer": "Build a self-service returns flow that captures order, item and reason up front: returns cost about [F3] a month in agent time, and the target cut is worth about [F7] a month.",
  "exec_summary": [
-  "We handle [F1] email returns a month at about [F2] each, about [F3] a month.",
+  "The retailer handles [F1] email returns a month at about [F2] each, about [F3] a month.",
   "[F4] returns, [F5] of them, needed a second email last month.",
   "The success target is a [F6] cut in agent cost and second emails under [F8]."
  ],

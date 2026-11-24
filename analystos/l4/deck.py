@@ -105,7 +105,7 @@ def exact_value(figure):
     if unit == "percent":
         return f"{sign}{text}%"
     if unit == "points":
-        return f"{sign}{text} pts"
+        return f"{sign}{text} {'pt' if abs(value) == 1 else 'pts'}"
     if unit == "usd":
         return f"{sign}${text}"
     if unit == "ratio":
@@ -128,7 +128,7 @@ def _format_value(figure):
     small = abs(value) < 1 and value != 0
     if unit in ("percent", "points"):
         text = _trim(f"{value:,.2f}") if small else _trim(f"{value:,.1f}")
-        return f"{text}%" if unit == "percent" else f"{text} pts"
+        return f"{text}%" if unit == "percent" else f"{text} {'pt' if abs(value) == 1 else 'pts'}"
     if unit == "usd":
         if float(value).is_integer() or abs(value) >= 100:
             return f"-${abs(value):,.0f}" if value < 0 else f"${value:,.0f}"

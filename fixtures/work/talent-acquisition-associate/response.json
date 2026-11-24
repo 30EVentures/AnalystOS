@@ -210,10 +210,10 @@
    "for": "Job seekers, job post for the hiring manager to review before posting",
    "body": [
     "Data Engineer. Salary range [F5] to [F6], depending on experience.",
-    "You will build and look after the pipelines that bring data from our products into our warehouse, so analysts and product teams can trust what they see.",
-    "What you need: strong SQL; experience building data pipelines in Python; experience with a cloud data warehouse; good habits around testing and version control; and the ability to explain data problems to people who are not engineers.",
-    "Nice to have: experience with workflow schedulers, streaming data, infrastructure as code, or data modelling for reporting. If you have some of these, great; if not, we will help you learn.",
-    "How to apply: send your CV and a few lines on a pipeline you built and what you would do differently now. We read every application."
+    "You will build and maintain our data pipelines. {One or two sentences on the team and the data you will work with, for the hiring manager to confirm.}",
+    "What you need: {essential requirement one}; {essential requirement two}; {essential requirement three}; {essential requirement four}; {essential requirement five}. The hiring manager fills these in from the essentials.",
+    "Nice to have: {the other requirements from today's post, as the hiring manager lists them}. You do not need all of these to apply.",
+    "How to apply: send your CV and a few lines on a data pipeline you built and what you would do differently now."
    ]
   }
  ]

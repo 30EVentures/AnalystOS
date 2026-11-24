@@ -7,7 +7,7 @@
   "Last month's cash exceeded declared sales of about [F5] by [F7]."
  ],
  "situation": "A bank monitoring cash deposits on its business accounts.",
- "complication": "One restaurant customer's cash deposits jumped sharply, in many deposits each under the reporting threshold.",
+ "complication": "One restaurant customer's cash deposits rose sharply last month, in many deposits, each below the same amount.",
  "key_question": "Does the restaurant's cash activity need the investigations lead's decision on suspicion and filing?",
  "titles": {
   "situation": "A business customer's cash deposits rose sharply last month.",
@@ -36,7 +36,7 @@
   },
   {
    "id": "F3",
-   "label": "Reporting threshold per deposit",
+   "label": "Amount each deposit stayed under",
    "value": 10000,
    "unit": "usd",
    "basis": "client",
@@ -111,7 +111,7 @@
   },
   {
    "branch": "How the cash came in",
-   "finding": "Every deposit stayed under the reporting threshold.",
+   "finding": "Every deposit stayed below the same amount.",
    "points": [
     "All [F2] deposits were under [F3]."
    ],
@@ -121,7 +121,7 @@
      "verdict": "untested"
     }
    ],
-   "so_what": "The pattern is one the lead should weigh for structuring."
+   "so_what": "The lead should weigh what this deposit pattern means."
   },
   {
    "branch": "Fit with the business",
@@ -209,7 +209,7 @@
  "work": [
   {
    "kind": "case_file",
-   "subject": "Restaurant customer: cash deposits under the reporting threshold",
+   "subject": "Restaurant customer: many cash deposits, each under the same amount",
    "facts": [
     "The customer deposited [F1] in cash last month across [F2] deposits.",
     "Each deposit was under [F3].",

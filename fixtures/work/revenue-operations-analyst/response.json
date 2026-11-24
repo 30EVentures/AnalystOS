@@ -1,18 +1,18 @@
 {
- "answer": "Retention, not acquisition, is the bigger leak: churn of [F4] wiped out [F10] of new revenue, and the shortfall to plan was [F9].",
+ "answer": "Churn is the likely lever, to be confirmed: it took [F4], equal to [F10] of new revenue won and more than the [F9] shortfall, but splitting the miss between acquisition and churn needs the plan's own assumptions for each.",
  "exec_summary": [
   "New customers added [F7] of annual recurring revenue.",
-  "Churn took away [F4], leaving net new revenue of [F8] against a plan of [F5].",
-  "Churn is larger than the whole [F9] shortfall."
+  "Churn took away [F4], leaving net new revenue of [F8] against a plan of [F5], a shortfall of [F9].",
+  "The plan gives only a net figure, so which side fell short needs its assumptions for gross new revenue and churn."
  ],
- "situation": "A subscription business that tracks leads, deals and churn in separate systems.",
- "complication": "Net new recurring revenue missed plan, and each team sees only its own part of the funnel.",
+ "situation": "A subscription business that tracks marketing leads, won customers and churn.",
+ "complication": "Net new recurring revenue missed plan, and the plan states only a net figure.",
  "key_question": "Where was recurring revenue lost against plan, and which lever closes the gap fastest?",
  "titles": {
   "situation": "Net new recurring revenue missed plan last year.",
   "options": "Three ways to close the gap to plan next year.",
-  "recommendation": "Put next year's first effort into reducing churn.",
-  "roadmap": "Size churn by cause before the plan is due, then act.",
+  "recommendation": "Confirm the split against the plan, then likely focus on churn.",
+  "roadmap": "Get the plan's assumptions first, then size churn before the plan is due.",
   "kpis": "Two measures show whether the leak is closing.",
   "risks": "The main risk is cutting acquisition while fixing churn."
  },
@@ -121,65 +121,56 @@
  "issue_tree": [
   {
    "branch": "Acquisition",
-   "finding": "New business brought in more than the plan's net figure.",
+   "finding": "New business added recurring revenue, but the plan's own target for it is not known.",
    "points": [
     "Of [F1] leads, [F2] became customers, a rate of [F6].",
-    "They added [F7] of recurring revenue, more than the [F5] plan."
+    "They added [F7] of recurring revenue."
    ],
    "hypotheses": [
     {
-     "text": "Weak lead flow caused the miss.",
-     "verdict": "refuted"
+     "text": "New business fell short of what the plan assumed.",
+     "verdict": "untested"
     }
    ],
-   "so_what": "The miss is not mainly an acquisition problem.",
-   "chart": {
-    "title": "New revenue won was above the net plan before churn.",
-    "figure_ids": [
-     "F5",
-     "F7"
-    ],
-    "labels": [
-     "Net plan",
-     "New revenue won"
-    ]
-   }
+   "so_what": "Whether acquisition missed depends on the gross new revenue the plan assumed."
   },
   {
    "branch": "Retention",
-   "finding": "Churn took away more than the whole shortfall.",
+   "finding": "Churn took away a large share of new revenue won.",
    "points": [
     "Churn of [F4] was [F10] of new revenue won.",
-    "Without that churn, net new revenue would have beaten plan."
+    "Churn is larger than the whole [F9] shortfall to plan."
    ],
    "hypotheses": [
     {
-     "text": "Churn explains the miss against plan.",
-     "verdict": "supported"
+     "text": "Churn above the plan's assumption explains the miss.",
+     "verdict": "untested"
     },
     {
      "text": "Churn is concentrated in recently won customers.",
      "verdict": "untested"
     }
    ],
-   "so_what": "Reducing churn is the fastest route back to plan.",
+   "so_what": "Churn is the likely lever, to be confirmed against the plan's churn assumption.",
    "chart": {
-    "title": "Churn was larger than the shortfall to plan.",
+    "title": "Churn took a large share of the new revenue won.",
     "figure_ids": [
-     "F9",
-     "F4"
+     "F7",
+     "F4",
+     "F8"
     ],
     "labels": [
-     "Shortfall to plan",
-     "Churn"
+     "New revenue won",
+     "Churn",
+     "Net new revenue"
     ]
    }
   }
  ],
  "options": [
   {
-   "name": "Retention first",
-   "description": "Find the main churn causes and target the largest with customer success.",
+   "name": "Confirm the split, then retention",
+   "description": "Split the shortfall using the plan's assumptions, then target the main churn causes with customer success if churn is the larger miss.",
    "effort": "medium"
   },
   {
@@ -194,13 +185,14 @@
   }
  ],
  "recommendation": {
-  "option": "Retention first",
-  "rationale": "Churn of [F4] is larger than the [F9] shortfall, so cutting it closes the gap faster than buying more leads; the chief revenue officer decides."
+  "option": "Confirm the split, then retention",
+  "rationale": "Churn of [F4] is larger than the whole [F9] shortfall, so it is the likely lever, but the plan's own assumptions must confirm which side missed before effort shifts; the chief revenue officer decides."
  },
  "roadmap": [
   {
    "horizon": "First 30 days",
    "actions": [
+    "Get the plan's assumptions for gross new revenue and churn, and split the shortfall between them.",
     "Join billing churn records to CRM deals to size churn by customer type before the plan is due."
    ]
   },

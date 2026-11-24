@@ -1,16 +1,16 @@
 {
  "answer": "Measured emissions cover [F7] of the estimated total, short of the [F8] the lenders' framework asks for; collect energy data from the missing sites and start water data before the report is published.",
  "exec_summary": [
-  "Energy data is complete for [F2] of our [F1] sites, [F3] of them.",
+  "Energy data is complete for [F2] of the business's [F1] sites, [F3] of them.",
   "Measured emissions of [F4] tonnes plus an estimate of [F5] tonnes give about [F6] tonnes in total.",
   "Measured emissions are [F7] of that total, [F9] short of the framework.",
   "Water use is not collected at any site, though the framework asks for it."
  ],
  "situation": "A business preparing its first sustainability report for its lenders.",
  "complication": "Energy data is missing for some sites and water data for all, so the report would fall short of the framework.",
- "key_question": "What gaps stand between our data and the lenders' framework, and which must close before publishing?",
+ "key_question": "What gaps stand between the business's data and the lenders' framework, and which must close before publishing?",
  "titles": {
-  "situation": "Our first sustainability report has data gaps.",
+  "situation": "The first sustainability report has data gaps.",
   "options": "Two ways to close the gaps before the report.",
   "recommendation": "Collect data from the missing sites before publishing.",
   "roadmap": "Close the emissions gap first, then water.",
@@ -20,7 +20,7 @@
  "figures": [
   {
    "id": "F1",
-   "label": "Sites we operate",
+   "label": "Sites operated",
    "value": 12,
    "unit": "count",
    "basis": "client",

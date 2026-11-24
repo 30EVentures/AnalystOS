@@ -132,7 +132,7 @@
    "branch": "Capacity in-house",
    "finding": "The in-house team's room for more work is not yet known.",
    "points": [
-    "The client has not measured in-house time per matter."
+    "The client gave no measure of in-house time per matter."
    ],
    "hypotheses": [
     {

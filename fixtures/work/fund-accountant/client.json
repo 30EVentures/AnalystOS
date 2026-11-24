@@ -7,13 +7,13 @@
   "kind": "person",
   "ref": "example-client"
  },
- "problem": "Our fund accounting system shows cash of $3,482,000 for the fund, but the custodian statement shows $3,617,500. We strike the net asset value tonight.",
+ "problem": "Our fund's draft net asset value tonight is $40,000,000, but our independent check of the fund's net assets comes to $39,900,000. The fund has 2,000,000 shares in issue.",
  "answers": {
-  "common.decision": "Which entries to book before the strike; the fund controller approves entries and the strike.",
+  "common.decision": "Which corrections to book before the strike; the fund controller approves entries and the strike.",
   "common.deadline": "Before tonight's net asset value strike.",
   "common.audience": "The fund controller.",
-  "common.materials": "A dividend of $41,500 was received at the custodian but is not booked. A subscription of $120,000 arrived at the custodian for tomorrow's dealing and is not booked. The custodian paid the $26,000 audit fee that we still show as an accrual. Today's draft net asset value is $83,000,000.",
-  "accounting-operations.systems": "Our fund accounting system and the custodian's cash statement, today's valuation, the fund's chart of accounts.",
+  "common.materials": "One corporate bond holding still carries last week's price; at today's independent price it is worth $90,000 less. The management fee is being accrued at last year's rate, which understates the accrual by $10,000.",
+  "accounting-operations.systems": "Our fund accounting system and the independent price feed, today's valuation, the fund's chart of accounts.",
   "accounting-operations.approver": "The fund controller approves all entries and the net asset value strike."
  }
 }

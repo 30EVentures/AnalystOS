@@ -1,5 +1,5 @@
 {
- "answer": "Report the program as on track: [F7] of committed children are reached with [F5] of the grant spent, and any budget moves stay within the [F9] the funder allows.",
+ "answer": "Report progress and spending plainly: [F7] of committed children are reached with [F5] of the grant spent, and any budget move is checked against the [F9] the funder allows.",
  "exec_summary": [
   "The grant is [F1], and [F2] is spent, [F5] of it.",
   "[F8] remains for the rest of the grant period.",
@@ -135,7 +135,7 @@
   },
   {
    "branch": "Spending against the grant",
-   "finding": "Spending is behind progress, leaving funds for the rest of the year.",
+   "finding": "The share of the grant spent is below the share of children reached.",
    "points": [
     "[F2] is spent, [F5] of the grant.",
     "[F8] remains."
@@ -237,9 +237,9 @@
    "title": "Interim report: progress and spending",
    "for": "The funder's program officer, report section for the executive director to review",
    "body": [
-    "Progress. The program has reached [F4] children so far against our commitment of [F3], which is [F7] of the year's goal. Tutoring sessions continue each week at every site.",
-    "Spending. We have spent [F2] of the [F1] grant, which is [F5]. The remaining [F8] will fund tutor time, reading materials and family sessions for the rest of the year.",
-    "Budget lines. We expect small moves between budget lines as tutoring hours rise. Any move will stay within the [F9] the grant agreement allows, and we will ask you first before any larger change.",
+    "Progress. The program has reached [F4] children so far against our commitment of [F3] for the year, which is [F7] of the goal. {How tutoring is delivered and any highlights, for the program lead to add.}",
+    "Spending. We have spent [F2] of the [F1] grant, which is [F5]. The remaining [F8] will fund {planned uses of the remaining funds, for the program lead to confirm against the budget tracker}.",
+    "Budget lines. {Any planned moves between budget lines, for the executive director to confirm, or a line saying none are planned.} Any move will stay within the [F9] the funder allows without approval, and we will ask you before any larger change.",
     "We would be glad to talk through any part of this report."
    ]
   }

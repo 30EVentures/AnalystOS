@@ -1,16 +1,16 @@
 {
- "answer": "Open the renewal with a check-in and reporting help, for the customer success manager to approve: active users fell [F7] and the customer pays about [F9] a year for unused seats.",
+ "answer": "Open the renewal with a check-in and reporting help, for the customer success manager to approve: active users fell by [F8] and the customer pays about [F10] a year for unused seats.",
  "exec_summary": [
-  "Active users fell from [F1] to [F2], down [F7].",
+  "Active users fell from [F1] to [F2], a fall of [F7] users or [F8].",
   "The customer pays for [F4] seats at [F3] each, about [F6] a year.",
-  "[F8] seats sit unused, worth about [F9] a year.",
+  "[F9] seats sit unused, worth about [F10] a year.",
   "They opened [F5] support tickets last quarter, most about reporting."
  ],
- "situation": "A software business renewing its largest customer, a regional distributor.",
+ "situation": "A software business whose largest customer renews next quarter.",
  "complication": "The customer's usage has fallen sharply ahead of renewal, and reporting causes most of their tickets.",
- "key_question": "How should we approach the largest customer's renewal given falling usage?",
+ "key_question": "How should the largest customer's renewal be approached given falling usage?",
  "titles": {
-  "situation": "Usage at our largest customer fell this year.",
+  "situation": "Usage at the largest customer fell this year.",
   "options": "Two ways to approach the renewal.",
   "recommendation": "Check in early and offer reporting help before renewal.",
   "roadmap": "Check in, fix reporting, then discuss renewal terms.",
@@ -72,11 +72,11 @@
   },
   {
    "id": "F7",
-   "label": "Change in active users",
-   "value": -40,
-   "unit": "percent",
+   "label": "Fall in active users",
+   "value": 100,
+   "unit": "count",
    "basis": "computed",
-   "operation": "growth_percent",
+   "operation": "difference",
    "inputs": [
     "F1",
     "F2"
@@ -84,6 +84,18 @@
   },
   {
    "id": "F8",
+   "label": "Fall in active users as a share of the start",
+   "value": 40,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F7",
+    "F1"
+   ]
+  },
+  {
+   "id": "F9",
    "label": "Unused seats",
    "value": 100,
    "unit": "count",
@@ -95,14 +107,14 @@
    ]
   },
   {
-   "id": "F9",
+   "id": "F10",
    "label": "Annual spend on unused seats",
    "value": 38400,
    "unit": "usd",
    "basis": "computed",
    "operation": "product",
    "inputs": [
-    "F8",
+    "F9",
     "F3"
    ]
   }
@@ -137,7 +149,7 @@
    "branch": "Value at risk",
    "finding": "A large slice of the contract pays for unused seats.",
    "points": [
-    "[F8] seats are unused, about [F9] of the [F6] contract."
+    "[F9] seats are unused, about [F10] of the [F6] contract."
    ],
    "hypotheses": [
     {
@@ -176,7 +188,7 @@
  ],
  "recommendation": {
   "option": "Early check-in with reporting help",
-  "rationale": "It tackles the usage drop behind about [F9] of unused spend before renewal talks; the customer success manager approves every message."
+  "rationale": "It tackles the usage drop behind about [F10] of unused spend before renewal talks; the customer success manager approves every message."
  },
  "roadmap": [
   {

@@ -1,18 +1,18 @@
 {
- "answer": "Prepare the file for the underwriter with the referral flagged: the value of [F1] is under the [F2] limit, but sprinklers cover only [F3] of the floor.",
+ "answer": "Refer the full file to a senior underwriter, as the guidelines require: the value of [F1] is under the [F2] limit, but sprinklers cover only [F3] of the floor.",
  "exec_summary": [
   "The declared value is [F1], [F5] under the referral limit of [F2].",
-  "Sprinklers cover [F3] of the floor area, short of the full cover our guidelines need.",
+  "Sprinklers cover [F3] of the floor area, short of the full cover the insurer's guidelines need.",
   "Water damage claims totalled [F4], [F6] of the declared value."
  ],
  "situation": "An insurer receiving a broker's submission for warehouse property cover.",
- "complication": "The warehouse is under the value limit but lacks full sprinkler cover, which our guidelines refer.",
- "key_question": "What does the underwriter need to decide on the warehouse submission?",
+ "complication": "The warehouse is under the value limit but lacks full sprinkler cover, which the insurer's guidelines refer.",
+ "key_question": "What does the senior underwriter need to decide on the warehouse submission?",
  "titles": {
-  "situation": "A warehouse submission needs the underwriter's decision this week.",
+  "situation": "A warehouse submission needs a decision this week.",
   "options": "Two ways to take the submission forward.",
-  "recommendation": "Put the full file to the underwriter with the referral flagged.",
-  "roadmap": "Complete the file, decide, then reply to the broker.",
+  "recommendation": "Refer the full file to a senior underwriter, as the guidelines require.",
+  "roadmap": "Complete the file, refer it, then reply to the broker.",
   "kpis": "Two measures show the submission was handled well.",
   "risks": "The main risk is quoting before the referral is cleared."
  },
@@ -102,7 +102,7 @@
   },
   {
    "branch": "Protection",
-   "finding": "Partial sprinkler cover triggers a referral under our guidelines.",
+   "finding": "Partial sprinkler cover triggers a referral under the insurer's guidelines.",
    "points": [
     "Sprinklers cover [F3] of the floor area."
    ],
@@ -112,7 +112,7 @@
      "verdict": "untested"
     }
    ],
-   "so_what": "The underwriter should note the referral to a senior underwriter."
+   "so_what": "The guidelines send this risk to a senior underwriter for the decision."
   },
   {
    "branch": "Claims history",
@@ -131,8 +131,8 @@
  ],
  "options": [
   {
-   "name": "Full file with referral flag",
-   "description": "Put the complete file to the underwriter, noting the sprinkler referral and the questions for the broker.",
+   "name": "Refer with a full file",
+   "description": "Refer the complete file to a senior underwriter, as the guidelines require, with the questions for the broker.",
    "effort": "low"
   },
   {
@@ -142,21 +142,21 @@
   }
  ],
  "recommendation": {
-  "option": "Full file with referral flag",
-  "rationale": "It lets the underwriter act this week with the sprinkler gap at [F3] in plain view; the underwriter decides, and a senior underwriter decides any referred risk."
+  "option": "Refer with a full file",
+  "rationale": "The guidelines refer this risk because sprinklers cover only [F3] of the floor, and a full file lets the senior underwriter decide this week; the senior underwriter accepts, prices or declines it."
  },
  "roadmap": [
   {
    "horizon": "First 30 days",
    "actions": [
-    "Put the file to the underwriter this week.",
-    "Send the broker the underwriter's questions once agreed."
+    "Refer the file to a senior underwriter this week.",
+    "Send the broker the open questions once the underwriter agrees them."
    ]
   },
   {
    "horizon": "Days 31-60",
    "actions": [
-    "Record the underwriter's decision and any referral outcome."
+    "Record the senior underwriter's decision."
    ]
   },
   {
@@ -206,7 +206,7 @@
     "What caused the water damage claims, and was the cause fixed?",
     "When was the warehouse last valued?"
    ],
-   "for_decision": "Should the underwriter accept, price or decline the warehouse, or refer it to a senior underwriter because sprinkler cover is partial?"
+   "for_decision": "Should the senior underwriter, to whom the guidelines refer this risk because sprinkler cover is partial, accept, price or decline it?"
   }
  ]
 }

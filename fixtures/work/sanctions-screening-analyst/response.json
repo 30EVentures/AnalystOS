@@ -220,7 +220,7 @@
     "Overnight screening of [F1] outgoing payments produced [F2] potential matches.",
     "[F3] potential matches are still open and hold payments of [F5].",
     "[F4] of the open matches name a beneficiary whose date of birth is not on file.",
-    "The remaining open matches have a date of birth on file and are ready for review."
+    "The remaining open matches have a date of birth on file."
    ],
    "evidence": [
     "The overnight screening results for outgoing payments.",

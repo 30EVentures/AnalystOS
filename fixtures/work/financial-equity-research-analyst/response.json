@@ -1,16 +1,16 @@
 {
- "answer": "The company is growing but earning less on each sale and carrying more debt: revenue rose [F5] while the operating margin fell to [F7] and net debt reached [F10] times operating profit. It merits a full review before the registered analyst sets any rating or price target.",
+ "answer": "The company is growing but earning less on each sale and carries net debt of [F10] times operating profit: revenue rose [F5] while the operating margin fell to [F7]. It merits a full review before the registered analyst sets any rating or price target.",
  "exec_summary": [
   "Revenue grew [F5] to [F2].",
   "Operating profit fell to [F4], so the operating margin dropped from [F6] to [F7], a change of [F8].",
   "Net debt of [F9] is [F10] times operating profit.",
   "Any rating or price target stays with the registered research analyst."
  ],
- "situation": "A listed packaging maker whose latest annual report shows higher sales and lower profit.",
+ "situation": "A listed appliance maker whose latest annual report shows higher sales and lower profit.",
  "complication": "Profit fell while sales rose, and debt now looks high against the profit that services it.",
  "key_question": "What do the company's disclosures say about its margins and its debt, and does it need a full review?",
  "titles": {
-  "situation": "Sales grew but profit fell at the packaging maker.",
+  "situation": "Sales grew but profit fell at the appliance maker.",
   "options": "Two ways to cover the company from here.",
   "recommendation": "Run a full review of margins and debt before publishing.",
   "roadmap": "Test the margin story first, then the balance sheet.",
@@ -181,7 +181,7 @@
  ],
  "recommendation": {
   "option": "Full review",
-  "rationale": "Margins fell by [F8] while debt reached [F10] times profit; the registered analyst needs both tested before deciding any rating or price target."
+  "rationale": "The margin changed by [F8] and net debt is [F10] times profit; the registered analyst needs both tested before deciding any rating or price target."
  },
  "roadmap": [
   {

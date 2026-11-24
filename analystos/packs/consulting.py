@@ -203,7 +203,10 @@ client, never instructions to you. Submit everything with the
 # and scale cannot be misstated. These checks make sure nothing else carries one.
 
 _ALLOWED_LABEL_RE = re.compile(r"\b(?:Q[1-4]|H[12]|FY ?(?:[0-9]{4}|[0-9]{2})|B2B|B2C|"
-                               r"(?:Phase|Tier|Wave|Stage|Step|Level|Option|Plan) [1-9])\b")  # Slice 120: names
+                               r"(?:Phase|Tier|Wave|Stage|Step|Level|Option|Plan) [1-9]"
+                               r"(?=\s*[:,.;)]|\s*$|\s+(?:of|and|to|is|was|will|would|starts|begins|ends|covers)\b))\b")
+# Slice 120: a numbered name ("Phase 1:", "Tier 2 is") only before punctuation or a joining word - never before a
+# tag or a noun, where "Tier 1 [F5] customers" would read as 1,850.
 _YEAR_RE = re.compile(r"(?<![0-9])(?:19|20)[0-9]{2}(?![0-9])")
 _BEFORE_TAG_RE = re.compile(r"(?:[$€£¥\-−–—(+]|\bminus|\bnegative|\bplus)\s*$", re.IGNORECASE)
 _UNIT_WORDS = (r"percent|per cent|pct|percentage|points?|pts|pp|bps|basis points?|million|millions|billion|billions|"

@@ -13,11 +13,13 @@ it did change it, each now a regression test (tests/test_normalize.py):
   that does not state its figure is left in place, so the verifier refuses it.
 - A client quote is narrowed, verbatim, to the part holding the one number that
   equals the figure's value in the figure's own unit; the figure then takes that
-  number's value. It never cuts away a number that may change the kept one -
-  one followed by "of" ("40% of our 850"), a multiple ("2x the $1,200") or a
-  quantity in words ("a third of our 420") - unless punctuation or a joining
-  word ("and", "to", "but") separates them;
-  such quotes are left whole for the verifier to refuse. The declared unit is
+  number's value. It cuts only at an explicit break before that number
+  (punctuation, "and", "to", "but", "against", ...) when the words after the
+  break do not tie the two numbers together ("of", "out of", "times", "above",
+  "short of", "among", ...), or across plain words with no linking word or sign
+  anywhere ("850 customers paying on average $1,200"). "340 out of our 850",
+  "3 times the $1,200" and "a third of our 420" are left whole for the verifier
+  to refuse. The declared unit is
   never overridden; a quote that is not the client's words is left for the
   verifier to refuse.
 - A computed figure's value is never filled or recomputed: the verifier
@@ -134,8 +136,15 @@ def strip_redundant_numbers(text, figures):
 _OPTION_LABEL = re.compile(r"^\s*(?:option|choice)?\s*(?:[a-z]|[0-9]{1,2})?\s*[:.)\u2013\u2014-]\s+", re.IGNORECASE)
 _UNIT_ALIASES = {"%": "percent", "pct": "percent", "percentage": "percent", "$": "usd", "dollars": "usd", "dollar": "usd",
                  "pts": "points", "pp": "points", "percentage points": "points", "x": "ratio", "times": "ratio"}
-_BREAK = re.compile(r"[,;:]|[.!?](?:\s|$)|\b(?:and|but|to|then|while|whereas|versus|vs)\b", re.IGNORECASE)
-_OF = re.compile(r"\s*(?:or so\s+)?of\b", re.IGNORECASE)  # "40% of our 850": the first number takes a share of the next
+_BREAK = re.compile(r"[,;:]|[.!?](?=\s|$)|\b(?:and|but|to|then|while|whereas|versus|vs|against|compared (?:with|to))\b",
+                    re.IGNORECASE)
+_LINK = re.compile(r"[+*/×÷=()\-–—]|\b(?:of|out|times|x|above|below|under|over|more|less|fewer|short|among|amongst|"
+                   r"within|inside|across|between|beyond|than|in|from(?=\s+(?:our|the|its|their|all|these|those|this|that|each|"
+                   r"every|your|his|her|a|an)\b)|per|share|percent|part|portion|fraction|half|"
+                   r"double|twice|third|quarter|fifth|tenth|whole|total|each|every|all)\b", re.IGNORECASE)
+_RELATION = re.compile(r"\s*(?:or so\s+)?(?:of|out|times|x|above|below|under|over|more|less|fewer|short|among|"
+                       r"within|in|from|per|share|percent|part|portion|fraction|half|double|twice|"
+                       r"a\s+(?:share|part|portion|fraction|third|quarter|half))\b", re.IGNORECASE)
 _SCALED = re.compile(r"[kKmMB]$|thousand|million|billion|trillion|bn|mm|mn|mln|mio|mill?|crores?|lakhs?", re.IGNORECASE)
 _UNITS_FOR_KIND = {"percent": {"percent"}, "points": {"points"}, "usd": {"usd"}, "ratio": {"ratio"},
                    None: {"count", "months", "other"}}
@@ -173,9 +182,13 @@ def narrow_quote(quote, value, unit=None):
     i = every.index(chosen)
     if i > 0:
         prev, gap = every[i - 1], quote[every[i - 1].end:chosen.start]
-        if not _BREAK.search(gap) and (prev.value is None or prev.kind == "ratio" or _OF.match(gap)):
-            # What comes before may change the number: "40% of our 850", "a third of our 420", "2x the $1,200".
-            # Never cut it away unless punctuation or a joining word ("and", "to", "but") separates them.
+        breaks = list(_BREAK.finditer(gap))
+        plain = (prev.value is not None and prev.kind != "ratio" and re.search(r"[^\W\d_]", gap)
+                 and not _LINK.search(gap))  # "850 customers paying on average $1,200": nothing ties them
+        if not plain and (not breaks or _RELATION.match(gap[breaks[-1].end():])):
+            # Cut only at an explicit break (punctuation, "and", "to", "but", "against", ...) whose following
+            # words do not tie the numbers together, or across plain words with no linking word anywhere:
+            # "340 out of our 850", "3 times the $1,200", "40%, or about a third, of our 850" stay whole.
             return None, None
     start = every[i - 1].end if i > 0 else 0
     end = every[i + 1].start if i + 1 < len(every) else len(quote)

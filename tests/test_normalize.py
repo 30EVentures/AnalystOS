@@ -366,9 +366,27 @@ class SecondReviewTest(unittest.TestCase):
             with self.subTest(quote=quote):
                 self.assertEqual(narrow_quote(quote, value, unit), (None, None))
         self.assertEqual(narrow_quote("half the $1,200 average", 1200, "usd"), (None, None))  # a word quantity, no "of"
+        for quote, value, unit in (("Some 340 out of our 850 customers are small clinics", 850, "count"),
+                                   ("About 40% out of our 850", 850, "count"), ("40% among our 850", 850, "count"),
+                                   ("A 40% share of the 850", 850, "count"), ("40%, or about a third, of our 850", 850, "count"),
+                                   ("40% (roughly) of our 850", 850, "count"), ("40% - of our 850 -", 850, "count"),
+                                   ("3 times the $1,200 average", 1200, "usd"), ("$300 above the $1,200 average", 1200, "usd"),
+                                   ("$300 short of the $1,200 average", 1200, "usd"),
+                                   ("50% less than the $1,200 average", 1200, "usd")):
+            with self.subTest(third_review=quote):  # third review: cut only at an explicit break
+                self.assertEqual(narrow_quote(quote, value, unit), (None, None))
+        self.assertEqual(narrow_quote("Contractor spend was $600,000 against a plan of $350,000", 350000, "usd")[0],
+                         "against a plan of $350,000")
         self.assertEqual(narrow_quote("went from 4% to 7% in two quarters", 7, "percent")[0], "to 7% in two quarters")
         self.assertEqual(narrow_quote("we have 850 customers paying on average $1,200 per month", 1200, "usd")[0],
-                         "customers paying on average $1,200 per month")
+                         "customers paying on average $1,200 per month")  # plain words, nothing ties the numbers
+        self.assertEqual(narrow_quote("fell to 88% this year as orders grew from 4,000", 4000, "count")[0],
+                         "this year as orders grew from 4,000")  # "from" starting a range ties nothing
+        for quote in ("40% across our 850", "40% between our 850", "$300 + the $1,200", "40% inside the 850",
+                      "40% of each 850", "40% came from our 850", "2x our usual $1,200 average", "4 850 customers"):
+            with self.subTest(linked=quote):
+                self.assertEqual(narrow_quote(quote, 1200 if "1,200" in quote else 850,
+                                              "usd" if "$" in quote else "count"), (None, None))
 
     def test_hyphenated_plural_and_short_scale_words(self):
         for text in ("$12.2-million", "$12.2 millions", "$12.2 mil", "$12.2 Mill."):
@@ -381,11 +399,13 @@ class SecondReviewTest(unittest.TestCase):
 
     def test_of_marks_a_year_only_as_end_or_start_of(self):
         figures = {"F2": {"value": 7, "unit": "percent"}}
-        for bad in ("A loss of 2031 each month.", "The deficit of 2025 per clinic hurts.", "Payback of 2028 is too long."):
+        for bad in ("A loss of 2031 each month.", "The deficit of 2025 per clinic hurts.", "Payback of 2028 is too long.",
+                    "Tier 1 [F5] customers churn least.", "Plan 3 save-desk hires by Q2.", "Wave 2 [F5] clinics.",
+                    "Start Phase 1 with Tier 2 clinics."):
             with self.subTest(bad=bad):
                 self.assertTrue(c.number_problems("t", bad, figures))
         for ok in ("Launch by the end of 2026.", "Start of 2027 is the deadline.", "In 2025 customers churned.",
-                   "Since 2024 renewals have fallen.", "Start Phase 1 with Tier 2 clinics."):
+                   "Since 2024 renewals have fallen.", "Phase 1: hire a retention owner.", "Tier 2 is the focus."):
             with self.subTest(ok=ok):
                 self.assertEqual(c.number_problems("t", ok, figures), [])
 

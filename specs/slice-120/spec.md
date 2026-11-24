@@ -66,6 +66,17 @@ aliases are read, never replaced by the quote's kind; "Phase 1", "Tier 2" and
 similar names are allowed; "in/since/during 2025" is a year even before a
 plural noun. Each is a test in tests/test_normalize.py (SecondReviewTest).
 
+## Third review (same day)
+
+The quick review of 249ae08 failed it: the cut rule, a list of dangerous words
+checked only right after the first number, still cut "340 out of our 850" and
+"3 times the $1,200"; and allowing "Tier 1" let "Tier 1 [F5] customers" (read
+as 1,850) through. Now a cut needs an explicit break whose following words do
+not tie the numbers, or plain words with no linking word or sign anywhere
+between the numbers; a numbered name is allowed only before punctuation or a
+joining word. Every case from that review's bypass script is refused except
+true excerpts ("Up 40% to 850 customers") and the open after-the-number case.
+
 ## Results (2026-11-23)
 
 - Every blocker case from the review: a regression test that fails on main
@@ -81,3 +92,5 @@ plural noun. Each is a test in tests/test_normalize.py (SecondReviewTest).
   (normaliser cut rule, option matching, unit aliases; year and label rules;
   hyphenated and plural scale words): 12/12 caught, after two survivors were
   closed with tests.
+- After the third review: targeted mutation over the new cut rule and the
+  numbered-name rule, all caught after two survivors were closed with tests.

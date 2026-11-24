@@ -14,11 +14,11 @@
  {"name": "ambiguous option name matched", "old": "    if len(inside) == 1:", "new": "    if inside:"},
  {"name": "a restating parenthetical kept", "old": "                    pos = paren.end()", "new": "                    pass"},
  {"name": "a parenthetical removed though it does not state the figure", "old": "                        inner[0], figure):\n                    pos = paren.end()", "new": "                        inner[0], figure) or True:\n                    pos = paren.end()"},
- {"name": "a cut across 'of' allowed (second review)", "old": "        if not _BREAK.search(gap) and (prev.value is None or prev.kind == \"ratio\" or _OF.match(gap)):", "new": "        if not _BREAK.search(gap) and (prev.value is None or prev.kind == \"ratio\"):"},
- {"name": "a cut after a multiple allowed", "old": "(prev.value is None or prev.kind == \"ratio\" or _OF.match(gap))", "new": "(prev.value is None or _OF.match(gap))"},
- {"name": "a joining word ignored", "old": "_BREAK = re.compile(r\"[,;:]|[.!?](?:\\s|$)|\\b(?:and|but|to|then|while|whereas|versus|vs)\\b\", re.IGNORECASE)", "new": "_BREAK = re.compile(r\"[,;:]|[.!?](?:\\s|$)\")"},
  {"name": "an option matched without its label (inversion)", "old": "    inside = [n for n in names if n.strip().lower() == bare]", "new": "    inside = [n for n in names if n.strip().lower() in said]"},
  {"name": "unit aliases ignored", "old": "                fig[\"unit\"] = _UNIT_ALIASES[fig[\"unit\"].strip().lower()]", "new": "                pass"},
  {"name": "an unknown unit replaced from the quote", "old": "                    if fig.get(\"unit\") is None:  # filled only when absent; never overridden", "new": "                    if fig.get(\"unit\") not in _UNITS:"},
- {"name": "a cut after a word quantity allowed", "old": "(prev.value is None or prev.kind == \"ratio\" or _OF.match(gap))", "new": "(prev.kind == \"ratio\" or _OF.match(gap))"}
+ {"name": "cut across linked plain words (third review)", "old": "                 and not _LINK.search(gap))", "new": "                 )"},
+ {"name": "cut after an explicit break whatever follows", "old": "(not breaks or _RELATION.match(gap[breaks[-1].end():]))", "new": "(not breaks)"},
+ {"name": "cut across plain words after a multiple", "old": "plain = (prev.value is not None and prev.kind != \"ratio\" and", "new": "plain = (prev.value is not None and"},
+ {"name": "cut across a gap with no words", "old": "re.search(r\"[^\\W\\d_]\", gap)", "new": "True"}
 ]

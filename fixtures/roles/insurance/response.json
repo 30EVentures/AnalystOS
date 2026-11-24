@@ -1,178 +1,200 @@
 {
- "answer": "Prepare the file for the adjuster to decide: the claim of [F1] exceeds the repair estimate of [F3] by [F5], and the reporting delay needs checking against the policy.",
- "exec_summary": [
-  "The policyholder claims [F1] against a repair estimate of [F3].",
-  "After the [F2] deductible, the estimate supports [F6].",
-  "The leak was reported [F4] days after it started, which the adjuster should check against the policy terms."
- ],
- "situation": "A homeowners claim for water damage from a burst pipe.",
- "complication": "The amount claimed is higher than the repair estimate, and the leak was reported late.",
- "key_question": "What does the adjuster need to decide this claim, and what is still open?",
- "titles": {
-  "situation": "A water damage claim is ready for review with open questions.",
-  "options": "Two ways the adjuster could proceed.",
-  "recommendation": "Ask the adjuster to decide on the documented estimate.",
-  "roadmap": "Close the open questions, then hand the file over.",
-  "kpis": "Two checks show the file is complete.",
-  "risks": "Missing documents or terms could change the decision."
- },
- "figures": [
-  {
-   "id": "F1",
-   "label": "Amount claimed",
-   "value": 18000,
-   "unit": "usd",
-   "basis": "client",
-   "quote": "claims $18,000"
+  "answer": "Prepare the file for the adjuster to decide: the claim of [F1] exceeds the repair estimate of [F3] by [F5], and the reporting delay needs checking against the policy.",
+  "exec_summary": [
+    "The policyholder claims [F1] against a repair estimate of [F3].",
+    "After the [F2] deductible, the estimate supports [F6].",
+    "The leak was reported [F4] days after it started, which the adjuster should check against the policy terms."
+  ],
+  "situation": "A homeowners claim for water damage from a burst pipe.",
+  "complication": "The amount claimed is higher than the repair estimate, and the leak was reported late.",
+  "key_question": "What does the adjuster need to decide this claim, and what is still open?",
+  "titles": {
+    "situation": "A water damage claim is ready for review with open questions.",
+    "options": "Two ways the adjuster could proceed.",
+    "recommendation": "Ask the adjuster to decide on the documented estimate.",
+    "roadmap": "Close the open questions, then hand the file over.",
+    "kpis": "Two checks show the file is complete.",
+    "risks": "Missing documents or terms could change the decision."
   },
-  {
-   "id": "F2",
-   "label": "Policy deductible",
-   "value": 1000,
-   "unit": "usd",
-   "basis": "client",
-   "quote": "a $1,000 deductible"
-  },
-  {
-   "id": "F3",
-   "label": "Repair estimate",
-   "value": 14500,
-   "unit": "usd",
-   "basis": "client",
-   "quote": "The repair estimate is $14,500"
-  },
-  {
-   "id": "F4",
-   "label": "Days between the leak and the report",
-   "value": 3,
-   "unit": "other",
-   "basis": "client",
-   "quote": "reported the leak 3 days after it started"
-  },
-  {
-   "id": "F5",
-   "label": "Claim above the estimate",
-   "value": 3500,
-   "unit": "usd",
-   "basis": "computed",
-   "operation": "difference",
-   "inputs": [
-    "F1",
-    "F3"
-   ]
-  },
-  {
-   "id": "F6",
-   "label": "Estimate after the deductible",
-   "value": 13500,
-   "unit": "usd",
-   "basis": "computed",
-   "operation": "difference",
-   "inputs": [
-    "F3",
-    "F2"
-   ]
-  }
- ],
- "issue_tree": [
-  {
-   "branch": "The amount",
-   "finding": "The documented loss is lower than the amount claimed.",
-   "points": [
-    "The claim exceeds the estimate by [F5].",
-    "The estimate less the deductible is [F6]."
-   ],
-   "hypotheses": [
+  "figures": [
     {
-     "text": "The full claimed amount is documented.",
-     "verdict": "refuted"
-    }
-   ],
-   "so_what": "The adjuster should ask for evidence of the difference or settle on the estimate.",
-   "chart": {
-    "title": "The claim is higher than the repair estimate.",
-    "figure_ids": [
-     "F1",
-     "F3",
-     "F6"
-    ],
-    "labels": [
-     "Claimed",
-     "Estimate",
-     "After deductible"
-    ]
-   }
-  },
-  {
-   "branch": "The reporting delay",
-   "finding": "The leak was reported late, and the policy terms decide whether it matters.",
-   "points": [
-    "The leak was reported [F4] days after it started."
-   ],
-   "hypotheses": [
+      "id": "F1",
+      "label": "Amount claimed",
+      "value": 18000,
+      "unit": "usd",
+      "basis": "client",
+      "quote": "claims $18,000"
+    },
     {
-     "text": "The delay made the damage worse.",
-     "verdict": "untested"
+      "id": "F2",
+      "label": "Policy deductible",
+      "value": 1000,
+      "unit": "usd",
+      "basis": "client",
+      "quote": "a $1,000 deductible"
+    },
+    {
+      "id": "F3",
+      "label": "Repair estimate",
+      "value": 14500,
+      "unit": "usd",
+      "basis": "client",
+      "quote": "The repair estimate is $14,500"
+    },
+    {
+      "id": "F4",
+      "label": "Days between the leak and the report",
+      "value": 3,
+      "unit": "other",
+      "basis": "client",
+      "quote": "reported the leak 3 days after it started"
+    },
+    {
+      "id": "F5",
+      "label": "Claim above the estimate",
+      "value": 3500,
+      "unit": "usd",
+      "basis": "computed",
+      "operation": "difference",
+      "inputs": [
+        "F1",
+        "F3"
+      ]
+    },
+    {
+      "id": "F6",
+      "label": "Estimate after the deductible",
+      "value": 13500,
+      "unit": "usd",
+      "basis": "computed",
+      "operation": "difference",
+      "inputs": [
+        "F3",
+        "F2"
+      ]
     }
-   ],
-   "so_what": "The adjuster needs the policy's notice terms before deciding."
-  }
- ],
- "options": [
-  {
-   "name": "Settle on the estimate",
-   "description": "Offer the documented estimate less the deductible, once the delay is checked.",
-   "effort": "low"
+  ],
+  "issue_tree": [
+    {
+      "branch": "The amount",
+      "finding": "The documented loss is lower than the amount claimed.",
+      "points": [
+        "The claim exceeds the estimate by [F5].",
+        "The estimate less the deductible is [F6]."
+      ],
+      "hypotheses": [
+        {
+          "text": "The full claimed amount is documented.",
+          "verdict": "refuted"
+        }
+      ],
+      "so_what": "The adjuster should ask for evidence of the difference or settle on the estimate.",
+      "chart": {
+        "title": "The claim is higher than the repair estimate.",
+        "figure_ids": [
+          "F1",
+          "F3",
+          "F6"
+        ],
+        "labels": [
+          "Claimed",
+          "Estimate",
+          "After deductible"
+        ]
+      }
+    },
+    {
+      "branch": "The reporting delay",
+      "finding": "The leak was reported late, and the policy terms decide whether it matters.",
+      "points": [
+        "The leak was reported [F4] days after it started."
+      ],
+      "hypotheses": [
+        {
+          "text": "The delay made the damage worse.",
+          "verdict": "untested"
+        }
+      ],
+      "so_what": "The adjuster needs the policy's notice terms before deciding."
+    }
+  ],
+  "options": [
+    {
+      "name": "Settle on the estimate",
+      "description": "Offer the documented estimate less the deductible, once the delay is checked.",
+      "effort": "low"
+    },
+    {
+      "name": "Request more evidence",
+      "description": "Ask the policyholder to document the extra amount before any offer.",
+      "effort": "medium"
+    }
+  ],
+  "recommendation": {
+    "option": "Settle on the estimate",
+    "rationale": "The documented estimate supports [F6]; the adjuster decides once the delay is checked against the policy."
   },
-  {
-   "name": "Request more evidence",
-   "description": "Ask the policyholder to document the extra amount before any offer.",
-   "effort": "medium"
-  }
- ],
- "recommendation": {
-  "option": "Settle on the estimate",
-  "rationale": "The documented estimate supports [F6]; the adjuster decides once the delay is checked against the policy."
- },
- "roadmap": [
-  {
-   "horizon": "First 30 days",
-   "actions": [
-    "Check the policy's notice terms for the delay.",
-    "Ask the policyholder for evidence of the extra amount."
-   ]
-  },
-  {
-   "horizon": "Days 31-60",
-   "actions": [
-    "Hand the complete file to the adjuster for a decision."
-   ]
-  },
-  {
-   "horizon": "Days 61-90",
-   "actions": [
-    "Record the outcome and any lessons for similar claims."
-   ]
-  }
- ],
- "kpis": [
-  {
-   "name": "File completeness",
-   "target": "All documents and terms attached"
-  },
-  {
-   "name": "Time to decision",
-   "target": "Within the deadline"
-  }
- ],
- "risks": [
-  {
-   "risk": "The policy excludes late-reported damage.",
-   "mitigation": "Check the notice terms before any offer."
-  },
-  {
-   "risk": "The estimate misses hidden damage.",
-   "mitigation": "Ask the contractor to confirm the scope."
-  }
- ]
+  "roadmap": [
+    {
+      "horizon": "First 30 days",
+      "actions": [
+        "Check the policy's notice terms for the delay.",
+        "Ask the policyholder for evidence of the extra amount."
+      ]
+    },
+    {
+      "horizon": "Days 31-60",
+      "actions": [
+        "Hand the complete file to the adjuster for a decision."
+      ]
+    },
+    {
+      "horizon": "Days 61-90",
+      "actions": [
+        "Record the outcome and any lessons for similar claims."
+      ]
+    }
+  ],
+  "kpis": [
+    {
+      "name": "File completeness",
+      "target": "All documents and terms attached"
+    },
+    {
+      "name": "Time to decision",
+      "target": "Within the deadline"
+    }
+  ],
+  "risks": [
+    {
+      "risk": "The policy excludes late-reported damage.",
+      "mitigation": "Check the notice terms before any offer."
+    },
+    {
+      "risk": "The estimate misses hidden damage.",
+      "mitigation": "Ask the contractor to confirm the scope."
+    }
+  ],
+  "work": [
+    {
+      "kind": "case_file",
+      "subject": "Water damage claim: burst pipe",
+      "facts": [
+        "The policyholder claims [F1] for a burst pipe.",
+        "The repair estimate is [F3], which is [F5] below the claim.",
+        "The policy deductible is [F2]; the estimate after the deductible is [F6].",
+        "The leak was reported [F4] days after it started."
+      ],
+      "evidence": [
+        "The policyholder's claim for the burst pipe.",
+        "The contractor's repair estimate.",
+        "The policy schedule with the deductible and water damage terms."
+      ],
+      "open_questions": [
+        "Does the reporting delay breach the policy's prompt-notice condition?",
+        "Does the claim include items beyond the repair estimate?"
+      ],
+      "for_decision": "Should the licensed adjuster pay the claim, and at what amount, given the estimate after the deductible of [F6]?"
+    }
+  ]
 }

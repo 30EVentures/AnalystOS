@@ -1378,7 +1378,7 @@
    "file": "samples/accounting-operations.xlsx",
    "format": "workbook",
    "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: reconciliation.",
-   "slide_count": 13,
+   "slide_count": 14,
    "figure_count": 9,
    "slides": [
     {
@@ -2029,7 +2029,7 @@
    "file": "samples/financial-crime.docx",
    "format": "memo",
    "delivers": "Delivers today: a verified Word memo. Also planned: case-file.",
-   "slide_count": 12,
+   "slide_count": 13,
    "figure_count": 7,
    "slides": [
     {
@@ -2345,7 +2345,7 @@
    "file": "samples/legal-contracts-procurement.docx",
    "format": "memo",
    "delivers": "Delivers today: a verified Word memo. Also planned: register.",
-   "slide_count": 12,
+   "slide_count": 13,
    "figure_count": 8,
    "slides": [
     {
@@ -2673,7 +2673,7 @@
    "file": "samples/content-communications.pptx",
    "format": "deck",
    "delivers": "Delivers today: a verified PowerPoint deck. Also planned: draft.",
-   "slide_count": 12,
+   "slide_count": 14,
    "figure_count": 7,
    "slides": [
     {
@@ -2995,7 +2995,7 @@
    "file": "samples/people-hr.docx",
    "format": "memo",
    "delivers": "Delivers today: a verified Word memo. Also planned: plan, draft.",
-   "slide_count": 12,
+   "slide_count": 14,
    "figure_count": 5,
    "slides": [
     {
@@ -3285,7 +3285,7 @@
    "file": "samples/software-it.pptx",
    "format": "deck",
    "delivers": "Delivers today: a verified PowerPoint deck. Also planned: code.",
-   "slide_count": 12,
+   "slide_count": 13,
    "figure_count": 6,
    "slides": [
     {
@@ -3579,7 +3579,7 @@
    "file": "samples/insurance.docx",
    "format": "memo",
    "delivers": "Delivers today: a verified Word memo. Also planned: case-file, workbook.",
-   "slide_count": 12,
+   "slide_count": 13,
    "figure_count": 6,
    "slides": [
     {
@@ -3884,7 +3884,7 @@
    "file": "samples/sales-customer-coordination.pptx",
    "format": "deck",
    "delivers": "Delivers today: a verified PowerPoint deck. Also planned: brief, draft.",
-   "slide_count": 12,
+   "slide_count": 13,
    "figure_count": 7,
    "slides": [
     {

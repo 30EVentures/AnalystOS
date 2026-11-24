@@ -174,7 +174,7 @@ def _client_unit(token, declared):
 
 
 TOP_LEVEL_KEYS = {"answer", "exec_summary", "situation", "complication", "key_question", "titles", "figures",
-                  "issue_tree", "options", "recommendation", "roadmap", "kpis", "risks"}
+                  "issue_tree", "options", "recommendation", "roadmap", "kpis", "risks", "work"}
 
 
 def _drop_unknown(value, schema):
@@ -278,7 +278,8 @@ def normalize_content(content, derived_units, recompute, operations, schema=None
             return [clean(v) for v in value]
         if isinstance(value, dict):
             return {k: (v if k in ("quote", "id", "inputs", "figure_ids", "operation", "basis", "unit", "verdict",
-                                   "effort", "horizon", "label") else clean(v)) for k, v in value.items()}
+                                   "effort", "horizon", "label", "kind", "code", "language", "figure_id", "effect",
+                                   "rating", "status") else clean(v)) for k, v in value.items()}
         return value
 
     for key in list(doc):

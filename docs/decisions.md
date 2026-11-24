@@ -24,6 +24,23 @@ No generator owned the hero's spec figure. It had been typed by hand and was
 frozen since about Slice 49. It now has its own `site_counts.py` pattern,
 generated from the same `count_specs()` as the evidence card.
 
+## 2026-11-23 — Slice 126: role-written work products, framework (phase 2)
+
+The owner: "loop through phase 2 for every single role". 40 of 73 roles list a
+native output beyond the analysis formats: draft, register, case file,
+reconciliation, plan or code. Built once, for all of them: a `work` list in the
+content with six fixed kinds (analystos/packs/work.py), checked by the same
+number rules; a reconciliation must balance on the verified figures and its
+journal entries are proposals; a case file ends in a question for a person;
+code is a labelled draft whose inner numbers are not figures (the one exemption
+from the number rules, stated on every rendering). The prompt asks each role for
+exactly its kinds; the renderers refuse a spec whose kinds are not its role's.
+Rendered in all three formats (a reconciliation's balances are live Excel
+formulas). Every one of the 40 roles is tested with work of its kinds on its
+family's example; 8 realistic worked examples so far, the rest tracked in
+specs/slice-126/LOOP.md. Two detector changes it needed: "Third," alone is an
+ordinal, not a fraction; code keeps its line breaks.
+
 ## 2026-11-23 — Slice 125: deck quality from the first passing live deck
 
 The only issues in the first passing live deck that code can check without

@@ -18,6 +18,7 @@ from docx.oxml.ns import qn
 from docx.shared import Pt, RGBColor
 
 from analystos.l4 import deck
+from analystos.packs import work as work_products
 
 _TAG_RE = re.compile(r"\[(F[1-9][0-9]{0,2})\]")
 INK = RGBColor(0x0F, 0x1B, 0x2D)
@@ -99,6 +100,64 @@ def source_text(fig, figures):
     return f"Assumption: {_plain(fig['rationale'], figures)}"
 
 
+EFFECT_TEXT = {"add_to_a": "adds to side A", "subtract_from_a": "comes off side A",
+               "add_to_b": "adds to side B", "subtract_from_b": "comes off side B"}
+
+
+def _work(doc, item, figures):
+    """One role-written work product (Slice 126), every number printed from its figure."""
+    kind = item["kind"]
+    _heading(doc, work_products.title_of(item), 2)
+    if kind == "draft":
+        p = doc.add_paragraph()
+        _run(p, f"For: {item['for']}", 10, False, True, MUTED)
+        for text in item["body"]:
+            _rich(doc.add_paragraph(), text, figures)
+    elif kind == "register":
+        _table(doc, ["Item", "Rating", "Owner", "Status", "Action"],
+               [[_plain(r["item"], figures), r["rating"].title(), r["owner"], r["status"].title(), _plain(r["action"], figures)]
+                for r in item["rows"]])
+    elif kind == "case_file":
+        for heading, key in (("Facts", "facts"), ("Evidence", "evidence"), ("Open questions", "open_questions")):
+            if item.get(key):
+                p = doc.add_paragraph()
+                _run(p, heading, 11, True, False, ACCENT)
+                for line in item[key]:
+                    _bullet(doc, line, figures)
+        p = doc.add_paragraph()
+        _run(p, "For decision by a qualified person: ", 11, True, False, ACCENT)
+        _rich(p, item["for_decision"], figures)
+    elif kind == "reconciliation":
+        rows = [[item["side_a"]["label"], _plain(f"[{item['side_a']['figure_id']}]", figures), "side A"]]
+        rows += [[line["label"], _plain(f"[{line['figure_id']}]", figures), EFFECT_TEXT[line["effect"]]]
+                 for line in item.get("items", [])]
+        rows.append([item["side_b"]["label"], _plain(f"[{item['side_b']['figure_id']}]", figures), "side B"])
+        _table(doc, ["Line", "Amount", "Effect"], rows)
+        p = doc.add_paragraph()
+        _run(p, "The sides agree once every item is applied; code checked this on the verified figures.", 10,
+             False, True, MUTED)
+        if item.get("entries"):
+            p = doc.add_paragraph()
+            _run(p, "Proposed entries, for approval", 11, True, False, ACCENT)
+            _table(doc, ["Debit", "Credit", "Amount", "Memo"],
+                   [[e["debit"], e["credit"], _plain(f"[{e['figure_id']}]", figures), _plain(e["memo"], figures)]
+                    for e in item["entries"]])
+    elif kind == "plan":
+        _table(doc, ["When", "Task", "Owner", "Done when"],
+               [[st["when"], _plain(st["task"], figures), st["owner"], _plain(st["done_when"], figures)]
+                for st in item["steps"]])
+    elif kind == "code":
+        p = doc.add_paragraph()
+        _run(p, f"{item['language'].title()} \u00b7 ", 10, True, False, MUTED)
+        _rich(p, item["purpose"], figures, 10, color=MUTED)
+        p = doc.add_paragraph()
+        _run(p, "Draft: not run or reviewed. Numbers inside the code are not figures.", 10, False, True, MUTED)
+        block = doc.add_paragraph()
+        run = block.add_run(item["code"])
+        run.font.name = "Courier New"
+        run.font.size = Pt(9)
+
+
 def render_memo(spec, engagement, catalog=None):
     """Word (.docx) bytes for a deck spec, or ValueError. See the module docstring."""
     role = deck.checked_role(spec, engagement, catalog)
@@ -167,6 +226,11 @@ def render_memo(spec, engagement, catalog=None):
         p = doc.add_paragraph()
         _run(p, rec["option"], 12, True, False, ACCENT)
         _rich(doc.add_paragraph(), rec["rationale"], figures)
+
+        if content.get("work"):
+            _heading(doc, "Work product")
+            for item in content["work"]:
+                _work(doc, item, figures)
 
         _heading(doc, "Next steps")
         for step in content["roadmap"]:

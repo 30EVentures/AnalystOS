@@ -1,222 +1,261 @@
 {
- "answer": "Prepare one entry for the controller to approve: recording the missing [F5] payment brings the ledger to [F8], matching the adjusted bank balance.",
- "exec_summary": [
-  "The bank shows [F1] and the ledger [F2].",
-  "After deposits in transit and uncleared cheques, the bank balance is [F7].",
-  "Recording the missing [F5] payment closes the gap to [F9]."
- ],
- "situation": "A business closing its month with bank and ledger cash that do not agree.",
- "complication": "The ledger shows less cash than the bank, and the close is due shortly.",
- "key_question": "What explains the difference, and what entry should the controller approve?",
- "titles": {
-  "situation": "The month cannot close until cash reconciles.",
-  "options": "Two ways to close the gap before month end.",
-  "recommendation": "Record the missing payment and leave timing items to clear.",
-  "roadmap": "Close this month, then stop the gap recurring.",
-  "kpis": "Two checks confirm the reconciliation holds.",
-  "risks": "A second unrecorded item would reopen the gap."
- },
- "figures": [
-  {
-   "id": "F1",
-   "label": "Bank statement balance",
-   "value": 84200,
-   "unit": "usd",
-   "basis": "client",
-   "quote": "The bank shows $84,200"
+  "answer": "Prepare one entry for the controller to approve: recording the missing [F5] payment brings the ledger to [F8], matching the adjusted bank balance.",
+  "exec_summary": [
+    "The bank shows [F1] and the ledger [F2].",
+    "After deposits in transit and uncleared cheques, the bank balance is [F7].",
+    "Recording the missing [F5] payment closes the gap to [F9]."
+  ],
+  "situation": "A business closing its month with bank and ledger cash that do not agree.",
+  "complication": "The ledger shows less cash than the bank, and the close is due shortly.",
+  "key_question": "What explains the difference, and what entry should the controller approve?",
+  "titles": {
+    "situation": "The month cannot close until cash reconciles.",
+    "options": "Two ways to close the gap before month end.",
+    "recommendation": "Record the missing payment and leave timing items to clear.",
+    "roadmap": "Close this month, then stop the gap recurring.",
+    "kpis": "Two checks confirm the reconciliation holds.",
+    "risks": "A second unrecorded item would reopen the gap."
   },
-  {
-   "id": "F2",
-   "label": "Ledger cash balance",
-   "value": 79950,
-   "unit": "usd",
-   "basis": "client",
-   "quote": "the ledger shows $79,950"
-  },
-  {
-   "id": "F3",
-   "label": "Deposits in transit",
-   "value": 3100,
-   "unit": "usd",
-   "basis": "client",
-   "quote": "There are $3,100 of deposits in transit"
-  },
-  {
-   "id": "F4",
-   "label": "Uncleared cheques",
-   "value": 1850,
-   "unit": "usd",
-   "basis": "client",
-   "quote": "$1,850 of uncleared cheques"
-  },
-  {
-   "id": "F5",
-   "label": "Unrecorded customer payment",
-   "value": 5500,
-   "unit": "usd",
-   "basis": "client",
-   "quote": "A $5,500 customer payment"
-  },
-  {
-   "id": "F6",
-   "label": "Bank balance plus deposits in transit",
-   "value": 87300,
-   "unit": "usd",
-   "basis": "computed",
-   "operation": "sum",
-   "inputs": [
-    "F1",
-    "F3"
-   ]
-  },
-  {
-   "id": "F7",
-   "label": "Adjusted bank balance",
-   "value": 85450,
-   "unit": "usd",
-   "basis": "computed",
-   "operation": "difference",
-   "inputs": [
-    "F6",
-    "F4"
-   ]
-  },
-  {
-   "id": "F8",
-   "label": "Ledger balance after the missing payment",
-   "value": 85450,
-   "unit": "usd",
-   "basis": "computed",
-   "operation": "sum",
-   "inputs": [
-    "F2",
-    "F5"
-   ]
-  },
-  {
-   "id": "F9",
-   "label": "Remaining difference",
-   "value": 0,
-   "unit": "usd",
-   "basis": "computed",
-   "operation": "difference",
-   "inputs": [
-    "F7",
-    "F8"
-   ]
-  }
- ],
- "issue_tree": [
-  {
-   "branch": "Timing items",
-   "finding": "Deposits in transit and uncleared cheques explain only part of the gap.",
-   "points": [
-    "Deposits in transit add [F3] to the bank side.",
-    "Uncleared cheques take [F4] off it."
-   ],
-   "hypotheses": [
+  "figures": [
     {
-     "text": "Timing items alone explain the gap.",
-     "verdict": "refuted"
-    }
-   ],
-   "so_what": "Timing items need no entry; they clear by themselves next month.",
-   "chart": {
-    "title": "Timing items move the bank balance only slightly.",
-    "figure_ids": [
-     "F1",
-     "F7"
-    ],
-    "labels": [
-     "Bank statement",
-     "Adjusted bank"
-    ]
-   }
-  },
-  {
-   "branch": "Missing entries",
-   "finding": "One unrecorded customer payment explains the rest of the gap.",
-   "points": [
-    "A [F5] payment was received but not recorded.",
-    "Recording it brings the ledger to [F8]."
-   ],
-   "hypotheses": [
+      "id": "F1",
+      "label": "Bank statement balance",
+      "value": 84200,
+      "unit": "usd",
+      "basis": "client",
+      "quote": "The bank shows $84,200"
+    },
     {
-     "text": "An unrecorded receipt explains the remaining gap.",
-     "verdict": "supported"
+      "id": "F2",
+      "label": "Ledger cash balance",
+      "value": 79950,
+      "unit": "usd",
+      "basis": "client",
+      "quote": "the ledger shows $79,950"
+    },
+    {
+      "id": "F3",
+      "label": "Deposits in transit",
+      "value": 3100,
+      "unit": "usd",
+      "basis": "client",
+      "quote": "There are $3,100 of deposits in transit"
+    },
+    {
+      "id": "F4",
+      "label": "Uncleared cheques",
+      "value": 1850,
+      "unit": "usd",
+      "basis": "client",
+      "quote": "$1,850 of uncleared cheques"
+    },
+    {
+      "id": "F5",
+      "label": "Unrecorded customer payment",
+      "value": 5500,
+      "unit": "usd",
+      "basis": "client",
+      "quote": "A $5,500 customer payment"
+    },
+    {
+      "id": "F6",
+      "label": "Bank balance plus deposits in transit",
+      "value": 87300,
+      "unit": "usd",
+      "basis": "computed",
+      "operation": "sum",
+      "inputs": [
+        "F1",
+        "F3"
+      ]
+    },
+    {
+      "id": "F7",
+      "label": "Adjusted bank balance",
+      "value": 85450,
+      "unit": "usd",
+      "basis": "computed",
+      "operation": "difference",
+      "inputs": [
+        "F6",
+        "F4"
+      ]
+    },
+    {
+      "id": "F8",
+      "label": "Ledger balance after the missing payment",
+      "value": 85450,
+      "unit": "usd",
+      "basis": "computed",
+      "operation": "sum",
+      "inputs": [
+        "F2",
+        "F5"
+      ]
+    },
+    {
+      "id": "F9",
+      "label": "Remaining difference",
+      "value": 0,
+      "unit": "usd",
+      "basis": "computed",
+      "operation": "difference",
+      "inputs": [
+        "F7",
+        "F8"
+      ]
     }
-   ],
-   "so_what": "One approved entry closes the month.",
-   "chart": {
-    "title": "Recording the payment makes the ledger match the bank.",
-    "figure_ids": [
-     "F2",
-     "F8",
-     "F7"
-    ],
-    "labels": [
-     "Ledger now",
-     "Ledger corrected",
-     "Adjusted bank"
-    ]
-   }
-  }
- ],
- "options": [
-  {
-   "name": "Record the payment",
-   "description": "Prepare one entry for the missing payment for the controller to approve.",
-   "effort": "low"
+  ],
+  "issue_tree": [
+    {
+      "branch": "Timing items",
+      "finding": "Deposits in transit and uncleared cheques explain only part of the gap.",
+      "points": [
+        "Deposits in transit add [F3] to the bank side.",
+        "Uncleared cheques take [F4] off it."
+      ],
+      "hypotheses": [
+        {
+          "text": "Timing items alone explain the gap.",
+          "verdict": "refuted"
+        }
+      ],
+      "so_what": "Timing items need no entry; they clear by themselves next month.",
+      "chart": {
+        "title": "Timing items move the bank balance only slightly.",
+        "figure_ids": [
+          "F1",
+          "F7"
+        ],
+        "labels": [
+          "Bank statement",
+          "Adjusted bank"
+        ]
+      }
+    },
+    {
+      "branch": "Missing entries",
+      "finding": "One unrecorded customer payment explains the rest of the gap.",
+      "points": [
+        "A [F5] payment was received but not recorded.",
+        "Recording it brings the ledger to [F8]."
+      ],
+      "hypotheses": [
+        {
+          "text": "An unrecorded receipt explains the remaining gap.",
+          "verdict": "supported"
+        }
+      ],
+      "so_what": "One approved entry closes the month.",
+      "chart": {
+        "title": "Recording the payment makes the ledger match the bank.",
+        "figure_ids": [
+          "F2",
+          "F8",
+          "F7"
+        ],
+        "labels": [
+          "Ledger now",
+          "Ledger corrected",
+          "Adjusted bank"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "name": "Record the payment",
+      "description": "Prepare one entry for the missing payment for the controller to approve.",
+      "effort": "low"
+    },
+    {
+      "name": "Write off the difference",
+      "description": "Book the gap to a suspense account and investigate later.",
+      "effort": "low"
+    }
+  ],
+  "recommendation": {
+    "option": "Record the payment",
+    "rationale": "It explains the whole gap with evidence, leaving a difference of [F9], where a write-off would hide it."
   },
-  {
-   "name": "Write off the difference",
-   "description": "Book the gap to a suspense account and investigate later.",
-   "effort": "low"
-  }
- ],
- "recommendation": {
-  "option": "Record the payment",
-  "rationale": "It explains the whole gap with evidence, leaving a difference of [F9], where a write-off would hide it."
- },
- "roadmap": [
-  {
-   "horizon": "First 30 days",
-   "actions": [
-    "Prepare the entry with the remittance as support.",
-    "Send it to the controller for approval."
-   ]
-  },
-  {
-   "horizon": "Days 31-60",
-   "actions": [
-    "Confirm the timing items cleared on next month's statement."
-   ]
-  },
-  {
-   "horizon": "Days 61-90",
-   "actions": [
-    "Match receipts to the bank daily to stop repeats."
-   ]
-  }
- ],
- "kpis": [
-  {
-   "name": "Unreconciled cash difference",
-   "target": "Nothing left unexplained at each month end"
-  },
-  {
-   "name": "Time to reconcile cash",
-   "target": "Shorter each month"
-  }
- ],
- "risks": [
-  {
-   "risk": "Another unrecorded receipt exists.",
-   "mitigation": "Match every receipt in the month to the bank before closing."
-  },
-  {
-   "risk": "A timing item does not clear.",
-   "mitigation": "Chase any item still open next month."
-  }
- ]
+  "roadmap": [
+    {
+      "horizon": "First 30 days",
+      "actions": [
+        "Prepare the entry with the remittance as support.",
+        "Send it to the controller for approval."
+      ]
+    },
+    {
+      "horizon": "Days 31-60",
+      "actions": [
+        "Confirm the timing items cleared on next month's statement."
+      ]
+    },
+    {
+      "horizon": "Days 61-90",
+      "actions": [
+        "Match receipts to the bank daily to stop repeats."
+      ]
+    }
+  ],
+  "kpis": [
+    {
+      "name": "Unreconciled cash difference",
+      "target": "Nothing left unexplained at each month end"
+    },
+    {
+      "name": "Time to reconcile cash",
+      "target": "Shorter each month"
+    }
+  ],
+  "risks": [
+    {
+      "risk": "Another unrecorded receipt exists.",
+      "mitigation": "Match every receipt in the month to the bank before closing."
+    },
+    {
+      "risk": "A timing item does not clear.",
+      "mitigation": "Chase any item still open next month."
+    }
+  ],
+  "work": [
+    {
+      "kind": "reconciliation",
+      "title": "October bank reconciliation",
+      "side_a": {
+        "label": "Bank statement balance",
+        "figure_id": "F1"
+      },
+      "side_b": {
+        "label": "Ledger cash balance",
+        "figure_id": "F2"
+      },
+      "items": [
+        {
+          "label": "Deposits in transit",
+          "figure_id": "F3",
+          "effect": "add_to_a"
+        },
+        {
+          "label": "Uncleared cheques",
+          "figure_id": "F4",
+          "effect": "subtract_from_a"
+        },
+        {
+          "label": "Customer payment not yet recorded",
+          "figure_id": "F5",
+          "effect": "add_to_b"
+        }
+      ],
+      "entries": [
+        {
+          "debit": "Cash",
+          "credit": "Accounts receivable",
+          "figure_id": "F5",
+          "memo": "Record the customer payment of [F5] that reached the bank but not the ledger; for the controller's approval."
+        }
+      ]
+    }
+  ]
 }

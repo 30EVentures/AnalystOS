@@ -23,6 +23,7 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
 from analystos.l4 import deck
+from analystos.packs import work as work_products
 
 _TAG_RE = re.compile(r"\[(F[1-9][0-9]{0,2})\]")
 HEAD_FILL = PatternFill("solid", fgColor="E0E6F2")
@@ -91,6 +92,87 @@ def _only_our_formulas(wb, own):
                     continue
                 if isinstance(cell.value, str) and cell.data_type == "f":
                     cell.data_type = "s"
+
+
+EFFECT_SIGN = {"add_to_a": ("a", 1), "subtract_from_a": ("a", -1), "add_to_b": ("b", 1), "subtract_from_b": ("b", -1)}
+TITLES = {"draft": "Draft", "register": "Register", "case_file": "Case file", "reconciliation": "Reconciliation",
+          "plan": "Plan", "code": "Code"}
+
+
+def _work_sheet(wb, n, item, figures, row_of, own):
+    """One sheet per role-written work product (Slice 126). A reconciliation's amounts and
+    adjusted balances are live formulas over the Inputs cells, so Excel shows they agree."""
+    kind = item["kind"]
+    ws = wb.create_sheet(f"{TITLES[kind]} {n}"[:31])
+    ws.append([work_products.title_of(item)])
+    ws["A1"].font = Font(bold=True, size=13)
+    if kind == "draft":
+        ws.append(["For: " + item["for"]])
+        for text in item["body"]:
+            ws.append([_plain(text, figures)])
+        ws.column_dimensions["A"].width = 110
+    elif kind == "register":
+        ws.append(["Item", "Rating", "Owner", "Status", "Action"])
+        for r in item["rows"]:
+            ws.append([_plain(r["item"], figures), r["rating"].title(), r["owner"], r["status"].title(),
+                       _plain(r["action"], figures)])
+        for col, width in zip("ABCDE", (50, 10, 26, 14, 50)):
+            ws.column_dimensions[col].width = width
+    elif kind == "case_file":
+        for heading, key in (("Facts", "facts"), ("Evidence", "evidence"), ("Open questions", "open_questions")):
+            if item.get(key):
+                ws.append([heading])
+                for line in item[key]:
+                    ws.append(["\u2022 " + _plain(line, figures)])
+        ws.append(["For decision by a qualified person: " + _plain(item["for_decision"], figures)])
+        ws.column_dimensions["A"].width = 110
+    elif kind == "reconciliation":
+        ws.append(["Line", "Amount", "Effect"])
+        start = ws.max_row + 1
+        lines = [(item["side_a"]["label"], item["side_a"]["figure_id"], "side A")]
+        lines += [(l["label"], l["figure_id"], l["effect"]) for l in item.get("items", [])]
+        lines.append((item["side_b"]["label"], item["side_b"]["figure_id"], "side B"))
+        for label, fid, effect in lines:
+            ws.append([label, f"=Inputs!{VALUE_COL}{row_of[fid]}", effect.replace("_", " ")])
+            own.add((ws.title, f"B{ws.max_row}"))
+        a = [f"B{start}"] + [("+" if EFFECT_SIGN[e][1] > 0 else "-") + f"B{start + i + 1}"
+                             for i, (_, _, e) in enumerate(lines[1:-1]) if EFFECT_SIGN[e][0] == "a"]
+        b_row = start + len(lines) - 1
+        b = [f"B{b_row}"] + [("+" if EFFECT_SIGN[e][1] > 0 else "-") + f"B{start + i + 1}"
+                             for i, (_, _, e) in enumerate(lines[1:-1]) if EFFECT_SIGN[e][0] == "b"]
+        ws.append(["Side A adjusted", "=" + "".join(a), "live formula"])
+        own.add((ws.title, f"B{ws.max_row}"))
+        ws.append(["Side B adjusted", "=" + "".join(b), "live formula"])
+        own.add((ws.title, f"B{ws.max_row}"))
+        ws.append(["Difference", f"=B{ws.max_row - 1}-B{ws.max_row}", "zero when reconciled"])
+        own.add((ws.title, f"B{ws.max_row}"))
+        for row in ws.iter_rows(min_row=start, max_row=ws.max_row, min_col=2, max_col=2):
+            row[0].number_format = NUMBER_FORMATS.get(figures[lines[0][1]]["unit"], "General")
+        if item.get("entries"):
+            ws.append([])
+            ws.append(["Proposed entries, for approval"])
+            ws.append(["Debit", "Credit", "Amount", "Memo"])
+            for e in item["entries"]:
+                ws.append([e["debit"], e["credit"], f"=Inputs!{VALUE_COL}{row_of[e['figure_id']]}", _plain(e["memo"], figures)])
+                own.add((ws.title, f"C{ws.max_row}"))
+                ws.cell(row=ws.max_row, column=3).number_format = NUMBER_FORMATS["usd"]
+        for col, width in zip("ABCD", (40, 18, 22, 60)):
+            ws.column_dimensions[col].width = width
+    elif kind == "plan":
+        ws.append(["When", "Task", "Owner", "Done when"])
+        for st in item["steps"]:
+            ws.append([st["when"], _plain(st["task"], figures), st["owner"], _plain(st["done_when"], figures)])
+        for col, width in zip("ABCD", (16, 50, 26, 50)):
+            ws.column_dimensions[col].width = width
+    elif kind == "code":
+        ws.append([f"{item['language'].title()} \u00b7 " + _plain(item["purpose"], figures)])
+        ws.append(["Draft: not run or reviewed. Numbers inside the code are not figures."])
+        for line in item["code"].splitlines():
+            ws.append([line])
+        ws.column_dimensions["A"].width = 110
+    for row in ws.iter_rows(min_row=2):
+        for cell in row:
+            cell.alignment = WRAP
 
 
 def _count_format(value):
@@ -179,6 +261,8 @@ def render_workbook(spec, engagement, catalog=None):
         _sheet(wb, "Risks", ["Risk", "Mitigation"],
                [[_plain(r["risk"], figures), _plain(r["mitigation"], figures)] for r in content["risks"]], (55, 55))
 
+        for n, item in enumerate(content.get("work") or [], start=1):
+            _work_sheet(wb, n, item, figures, row_of, own)
         _only_our_formulas(wb, own)
 
         props = wb.properties

@@ -25,6 +25,7 @@ from analystos.l2.analyze import (
 )
 from analystos.l2.prompt_safety import neutralize
 from analystos.l3.engagement import validate_engagement
+from analystos.packs import work as work_products
 from analystos.packs.numbers import SMALL_WORDS, find_numbers
 from analystos.models import model_name
 
@@ -108,6 +109,7 @@ TOOL = {
             "risks": {"type": "array", "minItems": 2, "maxItems": 6, "items": {
                 "type": "object", "required": ["risk", "mitigation"],
                 "properties": {"risk": _string(_MAX_BULLET), "mitigation": _string(_MAX_BULLET)}}},
+            "work": work_products.SCHEMA,  # Slice 126: role-written work products, only for roles that owe them
         },
     },
 }
@@ -755,7 +757,8 @@ def _unclean_strings(value, path="content", depth=0):
     if depth > 20:
         return [path]
     if isinstance(value, str):
-        bad = any(unicodedata.category(ch) in ("Cc", "Cf", "Cs", "Co", "Cn") for ch in value)
+        allowed = "\n\t" if re.search(r"\.work\[\d+\]\.code$", path) else ""  # code keeps its line breaks
+        bad = any(unicodedata.category(ch) in ("Cc", "Cf", "Cs", "Co", "Cn") and ch not in allowed for ch in value)
         return [path] if bad else []
     out = []
     if isinstance(value, dict):
@@ -768,8 +771,13 @@ def _unclean_strings(value, path="content", depth=0):
     return out
 
 
-def verify_content(content, client_text):
-    """Every problem with the model's content. Never raises; empty means it passes."""
+def verify_content(content, client_text, work_kinds=None):
+    """Every problem with the model's content. Never raises; empty means it passes.
+    ``work_kinds`` are the work-product kinds the role owes (Slice 126): each is required
+    and no other is allowed; an empty list allows no work. ``None`` (role unknown, as in
+    tests of the number rules) checks whatever work is present and requires none; every
+    production path passes the role's kinds, and the renderers refuse a spec whose kinds
+    are not its role's."""
     if not isinstance(content, dict):
         return ["content must be an object"]
     if not isinstance(client_text, str):
@@ -885,6 +893,12 @@ def verify_content(content, client_text):
         if isinstance(text, str):
             problems += number_problems(where, text, figures, years)
             used.update(_TAG_RE.findall(text))
+    work = content.get("work")
+    problems += work_products.verify_work(work, figures, number_problems, label_problems, years, work_kinds)
+    for _, text in work_products.work_texts(work):
+        if isinstance(text, str):
+            used.update(_TAG_RE.findall(text))
+    used.update(work_products.figure_ids_used(work))
     for fid in figures:
         if fid not in used and not any(fid in (f.get("inputs") or []) for f in figures.values()):
             problems.append(f"figure {fid} is never used")
@@ -931,6 +945,8 @@ def assemble_slides(content):
         {"kind": "kpis", "title": titles["kpis"], "kpis": [dict(k) for k in content["kpis"]], "bullets": []},
         {"kind": "risks", "title": titles["risks"], "risks": [dict(r) for r in content["risks"]], "bullets": []},
     ]
+    for item in content.get("work") or []:  # Slice 126: one slide per role-written work product
+        slides.append({"kind": "work", "title": work_products.title_of(item), "work": item, "bullets": []})
     for slide in slides:
         texts = [slide["title"], *slide["bullets"], slide.get("so_what", "")]
         if "chart" in slide:
@@ -941,7 +957,12 @@ def assemble_slides(content):
                 texts += [a for a in item.get("actions", [])]
         for branch in slide.get("tree", []):
             texts += [branch["branch"], *[h["text"] for h in branch["hypotheses"]]]
+        if slide["kind"] == "work":
+            texts += [t for _, t in work_products.work_texts([slide["work"]])]
         slide["figure_ids"] = _tags_in(*texts)
+        if slide["kind"] == "work":
+            slide["figure_ids"] += [f for f in sorted(work_products.figure_ids_used([slide["work"]]))
+                                    if f not in slide["figure_ids"]]
         for fid in slide.get("chart", {}).get("figure_ids", []):
             if fid not in slide["figure_ids"]:
                 slide["figure_ids"].append(fid)
@@ -998,8 +1019,11 @@ def system_prompt(role, briefs=None):
     elif role["boundary"] == "approval-gated":
         lines.append("Anything that would act in the client's own tools is a draft for a named approver: "
                      + "; ".join(role["gated_actions"]) + ". Never write as if it has been done.")
-    lines.append("Today you deliver a verified analysis deck; you do not produce the role's native work "
-                 "product (code, copy, postings), only the analysis and plan for it.")
+    work_text = work_products.prompt_text(role)
+    if work_text:
+        lines.append(work_text)
+    else:
+        lines.append("Leave the content's \"work\" list out: this role's output is the analysis itself.")
     return "\n\n".join(lines)
 
 
@@ -1055,13 +1079,14 @@ def build_deck_spec(engagement, catalog, client=None):
     role = work_role(engagement, catalog)  # never None: validate_engagement checked every role is in the catalog
     role_id = role["id"]
     system = system_prompt(role)
+    work_kinds = work_products.required_kinds(role)
 
     client = _resolve_client(client)
     client_text = client_text_of(engagement)
     prompt = build_prompt(engagement)
     content = _normalize(_request(client, prompt, system))
     attempts = 1
-    found = verify_content(content, client_text) if content is not None else ["the model returned no content"]
+    found = verify_content(content, client_text, work_kinds) if content is not None else ["the model returned no content"]
     if found:
         previous = neutralize(json.dumps(content, ensure_ascii=False)[:20000])
         checks = "\n".join(f"- {neutralize(p)}" for p in found[:40])
@@ -1070,7 +1095,8 @@ def build_deck_spec(engagement, catalog, client=None):
                   + "\n<</CHECKS>>")
         content = _normalize(_request(client, repair, system))
         attempts = 2
-        found = verify_content(content, client_text) if content is not None else ["the model returned no content"]
+        found = (verify_content(content, client_text, work_kinds) if content is not None
+                 else ["the model returned no content"])
         if found:
             raise VerificationFailed(found)
 
@@ -1079,6 +1105,7 @@ def build_deck_spec(engagement, catalog, client=None):
         "format": FORMAT,
         "engagement_id": engagement["id"],
         "role": role_id,
+        "work_kinds": work_kinds,
         "model": model_name(),
         "attempts": attempts,
         "client_text": client_text,
@@ -1097,7 +1124,10 @@ def check_deck_spec(spec):
     content, client_text = spec.get("content"), spec.get("client_text")
     if not isinstance(client_text, str):
         return ["the spec carries no client text to verify against"]
-    problems = verify_content(content, client_text)
+    work_kinds = spec.get("work_kinds", [])
+    if not isinstance(work_kinds, list) or not all(k in work_products.KINDS for k in work_kinds):
+        return ["the spec's work kinds are malformed"]
+    problems = verify_content(content, client_text, work_kinds)
     if problems:
         return ["content fails verification: " + p for p in problems[:5]]
     try:

@@ -136,3 +136,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 122 | a short homepage: specialist work, ready when you need it | [spec](slice-122/spec.md) |
 | 123 | role-specific output formats, phase 1: memo and workbook | [spec](slice-123/spec.md) |
 | 124 | wire the role formats into hiring and the homepage | [spec](slice-124/spec.md) |
+| 125 | deck quality: what a board reader caught in the first live deck | [spec](slice-125/spec.md) |

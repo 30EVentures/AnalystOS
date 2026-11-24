@@ -180,6 +180,22 @@ quarters" and "we have 850 customers paying on average $1,200 per month"):
   chart: {{"title": "Monthly churn rose sharply in two quarters.",
           "figure_ids": ["F1", "F2"], "labels": ["Before", "Now"]}}
 
+Quality rules (a board reader catches these):
+- Put a cost on the problem: when the client gives counts with prices,
+  revenue or costs, add a computed figure for what the problem costs (a month
+  or a year) and use it in the answer.
+- Fit the plan to the client's deadline: the roadmap horizons are fixed (First
+  30 days, Days 31-60, Days 61-90), so anything the client needs before its
+  deadline goes in a horizon that ends before it, and the action says so.
+- Claim only what the client's text supports: no timing ("before",
+  "immediately after") or proportion ("disproportionate", "most of the
+  market") unless a figure or the client's words state it. Describe the client
+  only in its own words (who it sells to is not its own size).
+- A hypothesis is supported or refuted only when the client's figures or
+  words in that branch clearly show it; mixed or indirect evidence is untested.
+- A number word in a title must match the rows under it: "three options" only
+  over exactly three options.
+
 Common mistakes that get content rejected:
 - "7% [F2]" or "[F2]%" or "$[F6]": write only "[F2]", "[F6]".
 - A quote with two numbers ("went from 4% to 7%"): quote only the part with
@@ -691,6 +707,35 @@ def _chart_problems(where, chart, figures):
     return problems
 
 
+# A counting word in a title must match the rows it introduces (Slice 125: the first live deck said "Three
+# paths exist" over four options and "Six metrics" over five). Only a count attached to the rows' own noun is
+# checked, so "only one fits" or "three months" are not counts of rows.
+_COUNT_WORDS = {w: n for n, w in enumerate(("zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+                                            "nine", "ten", "eleven", "twelve"))}
+_ROW_NOUNS = {
+    "options": r"options?|ways?|paths?|choices?|routes?|alternatives?|approaches?|directions?|plans?|scenarios?",
+    "kpis": r"measures?|metrics?|kpis?|indicators?|targets?|signals?",
+    "risks": r"risks?|threats?|dangers?",
+}
+_COUNTED_RE = {key: re.compile(r"\b(" + "|".join(_COUNT_WORDS) + r")\s+(?:(?!of\b|the\b)[a-z-]+\s+){0,2}?(?:" + nouns + r")\b",
+                               re.IGNORECASE) for key, nouns in _ROW_NOUNS.items()}
+
+
+def title_count_problems(titles, content):
+    """A title that counts its rows ("three options") must count them right."""
+    problems = []
+    for key, pattern in _COUNTED_RE.items():
+        rows = content.get(key)
+        if not isinstance(titles.get(key), str) or not isinstance(rows, list):
+            continue
+        for m in pattern.finditer(titles[key]):
+            said = _COUNT_WORDS[m.group(1).lower()]
+            if said != len(rows):
+                problems.append(f"titles.{key} says {m.group(0)!r} but there are {len(rows)} {key}; "
+                                f"make the count match or leave the number out")
+    return problems
+
+
 def _count_problem(name, value, lo, hi):
     if not isinstance(value, list) or not lo <= len(value) <= hi:
         return [f"{name} must have {lo} to {hi} entries"]
@@ -752,6 +797,7 @@ def verify_content(content, client_text):
         for key in TITLE_KEYS:
             if not _is_sentence(titles[key]):
                 problems.append(f"titles.{key} must be an action title: a sentence of 4 to 20 words")
+        problems += title_count_problems(titles, content)
 
     tree = content.get("issue_tree")
     problems += _count_problem("issue_tree", tree, 2, 5)

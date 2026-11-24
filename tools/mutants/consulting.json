@@ -38,5 +38,7 @@
  {"name": "the client's number matched by position only", "old": "        if ct is None or ct.value != qt.value or ct.kind != qt.kind:", "new": "        if ct is None:", "equivalent": "the same span in a verbatim match is the same characters up to letter case, and every case-sensitive suffix (M/m, K/k, B, x, percent) either reads the same either way or changes the span, so value and kind cannot differ; kept as defence in depth"},
  {"name": "a tag may be glued to a word", "old": "        if (before[-1:].isalnum() or before[-1:] in (\"_\", \"]\") or after[:1].isalnum() or after[:1] in (\"_\", \"[\")", "new": "        if (False"},
  {"name": "tags glued to tags allowed", "old": "        if (before[-1:].isalnum() or before[-1:] in (\"_\", \"]\") or after[:1].isalnum() or after[:1] in (\"_\", \"[\")", "new": "        if (before[-1:].isalnum() or before[-1:] in (\"_\",) or after[:1].isalnum() or after[:1] in (\"_\",)"},
- {"name": "a numbered name allowed before anything (third review)", "old": "                               r\"(?=\\s*[:,.;)]|\\s*$|\\s+(?:of|and|to|is|was|will|would|starts|begins|ends|covers)\\b))\\b\")", "new": "                               r\")\\b\")"}
+ {"name": "a numbered name allowed before anything (third review)", "old": "                               r\"(?=\\s*[:,.;)]|\\s*$|\\s+(?:of|and|to|is|was|will|would|starts|begins|ends|covers)\\b))\\b\")", "new": "                               r\")\\b\")"},
+ {"name": "title counts not checked", "old": "        problems += title_count_problems(titles, content)\n", "new": ""},
+ {"name": "'of' allowed between the count and the noun", "old": "(?:(?!of\\b|the\\b)[a-z-]+\\s+)", "new": "(?:[a-z-]+\\s+)"}
 ]

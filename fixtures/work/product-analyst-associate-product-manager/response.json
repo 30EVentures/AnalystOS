@@ -11,8 +11,8 @@
  "titles": {
   "situation": "Most new users never finish setting up a budget.",
   "options": "Two ways to raise setup completion.",
-  "recommendation": "Fix the bank connection step first.",
-  "roadmap": "Fix bank connection in the next sprints, then measure completion.",
+  "recommendation": "Confirm the quit step, then fix bank connection.",
+  "roadmap": "Confirm the quit step in event data, then fix it and measure completion.",
   "kpis": "Two measures show whether onboarding improved.",
   "risks": "The main risk is fixing the step users complain about but not the one they quit at."
  },

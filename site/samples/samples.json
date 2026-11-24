@@ -7416,7 +7416,7 @@
      "heading": "The recommendation",
      "title": [
       {
-       "t": "Fund the packing line this year and defer the racking."
+       "t": "Put the packing line to the CFO first, subject to an NPV check."
       }
      ],
      "bullets": [
@@ -10721,7 +10721,7 @@
         "ref": "F10"
        },
        {
-        "t": " profit; the registered analyst needs both tested before deciding any rating or price target."
+        "t": " operating profit; the registered analyst needs both tested before deciding any rating or price target."
        }
       ]
      ]
@@ -10984,14 +10984,14 @@
       ],
       [
        {
-        "t": "It secures the evidence behind "
+        "t": "It puts preservation of the records behind "
        },
        {
         "v": "$312,000",
         "ref": "F2"
        },
        {
-        "t": " of payments before anyone is alerted; the general counsel decides any next step and any conclusion about individuals."
+        "t": " of payments to counsel before anyone is alerted; the general counsel decides any next step and any conclusion about individuals."
        }
       ]
      ]
@@ -12832,7 +12832,7 @@
         "ref": "F7"
        },
        {
-        "t": " above the offer, all of which reaches the owners; the owners decide whether to counter."
+        "t": " above the offer, all of which would go to the owners before tax and fees; the owners decide whether to counter."
        }
       ]
      ]
@@ -17606,7 +17606,7 @@
      "heading": "The recommendation",
      "title": [
       {
-       "t": "Fix the bank connection step first."
+       "t": "Confirm the quit step, then fix bank connection."
       }
      ],
      "bullets": [
@@ -18345,7 +18345,7 @@
        "def test_percent_code_rounds_total_half_up_to_whole_cents():",
        "    # Expected rule, to confirm: the discounted total is rounded, half a cent up."
       ],
-      "more": 17
+      "more": 21
      }
     },
     {
@@ -19589,7 +19589,7 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Hold payout on any application without verified income until a lending team leader verifies it, until the app makes the check mandatory, then review past loans without one: "
+       "t": "Hold approval and payout on any application without verified income until a lending team leader verifies it; once the app makes the check mandatory, review past loans without one: "
       },
       {
        "v": "12.5%",
@@ -19737,7 +19737,7 @@
      "heading": "The recommendation",
      "title": [
       {
-       "t": "Flag skipped checks now and make the field mandatory."
+       "t": "Hold unchecked applications now and make the field mandatory."
       }
      ],
      "bullets": [
@@ -23169,7 +23169,7 @@
         "ref": "F10"
        },
        {
-        "t": " deferred tax early; the preparer decides the positions, signs and files."
+        "t": " deferred tax early; the preparer advises on the positions, signs as preparer and files."
        }
       ]
      ]

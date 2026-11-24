@@ -143,7 +143,7 @@
   },
   {
    "branch": "Risk and fit",
-   "finding": "The cloud ends hand patching, which may be behind the outages.",
+   "finding": "Hand patching may be behind the outages; the client's figures do not show it.",
    "points": [
     "The firm's two IT staff patch the servers by hand.",
     "The firm had [F10] outages last year."

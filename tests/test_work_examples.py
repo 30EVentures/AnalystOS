@@ -255,8 +255,15 @@ class SignWordTest(unittest.TestCase):
         self.assertEqual(deck.format_value({"value": 2, "unit": "points"}), "2 pts")
         self.assertEqual(deck.format_value({"value": 1.04, "unit": "points"}), "1 pt")  # chosen on the printed text
         self.assertEqual(deck.format_value({"value": 1.5, "unit": "points"}), "1.5 pts")
+        self.assertEqual(deck.exact_value({"value": 1, "unit": "points"}), "1 pt")
+        self.assertEqual(deck.exact_value({"value": 1.04, "unit": "points"}), "1.04 pts")
         from analystos.l4 import workbook
-        self.assertTrue(workbook.NUMBER_FORMATS["points"].startswith('[=1]0" pt"'))
+        self.assertEqual(workbook.NUMBER_FORMATS["points"], '[=1]0" pt";0.0##" pts"')
+
+    def test_a_ratio_followed_by_times_is_refused(self):
+        figs = {"F1": {"value": 4, "unit": "ratio"}, "F2": {"value": 4, "unit": "count"}}
+        self.assertIn("prints the ratio's x", c.ratio_word_problems("answer", "Debt is [F1] times profit.", figs)[0])
+        self.assertEqual(c.ratio_word_problems("answer", "Debt is [F1] profit; [F2] times a year.", figs), [])
 
     def test_dollars_per_item_may_be_dollars(self):
         self.assertIn("usd", c.derived_units("ratio", ["usd", "count"]))

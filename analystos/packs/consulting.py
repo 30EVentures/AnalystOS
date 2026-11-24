@@ -649,6 +649,16 @@ _SIGN_RE = re.compile(r"\b(" + "|".join(_FALL_WORDS + _RISE_WORDS) + r")\s+(?:by
                       re.IGNORECASE)
 
 
+_TIMES_RE = re.compile(r"\[(F[1-9][0-9]{0,2})\]\s+times\b", re.IGNORECASE)
+
+
+def ratio_word_problems(where, text, figures):
+    """A ratio already prints its "x" (4.00x); "[F10] times" would print "4.00x times" (Slice 129)."""
+    return [f"{where}: '{m.group(0)}' prints the ratio's x and then 'times'; write only the tag ('net debt is [{m.group(1)}] profit')"
+            for m in _TIMES_RE.finditer(text or "")
+            if isinstance(figures.get(m.group(1)), dict) and figures[m.group(1)].get("unit") == "ratio"]
+
+
 def sign_problems(where, text, figures):
     """A direction word right before a negative figure (Slice 129): "fell [F3]" with F3 = -40%
     prints "fell -40%", a double negative; "rose [F3]" contradicts the sign. Refused with a fix."""
@@ -926,13 +936,13 @@ def verify_content(content, client_text, work_kinds=None):
     for where, text in _texts(content):
         if isinstance(text, str):
             problems += number_problems(where, text, figures, years)
-            problems += sign_problems(where, text, figures)
+            problems += sign_problems(where, text, figures) + ratio_word_problems(where, text, figures)
             used.update(_TAG_RE.findall(text))
     work = content.get("work")
     problems += work_products.verify_work(work, figures, number_problems, label_problems, years, work_kinds)
     for where, text in work_products.work_texts(work):
         if isinstance(text, str):
-            problems += sign_problems(where, text, figures)
+            problems += sign_problems(where, text, figures) + ratio_word_problems(where, text, figures)
             used.update(_TAG_RE.findall(text))
     used.update(work_products.figure_ids_used(work))
     for fid in figures:

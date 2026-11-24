@@ -156,7 +156,7 @@
    "finding": "Net debt is high against the profit that services it.",
    "points": [
     "Net debt at year end was [F9].",
-    "That is [F10] times this year's operating profit."
+    "That is [F10] this year's operating profit."
    ],
    "hypotheses": [
     {
@@ -181,7 +181,7 @@
  ],
  "recommendation": {
   "option": "Full review",
-  "rationale": "The margin changed by [F8] and net debt is [F10] times profit; the registered analyst needs both tested before deciding any rating or price target."
+  "rationale": "The margin changed by [F8] and net debt is [F10] operating profit; the registered analyst needs both tested before deciding any rating or price target."
  },
  "roadmap": [
   {

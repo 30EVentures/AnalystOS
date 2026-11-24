@@ -12,7 +12,13 @@ here before entering the repo, and the whole set went through a fresh review. Th
 catalog now marks all 73 roles as checked on their own example. One writer found a
 test-helper bug: a blank line in a code draft made the no-stray-numbers check
 replace the empty string and space out the whole text, so code digits could not be
-matched; fixed with a regression test. Still no live-model output for these roles.
+matched; fixed with a regression test. Four review rounds then checked the work itself, not
+just its numbers: overclaims (causes, product claims, promises, a yield passed off as a return,
+a wrong per-deposit threshold) were rewritten, and drafts use {placeholders} for what the client
+did not say. Two rules moved into the verifier because the live model could make the same
+mistakes: a direction word before a negative figure ("fell -40%") and a ratio followed by
+"times" ("4.00x times"); dollars per item may now be dollars. Still no live-model output for
+these roles.
 
 ## 2026-11-24 — Slice 128: each role shows its own sample when it has one
 

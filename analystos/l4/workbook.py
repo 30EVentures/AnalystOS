@@ -32,7 +32,7 @@ HEAD_FONT = Font(bold=True, color="0F1B2D")
 WRAP = Alignment(wrap_text=True, vertical="top")
 BASIS = {"client": "Client", "computed": "Calculated", "assumption": "Assumption"}
 # Excel number formats per unit, chosen to show what deck.format_value shows.
-NUMBER_FORMATS = {"percent": '0.0##"%"', "points": '[=1]0" pt";[=-1]-0" pt";0.0##" pts"', "usd": '"$"#,##0.00', "ratio": '0.00"x"',
+NUMBER_FORMATS = {"percent": '0.0##"%"', "points": '[=1]0" pt";0.0##" pts"', "usd": '"$"#,##0.00', "ratio": '0.00"x"',
                   "count": "#,##0.##", "months": '0.##" months"', "other": "#,##0.##"}
 VALUE_COL = "C"
 

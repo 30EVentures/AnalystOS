@@ -72,7 +72,7 @@ def spec_digest(spec):
 
 # Excel number formats per unit, so a chart's data labels read exactly like the deck's text.
 NUMBER_FORMATS = {
-    "percent": '0.#"%"', "points": '[=1]0" pt";[=-1]-0" pt";0.#" pts"', "usd": '"$"#,##0', "count": "#,##0.#",
+    "percent": '0.#"%"', "points": '[=1]0" pt";0.#" pts"', "usd": '"$"#,##0', "count": "#,##0.#",
     "ratio": '0.00"x"', "months": '0.#" months"', "other": "#,##0.##",
 }
 

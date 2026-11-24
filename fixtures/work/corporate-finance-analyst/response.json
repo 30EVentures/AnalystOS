@@ -11,7 +11,7 @@
  "titles": {
   "situation": "Two projects compete for one capital budget.",
   "options": "Three ways to use this year's capital budget.",
-  "recommendation": "Fund the packing line this year and defer the racking.",
+  "recommendation": "Put the packing line to the CFO first, subject to an NPV check.",
   "roadmap": "Test each project's NPV, then put the packing line to the CFO.",
   "kpis": "Two measures show whether the chosen project delivers.",
   "risks": "The main risk is the labour savings arriving late."

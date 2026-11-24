@@ -13,7 +13,7 @@
   "situation": "Supplier payments went to an account matching an employee's.",
   "options": "Two ways to take the matter forward.",
   "recommendation": "Propose what to preserve and put the file to counsel.",
-  "roadmap": "Secure the evidence first, then close the control gap.",
+  "roadmap": "Put preservation to counsel first, then close the control gap.",
   "kpis": "Two measures show the matter is handled properly.",
   "risks": "The main risk is losing evidence before a decision."
  },
@@ -157,7 +157,7 @@
  ],
  "recommendation": {
   "option": "Propose preservation and refer",
-  "rationale": "It secures the evidence behind [F2] of payments before anyone is alerted; the general counsel decides any next step and any conclusion about individuals."
+  "rationale": "It puts preservation of the records behind [F2] of payments to counsel before anyone is alerted; the general counsel decides any next step and any conclusion about individuals."
  },
  "roadmap": [
   {
@@ -183,7 +183,7 @@
  "kpis": [
   {
    "name": "Preservation list with counsel before any interview",
-   "target": "All of them"
+   "target": "Agreed before any interview"
   },
   {
    "name": "Payments checked against delivery records",

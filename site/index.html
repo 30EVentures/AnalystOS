@@ -152,8 +152,24 @@ footer a{color:var(--muted)}
 .studio-links{margin-left:auto;display:flex;gap:16px}
 .studio-links a{color:#e8f4ff;text-decoration:none;opacity:.85}
 .studio-links a:hover,.studio-links a:focus-visible{opacity:1;text-decoration:underline}
-.studio-foot{margin:14px 0 0;font-size:.85rem;opacity:.9}
-.studio-foot a{color:inherit;text-decoration:underline}
+.af{background:#0f1b2d;color:#c9d3e3;margin:64px 0 0;padding:56px 0 26px;border:0;font:400 15px/1.55 var(--sans,system-ui,-apple-system,'Segoe UI',sans-serif)}
+.af-in{max-width:1100px;margin:0 auto;padding:0 20px}
+.af-grid{display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:36px;padding-bottom:40px;border-bottom:1px solid #26354f}
+.af-name{font:800 22px/1 var(--display,system-ui,sans-serif);letter-spacing:-.02em;color:#fff;text-decoration:none}
+.af-line{font:400 18px/1.45 var(--serif,Georgia,serif);color:#fff;margin:16px 0 18px;max-width:17em}
+.af-pill{display:flex;gap:8px;align-items:flex-start;background:#1a2a44;border:1px solid #2c3f60;border-radius:4px;padding:10px 12px;font-size:13.5px;line-height:1.4;color:#e8d9b0;max-width:20em}
+.af-pill::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:#e0a62e;margin-top:6px}
+.af h2{font:600 12px/1 var(--sans,system-ui,sans-serif);letter-spacing:.09em;text-transform:uppercase;color:#8da0bd;margin:4px 0 18px}
+.af ul{list-style:none;margin:0;padding:0}.af li{margin:0 0 11px}
+.af a{color:#e8eef8;text-decoration:none}.af li a:hover,.af li a:focus-visible,.af-mid a:hover{text-decoration:underline;text-underline-offset:3px}
+.af li small{display:block;color:#8da0bd;font-size:12.5px;margin-top:1px}
+.af-note{padding:22px 0 0;font-size:13.5px;line-height:1.7;color:#aab8cf;max-width:70ch}
+.af-note p,.af-note .fine{margin:0 0 8px;font:inherit;color:inherit;max-width:none}
+.af-mid{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:22px 0;font-size:14.5px;color:#aab8cf}
+.af-mid a{color:#fff}
+.af-bot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13.5px;color:#8da0bd}
+@media (max-width:900px){.af-grid{grid-template-columns:1fr 1fr}.af-grid>div:first-child{grid-column:1/-1}}
+@media print{.af{background:#fff;color:#000}.af a,.af-name,.af-line{color:#000}}
 @media (max-width:640px){.studio-line,.studio-sub{display:none}.studio-in{padding:9px 14px;gap:12px}.studio-links{gap:12px}}
 @media print{.studio-bar{display:none}}
 /* studio:css:end */
@@ -161,7 +177,7 @@ footer a{color:var(--muted)}
 </head>
 <body>
 <!-- studio:bar:start -->
-<div class="studio-bar" role="navigation" aria-label="30E Ventures"><div class="studio-in"><a class="studio-brand" href="https://30eventures.com"><svg class="studio-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="3" height="18" fill="#f2f6fa"/><rect x="6" y="3" width="15" height="3" fill="#f2f6fa"/><rect x="6" y="10.5" width="10" height="3" fill="#f2f6fa"/><rect x="6" y="18" width="15" height="3" fill="#2fd4ff"/></svg><span>30E<span class="studio-sub">VENTURES</span></span></a><span class="studio-line">AnalystOS is a 30E Ventures product</span><span class="studio-links"><a href="https://30eventures.com/portfolio">Portfolio</a><a href="https://30eventures.com/about">About</a><a href="https://30eventures.com/press">Press</a></span></div></div>
+<div class="studio-bar" role="navigation" aria-label="30E Ventures"><div class="studio-in"><a class="studio-brand" href="https://www.30eventures.com/"><svg class="studio-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="3" height="18" fill="#f2f6fa"/><rect x="6" y="3" width="15" height="3" fill="#f2f6fa"/><rect x="6" y="10.5" width="10" height="3" fill="#f2f6fa"/><rect x="6" y="18" width="15" height="3" fill="#2fd4ff"/></svg><span>30E<span class="studio-sub">VENTURES</span></span></a><span class="studio-line">AnalystOS is a 30E Ventures product</span><span class="studio-links"><a href="https://www.30eventures.com/portfolio/">Portfolio</a><a href="https://www.30eventures.com/about/">About</a><a href="https://www.30eventures.com/press/">Press</a></span></div></div>
 <!-- studio:bar:end -->
 <header class="top">
   <div class="topin">
@@ -416,18 +432,8 @@ footer a{color:var(--muted)}
 })();
 </script>
 
-<footer>
-  <div class="wrap">
-    <div class="more">
-      <a href="details.html">Full details: how it works, privacy and known limits</a>
-      <a href="upload.html">Have a document? Get a verified report from it</a>
-      <a href="llms.txt">For agents: llms.txt</a>
-      <a href="/api/v2/catalog">Role catalog (JSON)</a>
-    </div>
 <!-- studio:footer:start -->
-<p class="studio-foot">AnalystOS is built by <a href="https://30eventures.com">30E Ventures</a>, a machine-native venture studio in Toronto building the agentic internet. <a href="https://30eventures.com/portfolio">Portfolio</a> &middot; <a href="https://30eventures.com/about">About</a> &middot; <a href="https://30eventures.com/brand">Brand</a> &middot; <a href="https://30eventures.com/press">Press</a> &middot; <a href="https://30eventures.com/contact">Contact</a></p>
+<footer class="af"><div class="af-in"><div class="af-grid"><div><a class="af-name" href="/">AnalystOS</a><p class="af-line">Every figure in the report, proven against its source.</p><div class="af-pill"><span>Early stage. Not for confidential documents yet. Limits are published.</span></div></div><div><h2>Product</h2><ul><li><a href="/#how">How it works</a></li><li><a href="/#samples">Sample reports</a></li><li><a href="/hire.html">Hire a role</a><small>access code</small></li><li><a href="/upload.html">Upload a document</a><small>access code</small></li><li><a href="/details.html">Details, privacy and known limits</a></li></ul></div><div><h2>Developers</h2><ul><li><a href="/api/v1/openapi.json">API reference</a><small>OpenAPI 3.1</small></li><li><a href="/docs/api.md">API guide</a></li><li><a href="/docs/seal.md">Seal specification</a><small>re-verify offline</small></li><li><a href="/api/v2/catalog">Role catalog</a><small>JSON</small></li><li><a href="/.well-known/api-catalog">API catalog</a></li><li><a href="/llms.txt">llms.txt</a><small>for agents</small></li></ul></div><div><h2>Learn</h2><ul><li><a href="https://www.30eventures.com/concepts/">Concepts</a><small>verifiable by a stranger, and six more</small></li><li><a href="https://www.30eventures.com/learn/">Glossary</a><small>seal, verifier, fail closed</small></li><li><a href="https://www.30eventures.com/why/">Why we build</a></li><li><a href="https://www.30eventures.com/faq/">FAQ</a></li></ul></div><div><h2>30E Ventures</h2><ul><li><a href="https://www.30eventures.com/about/">About the studio</a></li><li><a href="https://www.30eventures.com/portfolio/">Portfolio</a></li><li><a href="https://www.30eventures.com/press/">Press</a></li><li><a href="https://www.30eventures.com/brand/">Brand</a></li><li><a href="https://www.30eventures.com/contact/">Contact</a></li></ul></div></div><div class="af-note"><!-- studio:note:start --><!-- studio:note:end --></div><div class="af-mid"><span>AnalystOS is built by <a href="https://www.30eventures.com/">30E Ventures</a>, a machine-native venture studio in Toronto building the agentic internet.</span><span>Status: <b>live, early stage</b>.</span></div><div class="af-bot"><span>&copy; 2026 30E Ventures &middot; Toronto, Canada</span><span>Use non-confidential documents only.</span></div></div></footer>
 <!-- studio:footer:end -->
-  </div>
-</footer>
 </body>
 </html>

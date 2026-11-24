@@ -21,7 +21,7 @@ def served_files():
 class ServedSiteIdentityTest(unittest.TestCase):
     def test_the_scan_actually_covers_the_pages_and_the_generated_docs(self):
         names = {p.relative_to(SITE).as_posix() for p in served_files()}
-        for expected in ("index.html", "upload.html", "index.old.html", "llms.txt", "docs/api.md"):
+        for expected in ("index.html", "details.html", "upload.html", "index.old.html", "llms.txt", "docs/api.md"):
             self.assertIn(expected, names)
 
     def test_no_served_file_contains_a_personal_name_or_email(self):

@@ -281,14 +281,14 @@ class AdvertisedPathsExistTest(unittest.TestCase):
         self.assertEqual(missing, [])
 
     def test_every_in_page_anchor_exists(self):
-        index = (SITE / "index.html").read_text(encoding="utf-8")
         checked = 0
         for url, where in advertised_get_urls().items():
             path, _, fragment = same_site(url)
-            if fragment and path == "/":
+            if fragment and (path == "/" or path.endswith(".html")):
+                page = (SITE / ("index.html" if path == "/" else path.lstrip("/"))).read_text(encoding="utf-8")
                 checked += 1
-                self.assertRegex(index, rf'id="{re.escape(fragment)}"', f"{url} (advertised in {where})")
-        self.assertGreater(checked, 0, "llms.txt links to /#trust; this check must see it")
+                self.assertRegex(page, rf'id="{re.escape(fragment)}"', f"{url} (advertised in {where})")
+        self.assertGreater(checked, 0, "llms.txt links to /details.html#trust; this check must see it")
 
     def test_the_sitemap_has_no_duplicates_and_only_this_host(self):
         urls = sitemap_urls()

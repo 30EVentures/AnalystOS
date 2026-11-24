@@ -25,7 +25,7 @@
 
 ## Limits, stated plainly
 
-- [Trust and known limits](https://analystos.dev/#trust): what leaves your environment, what is and is not checked
+- [Trust and known limits](https://analystos.dev/details.html#trust): what leaves your environment, what is and is not checked
 - Every figure is proven; only some relationships between figures are checked
 - Sealing proves a report was built from the sealed facts, not that the facts are the important ones
 

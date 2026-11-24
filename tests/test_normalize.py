@@ -88,7 +88,9 @@ def naturalise(response, client_text, variant):
     doc = {k: (walk(v, k) if k != "figures" else v) for k, v in doc.items()}
     for fig in doc["figures"]:
         if fig["basis"] == "client":
-            fig["quote"] = sentence_around(client_text, fig["quote"])      # a whole sentence, maybe two numbers
+            sentence = sentence_around(client_text, fig["quote"])
+            if len(find_numbers(sentence)) == 1:
+                fig["quote"] = sentence                                    # a whole sentence with its one number
             if fig["unit"] == "percent" and variant == 0:
                 fig["value"] = fig["value"] / 100                          # 7% given as 0.07
             fig["rationale"] = "Taken from the client's brief."           # an extra field
@@ -136,10 +138,20 @@ class NaturalWritingTest(unittest.TestCase):
         record = accepted_engagement(ROOT / "fixtures" / "consulting" / "churn-clinics")
         text = c.client_text_of(record)
         response = json.loads((ROOT / "fixtures" / "consulting" / "churn-clinics" / "response.json").read_text())
+        correct = copy.deepcopy(response)
         response["figures"][1]["quote"] = "churn went from 4% to 7% in two quarters"
         response["figures"][6]["rationale"] = "Exit surveys."
-        self.assertTrue(c.verify_content(response, text))
-        self.assertEqual(c.verify_content(normalize(response), text), [])
+        problems = c.verify_content(normalize(response), text)
+        # Slice 120: the extra field is dropped, but a two-number quote is never cut by code: it is refused with
+        # guidance, and the repair request carries that guidance to the model.
+        self.assertIn("quote only the client's words around that one number", problems[0])
+        # Everything else is the same root cause echoing through the figures and text that use F2.
+        self.assertTrue(all(any(k in p for k in ("defined earlier", "names no figure", "unknown or unverified"))
+                            for p in problems[1:]), problems)
+        replay = ReplayClient([response, correct])
+        spec = c.build_deck_spec(record, CATALOG, client=replay)
+        self.assertEqual(spec["attempts"], 2)
+        self.assertIn("quote only the client's words around that one number", replay.requests[1]["messages"][0]["content"])
 
 
 class NormalisingNeverWeakensTest(unittest.TestCase):
@@ -165,12 +177,17 @@ class NormalisingNeverWeakensTest(unittest.TestCase):
         problems = c.verify_content(normalize(response), text)
         self.assertTrue(any("not the client's exact words" in p or "does not" in p or "quote" in p for p in problems), problems)
 
-    def test_narrowing_needs_a_unique_match(self):
-        self.assertEqual(narrow_quote("went from 4% to 7% in two quarters", 7)[0], "to 7% in two quarters")
-        self.assertEqual(narrow_quote("went from 4% to 7% in two quarters", 0.04, "percent")[0], "went from 4% to")
-        self.assertEqual(narrow_quote("went from 4% to 7% in two quarters", 0.04), (None, None))  # x100 only for percent
-        self.assertEqual(narrow_quote("from 4% to 4% again", 4), (None, None))      # ambiguous
-        self.assertEqual(narrow_quote("from 4% to 7%", 5), (None, None))            # no match
+    def test_a_quote_is_never_cut(self):
+        # Slice 120: four release reviews each found a phrasing where a cut quote misled; code no longer cuts.
+        for quote in ("went from 4% to 7% in two quarters", "from 4% to 4% again", "Some 340 out of our 850 customers",
+                      "a 25% discount to the $1,200 list price", "$1,200 every 3 months"):
+            with self.subTest(quote=quote):
+                self.assertEqual(narrow_quote(quote, 7, "percent"), (None, None))
+                self.assertEqual(narrow_quote(quote, 1200, "usd"), (None, None))
+        self.assertEqual(narrow_quote("to 7% in two quarters", 7, "percent")[0], "to 7% in two quarters")
+        self.assertEqual(narrow_quote("to 7% in two quarters", 0.07, "percent")[1].value, 7)  # a percent as a fraction
+        self.assertEqual(narrow_quote("to 7% in two quarters", 0.07), (None, None))         # x100 only for percent
+        self.assertEqual(narrow_quote("to 7% in two quarters", 5, "percent"), (None, None))  # no match
         self.assertEqual(narrow_quote("about $9.6 million in revenue", 9.6)[1].value, 9600000)
 
     def test_a_wrong_computed_value_is_left_for_the_verifier(self):
@@ -245,8 +262,7 @@ class ReviewOfPr100Test(unittest.TestCase):
     def test_a_word_quantity_is_never_cut_out_of_a_quote(self):
         self.assertEqual(narrow_quote("A third of our 420 enterprise seats are idle", 420), (None, None))
         self.assertEqual(narrow_quote("half of the $1,200 average", 1200, "usd"), (None, None))
-        self.assertEqual(narrow_quote("quoted $1.8 million for a system that doubles picks", 1.8e6, "usd")[0],
-                         "quoted $1.8 million for a system that")  # a word quantity after the number bounds the cut
+        self.assertEqual(narrow_quote("quoted $1.8 million for a system that doubles picks", 1.8e6, "usd"), (None, None))
         self.assertTrue(self.refused("A third of our 420 enterprise seats are idle.",
                                      {"id": "F16", "label": "Idle enterprise seats", "value": 420, "unit": "count",
                                       "basis": "client", "quote": "A third of our 420 enterprise seats are idle"},
@@ -279,9 +295,10 @@ class ReviewOfPr100Test(unittest.TestCase):
                 self.assertFalse(c.quote_number_is_whole(quote, client))
 
     def test_narrowing_respects_the_declared_unit_and_scale(self):
-        self.assertEqual(narrow_quote("churn hit 7% and 7 clinics left", 7, "count")[0], "and 7 clinics left")
-        self.assertEqual(narrow_quote("churn hit 7% and 7 clinics left", 7, "percent")[0], "churn hit 7% and")
-        self.assertEqual(narrow_quote("a $12,000 contract and a $5 fee", 12, "usd"), (None, None))  # no scale word
+        self.assertEqual(narrow_quote("7 clinics left", 7, "count")[0], "7 clinics left")
+        self.assertEqual(narrow_quote("7 clinics left", 7, "percent"), (None, None))  # not the declared unit
+        self.assertEqual(narrow_quote("churn hit 7%", 7, "count"), (None, None))
+        self.assertEqual(narrow_quote("a $12,000 contract", 12, "usd"), (None, None))  # no scale word
         fig = {"id": "F1", "label": "Payback", "value": 6, "unit": "months", "basis": "client",
                "quote": "a 6 month payback"}
         self.assertEqual(normalize({"figures": [fig], "answer": "[F1]"})["figures"][0]["unit"], "months")
@@ -357,36 +374,18 @@ class ReviewOfPr100Test(unittest.TestCase):
 class SecondReviewTest(unittest.TestCase):
     """Slice 120, second release review: the cases it found, kept as regression tests."""
 
-    def test_a_number_that_may_change_the_kept_one_is_never_cut_away(self):
+    def test_every_reviewed_phrasing_is_left_whole(self):
         for quote, value, unit in (("About 40% of our 850 customers are small clinics", 850, "count"),
-                                   ("33% of our 420 enterprise seats are idle", 420, "count"),
-                                   ("1 in 3 of our 420", 420, "count"), ("1/3 of our 420", 420, "count"),
-                                   ("About 140 of our 420", 420, "count"), ("40% or so of our 850", 850, "count"),
-                                   ("50% of the $1,200 average", 1200, "usd"), ("2x the $1,200 average", 1200, "usd")):
+                                   ("Some 340 out of our 850 customers are small clinics", 850, "count"),
+                                   ("Small clinics get a 25% discount to the $1,200 list price", 1200, "usd"),
+                                   ("Small clinics pay 25% less compared with the $1,200 average", 1200, "usd"),
+                                   ("Churn is 3 points higher compared to the 12% average", 12, "percent"),
+                                   ("Small clinics pay $1,200 every 3 months", 1200, "usd"),
+                                   ("Small clinics pay $1,200 minus $300 in credits", 1200, "usd"),
+                                   ("$300 off the $1,200 average", 1200, "usd"), ("3 times the $1,200 average", 1200, "usd"),
+                                   ("we have 850 customers paying on average $1,200 per month", 1200, "usd")):
             with self.subTest(quote=quote):
                 self.assertEqual(narrow_quote(quote, value, unit), (None, None))
-        self.assertEqual(narrow_quote("half the $1,200 average", 1200, "usd"), (None, None))  # a word quantity, no "of"
-        for quote, value, unit in (("Some 340 out of our 850 customers are small clinics", 850, "count"),
-                                   ("About 40% out of our 850", 850, "count"), ("40% among our 850", 850, "count"),
-                                   ("A 40% share of the 850", 850, "count"), ("40%, or about a third, of our 850", 850, "count"),
-                                   ("40% (roughly) of our 850", 850, "count"), ("40% - of our 850 -", 850, "count"),
-                                   ("3 times the $1,200 average", 1200, "usd"), ("$300 above the $1,200 average", 1200, "usd"),
-                                   ("$300 short of the $1,200 average", 1200, "usd"),
-                                   ("50% less than the $1,200 average", 1200, "usd")):
-            with self.subTest(third_review=quote):  # third review: cut only at an explicit break
-                self.assertEqual(narrow_quote(quote, value, unit), (None, None))
-        self.assertEqual(narrow_quote("Contractor spend was $600,000 against a plan of $350,000", 350000, "usd")[0],
-                         "against a plan of $350,000")
-        self.assertEqual(narrow_quote("went from 4% to 7% in two quarters", 7, "percent")[0], "to 7% in two quarters")
-        self.assertEqual(narrow_quote("we have 850 customers paying on average $1,200 per month", 1200, "usd")[0],
-                         "customers paying on average $1,200 per month")  # plain words, nothing ties the numbers
-        self.assertEqual(narrow_quote("fell to 88% this year as orders grew from 4,000", 4000, "count")[0],
-                         "this year as orders grew from 4,000")  # "from" starting a range ties nothing
-        for quote in ("40% across our 850", "40% between our 850", "$300 + the $1,200", "40% inside the 850",
-                      "40% of each 850", "40% came from our 850", "2x our usual $1,200 average", "4 850 customers"):
-            with self.subTest(linked=quote):
-                self.assertEqual(narrow_quote(quote, 1200 if "1,200" in quote else 850,
-                                              "usd" if "$" in quote else "count"), (None, None))
 
     def test_hyphenated_plural_and_short_scale_words(self):
         for text in ("$12.2-million", "$12.2 millions", "$12.2 mil", "$12.2 Mill."):

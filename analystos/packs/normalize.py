@@ -11,17 +11,13 @@ it did change it, each now a regression test (tests/test_normalize.py):
   precision shown, within 5%, the right kind) is removed, as is a matching unit
   or currency beside the tag; code prints the verified value instead. A number
   that does not state its figure is left in place, so the verifier refuses it.
-- A client quote is narrowed, verbatim, to the part holding the one number that
-  equals the figure's value in the figure's own unit; the figure then takes that
-  number's value. It cuts only at an explicit break before that number
-  (punctuation, "and", "to", "but", "against", ...) when the words after the
-  break do not tie the two numbers together ("of", "out of", "times", "above",
-  "short of", "among", ...), or across plain words with no linking word or sign
-  anywhere ("850 customers paying on average $1,200"). "340 out of our 850",
-  "3 times the $1,200" and "a third of our 420" are left whole for the verifier
-  to refuse. The declared unit is
-  never overridden; a quote that is not the client's words is left for the
-  verifier to refuse.
+- A client quote is never cut or changed. When it states exactly one number and
+  that number is the figure's value in the figure's unit (as given, as a percent
+  stored as a fraction, or with the quote's scale word), the figure takes that
+  number's value as written. A quote with two numbers is left whole for the
+  verifier to refuse (the repair request tells the model to quote only the words
+  around one number). The declared unit is never overridden; a quote that is not
+  the client's words is left for the verifier to refuse.
 - A computed figure's value is never filled or recomputed: the verifier
   recomputes it and refuses a mismatch, so reversed or wrong inputs are caught.
   The one change made to a computed figure: its unit is set to the only unit its
@@ -35,9 +31,10 @@ it did change it, each now a regression test (tests/test_normalize.py):
 - A parenthetical right after a tag that states that figure ("[F2] (7%)") is
   removed.
 
-Slice 120 (release review of PR #100): earlier versions recomputed every computed
-value, matched quotes by scale and unit regardless of kind, cut across word
-quantities and rewrote "90 days" anywhere; each could make a wrong deck pass.
+Slice 120 (four release reviews of PR #100 and its fixes): earlier versions
+recomputed every computed value, matched quotes by scale and unit regardless of
+kind, cut quotes down to one number (every cut rule was bypassed by some
+phrasing) and rewrote "90 days" anywhere; each could make a wrong deck pass.
 
 Pure and total: never raises, never mutates its input.
 """
@@ -136,15 +133,6 @@ def strip_redundant_numbers(text, figures):
 _OPTION_LABEL = re.compile(r"^\s*(?:option|choice)?\s*(?:[a-z]|[0-9]{1,2})?\s*[:.)\u2013\u2014-]\s+", re.IGNORECASE)
 _UNIT_ALIASES = {"%": "percent", "pct": "percent", "percentage": "percent", "$": "usd", "dollars": "usd", "dollar": "usd",
                  "pts": "points", "pp": "points", "percentage points": "points", "x": "ratio", "times": "ratio"}
-_BREAK = re.compile(r"[,;:]|[.!?](?=\s|$)|\b(?:and|but|to|then|while|whereas|versus|vs|against|compared (?:with|to))\b",
-                    re.IGNORECASE)
-_LINK = re.compile(r"[+*/×÷=()\-–—]|\b(?:of|out|times|x|above|below|under|over|more|less|fewer|short|among|amongst|"
-                   r"within|inside|across|between|beyond|than|in|from(?=\s+(?:our|the|its|their|all|these|those|this|that|each|"
-                   r"every|your|his|her|a|an)\b)|per|share|percent|part|portion|fraction|half|"
-                   r"double|twice|third|quarter|fifth|tenth|whole|total|each|every|all)\b", re.IGNORECASE)
-_RELATION = re.compile(r"\s*(?:or so\s+)?(?:of|out|times|x|above|below|under|over|more|less|fewer|short|among|"
-                       r"within|in|from|per|share|percent|part|portion|fraction|half|double|twice|"
-                       r"a\s+(?:share|part|portion|fraction|third|quarter|half))\b", re.IGNORECASE)
 _SCALED = re.compile(r"[kKmMB]$|thousand|million|billion|trillion|bn|mm|mn|mln|mio|mill?|crores?|lakhs?", re.IGNORECASE)
 _UNITS_FOR_KIND = {"percent": {"percent"}, "points": {"points"}, "usd": {"usd"}, "ratio": {"ratio"},
                    None: {"count", "months", "other"}}
@@ -157,44 +145,28 @@ def _fits(token, unit):
 
 
 def narrow_quote(quote, value, unit=None):
-    """``(quote, token)`` narrowed to the verbatim part of ``quote`` holding the one number
-    that matches ``value`` (as given, as a percent of 1, or at a thousand/million/billion
-    scale). ``(None, None)`` when there is no unique match."""
-    every = find_numbers(quote)              # digits and number words: both bound the narrowed piece
-    tokens = [t for t in every if t.value is not None]
-    target = _number(value)
-    candidates = []
-    for token in tokens:
-        if target is None:
-            if len(tokens) == 1 and _fits(token, unit):
-                candidates.append(token)
-            continue
-        forms = [target] if _fits(token, unit) else []
-        if unit == "percent" and token.kind == "percent":
-            forms.append(target * 100)           # a percent stored as a fraction (0.07 for 7%)
-        if _SCALED.search(token.text) and _fits(token, unit):
-            forms += [target * 1e3, target * 1e6, target * 1e9]  # "$12.2 million" stored as 12.2
-        if any(math.isclose(token.value, f, rel_tol=1e-9, abs_tol=1e-9) for f in forms):
-            candidates.append(token)
-    if len(candidates) != 1:
+    """``(quote, token)`` when ``quote`` states exactly one number and that number is the
+    figure's ``value`` in its unit - as given, as a percent stored as a fraction (0.07 for
+    7%), or with the quote's own scale word ("$12.2 million" stored as 12.2) - else
+    ``(None, None)``. The quote itself is never changed: Slice 120 removed cutting a quote
+    down to one number after four release reviews each found a phrasing where the cut
+    piece misled ("340 out of our 850", "a 25% discount to the $1,200", "$1,200 every
+    3 months"). A quote with two numbers is refused by the verifier and fixed by the
+    model on the repair request. (The name is kept so callers need not change.)"""
+    every = find_numbers(quote)
+    if len(every) != 1 or every[0].value is None:
         return None, None
-    chosen = candidates[0]
-    i = every.index(chosen)
-    if i > 0:
-        prev, gap = every[i - 1], quote[every[i - 1].end:chosen.start]
-        breaks = list(_BREAK.finditer(gap))
-        plain = (prev.value is not None and prev.kind != "ratio" and re.search(r"[^\W\d_]", gap)
-                 and not _LINK.search(gap))  # "850 customers paying on average $1,200": nothing ties them
-        if not plain and (not breaks or _RELATION.match(gap[breaks[-1].end():])):
-            # Cut only at an explicit break (punctuation, "and", "to", "but", "against", ...) whose following
-            # words do not tie the numbers together, or across plain words with no linking word anywhere:
-            # "340 out of our 850", "3 times the $1,200", "40%, or about a third, of our 850" stay whole.
-            return None, None
-    start = every[i - 1].end if i > 0 else 0
-    end = every[i + 1].start if i + 1 < len(every) else len(quote)
-    piece = quote[start:end].strip(" ,;:-–—")
-    # Drop a dangling connector left at the cut ("went from 4% to" keeps its words; fine).
-    return piece, next(t for t in find_numbers(piece) if t.value is not None)
+    token, target = every[0], _number(value)
+    if target is None:
+        return (quote, token) if _fits(token, unit) else (None, None)
+    forms = [target] if _fits(token, unit) else []
+    if unit == "percent" and token.kind == "percent":
+        forms.append(target * 100)               # a percent stored as a fraction (0.07 for 7%)
+    if _SCALED.search(token.text) and _fits(token, unit):
+        forms += [target * 1e3, target * 1e6, target * 1e9]  # "$12.2 million" stored as 12.2
+    if any(math.isclose(token.value, f, rel_tol=1e-9, abs_tol=1e-9) for f in forms):
+        return quote, token
+    return None, None
 
 
 def _client_unit(token, declared):

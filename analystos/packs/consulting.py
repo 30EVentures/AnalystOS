@@ -178,7 +178,8 @@ quarters" and "we have 850 customers paying on average $1,200 per month"):
 
 Common mistakes that get content rejected:
 - "7% [F2]" or "[F2]%" or "$[F6]": write only "[F2]", "[F6]".
-- A quote with two numbers ("went from 4% to 7%"): quote the part with one.
+- A quote with two numbers ("went from 4% to 7%"): quote only the part with
+  one ("to 7% in two quarters"). Code never shortens a quote for you.
 - A percent stored as 0.07: store 7 with unit percent.
 - Digits for durations or days ("within 90 days", "by day 30"): write "within
   three months", "in the first month".
@@ -523,7 +524,8 @@ def _figure_problems(figures, client_text):
                 problems.append(f"{where}: its quote must include a word saying what the number is")
                 ok = False
             elif len(tokens) != 1 or tokens[0].value is None:
-                problems.append(f"{where}: its quote must state exactly one number in digits (it has {len(tokens)})")
+                problems.append(f"{where}: its quote must state exactly one number in digits (it has {len(tokens)}); "
+                                f"quote only the client's words around that one number, e.g. 'to 7% in two quarters'")
                 ok = False
             elif not quote_number_is_whole(quote, client_text):
                 problems.append(f"{where}: its quote cuts off the number the client wrote there "

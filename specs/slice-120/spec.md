@@ -77,6 +77,19 @@ between the numbers; a numbered name is allowed only before punctuation or a
 joining word. Every case from that review's bypass script is refused except
 true excerpts ("Up 40% to 850 customers") and the open after-the-number case.
 
+## Fourth review (same day): quote cutting removed
+
+The quick review of d77fdf0 failed it again on the same step: a cut quote could
+still mislead ("a 25% discount to the $1,200 list price" cut to "discount to the
+$1,200 list price"; "$1,200 every 3 months" cut to "$1,200 every"), some of it
+already possible on main. Four reviews each found a phrasing past the latest cut
+rule, so code no longer cuts a quote at all: a quote with two numbers is refused
+with guidance ("quote only the client's words around that one number") that the
+repair request carries to the model. The cost: when the live model quotes whole
+two-number sentences, as in the first paid test, the run needs its second call.
+Open, judged not realistic enough to block: "Tier 1, [F5] customers" and
+"Plan 3 of the hires" pass with a numbered name before punctuation or "of".
+
 ## Results (2026-11-23)
 
 - Every blocker case from the review: a regression test that fails on main

@@ -2,13 +2,10 @@
  {"name": "strip a number even when it does not state its figure", "old": "            if tokens and states(tokens[-1], figure):", "new": "            if tokens:"},
  {"name": "kind ignored when deciding a number states its figure", "old": "    if token.kind not in _KIND_FOR_UNIT.get(figure.get(\"unit\"), set()):\n        return False", "new": "    if False:\n        return False"},
  {"name": "5% gap ignored", "old": "    return token.value == 0 if fv == 0 else abs(token.value - fv) / abs(fv) <= 0.05", "new": "    return True"},
- {"name": "ambiguous quote narrowed anyway", "old": "    if len(candidates) != 1:\n        return None, None", "new": "    if not candidates:\n        return None, None"},
  {"name": "unexpected figure fields kept", "old": "                    if key not in _FIGURE_KEYS[basis]:\n                        del fig[key]", "new": "                    if False:\n                        del fig[key]"},
  {"name": "unused figures kept", "old": "        doc[\"figures\"] = _drop_unused(doc)", "new": "        pass"},
  {"name": "charted figures dropped as unused", "old": "            used.update(x for x in chart[\"figure_ids\"] if isinstance(x, str))", "new": "            pass"},
  {"name": "a quote matched regardless of unit (the PR #100 gap)", "old": "    return unit not in _UNITS or unit in _UNITS_FOR_KIND.get(token.kind, set())", "new": "    return True"},
- {"name": "x100 match for any unit", "old": "        if unit == \"percent\" and token.kind == \"percent\":", "new": "        if True:"},
- {"name": "scale match without a scale word", "old": "        if _SCALED.search(token.text) and _fits(token, unit):", "new": "        if _fits(token, unit):"},
  {"name": "nested unknown fields kept", "old": "                doc[key] = _drop_unknown(doc[key], schema[\"properties\"][key])", "new": "                pass"},
  {"name": "option name not matched", "old": "    if len(inside) == 1:\n        rec[\"option\"] = inside[0]", "new": "    if False:\n        rec[\"option\"] = inside[0]"},
  {"name": "ambiguous option name matched", "old": "    if len(inside) == 1:", "new": "    if inside:"},
@@ -17,8 +14,9 @@
  {"name": "an option matched without its label (inversion)", "old": "    inside = [n for n in names if n.strip().lower() == bare]", "new": "    inside = [n for n in names if n.strip().lower() in said]"},
  {"name": "unit aliases ignored", "old": "                fig[\"unit\"] = _UNIT_ALIASES[fig[\"unit\"].strip().lower()]", "new": "                pass"},
  {"name": "an unknown unit replaced from the quote", "old": "                    if fig.get(\"unit\") is None:  # filled only when absent; never overridden", "new": "                    if fig.get(\"unit\") not in _UNITS:"},
- {"name": "cut across linked plain words (third review)", "old": "                 and not _LINK.search(gap))", "new": "                 )"},
- {"name": "cut after an explicit break whatever follows", "old": "(not breaks or _RELATION.match(gap[breaks[-1].end():]))", "new": "(not breaks)"},
- {"name": "cut across plain words after a multiple", "old": "plain = (prev.value is not None and prev.kind != \"ratio\" and", "new": "plain = (prev.value is not None and"},
- {"name": "cut across a gap with no words", "old": "re.search(r\"[^\\W\\d_]\", gap)", "new": "True"}
+ {"name": "a two-number quote matched (cutting back)", "old": "    if len(every) != 1 or every[0].value is None:", "new": "    if not every or every[0].value is None:"},
+ {"name": "a quote matched to any unit", "old": "        return (quote, token) if _fits(token, unit) else (None, None)", "new": "        return quote, token", "equivalent": "only reached when the figure has no value; the declared unit is never changed, so the verifier still refuses a quote whose number is not that unit"},
+ {"name": "x100 match for any unit", "old": "    if unit == \"percent\" and token.kind == \"percent\":", "new": "    if True:"},
+ {"name": "scale match without a scale word", "old": "    if _SCALED.search(token.text) and _fits(token, unit):", "new": "    if _fits(token, unit):"},
+ {"name": "a quote of another unit matched", "old": "    forms = [target] if _fits(token, unit) else []", "new": "    forms = [target]"}
 ]

@@ -39,21 +39,17 @@ failed it again on two partly closed blockers (a quote cut across "40% of our
 850", written in digits; "$12.2-million" and "$12.2 millions") and one new hole
 ("of" taken as a time word), and those are fixed too. What the normaliser now
 does to numbers, stated exactly: it never fills or recomputes a computed
-figure's value; it replaces a client quote only with a verbatim part of it whose
-one number equals the declared value in the declared unit (and then sets the
-value to that number as written: 0.07 becomes 7, 12.2 with "million" becomes
-12,200,000), cutting only at an explicit break (punctuation, "and", "to",
-"but", "against") where the words after it do not tie the numbers together
-("of", "out of", "times", "above", ...), or across plain words with no linking
-word or sign at all ("850 customers paying on average $1,200"); it fills a unit only when none is given
+figure's value; it never cuts or changes a client quote; when a quote states exactly
+one number and it is the declared value in the declared unit, it sets the value
+to that number as written (0.07 becomes 7, 12.2 with "million" becomes
+12,200,000); it fills a unit only when none is given
 and maps aliases ("%", "USD"); and on a computed figure it sets the unit to the
 only one its operation allows and turns a "ratio" declared as a percent into
-percent_of_total (the value is still checked). A third review found the cut
-rule, then written as a short list of dangerous words checked only at the
-start, still let "340 out of our 850" and "3 times the $1,200" through; it now
-needs a safe break, or plain words with none of a much longer list of linking
-words anywhere between the numbers. That list can still miss a rare linking
-word; the cost of such a miss is a quote shown as a verbatim fragment. The cost: slips it used to fix
+percent_of_total (the value is still checked). Cutting a two-number quote down
+to one number was removed after four reviews in a row each found a phrasing
+where the cut misled ("340 out of our 850", "3 times the $1,200", "a 25% discount
+to the $1,200", "$1,200 every 3 months"): such a quote is now refused with
+guidance and fixed by the model on the repair request. The cost: slips it used to fix
 (a drifted calculation, "90 days", a missing value) now go to the one repair
 request; that path is tested only with a replayed correct second answer, so
 whether the live model fixes them is unmeasured. Lesson, again: no merge

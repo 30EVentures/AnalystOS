@@ -1,0 +1,234 @@
+{
+ "answer": "Fix dispatch at the main warehouse first: it caused [F9] of last quarter's [F8] late deliveries, which cost about [F10].",
+ "exec_summary": [
+  "On-time delivery fell from [F1] to [F2], a fall of [F6].",
+  "Of [F3] deliveries, [F8] were late, costing about [F10].",
+  "Late departures from the main warehouse caused [F4] of them, or [F9]."
+ ],
+ "situation": "A distributor delivering to stores from a main warehouse.",
+ "complication": "On-time delivery fell sharply in one quarter, and late deliveries carry re-delivery costs and penalties.",
+ "key_question": "Why did on-time delivery fall, and where should the fix start?",
+ "titles": {
+  "situation": "On-time delivery to stores fell sharply last quarter.",
+  "options": "Two ways to bring on-time delivery back up.",
+  "recommendation": "Fix dispatch timing at the main warehouse first.",
+  "roadmap": "Find the dispatch cause before the logistics review, then fix it.",
+  "kpis": "Two measures show on-time delivery is recovering.",
+  "risks": "The main risk is the warehouse delay hiding a transport problem."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "On-time delivery rate, before",
+   "value": 95,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "fell from 95%"
+  },
+  {
+   "id": "F2",
+   "label": "On-time delivery rate, last quarter",
+   "value": 86,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "to 86% last quarter"
+  },
+  {
+   "id": "F3",
+   "label": "Deliveries to stores last quarter",
+   "value": 20000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We made 20,000 deliveries"
+  },
+  {
+   "id": "F4",
+   "label": "Late deliveries that left the warehouse late",
+   "value": 2100,
+   "unit": "count",
+   "basis": "client",
+   "quote": "2,100 left our main warehouse late"
+  },
+  {
+   "id": "F5",
+   "label": "Cost per late delivery",
+   "value": 45,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "costs us $45 in re-delivery"
+  },
+  {
+   "id": "F6",
+   "label": "Fall in on-time delivery",
+   "value": 9,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "On-time deliveries last quarter",
+   "value": 17200,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F3",
+    "F2"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Late deliveries last quarter",
+   "value": 2800,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F3",
+    "F7"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Share of late deliveries from warehouse delays",
+   "value": 75,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F4",
+    "F8"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Cost of late deliveries last quarter",
+   "value": 126000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F8",
+    "F5"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Size of the problem",
+   "finding": "Late deliveries cost real money each quarter.",
+   "points": [
+    "On-time delivery fell by [F6] to [F2].",
+    "[F8] late deliveries cost about [F10]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The fall is large enough to act on now.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "Bringing the rate back up saves re-delivery costs and penalties.",
+   "chart": {
+    "title": "On-time delivery fell sharply last quarter.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "Before",
+     "Last quarter"
+    ]
+   }
+  },
+  {
+   "branch": "Where lateness starts",
+   "finding": "Most late deliveries start at the main warehouse.",
+   "points": [
+    "[F4] late deliveries left the warehouse late, [F9] of the total."
+   ],
+   "hypotheses": [
+    {
+     "text": "Lateness starts mainly on the road.",
+     "verdict": "refuted"
+    },
+    {
+     "text": "Warehouse staffing at peak dispatch causes the delays.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Fixing warehouse dispatch addresses most late deliveries.",
+   "chart": {
+    "title": "Most late deliveries left the warehouse late.",
+    "figure_ids": [
+     "F8",
+     "F4"
+    ],
+    "labels": [
+     "All late deliveries",
+     "Left the warehouse late"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Fix warehouse dispatch",
+   "description": "Find why loads leave late using dispatch logs and fix that cause.",
+   "effort": "medium"
+  },
+  {
+   "name": "Add carrier capacity",
+   "description": "Book more carrier slots to make up time on the road.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Fix warehouse dispatch",
+  "rationale": "Warehouse delays caused [F9] of late deliveries, which cost about [F10] last quarter; the head of logistics decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Match dispatch logs to late deliveries by hour and shift before the logistics review."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Fix the main cause with the warehouse manager."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Compare on-time delivery with [F1] and report savings."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "On-time delivery rate",
+   "target": "Back towards [F1]"
+  },
+  {
+   "name": "Loads leaving the warehouse late",
+   "target": "Falling each month"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Fixing dispatch reveals a transport problem behind it.",
+   "mitigation": "Track road delays separately in the same report."
+  },
+  {
+   "risk": "Dispatch logs and delivery records do not match.",
+   "mitigation": "Reconcile a sample week by hand first."
+  }
+ ]
+}

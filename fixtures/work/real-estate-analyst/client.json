@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "real-estate-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We are considering buying a small office building for $6,000,000. It is now 80% leased.",
+ "answers": {
+  "common.decision": "Whether to make an offer at the asking price; the investment committee decides.",
+  "common.deadline": "The seller wants offers within a month.",
+  "common.audience": "The investment committee.",
+  "common.materials": "At full occupancy the building's rent would be $900,000 a year. Operating costs not recovered from tenants are $300,000 a year. Similar buildings in the area trade at a 7.5% yield.",
+  "finance-modeling.purpose": "Work out the yield on the asking price today and once fully let.",
+  "finance-modeling.data": "The seller's rent roll and operating cost statement, in US dollars."
+ }
+}

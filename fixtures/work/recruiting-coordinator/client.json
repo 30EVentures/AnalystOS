@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "recruiting-coordinator"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We are hiring 12 customer service agents for a new team, and 60 candidates have passed the phone screen.",
+ "answers": {
+  "common.decision": "How to schedule the panel interviews; the customer service manager approves every booking and candidate message.",
+  "common.deadline": "The new team starts next quarter.",
+  "common.audience": "The customer service manager.",
+  "common.materials": "Each candidate needs a one-hour panel interview with two managers. Our managers have 40 interview hours free over the next three weeks. Last round, 20% of booked candidates did not show up.",
+  "people-hr.process": "Panel interviews for customer service hiring, booked through our calendar system.",
+  "people-hr.decider": "The customer service manager approves every booking and decides who is hired."
+ }
+}

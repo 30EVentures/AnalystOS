@@ -1,0 +1,230 @@
+{
+ "answer": "Cut walking and packing waits: they take [F6] and [F8] of each order's time, and fixing them is the route from [F3] same-day shipping to the [F9] target.",
+ "exec_summary": [
+  "The warehouse ships [F2] of [F1] orders a day the same day, [F3].",
+  "Each order takes [F4] minutes; walking takes [F5] and packing waits [F7].",
+  "The same-day target of [F9] is [F10] above today."
+ ],
+ "situation": "A regional distributor whose warehouse ships orders daily.",
+ "complication": "Many orders miss same-day dispatch, and overtime has helped only a little.",
+ "key_question": "Where does order time go in the warehouse, and what would lift same-day shipping?",
+ "titles": {
+  "situation": "Many orders miss same-day dispatch.",
+  "options": "Two ways to lift same-day shipping.",
+  "recommendation": "Batch picking and balance the packing bench.",
+  "roadmap": "Cut walking first, then fix packing waits.",
+  "kpis": "Two measures show the warehouse is faster.",
+  "risks": "The main risk is moving the bottleneck to packing."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Orders shipped a day",
+   "value": 2400,
+   "unit": "count",
+   "basis": "client",
+   "quote": "ships 2,400 orders a day"
+  },
+  {
+   "id": "F2",
+   "label": "Orders leaving the same day",
+   "value": 1800,
+   "unit": "count",
+   "basis": "client",
+   "quote": "only 1,800 leave the same day"
+  },
+  {
+   "id": "F3",
+   "label": "Same-day shipping rate",
+   "value": 75,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F4",
+   "label": "Minutes from release to dispatch",
+   "value": 120,
+   "unit": "other",
+   "basis": "client",
+   "quote": "an order takes 120 minutes"
+  },
+  {
+   "id": "F5",
+   "label": "Minutes walking between aisles",
+   "value": 48,
+   "unit": "other",
+   "basis": "client",
+   "quote": "takes 48 minutes of that"
+  },
+  {
+   "id": "F6",
+   "label": "Share of order time spent walking",
+   "value": 40,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F5",
+    "F4"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Minutes waiting at the packing bench",
+   "value": 30,
+   "unit": "other",
+   "basis": "client",
+   "quote": "takes 30 minutes"
+  },
+  {
+   "id": "F8",
+   "label": "Share of order time waiting to pack",
+   "value": 25,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F7",
+    "F4"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Same-day shipping target",
+   "value": 95,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "Ship 95% of orders"
+  },
+  {
+   "id": "F10",
+   "label": "Gap to the same-day target",
+   "value": 20,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F9",
+    "F3"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Picking",
+   "finding": "Walking is the largest share of order time.",
+   "points": [
+    "Walking takes [F5] minutes of each order, [F6] of the time.",
+    "Pickers pick one order at a time across the whole warehouse."
+   ],
+   "hypotheses": [
+    {
+     "text": "Batch picking would cut walking time.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Cutting walking is the biggest single lever on order time.",
+   "chart": {
+    "title": "Share of order time by activity.",
+    "figure_ids": [
+     "F6",
+     "F8"
+    ],
+    "labels": [
+     "Walking",
+     "Packing wait"
+    ]
+   }
+  },
+  {
+   "branch": "Packing",
+   "finding": "Orders wait at the packing bench after picking.",
+   "points": [
+    "Packing waits take [F7] minutes, [F8] of order time."
+   ],
+   "hypotheses": [
+    {
+     "text": "Packing is understaffed at peak times.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Faster picking will only help if packing keeps up."
+  },
+  {
+   "branch": "Overtime",
+   "finding": "Extra hours did little for same-day shipping.",
+   "points": [
+    "Overtime last quarter helped only a little."
+   ],
+   "hypotheses": [
+    {
+     "text": "More hours alone will reach the target.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The fix is in the process, not more hours."
+  }
+ ],
+ "options": [
+  {
+   "name": "Batch and rebalance",
+   "description": "Pick several orders per walk and move staff to packing at peaks.",
+   "effort": "medium"
+  },
+  {
+   "name": "Re-slot fast movers",
+   "description": "Move the fastest-selling items near packing to shorten walks.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Batch and rebalance",
+  "rationale": "It targets both walking at [F6] and packing waits at [F8] without a new building; the operations director decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Trial batch picking in one zone and time it.",
+    "Give the operations director the plan within the four weeks."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Roll batch picking out to all zones and move staff to packing at peaks."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Re-time orders and compare same-day shipping with the target."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Same-day shipping rate",
+   "target": "Rising towards the target"
+  },
+  {
+   "name": "Minutes from release to dispatch",
+   "target": "Falling every month"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Packing becomes the new bottleneck.",
+   "mitigation": "Move pickers to packing when the bench queue builds."
+  },
+  {
+   "risk": "Batching causes picking errors.",
+   "mitigation": "Check a sample of batched orders each day."
+  }
+ ]
+}

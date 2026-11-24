@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "legal-operations-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our legal department spent $2,400,000 on outside counsel last year, up from $1,920,000 the year before.",
+ "answers": {
+  "common.decision": "Where to cut outside counsel spend; the general counsel decides.",
+  "common.deadline": "Next year's budget round.",
+  "common.audience": "The general counsel.",
+  "common.materials": "Routine commercial contracts made up $720,000 of outside counsel spend. Outside firms billed 3,200 hours on those contracts.",
+  "legal-contracts-procurement.documents": "Outside counsel invoices and our matter list.",
+  "legal-contracts-procurement.reviewer": "The general counsel approves any change to how work is sent out."
+ }
+}

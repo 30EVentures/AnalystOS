@@ -1,0 +1,252 @@
+{
+ "answer": "The book ran at a loss ratio of [F8] against a priced [F3], costing [F12]; both more claims and larger claims drove it, so prepare a rate review for the appointed actuary to decide.",
+ "exec_summary": [
+  "Claims of [F1] on premium of [F2] give a loss ratio of [F8].",
+  "That is [F9] above the priced target, about [F12] of extra claims.",
+  "Claim counts rose by [F10] and the average claim by [F11]."
+ ],
+ "situation": "An insurer with a book of pet insurance policies.",
+ "complication": "Claims ran well above what the book was priced for.",
+ "key_question": "Why did the loss ratio miss its target, and what should the appointed actuary review?",
+ "titles": {
+  "situation": "The pet insurance book missed its priced loss ratio.",
+  "options": "Two ways to put the rate question to the appointed actuary.",
+  "recommendation": "Prepare a rate review for the appointed actuary.",
+  "roadmap": "Prepare the review before rate filings are due.",
+  "kpis": "Two measures show whether the book is back on target.",
+  "risks": "The main risk is treating one year's experience as the new trend."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Claims last year",
+   "value": 6300000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "came in at $6.3 million"
+  },
+  {
+   "id": "F2",
+   "label": "Earned premium last year",
+   "value": 9000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "earned premium of $9 million"
+  },
+  {
+   "id": "F3",
+   "label": "Priced loss ratio",
+   "value": 60,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "a loss ratio of 60%"
+  },
+  {
+   "id": "F4",
+   "label": "Claim count the year before",
+   "value": 4000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "Claim counts rose from 4,000"
+  },
+  {
+   "id": "F5",
+   "label": "Claim count last year",
+   "value": 4500,
+   "unit": "count",
+   "basis": "client",
+   "quote": "to 4,500"
+  },
+  {
+   "id": "F6",
+   "label": "Average claim the year before",
+   "value": 1200,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "average claim rose from $1,200"
+  },
+  {
+   "id": "F7",
+   "label": "Average claim last year",
+   "value": 1400,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "to $1,400"
+  },
+  {
+   "id": "F8",
+   "label": "Loss ratio last year",
+   "value": 70,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Loss ratio above target",
+   "value": 10,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F8",
+    "F3"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Rise in claim count",
+   "value": 12.5,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "growth_percent",
+   "inputs": [
+    "F4",
+    "F5"
+   ]
+  },
+  {
+   "id": "F11",
+   "label": "Rise in average claim",
+   "value": 16.7,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "growth_percent",
+   "inputs": [
+    "F6",
+    "F7"
+   ]
+  },
+  {
+   "id": "F12",
+   "label": "Claims above the priced level",
+   "value": 900000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F2",
+    "F9"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Against the priced target",
+   "finding": "The loss ratio ran well above the level the book was priced for.",
+   "points": [
+    "Claims of [F1] on premium of [F2] give [F8].",
+    "The gap of [F9] is about [F12] of extra claims."
+   ],
+   "hypotheses": [
+    {
+     "text": "The book is priced adequately.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "The appointed actuary has a case to review rates.",
+   "chart": {
+    "title": "The loss ratio ran above the priced target.",
+    "figure_ids": [
+     "F3",
+     "F8"
+    ],
+    "labels": [
+     "Priced",
+     "Last year"
+    ]
+   }
+  },
+  {
+   "branch": "What drove the claims",
+   "finding": "Both claim frequency and claim size rose.",
+   "points": [
+    "Claim counts rose by [F10], from [F4] to [F5].",
+    "The average claim rose by [F11], from [F6] to [F7]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Larger claims, not more claims, drove the rise.",
+     "verdict": "refuted"
+    },
+    {
+     "text": "Higher vet fees explain the larger claims.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "A rate review should look at both how often and how much pets claim.",
+   "chart": {
+    "title": "Claim count and average claim both rose last year.",
+    "figure_ids": [
+     "F10",
+     "F11"
+    ],
+    "labels": [
+     "Claim count",
+     "Average claim"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Prepare a rate review",
+   "description": "Prepare a rate review covering frequency and severity for the appointed actuary.",
+   "effort": "medium"
+  },
+  {
+   "name": "Wait for more data",
+   "description": "Hold rates and review again after another year of claims.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Prepare a rate review",
+  "rationale": "The book ran [F9] above its priced loss ratio, about [F12] of claims, and both drivers rose; the appointed actuary decides any rate change before filings are due."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Split claims by breed, age and treatment type to test the drivers.",
+    "Share the analysis with the appointed actuary."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Support the appointed actuary's rate review before filings are due."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Track monthly loss ratio against the priced target."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Loss ratio",
+   "target": "Back to [F3]"
+  },
+  {
+   "name": "Average claim",
+   "target": "Tracked monthly against [F7]"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "One year's experience is not the new trend.",
+   "mitigation": "Compare with earlier years before setting rates."
+  },
+  {
+   "risk": "Higher rates push healthy pets out of the book.",
+   "mitigation": "Test the effect of rate changes on renewals."
+  }
+ ]
+}

@@ -1,0 +1,245 @@
+{
+ "answer": "Counter rather than accept: the offer values the business at [F5] EBITDA, while comparable deals at [F3] imply [F6], which is [F7] more.",
+ "exec_summary": [
+  "The offer of [F1] is [F5] last year's EBITDA of [F2].",
+  "At the comparable multiple of [F3] the business is worth [F6], [F10] above the offer.",
+  "After repaying net debt of [F4], the owners would receive [F8] at the offer against [F9] at the comparable value."
+ ],
+ "situation": "A family-owned packaging manufacturer that has received an offer for the whole business.",
+ "complication": "The offer is priced below what comparable packaging deals have fetched.",
+ "key_question": "Is the offer fair against comparable deals, and what should the owners do before the buyer's deadline?",
+ "titles": {
+  "situation": "The owners have an offer for the business and a deadline.",
+  "options": "Three ways to respond to the buyer.",
+  "recommendation": "Counter at the comparable multiple.",
+  "roadmap": "Counter within the buyer's deadline, then negotiate terms.",
+  "kpis": "Two measures show whether the deal closes on fair value.",
+  "risks": "The main risk is the buyer walking away."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Offer for the business",
+   "value": 96000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "an offer of $96 million"
+  },
+  {
+   "id": "F2",
+   "label": "EBITDA last year",
+   "value": 12000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "EBITDA last year was $12 million"
+  },
+  {
+   "id": "F3",
+   "label": "Comparable deal multiple",
+   "value": 9.5,
+   "unit": "ratio",
+   "basis": "client",
+   "quote": "traded at 9.5x EBITDA"
+  },
+  {
+   "id": "F4",
+   "label": "Net debt repaid from proceeds",
+   "value": 18000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "net debt of $18 million"
+  },
+  {
+   "id": "F5",
+   "label": "Multiple implied by the offer",
+   "value": 8,
+   "unit": "ratio",
+   "basis": "computed",
+   "operation": "ratio",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Value at the comparable multiple",
+   "value": 114000000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F2",
+    "F3"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Value gap to the offer",
+   "value": 18000000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F6",
+    "F1"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Owners' proceeds at the offer",
+   "value": 78000000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F4"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Owners' proceeds at the comparable value",
+   "value": 96000000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F6",
+    "F4"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Comparable value above the offer",
+   "value": 18.75,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "growth_percent",
+   "inputs": [
+    "F1",
+    "F6"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "The offer against comparable deals",
+   "finding": "The offer sits below the multiple comparable deals fetched.",
+   "points": [
+    "The offer implies [F5] EBITDA against [F3] for comparable deals.",
+    "At the comparable multiple the business is worth [F6]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The offer is in line with the market.",
+     "verdict": "refuted"
+    },
+    {
+     "text": "The buyer sees risks the comparable deals did not carry.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "There is a case to ask for more before accepting.",
+   "chart": {
+    "title": "The offer is well below the value comparable deals imply.",
+    "figure_ids": [
+     "F1",
+     "F6"
+    ],
+    "labels": [
+     "Offer",
+     "At comparable multiple"
+    ]
+   }
+  },
+  {
+   "branch": "What the owners would receive",
+   "finding": "Net debt comes off the price, so the gap matters more to the owners.",
+   "points": [
+    "Repaying [F4] of net debt leaves [F8] at the offer.",
+    "At the comparable value the owners would receive [F9]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Debt repayment changes which offer is better.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "Every dollar of the [F7] gap goes straight to the owners.",
+   "chart": {
+    "title": "Owners' proceeds rise sharply at the comparable value.",
+    "figure_ids": [
+     "F8",
+     "F9"
+    ],
+    "labels": [
+     "At the offer",
+     "At comparable value"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Counter at the comparable multiple",
+   "description": "Reply within the deadline asking for a price at the comparable multiple, backed by the deal list.",
+   "effort": "low"
+  },
+  {
+   "name": "Accept the offer",
+   "description": "Accept the price as offered and focus on terms.",
+   "effort": "low"
+  },
+  {
+   "name": "Run a wider sale",
+   "description": "Invite other buyers to bid before answering.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Counter at the comparable multiple",
+  "rationale": "The comparable deals support a value [F7] above the offer, all of which reaches the owners; the owners decide whether to counter."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Prepare the comparable deal list and valuation for the owners.",
+    "Send the owners' counter before the buyer's deadline."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Negotiate price and terms with the buyer."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Agree final terms or prepare a wider sale if talks stall."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Price against the comparable value",
+   "target": "As close to [F6] as the buyer will go"
+  },
+  {
+   "name": "Owners' proceeds after debt",
+   "target": "Above [F8]"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The buyer walks away after a counter.",
+   "mitigation": "Keep the counter backed by the deal list and leave room to meet in between."
+  },
+  {
+   "risk": "Comparable deals were for stronger businesses.",
+   "mitigation": "Check each deal's size and growth before relying on the multiple."
+  }
+ ]
+}

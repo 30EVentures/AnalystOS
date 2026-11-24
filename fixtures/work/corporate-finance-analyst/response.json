@@ -1,0 +1,251 @@
+{
+ "answer": "Fund the packing line first: it returns [F9] a year on its cost against [F10] for the racking, and both cannot fit in the [F1] budget.",
+ "exec_summary": [
+  "Funding both projects would cost [F7], [F8] over the budget.",
+  "The packing line returns [F9] a year and the racking [F10], both above the hurdle of [F6].",
+  "Funding the packing line leaves [F11] of the budget for smaller projects."
+ ],
+ "situation": "A company setting its capital plan for the year with a fixed budget.",
+ "complication": "Two projects clear the hurdle rate, but the budget cannot fund both.",
+ "key_question": "Which project gives the better return for this year's capital budget?",
+ "titles": {
+  "situation": "Two projects compete for one capital budget.",
+  "options": "Three ways to use this year's capital budget.",
+  "recommendation": "Fund the packing line this year and defer the racking.",
+  "roadmap": "Approve the packing line now, then plan the racking for next year.",
+  "kpis": "Two measures show whether the chosen project delivers.",
+  "risks": "The main risk is the labour savings arriving late."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Capital budget this year",
+   "value": 3000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Our capital budget this year is $3,000,000"
+  },
+  {
+   "id": "F2",
+   "label": "Packing line cost",
+   "value": 2400000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "packing line costs $2,400,000"
+  },
+  {
+   "id": "F3",
+   "label": "Packing line annual saving",
+   "value": 800000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "save $800,000 a year in labour"
+  },
+  {
+   "id": "F4",
+   "label": "Warehouse racking cost",
+   "value": 1500000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "racking costs $1,500,000"
+  },
+  {
+   "id": "F5",
+   "label": "Warehouse racking annual saving",
+   "value": 300000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "save $300,000 a year in storage"
+  },
+  {
+   "id": "F6",
+   "label": "Hurdle rate",
+   "value": 15,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "Our hurdle rate is 15%"
+  },
+  {
+   "id": "F7",
+   "label": "Cost of both projects",
+   "value": 3900000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "sum",
+   "inputs": [
+    "F2",
+    "F4"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Cost of both above the budget",
+   "value": 900000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F7",
+    "F1"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Packing line annual return on cost",
+   "value": 33.3,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F3",
+    "F2"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Racking annual return on cost",
+   "value": 20,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F5",
+    "F4"
+   ]
+  },
+  {
+   "id": "F11",
+   "label": "Budget left after the packing line",
+   "value": 600000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Fit to the budget",
+   "finding": "The budget cannot fund both projects this year.",
+   "points": [
+    "Both projects together cost [F7] against a budget of [F1].",
+    "That is [F8] more than the budget allows."
+   ],
+   "hypotheses": [
+    {
+     "text": "Both projects fit within this year's budget.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "The CFO has to choose one project for this year.",
+   "chart": {
+    "title": "Both projects together cost more than the capital budget.",
+    "figure_ids": [
+     "F1",
+     "F7"
+    ],
+    "labels": [
+     "Budget",
+     "Both projects"
+    ]
+   }
+  },
+  {
+   "branch": "Return on each project",
+   "finding": "The packing line earns the higher return on its cost.",
+   "points": [
+    "The packing line saves [F3] a year on a cost of [F2], a return of [F9].",
+    "The racking saves [F5] a year on [F4], a return of [F10]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Both projects clear the hurdle rate.",
+     "verdict": "supported"
+    },
+    {
+     "text": "The savings estimates are reliable.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "If only one goes ahead, the packing line creates more value per dollar.",
+   "chart": {
+    "title": "The packing line returns more on its cost than the racking.",
+    "figure_ids": [
+     "F6",
+     "F10",
+     "F9"
+    ],
+    "labels": [
+     "Hurdle rate",
+     "Racking",
+     "Packing line"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Packing line first",
+   "description": "Fund the packing line this year and put the racking in next year's plan.",
+   "effort": "low"
+  },
+  {
+   "name": "Racking first",
+   "description": "Fund the racking this year and keep the rest of the budget free.",
+   "effort": "low"
+  },
+  {
+   "name": "Ask for a larger budget",
+   "description": "Ask the board to raise the budget to fund both this year.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Packing line first",
+  "rationale": "It returns [F9] against [F10] for the racking, fits the budget with [F11] to spare, and the racking still clears the hurdle for next year; the CFO decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Put the packing line in the capital plan before it is due next month.",
+    "Ask operations to confirm the labour saving estimate."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Order the packing line if the CFO approves."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Add the racking to next year's capital plan with updated costs."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Packing line labour saving",
+   "target": "At or above [F3] a year once running"
+  },
+  {
+   "name": "Capital spend against budget",
+   "target": "Within [F1]"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Labour savings arrive later than planned.",
+   "mitigation": "Agree a ramp-up plan with operations and track savings monthly."
+  },
+  {
+   "risk": "Storage costs rise while the racking waits.",
+   "mitigation": "Review storage costs during the year and bring the racking forward if needed."
+  }
+ ]
+}

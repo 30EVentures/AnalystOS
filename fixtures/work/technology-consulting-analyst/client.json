@@ -1,0 +1,20 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "technology-consulting-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our on-premises file and email servers reach end of support next year. Replacing the servers, with three years of support, is quoted at $234,000. A cloud office suite would cost $22 per user a month for our 250 staff.",
+ "answers": {
+  "common.decision": "Whether to replace the servers or move to the cloud suite; the managing partner decides.",
+  "common.deadline": "A recommendation within six weeks.",
+  "common.audience": "The managing partner and our two IT staff.",
+  "common.materials": "The cloud provider quoted a one-off migration of $30,000. We compare everything over 36 months.",
+  "consulting.current-state": "Our two IT staff patch the servers by hand. We had 3 outages last year.",
+  "consulting.success": "Fewer outages, staff able to work from any office, and spend within budget.",
+  "consulting.constraints": "A budget of $240,000 over the comparison period; our two IT staff stay."
+ }
+}

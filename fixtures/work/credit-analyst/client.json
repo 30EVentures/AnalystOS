@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "credit-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "A regional food distributor has asked us for a $2,000,000 term loan to buy delivery trucks. Its EBITDA last year was $1,800,000.",
+ "answers": {
+  "common.decision": "Whether to extend the loan and on what terms; the credit committee decides.",
+  "common.deadline": "The next credit committee meeting.",
+  "common.audience": "The credit committee.",
+  "common.materials": "The borrower's existing debt service is $600,000 a year. The new loan would add $300,000 a year in debt service. Our lending policy requires debt service cover of at least 1.25x.",
+  "finance-modeling.purpose": "Assess whether the borrower can service the new loan.",
+  "finance-modeling.data": "The borrower's financial statements for last year and the proposed loan terms, in US dollars."
+ }
+}

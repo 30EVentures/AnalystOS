@@ -1,0 +1,271 @@
+{
+ "answer": "Fund a targeted market adjustment for engineers in the pay review, for the head of people to decide case by case: pay sits [F4] below market, and turnover costs about [F12] a year against [F6] to close the gap.",
+ "exec_summary": [
+  "Median engineer pay is [F1] against a market median of [F2], [F4] below.",
+  "Closing that gap for all [F5] engineers would cost about [F6] a year.",
+  "Engineer turnover was [F7] against [F8] for the company, [F9] higher.",
+  "About [F10] engineers left, costing about [F12] to replace."
+ ],
+ "situation": "An employer reviewing engineering pay against the market ahead of its annual pay review.",
+ "complication": "Engineers are paid below market and leave faster than the rest of the company.",
+ "key_question": "How should the pay review close the engineering pay gap within budget?",
+ "titles": {
+  "situation": "Engineering pay sits below the market median.",
+  "options": "Three ways to close the engineering pay gap.",
+  "recommendation": "Fund a targeted market adjustment and let the head of people decide each case.",
+  "roadmap": "Model the adjustment, decide cases, then track leavers.",
+  "kpis": "Two measures show the gap and turnover are closing.",
+  "risks": "The main risk is spending the budget where it does not retain anyone."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Median engineer salary",
+   "value": 108000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "median salary is $108,000"
+  },
+  {
+   "id": "F2",
+   "label": "Market median salary",
+   "value": 120000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "market median of $120,000"
+  },
+  {
+   "id": "F3",
+   "label": "Gap to the market median",
+   "value": 12000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F4",
+   "label": "Gap as a share of the market median",
+   "value": 10,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F3",
+    "F2"
+   ]
+  },
+  {
+   "id": "F5",
+   "label": "Engineers",
+   "value": 80,
+   "unit": "count",
+   "basis": "client",
+   "quote": "Engineering has 80 people"
+  },
+  {
+   "id": "F6",
+   "label": "Cost to bring every engineer to the market median",
+   "value": 960000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F5",
+    "F3"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Engineer turnover last year",
+   "value": 20,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "engineers was 20% last year"
+  },
+  {
+   "id": "F8",
+   "label": "Company turnover last year",
+   "value": 12,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "against 12% across the company"
+  },
+  {
+   "id": "F9",
+   "label": "Engineer turnover above the company",
+   "value": 8,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F7",
+    "F8"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Engineers who left last year",
+   "value": 16,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F5",
+    "F7"
+   ]
+  },
+  {
+   "id": "F11",
+   "label": "Cost to replace an engineer",
+   "value": 40000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "about $40,000 in recruiting"
+  },
+  {
+   "id": "F12",
+   "label": "Cost of engineer turnover last year",
+   "value": 640000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F10",
+    "F11"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Pay against market",
+   "finding": "Engineering pay sits clearly below the market median.",
+   "points": [
+    "Median pay is [F1] against [F2], a gap of [F3]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Every engineer is below market by a similar amount.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "A median gap hides individuals far below and some at market.",
+   "chart": {
+    "title": "Engineer pay against the market median.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "Our median",
+     "Market median"
+    ]
+   }
+  },
+  {
+   "branch": "Turnover and its cost",
+   "finding": "Engineers leave faster than the rest of the company.",
+   "points": [
+    "Turnover was [F7] against [F8].",
+    "Replacing leavers cost about [F12]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Pay is the main reason engineers leave.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Turnover already costs a large share of what closing the gap would.",
+   "chart": {
+    "title": "Turnover cost against the full cost of closing the gap.",
+    "figure_ids": [
+     "F12",
+     "F6"
+    ],
+    "labels": [
+     "Turnover cost",
+     "Full gap cost"
+    ]
+   }
+  },
+  {
+   "branch": "Cost of closing the gap",
+   "finding": "Closing the gap for everyone would be costly.",
+   "points": [
+    "Bringing all [F5] engineers to market would cost about [F6] a year."
+   ],
+   "hypotheses": [
+    {
+     "text": "A targeted adjustment closes most of the retention risk for less.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Targeting the furthest below market keeps the cost down."
+  }
+ ],
+ "options": [
+  {
+   "name": "Targeted adjustment",
+   "description": "Fund adjustments for engineers furthest below market, decided case by case by the head of people.",
+   "effort": "medium"
+  },
+  {
+   "name": "Everyone to market",
+   "description": "Raise every engineer to the market median in this review.",
+   "effort": "high"
+  },
+  {
+   "name": "Retention bonuses",
+   "description": "Pay one-off retention bonuses and leave salaries unchanged.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Targeted adjustment",
+  "rationale": "Turnover cost about [F12] last year against [F6] to close the gap for everyone, so targeting is the better use of budget; the head of people decides each person's pay."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Map each engineer's pay against their salary band and the market median.",
+    "Model the cost of a targeted adjustment for the finance director."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Give the head of people the model to decide individual adjustments in the pay review."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Track engineer leavers and pay against market each month."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Engineer pay against the market median",
+   "target": "Gap narrowing at each review"
+  },
+  {
+   "name": "Engineer turnover",
+   "target": "Closer to the company rate"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Adjustments feel unfair to engineers not included.",
+   "mitigation": "Explain the criteria and apply them the same way to everyone."
+  },
+  {
+   "risk": "Turnover stays high after the review.",
+   "mitigation": "Ask leavers why they go and revisit the approach."
+  }
+ ]
+}

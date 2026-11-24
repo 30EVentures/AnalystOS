@@ -1,0 +1,227 @@
+{
+ "answer": "Fix the West's conversion first: closing [F1] of opportunities against the East's [F2] cost about [F9] of bookings last quarter.",
+ "exec_summary": [
+  "The West closed [F1] of qualified opportunities against [F2] in the East, a gap of [F5].",
+  "On [F3] opportunities that is [F6] wins instead of [F7] at the East's rate.",
+  "The [F8] missed wins at [F4] each are worth about [F9]."
+ ],
+ "situation": "A sales team split into regions, each working its own qualified opportunities.",
+ "complication": "The West converts far fewer qualified opportunities than the East, and nobody yet knows at which stage it loses them.",
+ "key_question": "Why does the West close fewer opportunities, and what is the gap worth?",
+ "titles": {
+  "situation": "The West closes far fewer qualified opportunities than the East.",
+  "options": "Two ways to close the conversion gap.",
+  "recommendation": "Find the stage where the West loses deals, then coach to it.",
+  "roadmap": "Find the losing stage before the sales review, then fix it.",
+  "kpis": "Two measures show whether the West is catching up.",
+  "risks": "The main risk is the regions' deals not being alike."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "West close rate on qualified opportunities",
+   "value": 18,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "closed 18% of its qualified opportunities"
+  },
+  {
+   "id": "F2",
+   "label": "East close rate on qualified opportunities",
+   "value": 26,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "against 26% in the East"
+  },
+  {
+   "id": "F3",
+   "label": "West qualified opportunities last quarter",
+   "value": 500,
+   "unit": "count",
+   "basis": "client",
+   "quote": "West had 500 qualified opportunities"
+  },
+  {
+   "id": "F4",
+   "label": "Average deal value",
+   "value": 40000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "The average deal is worth $40,000"
+  },
+  {
+   "id": "F5",
+   "label": "Close rate gap",
+   "value": 8,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "West wins last quarter",
+   "value": 90,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F3",
+    "F1"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "West wins at the East's close rate",
+   "value": 130,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F3",
+    "F2"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Wins missed against the East's rate",
+   "value": 40,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F7",
+    "F6"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Bookings missed against the East's rate",
+   "value": 1600000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F8",
+    "F4"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Size of the gap",
+   "finding": "The West's lower close rate costs real bookings.",
+   "points": [
+    "The West closed [F6] deals; at the East's rate it would have closed [F7].",
+    "The [F8] missed wins are worth about [F9]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The gap is large enough to act on now.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "Closing even part of the gap is worth a focused effort.",
+   "chart": {
+    "title": "The West's wins fall short of what the East's rate would give.",
+    "figure_ids": [
+     "F6",
+     "F7"
+    ],
+    "labels": [
+     "Actual wins",
+     "At the East's rate"
+    ]
+   }
+  },
+  {
+   "branch": "Where the West loses deals",
+   "finding": "The stage where West deals are lost is not yet known.",
+   "points": [
+    "The West's close rate of [F1] trails the East's [F2] by [F5]."
+   ],
+   "hypotheses": [
+    {
+     "text": "West deals stall at the proposal stage.",
+     "verdict": "untested"
+    },
+    {
+     "text": "West reps qualify opportunities more loosely.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "A stage-by-stage cut of the CRM export will show where to coach.",
+   "chart": {
+    "title": "The West's close rate trails the East's.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "West",
+     "East"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Stage analysis and coaching",
+   "description": "Compare stage-by-stage conversion between regions, then coach the West on its weakest stage.",
+   "effort": "low"
+  },
+  {
+   "name": "Move territories",
+   "description": "Reassign accounts between the regions.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Stage analysis and coaching",
+  "rationale": "It targets the gap worth about [F9] a quarter with little cost, and it tells the sales director where to act before anything is reorganised."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Cut the CRM export by stage and region before the quarterly sales review.",
+    "Present the losing stage to the sales director."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Coach West reps on the weakest stage."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Compare the West's close rate with [F1] last quarter."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "West close rate on qualified opportunities",
+   "target": "Rising from [F1] towards [F2]"
+  },
+  {
+   "name": "West wins a quarter",
+   "target": "Above [F6]"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The regions sell different deal types, so rates are not comparable.",
+   "mitigation": "Compare like-for-like deal sizes and products."
+  },
+  {
+   "risk": "CRM stages are recorded differently by region.",
+   "mitigation": "Check stage definitions with both regional managers first."
+  }
+ ]
+}

@@ -1,0 +1,221 @@
+{
+ "answer": "Move to the cloud suite: over the comparison period it costs about [F7] against [F1] for new servers, both fit the [F9] budget, and the cloud removes the hand patching behind last year's outages.",
+ "exec_summary": [
+  "New servers with support cost [F1].",
+  "The cloud suite costs [F5] over [F4] plus a [F6] migration, about [F7] in all.",
+  "The cloud is about [F8] cheaper, and both fit the [F9] budget.",
+  "Last year's [F10] outages point to hand patching as the bigger issue."
+ ],
+ "situation": "A firm whose file and email servers reach end of support next year.",
+ "complication": "The servers must be replaced or retired, and hand patching has already caused outages.",
+ "key_question": "Should the firm replace its servers or move to a cloud office suite?",
+ "titles": {
+  "situation": "Our servers reach end of support next year.",
+  "options": "Two ways to replace the servers.",
+  "recommendation": "Move to the cloud suite.",
+  "roadmap": "Plan the migration, move, then retire the servers.",
+  "kpis": "Two measures show the move worked.",
+  "risks": "The main risk is a disruptive migration."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Server replacement with support",
+   "value": 234000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "is quoted at $234,000"
+  },
+  {
+   "id": "F2",
+   "label": "Cloud suite price per user per month",
+   "value": 22,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "$22 per user"
+  },
+  {
+   "id": "F3",
+   "label": "Staff",
+   "value": 250,
+   "unit": "count",
+   "basis": "client",
+   "quote": "our 250 staff"
+  },
+  {
+   "id": "F4",
+   "label": "Comparison period, months",
+   "value": 36,
+   "unit": "months",
+   "basis": "client",
+   "quote": "over 36 months"
+  },
+  {
+   "id": "F5",
+   "label": "Cloud subscriptions over the period",
+   "value": 198000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F2",
+    "F3",
+    "F4"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "One-off migration",
+   "value": 30000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "a one-off migration of $30,000"
+  },
+  {
+   "id": "F7",
+   "label": "Cloud total over the period",
+   "value": 228000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "sum",
+   "inputs": [
+    "F5",
+    "F6"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Cloud saving over servers",
+   "value": 6000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F7"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Budget over the period",
+   "value": 240000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "A budget of $240,000"
+  },
+  {
+   "id": "F10",
+   "label": "Outages last year",
+   "value": 3,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We had 3 outages"
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Cost",
+   "finding": "The two options cost about the same over the period.",
+   "points": [
+    "Servers cost [F1]; the cloud costs [F7].",
+    "Both fit within the [F9] budget."
+   ],
+   "hypotheses": [
+    {
+     "text": "The cloud is far cheaper.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "Cost does not decide this; risk and fit do.",
+   "chart": {
+    "title": "Total cost over the period against budget.",
+    "figure_ids": [
+     "F1",
+     "F7",
+     "F9"
+    ],
+    "labels": [
+     "Servers",
+     "Cloud",
+     "Budget"
+    ]
+   }
+  },
+  {
+   "branch": "Risk and fit",
+   "finding": "The cloud removes the hand patching that caused outages.",
+   "points": [
+    "Our two IT staff patch the servers by hand.",
+    "We had [F10] outages last year."
+   ],
+   "hypotheses": [
+    {
+     "text": "The outages came from missed patches.",
+     "verdict": "untested"
+    },
+    {
+     "text": "Staff need to work from any office.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "The cloud better meets the firm's own success measures."
+  }
+ ],
+ "options": [
+  {
+   "name": "Cloud suite",
+   "description": "Move files and email to a cloud office suite and retire the servers.",
+   "effort": "medium"
+  },
+  {
+   "name": "Replace servers",
+   "description": "Buy new servers with support and keep running them in-house.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Cloud suite",
+  "rationale": "It costs about [F8] less, stays within budget and frees the IT staff from hand patching; the managing partner decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Agree the migration plan and data to move with the provider.",
+    "Give the managing partner the recommendation within the six weeks."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Move email first, then shared files, office by office."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Retire the servers once files are moved and checked."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Outages a year",
+   "target": "Fewer than last year"
+  },
+  {
+   "name": "Staff able to work from any office",
+   "target": "All staff"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Migration disrupts work.",
+   "mitigation": "Move one office at a time and keep the servers until each is checked."
+  },
+  {
+   "risk": "The subscription price rises.",
+   "mitigation": "Agree a fixed price for the comparison period."
+  }
+ ]
+}

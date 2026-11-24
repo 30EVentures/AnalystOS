@@ -11,6 +11,7 @@ from pathlib import Path
 
 from analystos.catalog import load_catalog
 from analystos.l4 import deck, formats
+from analystos.packs import work
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
@@ -139,7 +140,7 @@ class RoleSamplesTest(unittest.TestCase):
             for r in sample["roles"]:
                 with self.subTest(role=r["id"]):
                     self.assertEqual(r["own_sample"], r["id"] in family_roles | work_roles)
-        self.assertEqual(sum(r["own_sample"] for s in DOC["samples"] for r in s["roles"]), 23)
+        self.assertEqual(sum(r["own_sample"] for s in DOC["samples"] for r in s["roles"]), 73)  # Slice 129: every role
 
     def test_each_role_sample_is_its_own_file_in_its_own_format(self):
         catalog = {r["id"]: r for r in load_catalog()["roles"]}
@@ -150,7 +151,8 @@ class RoleSamplesTest(unittest.TestCase):
                 self.assertEqual(sample["file"], f"samples/roles/{role_id}.{fmt['extension']}")
                 self.assertTrue((SITE / sample["file"]).is_file())
                 self.assertEqual(sample["format"], fmt["name"])
-                self.assertIn("work", [s["kind"] for s in sample["slides"]])
+                has_work = "work" in [s["kind"] for s in sample["slides"]]
+                self.assertEqual(has_work, bool(work.required_kinds(catalog[role_id])))  # work pages only for roles that owe work
 
     def test_delivered_work_is_never_called_planned(self):
         for sample in DOC["samples"]:
@@ -193,7 +195,7 @@ class RoleSamplesTest(unittest.TestCase):
         names = {"memo": "Word memo", "workbook": "Excel workbook", "deck": "deck for"}
         for fmt, phrase in names.items():
             self.assertIn(phrase, statement)
-        self.assertIn("Roles with a worked example of their own show it", PAGE)
+        self.assertIn("Every role shows a worked example of its own.", PAGE)
         families = {f["id"] for f in catalog["families"]}
         self.assertEqual(set(formats.FAMILY_FORMAT), families)
 

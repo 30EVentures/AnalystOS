@@ -1,0 +1,220 @@
+{
+ "answer": "Rewrite the post around the [F4] essential requirements and show the salary range, for the hiring manager to review: only [F7] of applicants met today's list of [F3] must-haves.",
+ "exec_summary": [
+  "The post drew [F1] applicants, and [F2] met the must-have requirements, [F7].",
+  "It lists [F3] must-haves, of which the hiring manager calls [F4] essential.",
+  "That leaves [F8] requirements that could move to nice-to-have.",
+  "The post does not show the approved range of [F5] to [F6]."
+ ],
+ "situation": "An employer hiring a data engineer through its own job post.",
+ "complication": "The post draws many applicants but few meet a long must-have list, and it hides the salary.",
+ "key_question": "How should the data engineer job post change so it attracts more applicants who fit?",
+ "titles": {
+  "situation": "Few applicants meet the job post's must-haves.",
+  "options": "Two ways to fix the data engineer post.",
+  "recommendation": "Rewrite the post around essentials and show the range.",
+  "roadmap": "Rewrite, review, repost, then compare applicants.",
+  "kpis": "Two measures show the new post works.",
+  "risks": "The main risk is loosening a requirement that matters."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Applicants to the post",
+   "value": 380,
+   "unit": "count",
+   "basis": "client",
+   "quote": "drew 380 applicants"
+  },
+  {
+   "id": "F2",
+   "label": "Applicants meeting the must-haves",
+   "value": 19,
+   "unit": "count",
+   "basis": "client",
+   "quote": "only 19 met"
+  },
+  {
+   "id": "F3",
+   "label": "Must-have requirements listed",
+   "value": 14,
+   "unit": "count",
+   "basis": "client",
+   "quote": "lists 14 must-have requirements"
+  },
+  {
+   "id": "F4",
+   "label": "Requirements the hiring manager calls essential",
+   "value": 5,
+   "unit": "count",
+   "basis": "client",
+   "quote": "only 5 of them are truly essential"
+  },
+  {
+   "id": "F5",
+   "label": "Salary range, low end",
+   "value": 120000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "range is $120,000"
+  },
+  {
+   "id": "F6",
+   "label": "Salary range, high end",
+   "value": 140000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "to $140,000"
+  },
+  {
+   "id": "F7",
+   "label": "Share of applicants meeting the must-haves",
+   "value": 5,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Requirements that are not essential",
+   "value": 9,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F3",
+    "F4"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Fit of applicants",
+   "finding": "Very few applicants meet today's must-have list.",
+   "points": [
+    "[F2] of [F1] applicants met it, [F7]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Strong applicants are missed by a strict checklist.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The list is filtering on more than the role needs.",
+   "chart": {
+    "title": "Applicants and those meeting the must-haves.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "Applied",
+     "Met must-haves"
+    ]
+   }
+  },
+  {
+   "branch": "The requirement list",
+   "finding": "Most listed must-haves are not essential.",
+   "points": [
+    "The hiring manager calls [F4] of [F3] essential, leaving [F8]."
+   ],
+   "hypotheses": [
+    {
+     "text": "A shorter list draws more qualified applicants.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The rewrite keeps only the essentials as must-haves."
+  },
+  {
+   "branch": "Pay transparency",
+   "finding": "The post hides a salary range that is already approved.",
+   "points": [
+    "The approved range is [F5] to [F6]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Showing the range deters applicants who want more.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Showing the range sets expectations before anyone applies."
+  }
+ ],
+ "options": [
+  {
+   "name": "Rewrite and show pay",
+   "description": "Cut must-haves to the essentials, move the rest to nice-to-have, and show the range.",
+   "effort": "low"
+  },
+  {
+   "name": "Keep the post, screen harder",
+   "description": "Keep the post and add a screening questionnaire.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Rewrite and show pay",
+  "rationale": "It targets the cause behind the [F7] match rate at low effort; the hiring manager reviews the post and decides every screening outcome and offer."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Send the rewritten post to the hiring manager for review.",
+    "Repost once the hiring manager approves it."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Track applicants and those meeting the essentials each week."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Compare the new post's results with the old one for the hiring manager."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Applicants meeting the essentials",
+   "target": "Well above the old post"
+  },
+  {
+   "name": "Time from reposting to a shortlist",
+   "target": "Shorter than the old post"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "A dropped requirement turns out to matter.",
+   "mitigation": "Confirm the essentials with the hiring manager before reposting."
+  },
+  {
+   "risk": "Applicant volume swamps screening.",
+   "mitigation": "Add a short essentials check to the application form."
+  }
+ ],
+ "work": [
+  {
+   "kind": "draft",
+   "title": "Job post: Data Engineer",
+   "for": "Job seekers, job post for the hiring manager to review before posting",
+   "body": [
+    "Data Engineer. Salary range [F5] to [F6], depending on experience.",
+    "You will build and look after the pipelines that bring data from our products into our warehouse, so analysts and product teams can trust what they see.",
+    "What you need: strong SQL; experience building data pipelines in Python; experience with a cloud data warehouse; good habits around testing and version control; and the ability to explain data problems to people who are not engineers.",
+    "Nice to have: experience with workflow schedulers, streaming data, infrastructure as code, or data modelling for reporting. If you have some of these, great; if not, we will help you learn.",
+    "How to apply: send your CV and a few lines on a pipeline you built and what you would do differently now. We read every application."
+   ]
+  }
+ ]
+}

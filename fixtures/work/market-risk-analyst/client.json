@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "market-risk-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our trading book holds $40 million of corporate bonds with an average duration of 6 years.",
+ "answers": {
+  "common.decision": "Whether to hedge the book or reduce it; the head of trading decides.",
+  "common.deadline": "The next risk committee.",
+  "common.audience": "The head of trading and the risk committee.",
+  "common.materials": "Our risk policy says a rate rise of 1 percentage point must not cost the book more than $2 million. Rates have moved by as much as 2 percentage points in a year.",
+  "finance-modeling.purpose": "Measure the book's loss from a rise in rates against the limit.",
+  "finance-modeling.data": "The bond book's positions and durations, in US dollars."
+ }
+}

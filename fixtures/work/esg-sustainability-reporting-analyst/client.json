@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "esg-sustainability-reporting-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our first sustainability report is due and our lenders want our greenhouse gas emissions. We operate 12 sites. Energy data is complete for 9 sites.",
+ "answers": {
+  "common.decision": "Which gaps to close before the report is published; the finance director signs it off.",
+  "common.deadline": "The report is due at the end of next quarter.",
+  "common.audience": "The finance director and our lenders.",
+  "common.materials": "Direct and purchased-energy emissions from the sites with data total 18,000 tonnes. We estimate the missing sites at about 2,000 tonnes from their floor area. The lenders' framework asks that at least 95% of reported emissions be measured, not estimated. We have not collected water use at any site, and the framework asks for it.",
+  "research-reporting.scope": "All our sites, last financial year, against our lenders' reporting framework.",
+  "research-reporting.sources": "Our energy bills and meter readings."
+ }
+}

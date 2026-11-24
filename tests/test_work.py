@@ -103,7 +103,8 @@ def without_code(text, spec):
     for item in spec["content"].get("work", []):
         if item["kind"] == "code":
             for line in item["code"].splitlines():
-                text = text.replace(line, " ")
+                if line.strip():  # a blank line would replace "" and space out the whole text (Slice 129)
+                    text = text.replace(line, " ")
     return text
 
 

@@ -1,0 +1,238 @@
+{
+ "answer": "At the asking price the building yields [F9] today, below the market's [F5]; the price only works if the vacant space is let, which would lift the yield to [F10].",
+ "exec_summary": [
+  "The building is [F2] leased, so rent today is [F6] of a possible [F3].",
+  "After costs of [F4], net income is [F7] today and [F8] fully let.",
+  "That is a yield of [F9] today and [F10] fully let, against [F5] for similar buildings."
+ ],
+ "situation": "An investor considering an office building that is partly vacant.",
+ "complication": "The asking price only makes sense if the empty space is let.",
+ "key_question": "Is the asking price justified by the building's income today and once fully let?",
+ "titles": {
+  "situation": "A partly vacant office building is for sale at a fixed asking price.",
+  "options": "Three ways to approach the offer.",
+  "recommendation": "Offer only with a plan to let the vacant space.",
+  "roadmap": "Test leasing demand before the offer deadline, then decide.",
+  "kpis": "Two measures show whether the investment earns its yield.",
+  "risks": "The main risk is the vacant space staying empty."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Asking price",
+   "value": 6000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "for $6,000,000"
+  },
+  {
+   "id": "F2",
+   "label": "Share of space leased today",
+   "value": 80,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "It is now 80% leased"
+  },
+  {
+   "id": "F3",
+   "label": "Annual rent at full occupancy",
+   "value": 900000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "rent would be $900,000 a year"
+  },
+  {
+   "id": "F4",
+   "label": "Annual operating costs not recovered",
+   "value": 300000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "not recovered from tenants are $300,000 a year"
+  },
+  {
+   "id": "F5",
+   "label": "Market yield for similar buildings",
+   "value": 7.5,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "trade at a 7.5% yield"
+  },
+  {
+   "id": "F6",
+   "label": "Annual rent today",
+   "value": 720000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F3",
+    "F2"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Net operating income today",
+   "value": 420000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F6",
+    "F4"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Net operating income fully let",
+   "value": 600000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F3",
+    "F4"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Yield on the asking price today",
+   "value": 7,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F7",
+    "F1"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Yield on the asking price fully let",
+   "value": 10,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F8",
+    "F1"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Income today",
+   "finding": "Today's income gives a yield below the market.",
+   "points": [
+    "Rent today is [F6] and net income [F7].",
+    "That is a yield of [F9] against [F5] for similar buildings."
+   ],
+   "hypotheses": [
+    {
+     "text": "The price is justified by today's income alone.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "The buyer would be paying for space that earns nothing yet.",
+   "chart": {
+    "title": "Today's yield sits below the market yield.",
+    "figure_ids": [
+     "F9",
+     "F5",
+     "F10"
+    ],
+    "labels": [
+     "Today",
+     "Market",
+     "Fully let"
+    ]
+   }
+  },
+  {
+   "branch": "Income once fully let",
+   "finding": "Letting the vacant space lifts the yield well above the market.",
+   "points": [
+    "Fully let, net income rises to [F8] and the yield to [F10]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The vacant space can be let at the rent in the rent roll.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The case for the price rests on letting the vacant space.",
+   "chart": {
+    "title": "Net operating income rises once the building is fully let.",
+    "figure_ids": [
+     "F7",
+     "F8"
+    ],
+    "labels": [
+     "Today",
+     "Fully let"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Offer with a leasing plan",
+   "description": "Offer at the asking price only after agents confirm demand for the vacant space.",
+   "effort": "medium"
+  },
+  {
+   "name": "Offer below asking",
+   "description": "Offer a price that gives the market yield on today's income.",
+   "effort": "low"
+  },
+  {
+   "name": "Walk away",
+   "description": "Do not bid and look for a fully let building.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Offer with a leasing plan",
+  "rationale": "Fully let, the building yields [F10] against the market's [F5]; checking leasing demand first protects against paying for empty space that stays empty. The investment committee decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Ask local letting agents about demand and rent for the vacant space.",
+    "Bring the yield figures to the investment committee before the offer deadline."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "If the committee approves, carry out building and lease due diligence."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Agree a leasing plan for the vacant space before completion."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Occupancy",
+   "target": "Rising from [F2] towards full"
+  },
+  {
+   "name": "Yield on the purchase price",
+   "target": "At or above [F5]"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The vacant space stays empty.",
+   "mitigation": "Get agents' views on demand before offering."
+  },
+  {
+   "risk": "Operating costs rise above [F4].",
+   "mitigation": "Check service contracts and recent bills during due diligence."
+  }
+ ]
+}

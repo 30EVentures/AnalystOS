@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "operations-analyst-banking-capital-markets"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our ledger for our US dollar nostro account shows $8,940,000, but the correspondent bank's statement shows $8,712,000.",
+ "answers": {
+  "common.decision": "Which bookings and instruction fixes to make; the payment operations manager approves.",
+  "common.deadline": "Before end of day.",
+  "common.audience": "The payment operations manager.",
+  "common.materials": "A foreign exchange settlement of $250,000 was debited by the correspondent but booked in our ledger against a different nostro. Correspondent charges of $3,000 are not yet booked. A client receipt of $25,000 was credited by the correspondent but not yet applied in our ledger. This month we had 40 nostro breaks, and 24 came from settlement instructions pointing to the wrong nostro.",
+  "accounting-operations.systems": "Our core banking ledger and the correspondent's statement, today, our standard chart of accounts.",
+  "accounting-operations.approver": "The payment operations manager approves all bookings and any change to a client account or settlement instruction."
+ }
+}

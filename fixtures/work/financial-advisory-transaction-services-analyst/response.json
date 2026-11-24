@@ -1,0 +1,238 @@
+{
+ "answer": "Price the deal on [F7] of EBITDA, not the seller's [F1]: three items overstate earnings by [F6], which at [F2] is [F10] of price.",
+ "exec_summary": [
+  "The seller reports adjusted EBITDA of [F1].",
+  "A one-off gain, a lost contract and the missing manager cost overstate it by [F6].",
+  "On our view of [F7], the price at [F2] falls from [F8] to [F9]."
+ ],
+ "situation": "A buyer in diligence on a regional HVAC services company.",
+ "complication": "The seller's adjusted EBITDA includes items that will not recur under new ownership.",
+ "key_question": "What are the target's sustainable earnings, and what does that mean for the price?",
+ "titles": {
+  "situation": "The seller's adjusted EBITDA sets the price under discussion.",
+  "options": "Two ways to take the findings into the negotiation.",
+  "recommendation": "Price on diligence-adjusted EBITDA.",
+  "roadmap": "Agree the adjusted EBITDA before price, then protect it in the contract.",
+  "kpis": "Two measures show the price rests on sustainable earnings.",
+  "risks": "The main risk is the seller rejecting the adjustments."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Seller's adjusted EBITDA",
+   "value": 5200000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "adjusted EBITDA of $5.2 million"
+  },
+  {
+   "id": "F2",
+   "label": "Price multiple under discussion",
+   "value": 8,
+   "unit": "ratio",
+   "basis": "client",
+   "quote": "the price being discussed is 8x EBITDA"
+  },
+  {
+   "id": "F3",
+   "label": "One-off insurance gain",
+   "value": 250000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "a one-off insurance gain of $250,000"
+  },
+  {
+   "id": "F4",
+   "label": "EBITDA from the ended contract",
+   "value": 400000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "contributed $400,000 of EBITDA"
+  },
+  {
+   "id": "F5",
+   "label": "Cost of a replacement general manager",
+   "value": 200000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "a general manager at $200,000"
+  },
+  {
+   "id": "F6",
+   "label": "Total diligence adjustments",
+   "value": 850000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "sum",
+   "inputs": [
+    "F3",
+    "F4",
+    "F5"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Diligence-adjusted EBITDA",
+   "value": 4350000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F6"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Price on the seller's EBITDA",
+   "value": 41600000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Price on diligence-adjusted EBITDA",
+   "value": 34800000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F7",
+    "F2"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Price overstated by the seller's EBITDA",
+   "value": 6800000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F8",
+    "F9"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Items that will not recur",
+   "finding": "Three items in the seller's EBITDA will not continue under new ownership.",
+   "points": [
+    "The insurance gain of [F3] was one-off.",
+    "The ended contract took away [F4] of EBITDA.",
+    "A general manager would cost [F5] that the owner never charged."
+   ],
+   "hypotheses": [
+    {
+     "text": "The seller's adjustments capture every non-recurring item.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "Sustainable EBITDA is [F7], below the seller's figure by [F6].",
+   "chart": {
+    "title": "Sustainable EBITDA is below the seller's adjusted figure.",
+    "figure_ids": [
+     "F1",
+     "F7"
+    ],
+    "labels": [
+     "Seller's view",
+     "Diligence view"
+    ]
+   }
+  },
+  {
+   "branch": "Effect on price",
+   "finding": "At the multiple under discussion the adjustments move price sharply.",
+   "points": [
+    "On the seller's EBITDA the price is [F8].",
+    "On diligence-adjusted EBITDA it is [F9]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The adjustments are too small to change the price.",
+     "verdict": "refuted"
+    },
+    {
+     "text": "Other contracts are at risk of ending.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The buyer would overpay by [F10] if it priced on the seller's figure.",
+   "chart": {
+    "title": "Price falls when based on sustainable earnings.",
+    "figure_ids": [
+     "F8",
+     "F9"
+    ],
+    "labels": [
+     "Seller's EBITDA",
+     "Diligence EBITDA"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Price on adjusted EBITDA",
+   "description": "Present the three adjustments and propose price on diligence-adjusted EBITDA.",
+   "effort": "low"
+  },
+  {
+   "name": "Keep price, add protection",
+   "description": "Accept the seller's EBITDA but hold back part of the price until earnings are proven.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Price on adjusted EBITDA",
+  "rationale": "Each adjustment is backed by the seller's own accounts, and together they remove [F10] of overpayment; the deal lead decides the price to offer."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Share the adjustments with the deal lead before the price is agreed.",
+    "Ask the seller for the contract list to test other renewals."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Agree the adjusted EBITDA with the seller's advisers."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Reflect the agreed EBITDA and any warranties in the purchase agreement."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "EBITDA the price is based on",
+   "target": "No higher than [F7] unless new evidence appears"
+  },
+  {
+   "name": "Contract renewals tested",
+   "target": "Every major contract"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The seller rejects the adjustments.",
+   "mitigation": "Show each one against the seller's own accounts."
+  },
+  {
+   "risk": "More contracts end after closing.",
+   "mitigation": "Test renewal terms on the largest contracts before signing."
+  }
+ ]
+}

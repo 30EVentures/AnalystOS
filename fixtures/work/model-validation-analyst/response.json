@@ -1,0 +1,247 @@
+{
+ "answer": "The model under-predicted defaults by [F6], outside the [F5] tolerance, so prepare a recalibration finding for the head of model risk, who decides the validation opinion.",
+ "exec_summary": [
+  "The model predicted a default rate of [F1]; the actual rate was [F2], a gap of [F6].",
+  "That is [F7] more defaults than predicted, against a tolerance of [F5].",
+  "Across [F3] loans, [F10] more defaulted than predicted, about [F11] of balances."
+ ],
+ "situation": "A lender that uses a credit scoring model to approve loans.",
+ "complication": "Actual defaults ran well above what the model predicted.",
+ "key_question": "Does the model's default prediction stay within tolerance, and what should the validation report show?",
+ "titles": {
+  "situation": "The model's predicted defaults are tested against actual outcomes.",
+  "options": "Two ways the finding can be handled.",
+  "recommendation": "Recommend recalibration for the head of model risk to decide.",
+  "roadmap": "Report the finding, then support recalibration and retesting.",
+  "kpis": "Two measures show whether the model is back within tolerance.",
+  "risks": "The main risk is reading one year as a lasting shift."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Predicted default rate",
+   "value": 2.5,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "predicted a default rate of 2.5%"
+  },
+  {
+   "id": "F2",
+   "label": "Actual default rate",
+   "value": 3.5,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "but 3.5% actually defaulted"
+  },
+  {
+   "id": "F3",
+   "label": "Loans approved using the model",
+   "value": 12000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "we approved 12,000 loans"
+  },
+  {
+   "id": "F4",
+   "label": "Average loan balance",
+   "value": 25000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "average balance of $25,000"
+  },
+  {
+   "id": "F5",
+   "label": "Tolerance for prediction gap",
+   "value": 0.5,
+   "unit": "points",
+   "basis": "client",
+   "quote": "0.5 percentage points"
+  },
+  {
+   "id": "F6",
+   "label": "Gap between actual and predicted",
+   "value": 1,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Actual defaults above predicted",
+   "value": 40,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "growth_percent",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Predicted defaulted loans",
+   "value": 300,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F3",
+    "F1"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Actual defaulted loans",
+   "value": 420,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F3",
+    "F2"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Defaults the model missed",
+   "value": 120,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F9",
+    "F8"
+   ]
+  },
+  {
+   "id": "F11",
+   "label": "Balances on defaults the model missed",
+   "value": 3000000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F10",
+    "F4"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Against tolerance",
+   "finding": "The prediction gap is outside the agreed tolerance.",
+   "points": [
+    "The gap of [F6] is above the tolerance of [F5]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The model stays within tolerance.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "The validation report has to record a breach of tolerance.",
+   "chart": {
+    "title": "The prediction gap is above the agreed tolerance.",
+    "figure_ids": [
+     "F5",
+     "F6"
+    ],
+    "labels": [
+     "Tolerance",
+     "Actual gap"
+    ]
+   }
+  },
+  {
+   "branch": "Size of the miss",
+   "finding": "The model missed a material number of defaults.",
+   "points": [
+    "It predicted [F8] defaults; [F9] happened.",
+    "The [F10] missed defaults carry about [F11] of balances."
+   ],
+   "hypotheses": [
+    {
+     "text": "The miss comes from a change in borrowers since the model was built.",
+     "verdict": "untested"
+    },
+    {
+     "text": "The model ranks risk correctly but sets the level too low.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Recalibration may fix the level, but the cause needs testing first.",
+   "chart": {
+    "title": "Actual defaulted loans ran well above the model's prediction.",
+    "figure_ids": [
+     "F8",
+     "F9"
+    ],
+    "labels": [
+     "Predicted",
+     "Actual"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Recommend recalibration",
+   "description": "Present the breach and recommend recalibrating the model, then retesting it.",
+   "effort": "medium"
+  },
+  {
+   "name": "Recommend an overlay",
+   "description": "Present the breach and recommend a temporary adjustment on top of the model while the cause is studied.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Recommend recalibration",
+  "rationale": "A gap of [F6] is outside the [F5] tolerance and missed [F10] defaults; recalibration addresses the level directly. The head of model risk decides the validation opinion."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Write up the breach and the default counts for the head of model risk.",
+    "Ask the model owner for data on how borrowers have changed."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Test whether the model still ranks risk correctly."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Present the findings at the annual model review."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Gap between actual and predicted default rates",
+   "target": "Within [F5]"
+  },
+  {
+   "name": "Missed defaults",
+   "target": "Falling after any recalibration"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "One year is read as a lasting shift.",
+   "mitigation": "Compare with earlier years before concluding."
+  },
+  {
+   "risk": "Recalibration hides a deeper design problem.",
+   "mitigation": "Test ranking power as well as the default level."
+  }
+ ]
+}

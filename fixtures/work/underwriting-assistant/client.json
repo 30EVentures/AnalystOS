@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "underwriting-assistant"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "A broker has submitted a warehouse for property cover with a declared value of $4,250,000.",
+ "answers": {
+  "common.decision": "Whether to accept, price or decline the risk; the underwriter decides.",
+  "common.deadline": "The broker wants terms this week.",
+  "common.audience": "The underwriter.",
+  "common.materials": "Sprinklers cover 60% of the floor area. Our guidelines refer any warehouse valued over $5,000,000, or without full sprinkler cover, to a senior underwriter. The insured had two water damage claims totalling $85,000 in the last five years.",
+  "insurance.file": "Commercial property submission for a warehouse, our standard property wording.",
+  "insurance.decider": "The underwriter decides; a senior underwriter decides any referred risk."
+ }
+}

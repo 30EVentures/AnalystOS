@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "regulatory-reporting-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our quarterly capital return shows a core capital ratio of 14%, but our finance team calculates 12.6%. The return is due to the regulator in ten days.",
+ "answers": {
+  "common.decision": "Whether the return is ready to submit; the head of regulatory reporting decides and submits.",
+  "common.deadline": "Ten days.",
+  "common.audience": "The head of regulatory reporting.",
+  "common.materials": "Core capital is $630 million. Risk-weighted assets in the return are $4.5 billion; finance's figure is $5 billion. A $500 million commercial property loan portfolio has a blank risk weight in the reporting system, so the return left it out. Our minimum requirement including buffers is 10.5%.",
+  "accounting-operations.systems": "Our regulatory reporting system and the general ledger, this quarter, our standard chart of accounts.",
+  "accounting-operations.approver": "The head of regulatory reporting reviews and submits the return."
+ }
+}

@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "financial-advisory-transaction-services-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We are buying a regional HVAC services company. The seller reports adjusted EBITDA of $5.2 million, and the price being discussed is 8x EBITDA.",
+ "answers": {
+  "common.decision": "What EBITDA to price the deal on; the deal lead decides.",
+  "common.deadline": "Before the price is agreed.",
+  "common.audience": "The deal lead and the investment committee.",
+  "common.materials": "Last year's EBITDA includes a one-off insurance gain of $250,000. A maintenance contract that contributed $400,000 of EBITDA ended last year. The owner takes no salary; replacing him needs a general manager at $200,000 a year.",
+  "finance-modeling.purpose": "Test the seller's adjusted EBITDA and show its effect on price.",
+  "finance-modeling.data": "The seller's adjusted EBITDA bridge and last year's accounts, in US dollars."
+ }
+}

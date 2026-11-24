@@ -1,0 +1,208 @@
+{
+ "answer": "Measured emissions cover [F7] of the estimated total, short of the [F8] the lenders' framework asks for; collect energy data from the missing sites and start water data before the report is published.",
+ "exec_summary": [
+  "Energy data is complete for [F2] of our [F1] sites, [F3] of them.",
+  "Measured emissions of [F4] tonnes plus an estimate of [F5] tonnes give about [F6] tonnes in total.",
+  "Measured emissions are [F7] of that total, [F9] short of the framework.",
+  "Water use is not collected at any site, though the framework asks for it."
+ ],
+ "situation": "A business preparing its first sustainability report for its lenders.",
+ "complication": "Energy data is missing for some sites and water data for all, so the report would fall short of the framework.",
+ "key_question": "What gaps stand between our data and the lenders' framework, and which must close before publishing?",
+ "titles": {
+  "situation": "Our first sustainability report has data gaps.",
+  "options": "Two ways to close the gaps before the report.",
+  "recommendation": "Collect data from the missing sites before publishing.",
+  "roadmap": "Close the emissions gap first, then water.",
+  "kpis": "Two measures show the report meets the framework.",
+  "risks": "The main risk is publishing estimates as measurements."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Sites we operate",
+   "value": 12,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We operate 12 sites"
+  },
+  {
+   "id": "F2",
+   "label": "Sites with complete energy data",
+   "value": 9,
+   "unit": "count",
+   "basis": "client",
+   "quote": "complete for 9 sites"
+  },
+  {
+   "id": "F3",
+   "label": "Share of sites with complete data",
+   "value": 75,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F4",
+   "label": "Measured emissions, tonnes",
+   "value": 18000,
+   "unit": "other",
+   "basis": "client",
+   "quote": "the sites with data total 18,000 tonnes"
+  },
+  {
+   "id": "F5",
+   "label": "Estimated emissions at missing sites, tonnes",
+   "value": 2000,
+   "unit": "other",
+   "basis": "client",
+   "quote": "at about 2,000 tonnes"
+  },
+  {
+   "id": "F6",
+   "label": "Total emissions with the estimate, tonnes",
+   "value": 20000,
+   "unit": "other",
+   "basis": "computed",
+   "operation": "sum",
+   "inputs": [
+    "F4",
+    "F5"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Share of emissions that is measured",
+   "value": 90,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F4",
+    "F6"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Measured share the framework asks for",
+   "value": 95,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "at least 95% of reported emissions"
+  },
+  {
+   "id": "F9",
+   "label": "Shortfall against the framework",
+   "value": 5,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F8",
+    "F7"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Emissions coverage",
+   "finding": "Measured emissions fall short of the share the framework asks for.",
+   "points": [
+    "[F7] of emissions is measured against the [F8] asked for.",
+    "The missing sites account for an estimated [F5] tonnes."
+   ],
+   "hypotheses": [
+    {
+     "text": "Measuring the missing sites closes the gap.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "Energy data from the missing sites is enough to meet the framework.",
+   "chart": {
+    "title": "Measured share against the framework.",
+    "figure_ids": [
+     "F7",
+     "F8"
+    ],
+    "labels": [
+     "Measured now",
+     "Framework"
+    ]
+   }
+  },
+  {
+   "branch": "Other required metrics",
+   "finding": "Water use is a gap at every site.",
+   "points": [
+    "The framework asks for water use, which no site collects."
+   ],
+   "hypotheses": [
+    {
+     "text": "Water bills hold enough data to report water use.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Water data needs a collection method before the report."
+  }
+ ],
+ "options": [
+  {
+   "name": "Collect before publishing",
+   "description": "Gather energy bills from the missing sites and start water data now.",
+   "effort": "medium"
+  },
+  {
+   "name": "Publish with estimates",
+   "description": "Publish on time with estimates flagged and close gaps next year.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Collect before publishing",
+  "rationale": "It lifts measured emissions above the framework's [F8] and is achievable before the report is due; the finance director signs off."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Request energy bills and meter readings from the missing sites."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Recalculate the measured share and gather water bills for every site."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Hand the finance director the completed data before the report is due."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Measured share of emissions",
+   "target": "At least the framework's level"
+  },
+  {
+   "name": "Sites reporting water use",
+   "target": "All sites"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "A missing site cannot produce bills.",
+   "mitigation": "Ask the energy supplier for the site's account history."
+  },
+  {
+   "risk": "Estimates are reported as measured.",
+   "mitigation": "Label every estimated figure in the data file."
+  }
+ ]
+}

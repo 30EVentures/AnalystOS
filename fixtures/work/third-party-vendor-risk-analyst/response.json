@@ -1,0 +1,262 @@
+{
+ "answer": "Approve the vendor only with conditions: it met [F4] of controls against the [F8] our policy requires, and the gaps include encryption of stored data for [F1] customer records.",
+ "exec_summary": [
+  "The vendor would handle [F1] customer records.",
+  "It fully met [F3] of [F2] controls, [F4], short of policy by [F9].",
+  "It did not meet [F6] controls, including encryption and a tested recovery plan.",
+  "Its hosting subcontractor has not been assessed."
+ ],
+ "situation": "A business planning to outsource customer support to a vendor.",
+ "complication": "The vendor falls short of the policy for critical vendors and relies on an unassessed subcontractor.",
+ "key_question": "Should the business sign with the vendor, and on what conditions?",
+ "titles": {
+  "situation": "The vendor falls short of our policy.",
+  "options": "Two ways to proceed with the vendor.",
+  "recommendation": "Approve only with conditions met before go-live.",
+  "roadmap": "Agree conditions, verify them, then go live.",
+  "kpis": "Two measures show the vendor meets policy.",
+  "risks": "The main risk is customer data exposed at the vendor."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Customer records the vendor would handle",
+   "value": 120000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "handle 120,000 customer records"
+  },
+  {
+   "id": "F2",
+   "label": "Controls in the questionnaire",
+   "value": 80,
+   "unit": "count",
+   "basis": "client",
+   "quote": "questionnaire has 80 controls"
+  },
+  {
+   "id": "F3",
+   "label": "Controls fully met",
+   "value": 64,
+   "unit": "count",
+   "basis": "client",
+   "quote": "fully met 64 controls"
+  },
+  {
+   "id": "F4",
+   "label": "Share of controls fully met",
+   "value": 80,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F3",
+    "F2"
+   ]
+  },
+  {
+   "id": "F5",
+   "label": "Controls partly met",
+   "value": 10,
+   "unit": "count",
+   "basis": "client",
+   "quote": "partly met 10"
+  },
+  {
+   "id": "F6",
+   "label": "Controls not met",
+   "value": 6,
+   "unit": "count",
+   "basis": "client",
+   "quote": "did not meet 6"
+  },
+  {
+   "id": "F7",
+   "label": "Share of controls not met",
+   "value": 7.5,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F6",
+    "F2"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Controls met required for a critical vendor",
+   "value": 90,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "at least 90% of controls met"
+  },
+  {
+   "id": "F9",
+   "label": "Shortfall against policy",
+   "value": 10,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F8",
+    "F4"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Control gaps",
+   "finding": "The vendor falls short of our policy for critical vendors.",
+   "points": [
+    "[F4] of controls are fully met against [F8] required.",
+    "[F6] controls are not met, [F7] of the total, and [F5] are partly met."
+   ],
+   "hypotheses": [
+    {
+     "text": "The vendor can close the gaps before go-live.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The committee should not approve without conditions.",
+   "chart": {
+    "title": "Controls met against policy.",
+    "figure_ids": [
+     "F4",
+     "F8"
+    ],
+    "labels": [
+     "Vendor",
+     "Policy"
+    ]
+   }
+  },
+  {
+   "branch": "Data exposure",
+   "finding": "The gaps touch the data the vendor would hold.",
+   "points": [
+    "The vendor would handle [F1] customer records.",
+    "Stored data is not encrypted and recovery is untested."
+   ],
+   "hypotheses": [
+    {
+     "text": "Customer data would be exposed in a breach at the vendor.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "Encryption and recovery must be fixed before data moves."
+  },
+  {
+   "branch": "Fourth party",
+   "finding": "A subcontractor hosts the vendor's systems.",
+   "points": [
+    "We have not assessed the hosting subcontractor."
+   ],
+   "hypotheses": [
+    {
+     "text": "The subcontractor meets our standards.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The subcontractor needs assessing before signing."
+  }
+ ],
+ "options": [
+  {
+   "name": "Conditional approval",
+   "description": "Sign only if encryption, a tested recovery plan and a subcontractor review come first.",
+   "effort": "medium"
+  },
+  {
+   "name": "Find another vendor",
+   "description": "Restart selection with vendors that meet policy today.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Conditional approval",
+  "rationale": "It closes the gaps that expose [F1] customer records while keeping the outsourcing plan; the vendor risk committee decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Agree conditions with the vendor and put them to the committee in three weeks."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Verify encryption, the recovery test and the subcontractor review."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Confirm the vendor meets policy before any data moves."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Controls fully met",
+   "target": "At least the policy level"
+  },
+  {
+   "name": "Conditions verified before go-live",
+   "target": "All of them"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The vendor misses a condition.",
+   "mitigation": "Make each condition a requirement before any data moves."
+  },
+  {
+   "risk": "The subcontractor fails our review.",
+   "mitigation": "Require the vendor to move hosting or end the deal."
+  }
+ ],
+ "work": [
+  {
+   "kind": "register",
+   "title": "Customer-support vendor risk register",
+   "rows": [
+    {
+     "item": "Stored customer data is not encrypted.",
+     "rating": "high",
+     "owner": "Vendor relationship owner",
+     "status": "open",
+     "action": "Make encryption a condition before any data moves."
+    },
+    {
+     "item": "No tested disaster recovery plan.",
+     "rating": "high",
+     "owner": "Vendor relationship owner",
+     "status": "open",
+     "action": "Require a recovery test with results before go-live."
+    },
+    {
+     "item": "Hosting subcontractor not assessed.",
+     "rating": "medium",
+     "owner": "Third-party risk lead",
+     "status": "open",
+     "action": "Send our questionnaire to the subcontractor through the vendor."
+    },
+    {
+     "item": "Controls partly met: [F5].",
+     "rating": "medium",
+     "owner": "Third-party risk lead",
+     "status": "in progress",
+     "action": "Agree a remediation date for each with the vendor."
+    },
+    {
+     "item": "Controls fully met: [F4] against [F8] required.",
+     "rating": "medium",
+     "owner": "Vendor risk committee",
+     "status": "open",
+     "action": "Approve only once conditions bring the vendor to policy."
+    }
+   ]
+  }
+ ]
+}

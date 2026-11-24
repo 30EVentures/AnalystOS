@@ -1,0 +1,253 @@
+{
+ "answer": "Make the income check impossible to skip and review past loans without one: [F3] of sampled loans had no verified income, and those loans are in arrears far more often.",
+ "exec_summary": [
+  "[F2] of [F1] sampled loans had no income verification, [F3] of the sample.",
+  "[F5] of those loans are in arrears, against [F8] of loans with a check.",
+  "At about [F9] loans a month, that rate means about [F10] new loans a month without a check."
+ ],
+ "situation": "An online lender whose rules and policy require verified income on every loan.",
+ "complication": "Staff can skip the income check, and many sampled loans have none.",
+ "key_question": "Does the lender meet the verified-income requirement, and what must change?",
+ "titles": {
+  "situation": "The lender's income checks have a gap.",
+  "options": "Two ways to close the gap.",
+  "recommendation": "Make the income check mandatory and review past loans.",
+  "roadmap": "Stop new gaps first, then review past loans.",
+  "kpis": "Two measures show the gap is closed.",
+  "risks": "The main risk is customers harmed by unaffordable loans."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Loans reviewed",
+   "value": 320,
+   "unit": "count",
+   "basis": "client",
+   "quote": "In a review of 320 loans"
+  },
+  {
+   "id": "F2",
+   "label": "Reviewed loans without income verification",
+   "value": 40,
+   "unit": "count",
+   "basis": "client",
+   "quote": "40 had no income verification"
+  },
+  {
+   "id": "F3",
+   "label": "Share of reviewed loans without a check",
+   "value": 12.5,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F4",
+   "label": "Loans without a check now in arrears",
+   "value": 10,
+   "unit": "count",
+   "basis": "client",
+   "quote": "10 are in arrears"
+  },
+  {
+   "id": "F5",
+   "label": "Arrears rate, loans without a check",
+   "value": 25,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F4",
+    "F2"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Reviewed loans with a check",
+   "value": 280,
+   "unit": "count",
+   "basis": "client",
+   "quote": "Of the other 280 loans"
+  },
+  {
+   "id": "F7",
+   "label": "Loans with a check now in arrears",
+   "value": 14,
+   "unit": "count",
+   "basis": "client",
+   "quote": "14 are in arrears"
+  },
+  {
+   "id": "F8",
+   "label": "Arrears rate, loans with a check",
+   "value": 5,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F7",
+    "F6"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Loans written each month",
+   "value": 1600,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We write about 1,600 loans a month"
+  },
+  {
+   "id": "F10",
+   "label": "Estimated new loans a month without a check",
+   "value": 200,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F9",
+    "F3"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Does the lender comply",
+   "finding": "Many loans do not meet the verified-income requirement.",
+   "points": [
+    "[F2] of [F1] sampled loans had no income verification.",
+    "Staff can skip the income field on the application."
+   ],
+   "hypotheses": [
+    {
+     "text": "The gap comes from the skippable field.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The lender cannot show compliance until the check is enforced."
+  },
+  {
+   "branch": "Customer harm",
+   "finding": "Loans without a check fall into arrears more often.",
+   "points": [
+    "[F5] of loans without a check are in arrears.",
+    "[F8] of loans with a check are in arrears."
+   ],
+   "hypotheses": [
+    {
+     "text": "Loans without a check fall into arrears more often.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "Past loans without a check need review for customer harm.",
+   "chart": {
+    "title": "Arrears rate with and without an income check.",
+    "figure_ids": [
+     "F5",
+     "F8"
+    ],
+    "labels": [
+     "Without check",
+     "With check"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Enforce and review",
+   "description": "Make income verification mandatory and review every past loan without it.",
+   "effort": "medium"
+  },
+  {
+   "name": "Manual sign-off",
+   "description": "Have a second person confirm income on each loan until the app changes.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Enforce and review",
+  "rationale": "It stops about [F10] unchecked loans a month at the source and deals with harm on past loans; the head of compliance decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Require a second-person income check on every new loan until the app release.",
+    "Present the findings to the board risk committee within the six weeks."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Make the income field mandatory in the next app release."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Review past loans without a check, starting with those in arrears."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "New loans without verified income",
+   "target": "None"
+  },
+  {
+   "name": "Past unchecked loans reviewed",
+   "target": "All of them"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The app release slips.",
+   "mitigation": "Keep the second-person check until the release is live."
+  },
+  {
+   "risk": "Reviews find customers were harmed.",
+   "mitigation": "Agree a remediation approach with the head of compliance."
+  }
+ ],
+ "work": [
+  {
+   "kind": "register",
+   "title": "Verified-income compliance register",
+   "rows": [
+    {
+     "item": "Income check can be skipped: [F3] of sampled loans have none.",
+     "rating": "high",
+     "owner": "Head of lending operations",
+     "status": "open",
+     "action": "Add a second-person income check until the app makes the field mandatory."
+    },
+    {
+     "item": "Loans without a check: [F5] in arrears against [F8] with a check.",
+     "rating": "high",
+     "owner": "Head of collections",
+     "status": "open",
+     "action": "Review loans without a check in arrears first for affordability."
+    },
+    {
+     "item": "About [F10] new loans a month at risk while the gap stays open.",
+     "rating": "medium",
+     "owner": "Head of compliance",
+     "status": "in progress",
+     "action": "Report weekly counts of unchecked loans until the app release."
+    },
+    {
+     "item": "App field is optional for staff.",
+     "rating": "medium",
+     "owner": "Product owner for the loan app",
+     "status": "open",
+     "action": "Make income verification mandatory in the next release."
+    }
+   ]
+  }
+ ]
+}

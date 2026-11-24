@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "qa-test-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Last quarter 20 bugs reached customers, and 12 of them were in the checkout flow.",
+ "answers": {
+  "common.decision": "Which tests to add first; the engineering lead decides.",
+  "common.deadline": "Before the next release.",
+  "common.audience": "The engineering lead.",
+  "common.materials": "Automated tests cover 35% of the checkout code. Most checkout bugs involved discount codes. Each checkout bug cost us about $8,000 in refunds and support time.",
+  "software-it.codebase": "Python backend with pytest; tests run in CI on every pull request.",
+  "software-it.done": "Discount code bugs are caught by automated tests before release."
+ }
+}

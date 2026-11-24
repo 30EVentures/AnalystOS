@@ -1,0 +1,232 @@
+{
+ "answer": "Put the file to the investigations lead now: last month's cash of [F1] was [F6] above the usual monthly level and [F7] above declared sales, all in deposits under [F3].",
+ "exec_summary": [
+  "The customer deposited [F1] in cash last month across [F2] deposits.",
+  "Every deposit was under [F3].",
+  "Cash deposits averaged [F4] a month in the year before, so last month was [F6] higher.",
+  "Last month's cash exceeded declared sales of about [F5] by [F7]."
+ ],
+ "situation": "A bank monitoring cash deposits on its business accounts.",
+ "complication": "One restaurant customer's cash deposits jumped sharply, in many deposits each under the reporting threshold.",
+ "key_question": "Does the restaurant's cash activity need the investigations lead's decision on suspicion and filing?",
+ "titles": {
+  "situation": "A business customer's cash deposits rose sharply last month.",
+  "options": "Two ways to take the case forward.",
+  "recommendation": "Put the full file to the investigations lead now.",
+  "roadmap": "Decide on the case, then watch the account.",
+  "kpis": "Two measures show the case is handled in time.",
+  "risks": "The main risk is missing the filing window."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Cash deposited last month",
+   "value": 171000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "deposited $171,000 in cash"
+  },
+  {
+   "id": "F2",
+   "label": "Cash deposits last month",
+   "value": 19,
+   "unit": "count",
+   "basis": "client",
+   "quote": "across 19 deposits"
+  },
+  {
+   "id": "F3",
+   "label": "Reporting threshold per deposit",
+   "value": 10000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "each under $10,000"
+  },
+  {
+   "id": "F4",
+   "label": "Usual monthly cash deposits",
+   "value": 36000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "averaged $36,000 a month"
+  },
+  {
+   "id": "F5",
+   "label": "Declared monthly sales",
+   "value": 60000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "about $60,000 a month"
+  },
+  {
+   "id": "F6",
+   "label": "Rise on usual monthly cash",
+   "value": 375,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "growth_percent",
+   "inputs": [
+    "F4",
+    "F1"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Cash above declared sales",
+   "value": 111000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F5"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Change from the usual pattern",
+   "finding": "Last month's cash was far above the customer's usual level.",
+   "points": [
+    "Cash rose from about [F4] a month to [F1], [F6] higher."
+   ],
+   "hypotheses": [
+    {
+     "text": "A one-off event such as a large catering order explains the rise.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The change is large enough to need the lead's review.",
+   "chart": {
+    "title": "Last month's cash against the usual monthly level.",
+    "figure_ids": [
+     "F4",
+     "F1"
+    ],
+    "labels": [
+     "Usual month",
+     "Last month"
+    ]
+   }
+  },
+  {
+   "branch": "How the cash came in",
+   "finding": "Every deposit stayed under the reporting threshold.",
+   "points": [
+    "All [F2] deposits were under [F3]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The deposit sizes reflect normal daily takings.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The pattern is one the lead should weigh for structuring."
+  },
+  {
+   "branch": "Fit with the business",
+   "finding": "Cash deposits exceeded the restaurant's declared sales.",
+   "points": [
+    "Last month's cash exceeded declared sales of about [F5] by [F7]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Declared sales are out of date.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The gap needs an explanation before any conclusion.",
+   "chart": {
+    "title": "Cash deposited against declared sales.",
+    "figure_ids": [
+     "F1",
+     "F5"
+    ],
+    "labels": [
+     "Cash deposited",
+     "Declared sales"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Full file to the lead",
+   "description": "Put the facts, evidence and open questions to the investigations lead now.",
+   "effort": "low"
+  },
+  {
+   "name": "Ask the customer first",
+   "description": "Ask the customer about the cash before putting the file to the lead.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Full file to the lead",
+  "rationale": "The rise of [F6] and the gap of [F7] need the lead's judgement now; the lead decides any finding, any customer contact and any filing."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Put the file to the investigations lead.",
+    "Gather branch records for each deposit."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Record the lead's decision and any follow-up the lead asks for."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Review the account's cash activity again with the lead."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Decision recorded by the investigations lead",
+   "target": "Within the filing window"
+  },
+  {
+   "name": "Open questions answered in the file",
+   "target": "All of them before the decision"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The filing window is missed.",
+   "mitigation": "Put the file to the lead now and track the window."
+  },
+  {
+   "risk": "Contacting the customer tips them off.",
+   "mitigation": "Make no customer contact unless the lead decides it."
+  }
+ ],
+ "work": [
+  {
+   "kind": "case_file",
+   "subject": "Restaurant customer: cash deposits under the reporting threshold",
+   "facts": [
+    "The customer deposited [F1] in cash last month across [F2] deposits.",
+    "Each deposit was under [F3].",
+    "Cash deposits averaged [F4] a month in the year before.",
+    "Declared sales are about [F5] a month, and last month's cash exceeded them by [F7]."
+   ],
+   "evidence": [
+    "The account's cash deposit records for last month.",
+    "The account's cash deposit history for the year before.",
+    "The customer's declared sales on file."
+   ],
+   "open_questions": [
+    "Were the deposits made by the same person and at which branches?",
+    "Did the restaurant have any one-off income last month?",
+    "Is the declared sales figure current?"
+   ],
+   "for_decision": "Should the investigations lead treat this cash activity as suspicious and decide whether a regulatory report is needed?"
+  }
+ ]
+}

@@ -1,0 +1,240 @@
+{
+ "answer": "Retention, not acquisition, is the bigger leak: churn of [F4] wiped out [F10] of new revenue, and the shortfall to plan was [F9].",
+ "exec_summary": [
+  "New customers added [F7] of annual recurring revenue.",
+  "Churn took away [F4], leaving net new revenue of [F8] against a plan of [F5].",
+  "Churn is larger than the whole [F9] shortfall."
+ ],
+ "situation": "A subscription business that tracks leads, deals and churn in separate systems.",
+ "complication": "Net new recurring revenue missed plan, and each team sees only its own part of the funnel.",
+ "key_question": "Where was recurring revenue lost against plan, and which lever closes the gap fastest?",
+ "titles": {
+  "situation": "Net new recurring revenue missed plan last year.",
+  "options": "Three ways to close the gap to plan next year.",
+  "recommendation": "Put next year's first effort into reducing churn.",
+  "roadmap": "Size churn by cause before the plan is due, then act.",
+  "kpis": "Two measures show whether the leak is closing.",
+  "risks": "The main risk is cutting acquisition while fixing churn."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Marketing leads last year",
+   "value": 4000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "Marketing generated 4,000 leads"
+  },
+  {
+   "id": "F2",
+   "label": "New customers won",
+   "value": 200,
+   "unit": "count",
+   "basis": "client",
+   "quote": "we won 200 new customers"
+  },
+  {
+   "id": "F3",
+   "label": "Average new customer value a year",
+   "value": 15000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "worth $15,000 a year"
+  },
+  {
+   "id": "F4",
+   "label": "Recurring revenue lost to churn",
+   "value": 1200000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "lost $1.2 million of annual recurring revenue"
+  },
+  {
+   "id": "F5",
+   "label": "Plan for net new recurring revenue",
+   "value": 2500000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "plan was $2.5 million"
+  },
+  {
+   "id": "F6",
+   "label": "Lead-to-customer rate",
+   "value": 5,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "New recurring revenue won",
+   "value": 3000000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F2",
+    "F3"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Net new recurring revenue",
+   "value": 1800000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F7",
+    "F4"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Shortfall to plan",
+   "value": 700000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F5",
+    "F8"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Churn as a share of new revenue",
+   "value": 40,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F4",
+    "F7"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Acquisition",
+   "finding": "New business brought in more than the plan's net figure.",
+   "points": [
+    "Of [F1] leads, [F2] became customers, a rate of [F6].",
+    "They added [F7] of recurring revenue, more than the [F5] plan."
+   ],
+   "hypotheses": [
+    {
+     "text": "Weak lead flow caused the miss.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "The miss is not mainly an acquisition problem.",
+   "chart": {
+    "title": "New revenue won was above the net plan before churn.",
+    "figure_ids": [
+     "F5",
+     "F7"
+    ],
+    "labels": [
+     "Net plan",
+     "New revenue won"
+    ]
+   }
+  },
+  {
+   "branch": "Retention",
+   "finding": "Churn took away more than the whole shortfall.",
+   "points": [
+    "Churn of [F4] was [F10] of new revenue won.",
+    "Without that churn, net new revenue would have beaten plan."
+   ],
+   "hypotheses": [
+    {
+     "text": "Churn explains the miss against plan.",
+     "verdict": "supported"
+    },
+    {
+     "text": "Churn is concentrated in recently won customers.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Reducing churn is the fastest route back to plan.",
+   "chart": {
+    "title": "Churn was larger than the shortfall to plan.",
+    "figure_ids": [
+     "F9",
+     "F4"
+    ],
+    "labels": [
+     "Shortfall to plan",
+     "Churn"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Retention first",
+   "description": "Find the main churn causes and target the largest with customer success.",
+   "effort": "medium"
+  },
+  {
+   "name": "More leads",
+   "description": "Raise marketing spend to win more new customers.",
+   "effort": "high"
+  },
+  {
+   "name": "Both at once",
+   "description": "Split next year's extra effort evenly between acquisition and retention.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Retention first",
+  "rationale": "Churn of [F4] is larger than the [F9] shortfall, so cutting it closes the gap faster than buying more leads; the chief revenue officer decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Join billing churn records to CRM deals to size churn by customer type before the plan is due."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Agree a retention target with the customer success lead."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Track monthly churn against the target and report net new revenue."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Recurring revenue lost to churn",
+   "target": "Below [F4] next year"
+  },
+  {
+   "name": "Net new recurring revenue",
+   "target": "At or above [F5]"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Acquisition slips while the team focuses on churn.",
+   "mitigation": "Keep the lead-to-customer rate in the monthly report."
+  },
+  {
+   "risk": "Churn records do not match CRM accounts.",
+   "mitigation": "Reconcile customer lists across both systems first."
+  }
+ ]
+}

@@ -31,6 +31,9 @@ ROOT = Path(__file__).resolve().parents[1]
 CATALOG = load_catalog()
 ROLES = {r["id"]: r for r in CATALOG["roles"]}
 EXAMPLES = sorted(d for d in (ROOT / "fixtures" / "work").iterdir() if d.is_dir())
+FAMILY_EXAMPLE_ROLES = {json.loads(p.read_text())["roles"][0]
+                        for p in [*(ROOT / "fixtures" / "roles").glob("*/client.json"),
+                                  ROOT / "fixtures" / "consulting" / "churn-clinics" / "client.json"]}
 # A draft that reads as already acted on: sent, emailed, posted, booked, filed or signed (Slice 127 review).
 _ACTED = r"(?:sent|emailed|posted|booked|filed|signed|submitted)"
 DONE = re.compile(r"\b(?:has|have|had|was|were)\s+(?:already\s+)?(?:been\s+)?" + _ACTED + r"\b"
@@ -82,15 +85,21 @@ def reconciliation_totals(data):
 
 
 class WorkExamplesTest(unittest.TestCase):
-    def test_each_example_is_for_a_role_that_owes_work(self):
-        self.assertEqual(len(EXAMPLES), 10)
+    def test_every_role_has_a_worked_example_of_its_own(self):
+        # Slice 129: the 13 family examples plus one example per other role, 73 in all.
+        self.assertEqual(len(FAMILY_EXAMPLE_ROLES), 13)
+        self.assertEqual({d.name for d in EXAMPLES} | FAMILY_EXAMPLE_ROLES, set(ROLES))
+        self.assertEqual({d.name for d in EXAMPLES} & FAMILY_EXAMPLE_ROLES, set())
+
+    def test_each_example_carries_exactly_its_roles_work(self):
         for directory in EXAMPLES:
             client, response = load(directory)
             with self.subTest(example=directory.name):
                 self.assertEqual(client["roles"], [directory.name])
                 owed = work.required_kinds(ROLES[directory.name])
-                self.assertTrue(owed)
-                self.assertEqual(sorted({item["kind"] for item in response["work"]}), owed)
+                self.assertEqual(sorted({item["kind"] for item in response.get("work", [])}), owed)
+                if not owed:
+                    self.assertNotIn("work", response)
                 self.assertIn("Not a real company", client["note"])
 
     def test_each_example_verifies_first_time_and_renders_in_its_role_format(self):
@@ -102,7 +111,7 @@ class WorkExamplesTest(unittest.TestCase):
                 data, fmt = formats.render(spec, record, CATALOG)
                 self.assertEqual(fmt, formats.format_of(ROLES[directory.name]))
                 text = rendered_text(data, fmt)
-                for item in spec["content"]["work"]:
+                for item in spec["content"].get("work", []):
                     self.assertIn(work.title_of(item).split(":")[0], text)
                 self.assertEqual(leftover_numbers(without_code(text, spec), spec), "")
 
@@ -110,7 +119,7 @@ class WorkExamplesTest(unittest.TestCase):
         seen = 0
         for directory in EXAMPLES:
             _, response = load(directory)
-            if not any(item["kind"] == "reconciliation" for item in response["work"]):
+            if not any(item["kind"] == "reconciliation" for item in response.get("work", [])):
                 continue
             with self.subTest(example=directory.name):
                 spec, record = build(directory)
@@ -123,14 +132,14 @@ class WorkExamplesTest(unittest.TestCase):
                     self.assertAlmostEqual(rows["Side A adjusted"], rows["Side B adjusted"])
                     self.assertAlmostEqual(rows["Difference"], 0)
                     seen += 1
-        self.assertEqual(seen, 2)
+        self.assertEqual(seen, sum("reconciliation" in work.required_kinds(ROLES[d.name]) for d in EXAMPLES))
 
     def test_drafts_are_written_for_approval_and_never_read_as_done(self):
         seen = 0
         for directory in EXAMPLES:
             _, response = load(directory)
             boundary = ROLES[directory.name]["boundary"]
-            for item in response["work"]:
+            for item in response.get("work", []):
                 if item["kind"] != "draft":
                     continue
                 with self.subTest(example=directory.name):
@@ -141,7 +150,7 @@ class WorkExamplesTest(unittest.TestCase):
                     body = " ".join(item["body"])
                     self.assertIsNone(DONE.search(body), body)
                     seen += 1
-        self.assertEqual(seen, 3)
+        self.assertEqual(seen, sum(work.required_kinds(ROLES[d.name]).count("draft") for d in EXAMPLES))
 
     def test_the_done_pattern_catches_the_review_examples(self):
         for text in ("This notice has been sent and signed.", "We have already emailed this to you and posted both entries.",
@@ -152,11 +161,17 @@ class WorkExamplesTest(unittest.TestCase):
     def test_case_files_ask_a_qualified_person(self):
         for directory in EXAMPLES:
             _, response = load(directory)
-            for item in response["work"]:
+            for item in response.get("work", []):
                 if item["kind"] == "case_file":
                     with self.subTest(example=directory.name):
                         self.assertTrue(item["for_decision"].startswith("Should the "))
                         self.assertTrue(item["for_decision"].endswith("?"))
+
+
+class HelperTest(unittest.TestCase):
+    def test_a_blank_code_line_does_not_hide_stray_numbers(self):
+        spec = {"content": {"work": [{"kind": "code", "code": "x = 1\n\ny = 2\n"}]}}
+        self.assertEqual(without_code("x = 1 and 42", spec).split(), ["and", "42"])
 
 
 class CoverageTest(unittest.TestCase):
@@ -168,7 +183,7 @@ class CoverageTest(unittest.TestCase):
             covered |= {(family, item["kind"]) for item in response.get("work", [])}
         for directory in EXAMPLES:
             _, response = load(directory)
-            covered |= {(ROLES[directory.name]["family"], item["kind"]) for item in response["work"]}
+            covered |= {(ROLES[directory.name]["family"], item["kind"]) for item in response.get("work", [])}
         self.assertEqual(sorted(owed - covered), [])
         self.assertEqual(len(owed), 20)
 

@@ -115,7 +115,7 @@ class TheRealCatalogTest(unittest.TestCase):
         own = set()
         for client in ROOT.glob("fixtures/*/*/client.json"):
             own.update(json.loads(client.read_text())["roles"])
-        self.assertEqual(len(own), 23)
+        self.assertEqual(len(own), 73)  # Slice 129: every role has its own example
         for role in CATALOG["roles"]:
             with self.subTest(role=role["id"]):
                 self.assertEqual(role["status"], "available")

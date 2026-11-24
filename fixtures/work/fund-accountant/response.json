@@ -1,0 +1,281 @@
+{
+ "answer": "Three unbooked custodian items explain the whole [F6] cash break: book them for the fund controller's approval before the net asset value is struck.",
+ "exec_summary": [
+  "Our system shows [F1] of cash against the custodian's [F2], a break of [F6].",
+  "A dividend of [F3] and a subscription of [F4] are at the custodian but not booked.",
+  "The custodian paid the [F5] audit fee we still show as accrued.",
+  "Net, the three items come to [F8], the whole break."
+ ],
+ "situation": "A fund whose cash is checked against the custodian before each net asset value strike.",
+ "complication": "Fund cash in our system is below the custodian's, hours before the strike.",
+ "key_question": "What explains the cash break, and what must be booked before the net asset value is struck?",
+ "titles": {
+  "situation": "Fund cash disagrees with the custodian before the strike.",
+  "options": "Two ways to handle the break before the strike.",
+  "recommendation": "Book all three items for approval before the strike.",
+  "roadmap": "Clear the break tonight, then book custodian cash daily.",
+  "kpis": "Two measures show cash is clean at each strike.",
+  "risks": "The main risk is booking the subscription into tonight's valuation."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Fund cash in our system",
+   "value": 3482000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "shows cash of $3,482,000"
+  },
+  {
+   "id": "F2",
+   "label": "Fund cash at the custodian",
+   "value": 3617500,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "the custodian statement shows $3,617,500"
+  },
+  {
+   "id": "F3",
+   "label": "Dividend received, not booked",
+   "value": 41500,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "A dividend of $41,500"
+  },
+  {
+   "id": "F4",
+   "label": "Subscription received for tomorrow's dealing",
+   "value": 120000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "A subscription of $120,000"
+  },
+  {
+   "id": "F5",
+   "label": "Audit fee paid by the custodian",
+   "value": 26000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "the $26,000 audit fee"
+  },
+  {
+   "id": "F6",
+   "label": "Cash break",
+   "value": 135500,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Unbooked cash received",
+   "value": 161500,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "sum",
+   "inputs": [
+    "F3",
+    "F4"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Net effect of the three items",
+   "value": 135500,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F7",
+    "F5"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Draft net asset value",
+   "value": 83000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "draft net asset value is $83,000,000"
+  },
+  {
+   "id": "F10",
+   "label": "Dividend as a share of the draft net asset value",
+   "value": 0.05,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F3",
+    "F9"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Cash received",
+   "finding": "Cash has arrived at the custodian that we have not booked.",
+   "points": [
+    "The dividend of [F3] and the subscription of [F4] total [F7]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The dividend was already accrued as receivable.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "If the dividend was not accrued, the draft value is understated by [F10].",
+   "chart": {
+    "title": "Cash in our system and at the custodian.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "Our system",
+     "Custodian"
+    ]
+   }
+  },
+  {
+   "branch": "Cash paid",
+   "finding": "The custodian paid a fee we still show as owed.",
+   "points": [
+    "The audit fee of [F5] is still an accrual in our system."
+   ],
+   "hypotheses": [
+    {
+     "text": "The fee payment changes the fund's value.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "Booking the payment clears the accrual without moving the value."
+  },
+  {
+   "branch": "Timing",
+   "finding": "The subscription belongs to tomorrow's dealing, not tonight's value.",
+   "points": [
+    "The subscription of [F4] arrived for tomorrow's dealing."
+   ],
+   "hypotheses": [
+    {
+     "text": "The subscription should lift tonight's value.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "It is booked as received in advance, outside tonight's value."
+  }
+ ],
+ "options": [
+  {
+   "name": "Book all three",
+   "description": "Book the dividend, the subscription received in advance and the fee payment for approval.",
+   "effort": "low"
+  },
+  {
+   "name": "Strike with a note",
+   "description": "Strike tonight with the break noted and book tomorrow.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Book all three",
+  "rationale": "It clears the whole [F6] break before the strike and keeps the subscription out of tonight's value; the fund controller approves the entries and the strike."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Book the three entries tonight once the fund controller approves, before the strike.",
+    "Confirm whether the dividend was accrued."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Book custodian cash movements every day before the valuation."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Review with the fund controller any breaks still open at a strike."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Unexplained cash break at the strike",
+   "target": "Nothing"
+  },
+  {
+   "name": "Custodian cash movements booked the same day",
+   "target": "All of them"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The subscription is counted in tonight's value.",
+   "mitigation": "Book it as received in advance for tomorrow's dealing."
+  },
+  {
+   "risk": "The dividend is booked against income and a receivable.",
+   "mitigation": "Check for an existing receivable before booking."
+  }
+ ],
+ "work": [
+  {
+   "kind": "reconciliation",
+   "title": "Fund cash against the custodian before the strike",
+   "side_a": {
+    "label": "Fund cash in our system",
+    "figure_id": "F1"
+   },
+   "side_b": {
+    "label": "Fund cash at the custodian",
+    "figure_id": "F2"
+   },
+   "items": [
+    {
+     "label": "Dividend received, not booked",
+     "figure_id": "F3",
+     "effect": "add_to_a"
+    },
+    {
+     "label": "Subscription received for tomorrow's dealing",
+     "figure_id": "F4",
+     "effect": "add_to_a"
+    },
+    {
+     "label": "Audit fee paid by the custodian",
+     "figure_id": "F5",
+     "effect": "subtract_from_a"
+    }
+   ],
+   "entries": [
+    {
+     "debit": "Cash at custodian",
+     "credit": "Dividends receivable",
+     "figure_id": "F3",
+     "memo": "Book the dividend of [F3]; credit income instead if it was never accrued; for the fund controller's approval."
+    },
+    {
+     "debit": "Cash at custodian",
+     "credit": "Subscriptions received in advance",
+     "figure_id": "F4",
+     "memo": "Book the subscription of [F4] for tomorrow's dealing; for the fund controller's approval."
+    },
+    {
+     "debit": "Accrued audit fee",
+     "credit": "Cash at custodian",
+     "figure_id": "F5",
+     "memo": "Book the custodian's payment of the audit fee of [F5]; for the fund controller's approval."
+    }
+   ]
+  }
+ ]
+}

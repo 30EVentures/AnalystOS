@@ -1,0 +1,236 @@
+{
+ "answer": "Turnover rose from [F1] to [F2], adding about [F10] in replacement costs; shift scheduling is the main reason leavers gave, so prepare a scheduling policy review for the HR director to decide.",
+ "exec_summary": [
+  "Turnover rose by [F6], from about [F8] leavers to [F7].",
+  "The [F9] extra leavers cost about [F10] to replace.",
+  "Shift scheduling was the main reason for [F5] leavers, or [F11]."
+ ],
+ "situation": "A business with a large warehouse workforce working shifts.",
+ "complication": "Turnover rose sharply in one year, and replacing leavers is costly.",
+ "key_question": "Why did warehouse turnover rise, and what group-level change should the HR director consider?",
+ "titles": {
+  "situation": "Warehouse turnover rose sharply last year.",
+  "options": "Two policy changes the HR director could consider.",
+  "recommendation": "Review shift scheduling policy for the HR director to decide.",
+  "roadmap": "Prepare the review for the HR leadership meeting, then track turnover.",
+  "kpis": "Two measures show whether turnover is falling.",
+  "risks": "The main risk is reading exit surveys as the whole story."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Voluntary turnover, year before",
+   "value": 18,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "rose from 18%"
+  },
+  {
+   "id": "F2",
+   "label": "Voluntary turnover, last year",
+   "value": 27,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "to 27% last year"
+  },
+  {
+   "id": "F3",
+   "label": "Warehouse staff employed",
+   "value": 400,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We employ 400 warehouse staff"
+  },
+  {
+   "id": "F4",
+   "label": "Cost to replace one leaver",
+   "value": 6000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Replacing one costs about $6,000"
+  },
+  {
+   "id": "F5",
+   "label": "Leavers naming shift scheduling",
+   "value": 54,
+   "unit": "count",
+   "basis": "client",
+   "quote": "54 leavers named shift scheduling"
+  },
+  {
+   "id": "F6",
+   "label": "Rise in turnover",
+   "value": 9,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Leavers last year",
+   "value": 108,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F3",
+    "F2"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Leavers at the earlier rate",
+   "value": 72,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F3",
+    "F1"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Extra leavers from the rise",
+   "value": 36,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F7",
+    "F8"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Extra replacement cost",
+   "value": 216000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F9",
+    "F4"
+   ]
+  },
+  {
+   "id": "F11",
+   "label": "Share of leavers naming shift scheduling",
+   "value": 50,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F5",
+    "F7"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Cost of the rise",
+   "finding": "The rise in turnover carries a clear replacement cost.",
+   "points": [
+    "At [F2] of [F3] staff, about [F7] left, against [F8] at the earlier rate.",
+    "The [F9] extra leavers cost about [F10] to replace."
+   ],
+   "hypotheses": [
+    {
+     "text": "The rise is costly enough to act on.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "A policy that brings turnover back down pays for itself quickly.",
+   "chart": {
+    "title": "Leavers rose sharply with the higher turnover rate.",
+    "figure_ids": [
+     "F8",
+     "F7"
+    ],
+    "labels": [
+     "At the earlier rate",
+     "Last year"
+    ]
+   }
+  },
+  {
+   "branch": "Why staff leave",
+   "finding": "Shift scheduling is the reason leavers name most.",
+   "points": [
+    "[F5] leavers named shift scheduling, [F11] of all leavers."
+   ],
+   "hypotheses": [
+    {
+     "text": "Shift scheduling is a major driver of turnover.",
+     "verdict": "supported"
+    },
+    {
+     "text": "Pay is a bigger driver than leavers report.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "A scheduling policy review targets the most common reason staff give for leaving."
+  }
+ ],
+ "options": [
+  {
+   "name": "Scheduling policy review",
+   "description": "Review how shifts are set and swapped, with options for the HR director to decide.",
+   "effort": "medium"
+  },
+  {
+   "name": "Retention bonus",
+   "description": "Offer a group-wide retention bonus to warehouse staff.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Scheduling policy review",
+  "rationale": "Shift scheduling is the main reason for [F11] of leavers, and the extra turnover costs about [F10]; the HR director decides any policy change."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Prepare the scheduling policy options for the HR leadership meeting.",
+    "Check exit survey reasons by shift and site, by group only."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Support the HR director in consulting staff representatives on any chosen option."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Track monthly turnover against [F1] and [F2]."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Voluntary turnover",
+   "target": "Back towards [F1]"
+  },
+  {
+   "name": "Leavers naming shift scheduling",
+   "target": "Falling each quarter"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Exit surveys miss reasons leavers did not state.",
+   "mitigation": "Add stay interviews by group alongside exit surveys."
+  },
+  {
+   "risk": "Analysis is used to judge individuals.",
+   "mitigation": "Report only at group level and leave individual decisions to managers and HR."
+  }
+ ]
+}

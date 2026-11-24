@@ -1,0 +1,185 @@
+{
+ "answer": "Add automated tests for discount codes at checkout first: checkout produced [F5] of escaped bugs, costing about [F6] last quarter.",
+ "exec_summary": [
+  "[F2] of the [F1] bugs that reached customers were in checkout, [F5].",
+  "At about [F4] each, checkout bugs cost about [F6] last quarter.",
+  "Automated tests cover only [F3] of the checkout code.",
+  "Most checkout bugs involved discount codes."
+ ],
+ "situation": "A software team whose checkout bugs sometimes reach customers.",
+ "complication": "Checkout bugs escape to customers, mostly around discount codes, and test coverage is thin.",
+ "key_question": "Which tests would catch the checkout bugs before they reach customers?",
+ "titles": {
+  "situation": "Most escaped bugs were in checkout.",
+  "options": "Two ways to stop checkout bugs reaching customers.",
+  "recommendation": "Add automated discount code tests to checkout first.",
+  "roadmap": "Cover discount codes first, then the rest of checkout.",
+  "kpis": "Two measures show fewer checkout bugs escape.",
+  "risks": "The main risk is tests that pass but miss real cases."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Bugs that reached customers last quarter",
+   "value": 20,
+   "unit": "count",
+   "basis": "client",
+   "quote": "20 bugs reached customers"
+  },
+  {
+   "id": "F2",
+   "label": "Escaped bugs in the checkout flow",
+   "value": 12,
+   "unit": "count",
+   "basis": "client",
+   "quote": "12 of them were in the checkout flow"
+  },
+  {
+   "id": "F3",
+   "label": "Checkout code covered by automated tests",
+   "value": 35,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "cover 35% of the checkout code"
+  },
+  {
+   "id": "F4",
+   "label": "Cost of each checkout bug",
+   "value": 8000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "about $8,000 in refunds"
+  },
+  {
+   "id": "F5",
+   "label": "Share of escaped bugs in checkout",
+   "value": 60,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Cost of checkout bugs last quarter",
+   "value": 96000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F2",
+    "F4"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Where bugs escape",
+   "finding": "Checkout is the main source of escaped bugs.",
+   "points": [
+    "[F2] of [F1] escaped bugs were in checkout.",
+    "They cost about [F6]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Checkout changes more often than other code.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Testing effort should start in checkout.",
+   "chart": {
+    "title": "Escaped bugs overall and in checkout.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "All escaped",
+     "Checkout"
+    ]
+   }
+  },
+  {
+   "branch": "Why tests miss them",
+   "finding": "Thin test coverage leaves discount logic unchecked.",
+   "points": [
+    "Tests cover [F3] of checkout code.",
+    "Most checkout bugs involved discount codes."
+   ],
+   "hypotheses": [
+    {
+     "text": "Discount rules have no automated tests today.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Discount code tests are the first gap to close."
+  }
+ ],
+ "options": [
+  {
+   "name": "Discount tests first",
+   "description": "Add automated tests for discount codes, then widen checkout coverage.",
+   "effort": "low"
+  },
+  {
+   "name": "Manual test pass",
+   "description": "Add a manual checkout test pass before each release.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Discount tests first",
+  "rationale": "It targets the bugs behind most of the [F6] cost and runs on every pull request; the engineering lead decides what is merged."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Send the draft discount tests to the engineering lead for review before the next release."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Add tests for the remaining checkout steps."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Compare escaped checkout bugs with last quarter."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Checkout bugs reaching customers",
+   "target": "Fewer than last quarter"
+  },
+  {
+   "name": "Checkout code covered by tests",
+   "target": "Rising each release"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Tests pass but miss real customer cases.",
+   "mitigation": "Build test cases from last quarter's bug reports."
+  },
+  {
+   "risk": "Slow tests delay pull requests.",
+   "mitigation": "Keep checkout tests as fast unit tests."
+  }
+ ],
+ "work": [
+  {
+   "kind": "code",
+   "language": "python",
+   "purpose": "Draft automated tests for discount codes at checkout, for the engineering lead to review.",
+   "code": "# Draft: tests for discount codes at checkout. Not run or reviewed.\nfrom datetime import date\nimport pytest\nfrom checkout.pricing import Cart, DiscountError, apply_discount\ndef make_cart(total_cents):\n    return Cart(items=[{\"sku\": \"ITEM\", \"price_cents\": total_cents, \"qty\": 1}])\ndef test_percent_code_reduces_total():\n    cart = apply_discount(make_cart(10000), \"SAVE10\", today=date(2026, 1, 15))\n    assert cart.total_cents == 9000\ndef test_percent_code_rounds_to_whole_cents():\n    cart = apply_discount(make_cart(999), \"SAVE10\", today=date(2026, 1, 15))\n    assert cart.total_cents == 899\ndef test_expired_code_is_rejected():\n    with pytest.raises(DiscountError):\n        apply_discount(make_cart(10000), \"SUMMER\", today=date(2026, 10, 1))\ndef test_fixed_code_never_makes_total_negative():\n    cart = apply_discount(make_cart(500), \"TENOFF\", today=date(2026, 1, 15))\n    assert cart.total_cents == 0\ndef test_same_code_cannot_apply_twice():\n    cart = apply_discount(make_cart(10000), \"SAVE10\", today=date(2026, 1, 15))\n    with pytest.raises(DiscountError):\n        apply_discount(cart, \"SAVE10\", today=date(2026, 1, 15))\n"
+  }
+ ]
+}

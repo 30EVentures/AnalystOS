@@ -1,0 +1,208 @@
+{
+ "answer": "Bring routine contract work in-house with templates and a self-service playbook: it took [F3] of outside counsel spend, [F7] of the total.",
+ "exec_summary": [
+  "Outside counsel spend rose to [F1] from [F2], up [F5].",
+  "The increase was [F6].",
+  "Routine commercial contracts took [F3], [F7] of spend.",
+  "Outside firms billed [F4] hours on routine contracts."
+ ],
+ "situation": "A legal department that sends much of its work to outside law firms.",
+ "complication": "Outside counsel spend is rising, and a large share goes on routine contracts.",
+ "key_question": "Where can the legal department cut outside counsel spend without adding risk?",
+ "titles": {
+  "situation": "Outside counsel spend rose sharply last year.",
+  "options": "Three ways to reduce outside counsel spend.",
+  "recommendation": "Bring routine contracts in-house with templates and a playbook.",
+  "roadmap": "Templates first, then route routine work in-house.",
+  "kpis": "Two measures show outside spend is falling.",
+  "risks": "The main risk is overloading the in-house team."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Outside counsel spend last year",
+   "value": 2400000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "spent $2,400,000 on outside counsel"
+  },
+  {
+   "id": "F2",
+   "label": "Outside counsel spend the year before",
+   "value": 1920000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "up from $1,920,000"
+  },
+  {
+   "id": "F3",
+   "label": "Outside counsel spend on routine contracts",
+   "value": 720000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "made up $720,000"
+  },
+  {
+   "id": "F4",
+   "label": "Hours billed on routine contracts",
+   "value": 3200,
+   "unit": "count",
+   "basis": "client",
+   "quote": "billed 3,200 hours"
+  },
+  {
+   "id": "F5",
+   "label": "Growth in outside counsel spend",
+   "value": 25,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "growth_percent",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Increase in outside counsel spend",
+   "value": 480000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Share of spend on routine contracts",
+   "value": 30,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F3",
+    "F1"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "The trend",
+   "finding": "Outside counsel spend grew quickly year on year.",
+   "points": [
+    "Spend rose from [F2] to [F1], an increase of [F6]."
+   ],
+   "hypotheses": [
+    {
+     "text": "More disputes drove the increase.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The budget round needs a plan to slow the growth.",
+   "chart": {
+    "title": "Outside counsel spend rose year on year.",
+    "figure_ids": [
+     "F2",
+     "F1"
+    ],
+    "labels": [
+     "Year before",
+     "Last year"
+    ]
+   }
+  },
+  {
+   "branch": "Where the money goes",
+   "finding": "Routine contracts are a large and repeatable share of spend.",
+   "points": [
+    "Routine contracts took [F3], [F7] of the total.",
+    "Outside firms billed [F4] hours on them."
+   ],
+   "hypotheses": [
+    {
+     "text": "Most routine contracts follow a standard form.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Routine contracts are the clearest place to save."
+  },
+  {
+   "branch": "Capacity in-house",
+   "finding": "The in-house team's room for more work is not yet known.",
+   "points": [
+    "The client has not measured in-house time per matter."
+   ],
+   "hypotheses": [
+    {
+     "text": "The in-house team can absorb routine contracts with templates.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Track in-house time before moving work back in."
+  }
+ ],
+ "options": [
+  {
+   "name": "Templates and playbook",
+   "description": "Build contract templates and a self-service playbook so routine contracts stay in-house.",
+   "effort": "medium"
+  },
+  {
+   "name": "Negotiate panel rates",
+   "description": "Ask outside firms for lower or fixed fees on routine contracts.",
+   "effort": "low"
+  },
+  {
+   "name": "Hire a contracts lawyer",
+   "description": "Add an in-house contracts lawyer to take routine work.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Templates and playbook",
+  "rationale": "It targets the [F3] spent on routine contracts with no new hire; the general counsel decides how work is sent out."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Collect the most common routine contract types from outside counsel invoices.",
+    "Track in-house time per matter."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Draft templates and a playbook for the most common types, for the general counsel's approval."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Route new routine contracts in-house and compare outside spend with last year."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Outside counsel spend on routine contracts",
+   "target": "Falling each quarter"
+  },
+  {
+   "name": "Routine contracts handled in-house",
+   "target": "Rising each month"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The in-house team is overloaded.",
+   "mitigation": "Track time per matter and keep complex contracts with outside firms."
+  },
+  {
+   "risk": "Templates miss a risky term.",
+   "mitigation": "Have the general counsel approve each template before use."
+  }
+ ]
+}

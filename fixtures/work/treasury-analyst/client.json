@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "treasury-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We hold $4.2 million in cash and burn $350,000 a month. We need to know how long our cash lasts.",
+ "answers": {
+  "common.decision": "Whether to draw the credit facility or cut spending; the CFO decides.",
+  "common.deadline": "The board meets in three weeks.",
+  "common.audience": "The CFO and the board.",
+  "common.materials": "Our bank covenant requires a minimum cash balance of $700,000. Our revolving credit facility of $1.4 million is undrawn.",
+  "finance-modeling.purpose": "Measure the cash runway and the effect of the covenant and the facility.",
+  "finance-modeling.data": "Month-end bank balances and the monthly cash flow forecast, in US dollars."
+ }
+}

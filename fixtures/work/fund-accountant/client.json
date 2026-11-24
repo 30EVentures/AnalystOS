@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "fund-accountant"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our fund accounting system shows cash of $3,482,000 for the fund, but the custodian statement shows $3,617,500. We strike the net asset value tonight.",
+ "answers": {
+  "common.decision": "Which entries to book before the strike; the fund controller approves entries and the strike.",
+  "common.deadline": "Before tonight's net asset value strike.",
+  "common.audience": "The fund controller.",
+  "common.materials": "A dividend of $41,500 was received at the custodian but is not booked. A subscription of $120,000 arrived at the custodian for tomorrow's dealing and is not booked. The custodian paid the $26,000 audit fee that we still show as an accrual. Today's draft net asset value is $83,000,000.",
+  "accounting-operations.systems": "Our fund accounting system and the custodian's cash statement, today's valuation, the fund's chart of accounts.",
+  "accounting-operations.approver": "The fund controller approves all entries and the net asset value strike."
+ }
+}

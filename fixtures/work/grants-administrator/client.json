@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "grants-administrator"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our children's literacy program received a $250,000 grant and the interim report to the funder is due next month.",
+ "answers": {
+  "common.decision": "What the interim report should say about progress and spending; the executive director signs it off.",
+  "common.deadline": "Next month.",
+  "common.audience": "The executive director and the funder's program officer.",
+  "common.materials": "We have spent $140,000 so far. We committed to tutor 400 children this year and have reached 320. The funder allows up to 10% of the grant to move between budget lines without approval.",
+  "legal-contracts-procurement.documents": "The grant agreement and our budget tracker.",
+  "legal-contracts-procurement.reviewer": "Our executive director reviews every funder report."
+ }
+}

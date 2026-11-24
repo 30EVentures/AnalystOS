@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "hr-analyst-people-analytics"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Voluntary turnover among our warehouse staff rose from 18% to 27% last year.",
+ "answers": {
+  "common.decision": "Whether to change shift scheduling policy for warehouse staff; the HR director decides, and any decision about an individual stays with their manager and HR.",
+  "common.deadline": "The HR leadership meeting next month.",
+  "common.audience": "The HR director and the operations director.",
+  "common.materials": "We employ 400 warehouse staff. Replacing one costs about $6,000 in hiring and training. In exit surveys, 54 leavers named shift scheduling as their main reason.",
+  "data-analytics.data": "Headcount and leaver records for warehouse staff and exit survey answers, by group, not by name.",
+  "data-analytics.question": "Why warehouse turnover rose and what it costs."
+ }
+}

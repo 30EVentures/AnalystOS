@@ -1,0 +1,247 @@
+{
+ "answer": "Report the program as on track: [F7] of committed children are reached with [F5] of the grant spent, and any budget moves stay within the [F9] the funder allows.",
+ "exec_summary": [
+  "The grant is [F1], and [F2] is spent, [F5] of it.",
+  "[F8] remains for the rest of the grant period.",
+  "The program has reached [F4] of the [F3] children committed, [F7].",
+  "Up to [F9] can move between budget lines without the funder's approval."
+ ],
+ "situation": "A charity running a children's literacy program funded by a grant.",
+ "complication": "The interim report is due next month and must show progress and spending against the grant.",
+ "key_question": "What should the interim report tell the funder about progress and spending?",
+ "titles": {
+  "situation": "The grant is part spent and the interim report is due.",
+  "options": "Two ways to present progress to the funder.",
+  "recommendation": "Report progress plainly and flag budget moves early.",
+  "roadmap": "Draft, review, then send the report before it is due.",
+  "kpis": "Two measures show the grant ends on target.",
+  "risks": "The main risk is reporting a budget move the funder did not expect."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Grant awarded",
+   "value": 250000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "received a $250,000 grant"
+  },
+  {
+   "id": "F2",
+   "label": "Grant spent so far",
+   "value": 140000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "We have spent $140,000"
+  },
+  {
+   "id": "F3",
+   "label": "Children committed for the year",
+   "value": 400,
+   "unit": "count",
+   "basis": "client",
+   "quote": "committed to tutor 400 children"
+  },
+  {
+   "id": "F4",
+   "label": "Children reached so far",
+   "value": 320,
+   "unit": "count",
+   "basis": "client",
+   "quote": "have reached 320"
+  },
+  {
+   "id": "F5",
+   "label": "Share of grant spent",
+   "value": 56,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Share of grant that may move between lines",
+   "value": 10,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "up to 10% of the grant"
+  },
+  {
+   "id": "F7",
+   "label": "Share of committed children reached",
+   "value": 80,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F4",
+    "F3"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Grant remaining",
+   "value": 110000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "remainder",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Grant that may move between lines",
+   "value": 25000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F1",
+    "F6"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Progress against commitments",
+   "finding": "The program has reached most of the children it committed to.",
+   "points": [
+    "[F4] of [F3] children are reached, [F7]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The program will reach every committed child by year end.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The report can show solid progress with a plan for the rest.",
+   "chart": {
+    "title": "Children reached against the commitment.",
+    "figure_ids": [
+     "F3",
+     "F4"
+    ],
+    "labels": [
+     "Committed",
+     "Reached"
+    ]
+   }
+  },
+  {
+   "branch": "Spending against the grant",
+   "finding": "Spending is behind progress, leaving funds for the rest of the year.",
+   "points": [
+    "[F2] is spent, [F5] of the grant.",
+    "[F8] remains."
+   ],
+   "hypotheses": [
+    {
+     "text": "Some costs are invoiced but not yet paid.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The report should explain what the remaining funds will pay for.",
+   "chart": {
+    "title": "Grant spent and remaining.",
+    "figure_ids": [
+     "F2",
+     "F8"
+    ],
+    "labels": [
+     "Spent",
+     "Remaining"
+    ]
+   }
+  },
+  {
+   "branch": "Room to move the budget",
+   "finding": "Small moves between budget lines need no approval.",
+   "points": [
+    "Up to [F9], or [F6] of the grant, can move between lines."
+   ],
+   "hypotheses": [
+    {
+     "text": "Planned moves stay within that limit.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Any larger move needs the funder's approval before it is made."
+  }
+ ],
+ "options": [
+  {
+   "name": "Plain report with early flags",
+   "description": "Report progress and spending plainly and flag any planned budget moves.",
+   "effort": "low"
+  },
+  {
+   "name": "Short report only",
+   "description": "Send headline numbers only and explain later if asked.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Plain report with early flags",
+  "rationale": "It shows [F7] of the commitment met and names any budget move before the funder asks; the executive director reviews the report before it goes."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Draft the report sections and check every figure against the budget tracker.",
+    "Send the draft to the executive director for review before it is due."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Track spending and children reached each month."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Plan the final report against the grant agreement."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Committed children reached",
+   "target": "All of them by year end"
+  },
+  {
+   "name": "Budget moves above the allowed limit",
+   "target": "None without funder approval"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "A planned move exceeds the allowed limit.",
+   "mitigation": "Ask the program officer for approval before making it."
+  },
+  {
+   "risk": "Figures in the report do not match the tracker.",
+   "mitigation": "Check each figure against the tracker before review."
+  }
+ ],
+ "work": [
+  {
+   "kind": "draft",
+   "title": "Interim report: progress and spending",
+   "for": "The funder's program officer, report section for the executive director to review",
+   "body": [
+    "Progress. The program has reached [F4] children so far against our commitment of [F3], which is [F7] of the year's goal. Tutoring sessions continue each week at every site.",
+    "Spending. We have spent [F2] of the [F1] grant, which is [F5]. The remaining [F8] will fund tutor time, reading materials and family sessions for the rest of the year.",
+    "Budget lines. We expect small moves between budget lines as tutoring hours rise. Any move will stay within the [F9] the grant agreement allows, and we will ask you first before any larger change.",
+    "We would be glad to talk through any part of this report."
+   ]
+  }
+ ]
+}

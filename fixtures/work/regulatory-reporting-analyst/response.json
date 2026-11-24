@@ -1,0 +1,236 @@
+{
+ "answer": "The return overstates the capital ratio by [F6]: a portfolio with a blank risk weight was left out. Corrected, the ratio is [F5], still [F10] above the minimum; the head of regulatory reporting decides on submission.",
+ "exec_summary": [
+  "Core capital of [F1] over the return's risk-weighted assets of [F2] gives [F4].",
+  "Over finance's [F3], it gives [F5].",
+  "The gap in risk-weighted assets is [F8], the size of the [F7] portfolio left out.",
+  "The corrected ratio is [F10] above the [F9] minimum."
+ ],
+ "situation": "A bank preparing its quarterly capital return for the regulator.",
+ "complication": "The return and finance disagree on the capital ratio days before it is due.",
+ "key_question": "Why does the return's capital ratio differ from finance's, and is it ready to submit?",
+ "titles": {
+  "situation": "The return overstates the capital ratio.",
+  "options": "Two ways to correct the return before submission.",
+  "recommendation": "Fix the risk weight and re-run the return for review.",
+  "roadmap": "Correct this return, then stop blank risk weights recurring.",
+  "kpis": "Two measures show the return is right.",
+  "risks": "The main risk is submitting a wrong ratio."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Core capital",
+   "value": 630000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Core capital is $630 million"
+  },
+  {
+   "id": "F2",
+   "label": "Risk-weighted assets in the return",
+   "value": 4500000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Risk-weighted assets in the return are $4.5 billion"
+  },
+  {
+   "id": "F3",
+   "label": "Risk-weighted assets per finance",
+   "value": 5000000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "finance's figure is $5 billion"
+  },
+  {
+   "id": "F4",
+   "label": "Capital ratio in the return",
+   "value": 14,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F5",
+   "label": "Capital ratio on finance's figure",
+   "value": 12.6,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F1",
+    "F3"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Overstatement of the ratio",
+   "value": 1.4,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F4",
+    "F5"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Portfolio with a blank risk weight",
+   "value": 500000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "A $500 million commercial property loan portfolio"
+  },
+  {
+   "id": "F8",
+   "label": "Gap in risk-weighted assets",
+   "value": 500000000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F3",
+    "F2"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Minimum requirement including buffers",
+   "value": 10.5,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "including buffers is 10.5%"
+  },
+  {
+   "id": "F10",
+   "label": "Headroom over the minimum",
+   "value": 2.1,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F5",
+    "F9"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "The ratio",
+   "finding": "The return's ratio is higher than finance's.",
+   "points": [
+    "The return shows [F4]; finance's figures give [F5]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Capital itself is misstated.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The difference sits in risk-weighted assets, not capital.",
+   "chart": {
+    "title": "Capital ratio in the return and on finance's figures.",
+    "figure_ids": [
+     "F4",
+     "F5",
+     "F9"
+    ],
+    "labels": [
+     "Return",
+     "Finance",
+     "Minimum"
+    ]
+   }
+  },
+  {
+   "branch": "The cause",
+   "finding": "A portfolio with a blank risk weight was left out.",
+   "points": [
+    "Risk-weighted assets differ by [F8].",
+    "The portfolio left out is [F7]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The blank risk weight explains the whole gap.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Fixing the risk weight should bring the return to finance's figure."
+  },
+  {
+   "branch": "Compliance",
+   "finding": "The corrected ratio still meets the minimum.",
+   "points": [
+    "The corrected ratio is [F10] above the minimum of [F9]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The bank breaches its minimum.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "The correction lowers headroom but does not breach the requirement."
+  }
+ ],
+ "options": [
+  {
+   "name": "Fix and re-run",
+   "description": "Set the portfolio's risk weight, re-run the return and reconcile it to finance.",
+   "effort": "low"
+  },
+  {
+   "name": "Manual adjustment",
+   "description": "Add the portfolio to the return by hand and note the adjustment.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Fix and re-run",
+  "rationale": "It corrects the [F6] overstatement at the source and leaves a clean audit trail; the head of regulatory reporting reviews and decides on submission."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Set the risk weight, re-run the return and hand it to the head of regulatory reporting before the due date."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Add a check for blank risk weights before each return is run."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Reconcile the return to finance's figures every quarter."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Gap between the return and finance's ratio",
+   "target": "Nothing at submission"
+  },
+  {
+   "name": "Exposures with a blank risk weight",
+   "target": "None"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Other exposures also have blank risk weights.",
+   "mitigation": "Run a full check for blanks before re-running."
+  },
+  {
+   "risk": "The re-run misses the due date.",
+   "mitigation": "Start the re-run as soon as the weight is set."
+  }
+ ]
+}

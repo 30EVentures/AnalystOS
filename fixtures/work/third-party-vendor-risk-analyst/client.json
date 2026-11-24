@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "third-party-vendor-risk-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We plan to outsource customer support to a vendor that would handle 120,000 customer records. Our vendor questionnaire has 80 controls.",
+ "answers": {
+  "common.decision": "Whether to sign with the vendor and on what conditions; the vendor risk committee decides.",
+  "common.deadline": "The committee meets in three weeks.",
+  "common.audience": "The vendor risk committee.",
+  "common.materials": "The vendor fully met 64 controls, partly met 10 and did not meet 6. The controls not met include encryption of stored data and a tested disaster recovery plan. The vendor hosts its systems with a subcontractor we have not assessed. Our policy requires at least 90% of controls met for a critical vendor.",
+  "risk-audit-controls.framework": "Our third-party risk policy and its vendor questionnaire.",
+  "risk-audit-controls.scope": "The proposed customer-support vendor, before the contract is signed."
+ }
+}

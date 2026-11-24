@@ -1,0 +1,212 @@
+{
+ "answer": "Prepare the file for the underwriter with the referral flagged: the value of [F1] is under the [F2] limit, but sprinklers cover only [F3] of the floor.",
+ "exec_summary": [
+  "The declared value is [F1], [F5] under the referral limit of [F2].",
+  "Sprinklers cover [F3] of the floor area, short of the full cover our guidelines need.",
+  "Water damage claims totalled [F4], [F6] of the declared value."
+ ],
+ "situation": "An insurer receiving a broker's submission for warehouse property cover.",
+ "complication": "The warehouse is under the value limit but lacks full sprinkler cover, which our guidelines refer.",
+ "key_question": "What does the underwriter need to decide on the warehouse submission?",
+ "titles": {
+  "situation": "A warehouse submission needs the underwriter's decision this week.",
+  "options": "Two ways to take the submission forward.",
+  "recommendation": "Put the full file to the underwriter with the referral flagged.",
+  "roadmap": "Complete the file, decide, then reply to the broker.",
+  "kpis": "Two measures show the submission was handled well.",
+  "risks": "The main risk is quoting before the referral is cleared."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Declared value of the warehouse",
+   "value": 4250000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "a declared value of $4,250,000"
+  },
+  {
+   "id": "F2",
+   "label": "Value limit before referral",
+   "value": 5000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "valued over $5,000,000"
+  },
+  {
+   "id": "F3",
+   "label": "Floor area with sprinklers",
+   "value": 60,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "Sprinklers cover 60% of the floor area"
+  },
+  {
+   "id": "F4",
+   "label": "Water damage claims in the last five years",
+   "value": 85000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "totalling $85,000"
+  },
+  {
+   "id": "F5",
+   "label": "Headroom under the value limit",
+   "value": 750000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Claims as a share of declared value",
+   "value": 2,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F4",
+    "F1"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Value against guidelines",
+   "finding": "The declared value sits under the referral limit.",
+   "points": [
+    "The value of [F1] is [F5] under [F2]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The declared value reflects today's rebuild cost.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Value alone does not trigger a referral.",
+   "chart": {
+    "title": "Declared value against the referral limit.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "Declared value",
+     "Referral limit"
+    ]
+   }
+  },
+  {
+   "branch": "Protection",
+   "finding": "Partial sprinkler cover triggers a referral under our guidelines.",
+   "points": [
+    "Sprinklers cover [F3] of the floor area."
+   ],
+   "hypotheses": [
+    {
+     "text": "The unsprinklered area stores low-hazard goods.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The underwriter should note the referral to a senior underwriter."
+  },
+  {
+   "branch": "Claims history",
+   "finding": "The insured has a water damage history.",
+   "points": [
+    "Two water damage claims totalled [F4], [F6] of value."
+   ],
+   "hypotheses": [
+    {
+     "text": "The cause of the water claims has been fixed.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Ask the broker what caused the claims and what changed."
+  }
+ ],
+ "options": [
+  {
+   "name": "Full file with referral flag",
+   "description": "Put the complete file to the underwriter, noting the sprinkler referral and the questions for the broker.",
+   "effort": "low"
+  },
+  {
+   "name": "Ask the broker first",
+   "description": "Hold the file until the broker answers every open question.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Full file with referral flag",
+  "rationale": "It lets the underwriter act this week with the sprinkler gap at [F3] in plain view; the underwriter decides, and a senior underwriter decides any referred risk."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Put the file to the underwriter this week.",
+    "Send the broker the underwriter's questions once agreed."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Record the underwriter's decision and any referral outcome."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Review how long referred warehouse submissions take to decide."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Submissions with complete files before decision",
+   "target": "All of them"
+  },
+  {
+   "name": "Referred risks decided by a senior underwriter",
+   "target": "Every one"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Terms go to the broker before the referral is cleared.",
+   "mitigation": "Send no terms until the senior underwriter has decided."
+  },
+  {
+   "risk": "The declared value is understated.",
+   "mitigation": "Ask the broker for a recent valuation."
+  }
+ ],
+ "work": [
+  {
+   "kind": "case_file",
+   "subject": "Warehouse property submission with partial sprinkler cover",
+   "facts": [
+    "The broker submitted a warehouse with a declared value of [F1].",
+    "Our guidelines refer warehouses valued over [F2], or without full sprinkler cover, to a senior underwriter.",
+    "Sprinklers cover [F3] of the floor area.",
+    "The insured had two water damage claims totalling [F4] in the last five years."
+   ],
+   "evidence": [
+    "The broker's submission and declared value.",
+    "Our property underwriting guidelines.",
+    "The insured's claims history from the submission."
+   ],
+   "open_questions": [
+    "What is stored in the area without sprinklers?",
+    "What caused the water damage claims, and was the cause fixed?",
+    "When was the warehouse last valued?"
+   ],
+   "for_decision": "Should the underwriter accept, price or decline the warehouse, or refer it to a senior underwriter because sprinkler cover is partial?"
+  }
+ ]
+}

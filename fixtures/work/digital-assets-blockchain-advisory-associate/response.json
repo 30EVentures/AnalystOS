@@ -1,0 +1,232 @@
+{
+ "answer": "Do not switch supplier payments yet: the saving is real per payment, but only suppliers receiving [F9] a year accept stablecoins, so the reachable saving is about [F10] a year against wire costs of [F3].",
+ "exec_summary": [
+  "Wires cost about [F2] of [F1], about [F3] a year.",
+  "The provider quotes [F4], a gap of [F5].",
+  "Only [F6] of [F7] suppliers accept stablecoins, [F8] of them.",
+  "Those suppliers receive [F9], so the reachable saving is about [F10] a year."
+ ],
+ "situation": "An importer paying overseas suppliers by international wire.",
+ "complication": "Wire costs are high, but few suppliers accept stablecoins and the bank must agree.",
+ "key_question": "Is a stablecoin payment route worth piloting for supplier payments?",
+ "titles": {
+  "situation": "Wire costs on supplier payments are high.",
+  "options": "Two ways to cut supplier payment costs.",
+  "recommendation": "Cut wire costs with the bank before piloting stablecoins.",
+  "roadmap": "Negotiate first, then revisit stablecoins.",
+  "kpis": "Two measures show payment costs are falling.",
+  "risks": "The main risks sit with the bank and the auditors."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Yearly payments to overseas suppliers",
+   "value": 6000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "about $6,000,000 a year"
+  },
+  {
+   "id": "F2",
+   "label": "Wire cost as a share of payments",
+   "value": 2.5,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "about 2.5% of that"
+  },
+  {
+   "id": "F3",
+   "label": "Yearly wire cost",
+   "value": 150000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F4",
+   "label": "Stablecoin provider cost as a share of payments",
+   "value": 0.8,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "a total cost of 0.8%"
+  },
+  {
+   "id": "F5",
+   "label": "Cost gap per payment",
+   "value": 1.7,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F4"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Suppliers that would accept stablecoins",
+   "value": 4,
+   "unit": "count",
+   "basis": "client",
+   "quote": "Only 4 of our"
+  },
+  {
+   "id": "F7",
+   "label": "Overseas suppliers",
+   "value": 25,
+   "unit": "count",
+   "basis": "client",
+   "quote": "our 25 suppliers"
+  },
+  {
+   "id": "F8",
+   "label": "Share of suppliers that would accept",
+   "value": 16,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F6",
+    "F7"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Yearly payments to accepting suppliers",
+   "value": 1500000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "receive $1,500,000 of our payments"
+  },
+  {
+   "id": "F10",
+   "label": "Reachable yearly saving",
+   "value": 25500,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F9",
+    "F5"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "The saving",
+   "finding": "The reachable saving is small next to total wire costs.",
+   "points": [
+    "Wires cost about [F3] a year.",
+    "Stablecoin payments to willing suppliers save about [F10]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Stablecoins would cut most wire costs.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "Supplier take-up, not price, limits the saving.",
+   "chart": {
+    "title": "Yearly wire cost and reachable saving.",
+    "figure_ids": [
+     "F3",
+     "F10"
+    ],
+    "labels": [
+     "Wire cost",
+     "Reachable saving"
+    ]
+   }
+  },
+  {
+   "branch": "Supplier take-up",
+   "finding": "Few suppliers accept stablecoins today.",
+   "points": [
+    "[F6] of [F7] suppliers would accept them."
+   ],
+   "hypotheses": [
+    {
+     "text": "More suppliers would accept with time.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "A pilot would cover a narrow slice of payments."
+  },
+  {
+   "branch": "Bank and audit risk",
+   "finding": "The bank and auditors must accept the route.",
+   "points": [
+    "The bank must agree to any new payment route.",
+    "The company will not hold digital assets on its balance sheet."
+   ],
+   "hypotheses": [
+    {
+     "text": "The bank will agree to the provider.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Bank and auditor sign-off are conditions, not details."
+  }
+ ],
+ "options": [
+  {
+   "name": "Negotiate wire costs",
+   "description": "Ask the bank to reduce wire fees and currency spreads.",
+   "effort": "low"
+  },
+  {
+   "name": "Stablecoin pilot",
+   "description": "Pay the willing suppliers by stablecoin through the provider.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Negotiate wire costs",
+  "rationale": "Wire costs of [F3] cover every supplier while the stablecoin route reaches only [F8] of them; the finance director decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Ask the bank for lower wire fees and spreads.",
+    "Give the finance director the recommendation within the four weeks."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Ask the bank and auditors for their view of the stablecoin provider."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Recheck supplier take-up and decide whether a pilot is worth it."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Payment cost as a share of payments",
+   "target": "Below today's level"
+  },
+  {
+   "name": "Suppliers accepting stablecoins",
+   "target": "Rising before any pilot"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The bank refuses the new route.",
+   "mitigation": "Ask for the bank's view before any pilot."
+  },
+  {
+   "risk": "Auditors question how payments are recorded.",
+   "mitigation": "Agree the accounting with the auditors first."
+  }
+ ]
+}

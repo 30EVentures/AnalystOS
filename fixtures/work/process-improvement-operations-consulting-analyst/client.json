@@ -1,0 +1,20 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "process-improvement-operations-consulting-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We are a regional distributor. Our warehouse ships 2,400 orders a day, but only 1,800 leave the same day.",
+ "answers": {
+  "common.decision": "Which changes to make in the warehouse; the operations director decides.",
+  "common.deadline": "A plan in four weeks.",
+  "common.audience": "The operations director and the warehouse manager.",
+  "common.materials": "A time study found an order takes 120 minutes from release to dispatch. Walking between aisles takes 48 minutes of that, and waiting at the packing bench takes 30 minutes.",
+  "consulting.current-state": "Pickers pick one order at a time and walk the whole warehouse for each. We added overtime last quarter, which helped a little.",
+  "consulting.success": "Ship 95% of orders the same day.",
+  "consulting.constraints": "No new building; budget for minor layout changes only."
+ }
+}

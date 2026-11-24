@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "procurement-assistant"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We buy about 20,000 reams of copy paper a year from one supplier at $5.40 a ream, and the contract ends next quarter.",
+ "answers": {
+  "common.decision": "Which suppliers to invite to quote and on what terms; the procurement manager approves.",
+  "common.deadline": "Before the contract ends next quarter.",
+  "common.audience": "The procurement manager.",
+  "common.materials": "Our paper budget for next year is $97,200. Facilities wants recycled paper and delivery to all our offices.",
+  "legal-contracts-procurement.documents": "The current supply contract and our purchase history.",
+  "legal-contracts-procurement.reviewer": "The procurement manager approves every request sent to suppliers."
+ }
+}

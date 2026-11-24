@@ -1,0 +1,208 @@
+{
+ "answer": "Measure every promotion against held-back stores using loyalty-card data: it covers [F4] of sales, and cutting spend on promotions that do not pay off by [F5] would save about [F6] a year.",
+ "exec_summary": [
+  "The chain spends [F2] a year on about [F3] promotions.",
+  "The loyalty card covers [F4] of sales, enough to measure most promotions.",
+  "Holding back [F7] stores once, [F8] of the chain, showed the method works.",
+  "The target cut of [F5] is worth about [F6] a year."
+ ],
+ "situation": "A regional grocery chain that plans promotions on buyers' judgment.",
+ "complication": "Promotion spend is large and nobody can tell which promotions pay off.",
+ "key_question": "How should the chain use its data to tell which promotions pay off?",
+ "titles": {
+  "situation": "Promotion spend is large but unmeasured.",
+  "options": "Two ways to measure promotions.",
+  "recommendation": "Compare promoted stores with held-back stores.",
+  "roadmap": "Build the method, test it, then make it routine.",
+  "kpis": "Two measures show the method is working.",
+  "risks": "The main risk is a comparison buyers do not trust."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Stores",
+   "value": 30,
+   "unit": "count",
+   "basis": "client",
+   "quote": "with 30 stores"
+  },
+  {
+   "id": "F2",
+   "label": "Yearly promotion spend",
+   "value": 1200000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "We spend $1,200,000 a year"
+  },
+  {
+   "id": "F3",
+   "label": "Promotions a year",
+   "value": 400,
+   "unit": "count",
+   "basis": "client",
+   "quote": "about 400 promotions a year"
+  },
+  {
+   "id": "F4",
+   "label": "Sales covered by the loyalty card",
+   "value": 65,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "covers 65% of sales"
+  },
+  {
+   "id": "F5",
+   "label": "Target cut in spend on promotions that do not pay off",
+   "value": 20,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "that do not pay off by 20%"
+  },
+  {
+   "id": "F6",
+   "label": "Yearly saving at the target",
+   "value": 240000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F2",
+    "F5"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Stores held back in the one test",
+   "value": 3,
+   "unit": "count",
+   "basis": "client",
+   "quote": "held back 3 stores"
+  },
+  {
+   "id": "F8",
+   "label": "Share of stores held back",
+   "value": 10,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F7",
+    "F1"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "The data",
+   "finding": "Loyalty-card data is enough to measure most promotions.",
+   "points": [
+    "The card covers [F4] of sales.",
+    "The data already sits in the chain's data warehouse."
+   ],
+   "hypotheses": [
+    {
+     "text": "Card shoppers respond to promotions like other shoppers.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "No new data source is needed to start."
+  },
+  {
+   "branch": "The method",
+   "finding": "Held-back stores give a fair comparison.",
+   "points": [
+    "The chain once held back [F7] stores, [F8] of the chain."
+   ],
+   "hypotheses": [
+    {
+     "text": "A small held-back group is enough to read lift.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Repeating the held-back test makes it routine."
+  },
+  {
+   "branch": "The prize",
+   "finding": "Promotion spend is large enough to justify measurement.",
+   "points": [
+    "The chain spends [F2] a year on promotions.",
+    "A [F5] cut on promotions that do not pay off saves about [F6]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Some promotions do not pay off.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Measurement pays for itself if it moves spend.",
+   "chart": {
+    "title": "Yearly promotion spend and the target saving.",
+    "figure_ids": [
+     "F2",
+     "F6"
+    ],
+    "labels": [
+     "Spend",
+     "Target saving"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Held-back stores",
+   "description": "Hold back a few stores from each major promotion and compare card sales.",
+   "effort": "medium"
+  },
+  {
+   "name": "Before and after",
+   "description": "Compare each promotion's sales with the weeks before it.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Held-back stores",
+  "rationale": "It gives a fair read of lift with data the chain already has and targets about [F6] a year; the commercial director decides which promotions to keep."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Agree with the commercial director which promotions to test first.",
+    "Write the held-back store method for the two analysts."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Run the method on the first promotions and share results with buyers."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Make lift reports routine and flag promotions that do not pay off."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Promotions with a measured lift",
+   "target": "Every major promotion"
+  },
+  {
+   "name": "Spend on promotions that do not pay off",
+   "target": "Down by the target"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Buyers do not trust the results.",
+   "mitigation": "Agree the method with buyers before the first test."
+  },
+  {
+   "risk": "Held-back stores lose sales.",
+   "mitigation": "Rotate which stores are held back."
+  }
+ ]
+}

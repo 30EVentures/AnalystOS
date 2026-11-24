@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "audit-associate-external-audit"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our audit team is testing a client's year-end trade receivables of $12,000,000. We sent confirmations for 60 customer balances covering $2,400,000.",
+ "answers": {
+  "common.decision": "How to follow up the exceptions and non-replies; the engagement manager and partner decide any audit conclusion.",
+  "common.deadline": "Fieldwork closes in two weeks.",
+  "common.audience": "The engagement manager.",
+  "common.materials": "48 customers replied. 6 replies disagreed with the client's balance, by a total of $96,000. Performance materiality is $300,000.",
+  "risk-audit-controls.framework": "The auditing standards our firm applies and its confirmation procedures.",
+  "risk-audit-controls.scope": "The client's trade receivables at year end."
+ }
+}

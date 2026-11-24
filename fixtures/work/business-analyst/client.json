@@ -1,0 +1,20 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "business-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We are an online homeware retailer. We handle 3,000 returns a month by email, and each email return costs us about $6 in agent time.",
+ "answers": {
+  "common.decision": "Whether to build a self-service returns flow and what it must do; the head of customer service decides.",
+  "common.deadline": "Requirements in four weeks.",
+  "common.audience": "The head of customer service and our one developer.",
+  "common.materials": "Customers often forget to include the order details or a reason, so agents email back.",
+  "consulting.current-state": "We tried a returns form on the website last year, but it only collected order numbers. Last month 540 returns needed a second email to the customer.",
+  "consulting.success": "Cut agent cost on returns by 60% and keep second emails under 5% of returns.",
+  "consulting.constraints": "One developer for three months; it must work with our existing order system."
+ }
+}

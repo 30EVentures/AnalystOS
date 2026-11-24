@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "privacy-data-protection-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We are a home insurance broker. We want to know where our handling of personal data falls short of the data protection law and our privacy policy.",
+ "answers": {
+  "common.decision": "Which fixes to make first; the data protection officer decides.",
+  "common.deadline": "A report in four weeks.",
+  "common.audience": "The data protection officer and the executive team.",
+  "common.materials": "We received 240 subject access requests last year, and 36 were answered after the one-month legal deadline. Our customer database holds 400,000 records, of which 140,000 belong to customers inactive for longer than our six-year retention period. We found 3 marketing lists shared with an agency without a data processing agreement.",
+  "risk-audit-controls.framework": "The data protection law that applies to us and our privacy policy.",
+  "risk-audit-controls.scope": "Subject access requests, customer data retention and data shared with agencies, last year."
+ }
+}

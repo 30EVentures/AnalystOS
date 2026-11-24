@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "talent-acquisition-associate"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our data engineer job post drew 380 applicants in four weeks, but only 19 met the must-have requirements.",
+ "answers": {
+  "common.decision": "How to rewrite the post; the hiring manager decides who is screened in and any offer.",
+  "common.deadline": "Before the role is reposted.",
+  "common.audience": "The hiring manager.",
+  "common.materials": "The post lists 14 must-have requirements. The hiring manager says only 5 of them are truly essential. The approved salary range is $120,000 to $140,000, and the post does not show it.",
+  "people-hr.process": "Job posting and applicant screening for engineering roles.",
+  "people-hr.decider": "The hiring manager decides who is screened in and approves any offer."
+ }
+}

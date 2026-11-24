@@ -190,6 +190,24 @@ def _drop_unknown(value, schema):
     return value
 
 
+def _lower_work_enums(doc):
+    """"High" is "high": work products' fixed choices are compared in lower case (Slice 126 review)."""
+    for item in doc.get("work") or []:
+        if not isinstance(item, dict):
+            continue
+        for key in ("kind", "language"):
+            if isinstance(item.get(key), str):
+                item[key] = item[key].strip().lower()
+        for row in item.get("rows") or []:
+            if isinstance(row, dict):
+                for key in ("rating", "status"):
+                    if isinstance(row.get(key), str):
+                        row[key] = row[key].strip().lower()
+        for line in item.get("items") or []:
+            if isinstance(line, dict) and isinstance(line.get("effect"), str):
+                line["effect"] = line["effect"].strip().lower()
+
+
 def _match_option(doc):
     """A recommendation naming an option with a label in front ("Option A: Save desk", "B) Save
     desk") gets that option's exact name; anything else is left for the verifier."""
@@ -225,6 +243,7 @@ def normalize_content(content, derived_units, recompute, operations, schema=None
             if key != "figures" and key in schema["properties"]:
                 doc[key] = _drop_unknown(doc[key], schema["properties"][key])
     _match_option(doc)
+    _lower_work_enums(doc)
     figures = doc.get("figures")
     if isinstance(figures, list):
         fixed, by_id = [], {}

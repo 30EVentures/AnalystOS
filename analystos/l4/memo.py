@@ -148,7 +148,7 @@ def _work(doc, item, figures):
                 for st in item["steps"]])
     elif kind == "code":
         p = doc.add_paragraph()
-        _run(p, f"{item['language'].title()} \u00b7 ", 10, True, False, MUTED)
+        _run(p, work_products.LANGUAGE_NAMES[item["language"]] + " \u00b7 ", 10, True, False, MUTED)
         _rich(p, item["purpose"], figures, 10, color=MUTED)
         p = doc.add_paragraph()
         _run(p, "Draft: not run or reviewed. Numbers inside the code are not figures.", 10, False, True, MUTED)

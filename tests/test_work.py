@@ -65,9 +65,8 @@ def synthetic_work(kind, figure_ids):
                       "evidence": ["The client's own figures and statements."],
                       "open_questions": ["Is any record missing?"],
                       "for_decision": "Should the qualified person approve the proposed next step?"},
-        "reconciliation": {"kind": "reconciliation", "title": "Check of one figure against itself",
-                           "side_a": {"label": "Source record", "figure_id": a},
-                           "side_b": {"label": "Working record", "figure_id": a}, "items": [], "entries": []},
+        # Every role that owes a reconciliation is in accounting; its example's figures balance for real.
+        "reconciliation": json.loads((example_dir("accounting-operations") / "response.json").read_text())["work"][0],
         "plan": {"kind": "plan", "title": "Next steps",
                  "steps": [{"when": "Week one", "task": f"Confirm [{a}] with the owner.", "owner": "Team lead",
                             "done_when": "The owner has confirmed it."},
@@ -214,6 +213,62 @@ class RulesTest(unittest.TestCase):
                 render(forged, record, CATALOG)
         data, _ = formats.render(spec, record, CATALOG)
         self.assertTrue(data)
+
+
+class ReviewNotesTest(unittest.TestCase):
+    """Slice 126 review: shapes the renderers need, sides that differ, lower-case choices, code slides."""
+
+    FIGS = ShapeRulesTestFigs = {"F1": {"id": "F1", "value": 100.0, "unit": "usd"},
+                                 "F2": {"id": "F2", "value": 40.0, "unit": "usd"}}
+
+    def check(self, work_list, owed):
+        return work.verify_work(work_list, self.FIGS, c.number_problems, c.label_problems, set(), owed)
+
+    def test_shapes_a_renderer_cannot_draw_are_refused(self):
+        cases = (([{"kind": "draft", "title": "Note", "body": ["Hello."]}], ["draft"], "a draft needs 'for'"),
+                 ([{"kind": "plan", "title": "Steps", "steps": ["Do it", "Then this"]}], ["plan"],
+                  "steps must be a list of objects"),
+                 ([{"kind": "reconciliation", "title": "Cash", "side_a": {"label": "Bank", "figure_id": "F1"},
+                    "side_b": {"label": "Ledger", "figure_id": "F2"}, "entries": {"debit": "Cash"}}], ["reconciliation"],
+                  "entries must be a list of objects"),
+                 ([{"kind": "case_file", "subject": "Case", "facts": "one fact", "evidence": ["x"],
+                    "for_decision": "Approve?"}], ["case_file"], "facts must be a list of text"))
+        for work_list, owed, needle in cases:
+            with self.subTest(needle=needle):
+                problems = self.check(work_list, owed)
+                self.assertTrue(any(needle in p for p in problems), problems)
+
+    def test_a_figure_reconciled_against_itself_is_refused(self):
+        item = {"kind": "reconciliation", "title": "Cash", "side_a": {"label": "Bank", "figure_id": "F1"},
+                "side_b": {"label": "Ledger", "figure_id": "F1"}}
+        self.assertTrue(any("two different figures" in p for p in self.check([item], ["reconciliation"])))
+
+    def test_capitalised_choices_are_read_as_lower_case(self):
+        rows = [{"item": "A gap.", "rating": "High", "owner": "Team lead", "status": "Open", "action": "Fix it."},
+                {"item": "Another.", "rating": "LOW", "owner": "Team lead", "status": "In progress", "action": "Close."}]
+        out = c._normalize({"work": [{"kind": "Register", "title": "Gaps", "rows": rows}]})
+        self.assertEqual(self.check(out["work"], ["register"]), [])
+
+    def test_the_prompt_keeps_dates_and_ids_out_of_work(self):
+        self.assertIn("no dates, durations, IDs, clause, form, version or ticket numbers",
+                      c.system_prompt(ROLES["content-writer-copywriter"]))
+
+    def test_the_deck_prints_the_code_purpose_with_values_and_says_when_it_cuts(self):
+        role = ROLES["junior-software-developer"]
+        response = json.loads((example_dir("software-it") / "response.json").read_text())
+        response["work"][0]["purpose"] = "Cut the [F3] query first."
+        response["work"][0]["code"] = "\n".join(f"line_{chr(97 + i % 26)}" for i in range(50))
+        spec = c.build_deck_spec(engagement_for(role), CATALOG, client=ReplayClient([response]))
+        data, fmt = formats.render(spec, engagement_for(role), CATALOG)
+        text = rendered_text(data, fmt)
+        self.assertNotIn("[F3]", text)
+        self.assertIn("Python \u00b7 Cut the", text)
+        self.assertIn("Showing the first forty lines", text)
+
+    def test_thirds_is_a_quantity_again(self):
+        from analystos.packs.numbers import find_numbers
+        self.assertTrue(find_numbers("split into thirds"))
+        self.assertFalse(find_numbers("Third, set a reminder"))
 
 
 class ShapeRulesTest(unittest.TestCase):

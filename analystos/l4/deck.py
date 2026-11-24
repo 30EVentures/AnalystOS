@@ -572,11 +572,16 @@ def _work_slide(prs, spec, s, number, total):
         rows = [[st["when"], st["task"], st["owner"], st["done_when"]] for st in item["steps"]]
         _table(slide, rows, [1.6, 4.5, 2.2, 3.5], BODY_TOP, ["When", "Task", "Owner", "Done when"], 12)
     elif kind == "code":
+        lines = item["code"].splitlines()
         _, frame = _textbox(slide, MARGIN, BODY_TOP - Inches(0.1), width, Inches(0.4))
-        _run(frame.paragraphs[0], f"{item['language'].title()} \u00b7 {item['purpose']}  \u2014  Draft: not run or "
-                                  "reviewed. Numbers inside the code are not figures.", 11, MUTED)
+        _run(frame.paragraphs[0], work_products.LANGUAGE_NAMES[item["language"]] + " \u00b7 ", 11, MUTED)
+        _rich(frame.paragraphs[0], item["purpose"], 11, MUTED)
+        note = "  \u2014  Draft: not run or reviewed. Numbers inside the code are not figures."
+        if len(lines) > 40:
+            note += " Showing the first forty lines; the full code is in the source file."
+        _run(frame.paragraphs[0], note, 11, MUTED)
         _, frame = _textbox(slide, MARGIN, BODY_TOP + Inches(0.4), width, height - Inches(0.4))
-        for i, line in enumerate(item["code"].splitlines()[:40]):
+        for i, line in enumerate(lines[:40]):
             paragraph = frame.paragraphs[0] if i == 0 else frame.add_paragraph()
             run = paragraph.add_run()
             run.text = line

@@ -165,7 +165,7 @@ def _work_sheet(wb, n, item, figures, row_of, own):
         for col, width in zip("ABCD", (16, 50, 26, 50)):
             ws.column_dimensions[col].width = width
     elif kind == "code":
-        ws.append([f"{item['language'].title()} \u00b7 " + _plain(item["purpose"], figures)])
+        ws.append([work_products.LANGUAGE_NAMES[item["language"]] + " \u00b7 " + _plain(item["purpose"], figures)])
         ws.append(["Draft: not run or reviewed. Numbers inside the code are not figures."])
         for line in item["code"].splitlines():
             ws.append([line])

@@ -29,6 +29,16 @@ FIELDS = {
     "plan": {"kind", "title", "steps"},
     "code": {"kind", "language", "purpose", "code"},
 }
+REQUIRED = {  # fields a renderer reads; missing or mistyped is refused before any paid call is wasted
+    "draft": {"title", "for", "body"}, "register": {"title", "rows"},
+    "case_file": {"subject", "facts", "evidence", "for_decision"},
+    "reconciliation": {"title", "side_a", "side_b"}, "plan": {"title", "steps"},
+    "code": {"language", "purpose", "code"},
+}
+ROW_FIELDS = {"rows": {"item", "rating", "owner", "status", "action"}, "steps": {"when", "task", "owner", "done_when"},
+              "items": {"label", "figure_id", "effect"}, "entries": {"debit", "credit", "figure_id", "memo"}}
+LANGUAGE_NAMES = {"python": "Python", "sql": "SQL", "javascript": "JavaScript", "typescript": "TypeScript",
+                  "java": "Java", "go": "Go", "bash": "Bash", "yaml": "YAML", "other": "Code"}
 MAX_TEXT, MAX_LABEL, MAX_PARAGRAPH, MAX_CODE = 300, 120, 1200, 6000
 BALANCE_TOLERANCE = 0.005
 
@@ -107,7 +117,9 @@ def prompt_text(role):
              "Include at least one of each:"]
     lines += [f"- {GUIDE[k]}" for k in kinds]
     lines.append("Every number rule above applies to work products too (code excepted). Owners and accounts are "
-                 "named in words, never by a person's name or a number.")
+                 "named in words, never by a person's name or a number. In drafts, case files and plans write no "
+                 "dates, durations, IDs, clause, form, version or ticket numbers: use words (\"by month end\", "
+                 "\"within a day\") or leave them out. Ratings, statuses and effects are lower case, as listed.")
     if role.get("boundary") == "approval-gated":
         lines.append("Everything in work is a draft for the named approver; never write as if it was sent, posted "
                      "or booked.")
@@ -121,7 +133,7 @@ TITLES = {"draft": "Draft", "register": "Register", "case_file": "Case file", "r
 def title_of(item):
     """A work product's heading: its kind and its own title or subject or purpose."""
     kind = item.get("kind") if isinstance(item, dict) else None
-    name = item.get("title") or item.get("subject") or ("" if kind != "code" else item.get("language", "").title())
+    name = item.get("title") or item.get("subject") or ("" if kind != "code" else LANGUAGE_NAMES.get(item.get("language"), ""))
     return f"{TITLES.get(kind, 'Work')}: {name}" if name else TITLES.get(kind, "Work")
 
 
@@ -240,6 +252,10 @@ def verify_work(work, figures, number_problems, label_problems, client_years, ki
         extra = set(item) - FIELDS[kind]
         if extra:
             problems.append(f"{w}: fields {sorted(extra)} do not belong to a {kind}")
+        shape = _shape_problems(w, kind, item)
+        if shape:
+            problems += shape
+            continue
         problems += _KIND_CHECKS[kind](w, item, figures)
     for kind in sorted(owed - seen):
         problems.append(f"work must include a {kind}; this role delivers one")
@@ -253,6 +269,23 @@ def verify_work(work, figures, number_problems, label_problems, client_years, ki
             problems.append(f"{where} must be a short non-empty name")
         else:
             problems += label_problems(where, text, client_years)
+    return problems
+
+
+def _shape_problems(w, kind, item):
+    """Missing fields, lists that are not lists, and rows that are not objects with their fields."""
+    problems = [f"{w}: a {kind} needs {field!r}" for field in sorted(REQUIRED[kind] - set(item))]
+    for key in ("body", "facts", "evidence", "open_questions"):
+        if key in item and not (isinstance(item[key], list) and all(isinstance(x, str) for x in item[key])):
+            problems.append(f"{w}.{key} must be a list of text")
+    for key, fields in ROW_FIELDS.items():
+        if key not in item:
+            continue
+        if not isinstance(item[key], list) or not all(isinstance(x, dict) and fields <= set(x) for x in item[key]):
+            problems.append(f"{w}.{key} must be a list of objects with {sorted(fields)}")
+    for side in ("side_a", "side_b"):
+        if side in item and not (isinstance(item[side], dict) and {"label", "figure_id"} <= set(item[side])):
+            problems.append(f"{w}.{side} must be an object with a label and a figure_id")
     return problems
 
 
@@ -292,6 +325,8 @@ def _reconciliation(w, item, figures):
         if value is None:
             problems.append(f"{w}.{side} needs a label and the id of a verified figure")
         sides[side] = (value, figures.get(part.get("figure_id"), {}).get("unit") if isinstance(part, dict) else None)
+    if item["side_a"].get("figure_id") == item["side_b"].get("figure_id"):
+        problems.append(f"{w}: side_a and side_b must be two different figures; a figure always agrees with itself")
     adjusted = {"a": sides["side_a"][0], "b": sides["side_b"][0]}
     units = {sides["side_a"][1], sides["side_b"][1]}
     for j, line in enumerate(_list(item.get("items"))):

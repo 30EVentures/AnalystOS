@@ -1,10 +1,11 @@
-"""Fix the live model's mechanical slips before verification (Slice 119).
+"""Fix the live model's mechanical slips before verification (Slices 119-120).
 
 The first paid test failed because the live model writes the natural way -
 "churn rose to 7% [F2]", a whole two-number sentence as a quote, a percent
 stored as 0.07 - where the worked examples had followed the rules exactly. This
-module fixes only slips that cannot change what a reader is told, and leaves
-every judgement to the unchanged verifier:
+module is meant to fix only slips that do not change what a reader is told, and
+to leave every judgement to the verifier; two release reviews found cases where
+it did change it, each now a regression test (tests/test_normalize.py):
 
 - A written number directly before a tag that states that tag's figure (at the
   precision shown, within 5%, the right kind) is removed, as is a matching unit
@@ -12,13 +13,18 @@ every judgement to the unchanged verifier:
   that does not state its figure is left in place, so the verifier refuses it.
 - A client quote is narrowed, verbatim, to the part holding the one number that
   equals the figure's value in the figure's own unit; the figure then takes that
-  number's value. Narrowing is refused when a quantity in words comes before
-  that number ("a third of our 420", "half of the $1,200"), which a cut would drop. The declared unit is
+  number's value. It never cuts away a number that may change the kept one -
+  one followed by "of" ("40% of our 850"), a multiple ("2x the $1,200") or a
+  quantity in words ("a third of our 420") - unless punctuation or a joining
+  word ("and", "to", "but") separates them;
+  such quotes are left whole for the verifier to refuse. The declared unit is
   never overridden; a quote that is not the client's words is left for the
   verifier to refuse.
-- A computed figure with no value gets its recomputation; a value that is there
-  is left for the verifier, which refuses it unless it matches (so reversed or
-  wrong inputs are still caught). A unit is derived only when exactly one fits.
+- A computed figure's value is never filled or recomputed: the verifier
+  recomputes it and refuses a mismatch, so reversed or wrong inputs are caught.
+  The one change made to a computed figure: its unit is set to the only unit its
+  operation and inputs allow (percent minus percent is points), and a ratio
+  declared as a percent becomes percent_of_total; the value is still checked.
 - Fields that are never shown (not in the tool schema, at any depth) are
   dropped; unused figures that feed no other figure are dropped; numeric
   strings become numbers; a recommendation naming an option with extra words
@@ -125,7 +131,12 @@ def strip_redundant_numbers(text, figures):
     return re.sub(r"[ \t]{2,}", " ", "".join(out))
 
 
-_SCALED = re.compile(r"[kKmMB]$|thousand|million|billion|trillion|bn|mm|mn|mln|mio|crores?|lakhs?", re.IGNORECASE)
+_OPTION_LABEL = re.compile(r"^\s*(?:option|choice)?\s*(?:[a-z]|[0-9]{1,2})?\s*[:.)\u2013\u2014-]\s+", re.IGNORECASE)
+_UNIT_ALIASES = {"%": "percent", "pct": "percent", "percentage": "percent", "$": "usd", "dollars": "usd", "dollar": "usd",
+                 "pts": "points", "pp": "points", "percentage points": "points", "x": "ratio", "times": "ratio"}
+_BREAK = re.compile(r"[,;:]|[.!?](?:\s|$)|\b(?:and|but|to|then|while|whereas|versus|vs)\b", re.IGNORECASE)
+_OF = re.compile(r"\s*(?:or so\s+)?of\b", re.IGNORECASE)  # "40% of our 850": the first number takes a share of the next
+_SCALED = re.compile(r"[kKmMB]$|thousand|million|billion|trillion|bn|mm|mn|mln|mio|mill?|crores?|lakhs?", re.IGNORECASE)
 _UNITS_FOR_KIND = {"percent": {"percent"}, "points": {"points"}, "usd": {"usd"}, "ratio": {"ratio"},
                    None: {"count", "months", "other"}}
 _UNITS = {"percent", "points", "usd", "ratio", "count", "months", "other"}
@@ -159,9 +170,13 @@ def narrow_quote(quote, value, unit=None):
     if len(candidates) != 1:
         return None, None
     chosen = candidates[0]
-    if any(t.value is None and t.start < chosen.start for t in every):
-        return None, None  # a word quantity before the number ("a third of our 420") could change it: never cut it away
     i = every.index(chosen)
+    if i > 0:
+        prev, gap = every[i - 1], quote[every[i - 1].end:chosen.start]
+        if not _BREAK.search(gap) and (prev.value is None or prev.kind == "ratio" or _OF.match(gap)):
+            # What comes before may change the number: "40% of our 850", "a third of our 420", "2x the $1,200".
+            # Never cut it away unless punctuation or a joining word ("and", "to", "but") separates them.
+            return None, None
     start = every[i - 1].end if i > 0 else 0
     end = every[i + 1].start if i + 1 < len(every) else len(quote)
     piece = quote[start:end].strip(" ,;:-–—")
@@ -193,8 +208,8 @@ def _drop_unknown(value, schema):
 
 
 def _match_option(doc):
-    """A recommendation naming an option with extra words gets that option's exact name,
-    when exactly one option name appears inside it."""
+    """A recommendation naming an option with a label in front ("Option A: Save desk", "B) Save
+    desk") gets that option's exact name; anything else is left for the verifier."""
     rec, options = doc.get("recommendation"), doc.get("options")
     if not isinstance(rec, dict) or not isinstance(rec.get("option"), str) or not isinstance(options, list):
         return
@@ -202,15 +217,17 @@ def _match_option(doc):
     said = rec["option"].strip().lower()
     if said in {n.strip().lower() for n in names}:
         return
-    inside = [n for n in names if n.strip().lower() in said]
+    bare = _OPTION_LABEL.sub("", said, count=1).strip()
+    inside = [n for n in names if n.strip().lower() == bare]  # exact after the label: "Do not X" never becomes "X"
     if len(inside) == 1:
         rec["option"] = inside[0]
 
 
 def normalize_content(content, derived_units, recompute, operations, schema=None):
     """A copy of ``content`` with the mechanical slips above fixed. Anything it cannot fix
-    is left for the verifier. ``derived_units``, ``recompute`` and ``operations`` come
-    from the consulting pack (passed in to avoid an import cycle)."""
+    is left for the verifier. ``derived_units`` and ``operations`` come from the consulting
+    pack (passed in to avoid an import cycle); ``recompute`` is no longer used (Slice 120)
+    and kept so callers need not change."""
     if not isinstance(content, dict):
         return content
     try:
@@ -241,12 +258,14 @@ def normalize_content(content, derived_units, recompute, operations, schema=None
             number = _number(fig.get("value"))
             if number is not None:
                 fig["value"] = number
+            if isinstance(fig.get("unit"), str) and fig["unit"].strip().lower() in _UNIT_ALIASES:
+                fig["unit"] = _UNIT_ALIASES[fig["unit"].strip().lower()]  # "%" is percent, "USD" is usd
             if basis == "client" and isinstance(fig.get("quote"), str):
                 piece, token = narrow_quote(fig["quote"], fig.get("value"), fig.get("unit"))
                 if piece:
                     fig["quote"] = piece
                     fig["value"] = token.value
-                    if fig.get("unit") not in _UNITS:  # filled only when missing; never overridden
+                    if fig.get("unit") is None:  # filled only when absent; never overridden
                         fig["unit"] = _client_unit(token, None)
             elif basis == "computed":
                 inputs = fig.get("inputs")
@@ -259,15 +278,8 @@ def normalize_content(content, derived_units, recompute, operations, schema=None
                     allowed = derived_units(op, units)
                     if fig.get("unit") not in allowed and len(allowed) == 1:
                         fig["unit"] = next(iter(allowed))
-                    values = [by_id[x].get("value") for x in inputs]
-                    if _number(fig.get("value")) is None and all(
-                            isinstance(v, (int, float)) and not isinstance(v, bool) for v in values):
-                        try:
-                            result = recompute(op, values)
-                        except (ArithmeticError, TypeError, ValueError):
-                            result = None
-                        if isinstance(result, (int, float)) and math.isfinite(result):
-                            fig["value"] = result
+                    # A computed value is never filled or recomputed here (Slice 120): with wrong inputs the
+                    # recomputation is a correct sum of the wrong things. The verifier recomputes and refuses.
             if isinstance(fig.get("id"), str):
                 by_id[fig["id"]] = fig
             fixed.append(fig)

@@ -34,11 +34,20 @@ matching ignored the kind of number; bare digits 0-12 beside tags; "90 days"
 rewritten anywhere). Slice 119's entry below and its PR said the normaliser
 "cannot change the delivered numbers" and that normalising "never makes a wrong
 number acceptable": both were false, because its own tests covered only friendly
-cases. Fixed in Slice 120 (see specs/slice-120): the normaliser fills only what
-is missing or restates what the verifier would accept, never overrides a value
-or unit the verifier checks. The cost: some slips it used to fix (a drifted
-calculation, "90 days") now go to the one repair request instead. Lesson,
-again: no merge before the review.
+cases. Fixed in Slice 120 (see specs/slice-120). A second fresh review of the fix
+failed it again on two partly closed blockers (a quote cut across "40% of our
+850", written in digits; "$12.2-million" and "$12.2 millions") and one new hole
+("of" taken as a time word), and those are fixed too. What the normaliser now
+does to numbers, stated exactly: it never fills, recomputes or replaces a
+figure's value; it replaces a quote only with a verbatim part of it whose one
+number equals the declared value in the declared unit, and never cuts away a
+number that may change the kept one; it fills a unit only when none is given,
+maps aliases ("%", "USD"), and sets a computed figure's unit to the only one its
+operation allows (the value is still checked). The cost: slips it used to fix
+(a drifted calculation, "90 days", a missing value) now go to the one repair
+request; that path is tested only with a replayed correct second answer, so
+whether the live model fixes them is unmeasured. Lesson, again: no merge
+before the review.
 
 ## 2026-11-23 — Slice 119: survive the live model's natural writing (the first paid test failed)
 

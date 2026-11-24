@@ -49,6 +49,23 @@ a run that fails or, worse, on a deck that misleads.
 5. Left open, stated: an accounting-style "(4%)" quote is read as +4%; a
    two-number contrast can be narrowed to the wrong one (as on main).
 
+## Second review (same day)
+
+The fresh review of the first Slice 120 commit (e11ec07) failed it: a quote
+could still be cut across a quantity written in digits ("About 40% of our 850
+customers" became "of our 850 customers"); "$12.2-million" and "$12.2 millions"
+still became $12.20; and "of" taken as a time word let "A loss of 2031 each
+month" pass. Fixed: a quote is never cut where the number before may change the
+kept one (followed by "of", a multiple, or a quantity in words) unless
+punctuation or "and"/"to"/"but" separates them; hyphenated, plural and short
+scale words ("-million", "millions", "mil") are part of the number; "of" marks
+a year only as "end/start/beginning/middle of". Also: a computed value is never
+filled (a missing value with a wrong input passed); "Option A: X" is matched
+only by exact name after a label (it inverted "Do not X"); "%"/"USD" unit
+aliases are read, never replaced by the quote's kind; "Phase 1", "Tier 2" and
+similar names are allowed; "in/since/during 2025" is a year even before a
+plural noun. Each is a test in tests/test_normalize.py (SecondReviewTest).
+
 ## Results (2026-11-23)
 
 - Every blocker case from the review: a regression test that fails on main
@@ -60,3 +77,7 @@ a run that fails or, worse, on a deck that misleads.
   five survivors in the first pass were closed with tests.
 - Full suite OK; refresh check clean; Flashy fence holds (the regenerated
   `drafts/measures.json` is left out, as in Slice 119).
+- After the second review: a targeted mutation run over every rule it changed
+  (normaliser cut rule, option matching, unit aliases; year and label rules;
+  hyphenated and plural scale words): 12/12 caught, after two survivors were
+  closed with tests.

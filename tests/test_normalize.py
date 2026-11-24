@@ -182,8 +182,9 @@ class NormalisingNeverWeakensTest(unittest.TestCase):
         self.assertEqual(next(f for f in out["figures"] if f["id"] == "F14")["value"], 999999)
         self.assertTrue(any("F14" in p for p in c.verify_content(out, c.client_text_of(record))))
         missing = json.loads((ROOT / "fixtures" / "consulting" / "churn-clinics" / "response.json").read_text())
-        del missing["figures"][13]["value"]  # a missing value is filled with the recomputation
-        self.assertEqual(next(f for f in normalize(missing)["figures"] if f["id"] == "F14")["value"], 30600)
+        del missing["figures"][13]["value"]  # a missing value is not filled either (second review: wrong inputs)
+        self.assertNotIn("value", next(f for f in normalize(missing)["figures"] if f["id"] == "F14"))
+        self.assertTrue(any("F14" in p for p in c.verify_content(normalize(missing), c.client_text_of(record))))
 
     def test_never_raises(self):
         for junk in (None, 1, "x", [], {}, {"figures": None}, {"figures": [None, 1, {"id": []}]},
@@ -287,16 +288,18 @@ class ReviewOfPr100Test(unittest.TestCase):
 
     def test_an_ambiguous_option_name_is_left_alone(self):
         doc = {"options": [{"name": "Save"}, {"name": "Save desk"}], "recommendation": {"option": "Option A: Save desk"}}
-        self.assertEqual(normalize(doc)["recommendation"]["option"], "Option A: Save desk")
+        self.assertEqual(normalize(doc)["recommendation"]["option"], "Save desk")  # exact after the label
+        doc = {"options": [{"name": "Save"}, {"name": "Save desk"}], "recommendation": {"option": "Save desk now"}}
+        self.assertEqual(normalize(doc)["recommendation"]["option"], "Save desk now")  # no label: left alone
         doc = {"options": [{"name": "Save desk"}, {"name": "Hire"}], "recommendation": {"option": "Option A: Save desk"}}
         self.assertEqual(normalize(doc)["recommendation"]["option"], "Save desk")
 
-    def test_a_boolean_computed_value_counts_as_missing(self):
+    def test_a_boolean_computed_value_is_left_for_the_verifier(self):
         figures = [{"id": "F1", "label": "a", "value": 3, "unit": "count", "basis": "assumption", "rationale": "r"},
                    {"id": "F2", "label": "b", "value": 4, "unit": "count", "basis": "assumption", "rationale": "r"},
                    {"id": "F3", "label": "c", "value": True, "unit": "count", "basis": "computed", "operation": "sum",
                     "inputs": ["F1", "F2"]}]
-        self.assertEqual(normalize({"figures": figures, "answer": "[F3]"})["figures"][2]["value"], 7)
+        self.assertIs(normalize({"figures": figures, "answer": "[F3]"})["figures"][2]["value"], True)
 
     def test_reversed_or_wrong_inputs_are_refused_not_recomputed(self):
         response = json.loads((self.base / "response.json").read_text())
@@ -349,6 +352,64 @@ class ReviewOfPr100Test(unittest.TestCase):
         self.assertIn("90", replay.requests[1]["messages"][0]["content"])
         prs = Presentation(io.BytesIO(deck.render_deck(spec, record, CATALOG)))
         self.assertEqual(unexplained_numbers(prs, spec), [])
+
+
+class SecondReviewTest(unittest.TestCase):
+    """Slice 120, second release review: the cases it found, kept as regression tests."""
+
+    def test_a_number_that_may_change_the_kept_one_is_never_cut_away(self):
+        for quote, value, unit in (("About 40% of our 850 customers are small clinics", 850, "count"),
+                                   ("33% of our 420 enterprise seats are idle", 420, "count"),
+                                   ("1 in 3 of our 420", 420, "count"), ("1/3 of our 420", 420, "count"),
+                                   ("About 140 of our 420", 420, "count"), ("40% or so of our 850", 850, "count"),
+                                   ("50% of the $1,200 average", 1200, "usd"), ("2x the $1,200 average", 1200, "usd")):
+            with self.subTest(quote=quote):
+                self.assertEqual(narrow_quote(quote, value, unit), (None, None))
+        self.assertEqual(narrow_quote("half the $1,200 average", 1200, "usd"), (None, None))  # a word quantity, no "of"
+        self.assertEqual(narrow_quote("went from 4% to 7% in two quarters", 7, "percent")[0], "to 7% in two quarters")
+        self.assertEqual(narrow_quote("we have 850 customers paying on average $1,200 per month", 1200, "usd")[0],
+                         "customers paying on average $1,200 per month")
+
+    def test_hyphenated_plural_and_short_scale_words(self):
+        for text in ("$12.2-million", "$12.2 millions", "$12.2 mil", "$12.2 Mill."):
+            with self.subTest(text=text):
+                self.assertAlmostEqual(find_numbers(text)[0].value, 12.2e6)
+        self.assertEqual([t.text for t in find_numbers("4-7%")], ["4", "7%"])  # a range is not a scale
+        client = "Our pipeline was worth $12.2-million last year."
+        self.assertFalse(c.quote_number_is_whole("Our pipeline was worth $12.2", client))
+        self.assertTrue(c.quote_number_is_whole("Our pipeline was worth $12.2-million", client))
+
+    def test_of_marks_a_year_only_as_end_or_start_of(self):
+        figures = {"F2": {"value": 7, "unit": "percent"}}
+        for bad in ("A loss of 2031 each month.", "The deficit of 2025 per clinic hurts.", "Payback of 2028 is too long."):
+            with self.subTest(bad=bad):
+                self.assertTrue(c.number_problems("t", bad, figures))
+        for ok in ("Launch by the end of 2026.", "Start of 2027 is the deadline.", "In 2025 customers churned.",
+                   "Since 2024 renewals have fallen.", "Start Phase 1 with Tier 2 clinics."):
+            with self.subTest(ok=ok):
+                self.assertEqual(c.number_problems("t", ok, figures), [])
+
+    def test_an_option_is_matched_only_after_a_label(self):
+        options = [{"name": "Shift budget to new sales"}, {"name": "Save desk"}]
+        for said, expected in (("Option A: Save desk", "Save desk"), ("B) Save desk", "Save desk"),
+                               ("Do not shift budget to new sales", "Do not shift budget to new sales"),
+                               ("Save desk first, then sales", "Save desk first, then sales")):
+            with self.subTest(said=said):
+                doc = {"options": copy.deepcopy(options), "recommendation": {"option": said}}
+                self.assertEqual(normalize(doc)["recommendation"]["option"], expected)
+
+    def test_unit_aliases_and_unreadable_values_are_not_guessed(self):
+        fig = {"id": "F1", "label": "Quarterly churn rate", "value": 0.6, "unit": "%", "basis": "client",
+               "quote": "We lost 60 clinics"}
+        out = normalize({"figures": [fig], "answer": "[F1]"})["figures"][0]
+        self.assertEqual(out["unit"], "percent")  # "%" read as percent, never replaced by the quote's count
+        odd = dict(fig, unit="clinics", value=60)
+        self.assertEqual(normalize({"figures": [odd], "answer": "[F1]"})["figures"][0]["unit"], "clinics")  # left to refuse
+        figures = [{"id": "F1", "label": "a", "value": 3, "unit": "count", "basis": "assumption", "rationale": "r"},
+                   {"id": "F2", "label": "b", "value": 4, "unit": "count", "basis": "assumption", "rationale": "r"},
+                   {"id": "F3", "label": "c", "value": "59.5 clinics", "unit": "count", "basis": "computed",
+                    "operation": "sum", "inputs": ["F1", "F2"]}]
+        self.assertEqual(normalize({"figures": figures, "answer": "[F3]"})["figures"][2]["value"], "59.5 clinics")
 
 
 if __name__ == "__main__":

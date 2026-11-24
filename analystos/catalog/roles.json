@@ -184,9 +184,9 @@
    ],
    "status": "available",
    "eval": {
-    "set": "fixtures/roles/research-reporting",
+    "set": "fixtures/work/regulatory-change-analyst",
     "passed": true,
-    "method": "mock-family"
+    "method": "mock"
    },
    "rate_cents_per_engagement_hour": "tbd",
    "delivers_today": "verified-memo"
@@ -259,9 +259,9 @@
    ],
    "status": "available",
    "eval": {
-    "set": "fixtures/consulting",
+    "set": "fixtures/work/risk-advisory-associate",
     "passed": true,
-    "method": "mock-family"
+    "method": "mock"
    },
    "rate_cents_per_engagement_hour": "tbd",
    "delivers_today": "verified-deck"
@@ -749,9 +749,9 @@
    ],
    "status": "available",
    "eval": {
-    "set": "fixtures/roles/accounting-operations",
+    "set": "fixtures/work/accounts-payable-receivable-clerk",
     "passed": true,
-    "method": "mock-family"
+    "method": "mock"
    },
    "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [
@@ -839,9 +839,9 @@
    ],
    "status": "available",
    "eval": {
-    "set": "fixtures/roles/accounting-operations",
+    "set": "fixtures/work/trade-support-middle-office-analyst",
     "passed": true,
-    "method": "mock-family"
+    "method": "mock"
    },
    "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [
@@ -946,9 +946,9 @@
    ],
    "status": "available",
    "eval": {
-    "set": "fixtures/roles/risk-audit-controls",
+    "set": "fixtures/work/operational-risk-analyst",
     "passed": true,
-    "method": "mock-family"
+    "method": "mock"
    },
    "rate_cents_per_engagement_hour": "tbd",
    "delivers_today": "verified-memo"
@@ -1022,9 +1022,9 @@
    ],
    "status": "available",
    "eval": {
-    "set": "fixtures/roles/risk-audit-controls",
+    "set": "fixtures/work/cybersecurity-analyst-junior",
     "passed": true,
-    "method": "mock-family"
+    "method": "mock"
    },
    "rate_cents_per_engagement_hour": "tbd",
    "delivers_today": "verified-memo"
@@ -1041,9 +1041,9 @@
    ],
    "status": "available",
    "eval": {
-    "set": "fixtures/roles/financial-crime",
+    "set": "fixtures/work/compliance-aml-kyc-analyst",
     "passed": true,
-    "method": "mock-family"
+    "method": "mock"
    },
    "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
@@ -1150,9 +1150,9 @@
    ],
    "status": "available",
    "eval": {
-    "set": "fixtures/roles/legal-contracts-procurement",
+    "set": "fixtures/work/paralegal-contracts-administrator",
     "passed": true,
-    "method": "mock-family"
+    "method": "mock"
    },
    "rate_cents_per_engagement_hour": "tbd",
    "human_decides": [
@@ -1476,9 +1476,9 @@
    ],
    "status": "available",
    "eval": {
-    "set": "fixtures/roles/software-it",
+    "set": "fixtures/work/it-help-desk-technical-support-specialist",
     "passed": true,
-    "method": "mock-family"
+    "method": "mock"
    },
    "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [
@@ -1587,9 +1587,9 @@
    ],
    "status": "available",
    "eval": {
-    "set": "fixtures/roles/sales-customer-coordination",
+    "set": "fixtures/work/project-program-coordinator",
     "passed": true,
-    "method": "mock-family"
+    "method": "mock"
    },
    "rate_cents_per_engagement_hour": "tbd",
    "gated_actions": [

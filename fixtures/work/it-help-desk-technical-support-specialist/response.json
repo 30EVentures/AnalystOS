@@ -1,0 +1,197 @@
+{
+ "answer": "Ask the IT manager to approve rolling back the update on the older laptop model: it raises [F5] of tickets and they are [F4] above normal.",
+ "exec_summary": [
+  "Failed-connection tickets reached [F1] this week against a normal [F2].",
+  "That is [F4] more than normal.",
+  "[F3] tickets, [F5] of them, come from the older laptop model."
+ ],
+ "situation": "An IT help desk supporting staff who work remotely over the VPN.",
+ "complication": "A VPN update broke connections for many staff, mostly on one laptop model.",
+ "key_question": "What should be done about the VPN failures after the update?",
+ "titles": {
+  "situation": "VPN tickets jumped after the update.",
+  "options": "Two ways to restore connections.",
+  "recommendation": "Roll back the update on the older laptop model, with approval.",
+  "roadmap": "Restore connections now, then fix the update properly.",
+  "kpis": "Two measures show connections are back.",
+  "risks": "The main risk is rolling back a security fix."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Failed-connection tickets this week",
+   "value": 260,
+   "unit": "count",
+   "basis": "client",
+   "quote": "260 tickets about failed connections"
+  },
+  {
+   "id": "F2",
+   "label": "Failed-connection tickets in a normal week",
+   "value": 60,
+   "unit": "count",
+   "basis": "client",
+   "quote": "against a normal 60"
+  },
+  {
+   "id": "F3",
+   "label": "Tickets from the older laptop model",
+   "value": 195,
+   "unit": "count",
+   "basis": "client",
+   "quote": "195 of the tickets come from staff on the older laptop model"
+  },
+  {
+   "id": "F4",
+   "label": "Tickets above a normal week",
+   "value": 200,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F5",
+   "label": "Share of tickets from the older laptop model",
+   "value": 75,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F3",
+    "F1"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "The spike",
+   "finding": "Tickets rose sharply after the update.",
+   "points": [
+    "Tickets are [F4] above a normal week."
+   ],
+   "hypotheses": [
+    {
+     "text": "The spike is unrelated to the update.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "The update is the likely cause.",
+   "chart": {
+    "title": "Tickets this week and in a normal week.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "This week",
+     "Normal"
+    ]
+   }
+  },
+  {
+   "branch": "Who is affected",
+   "finding": "Most failures come from one laptop model.",
+   "points": [
+    "[F5] of tickets come from the older model."
+   ],
+   "hypotheses": [
+    {
+     "text": "The update is incompatible with the older model's network driver.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "A rollback on that model would clear most tickets."
+  }
+ ],
+ "options": [
+  {
+   "name": "Roll back on the older model",
+   "description": "Roll back the update on the older laptop model while the vendor investigates.",
+   "effort": "low"
+  },
+  {
+   "name": "Wait for a vendor fix",
+   "description": "Keep the update and wait for the vendor's patch.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Roll back on the older model",
+  "rationale": "It restores most of the [F4] extra failures today; the IT manager approves before anything changes."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Roll back the update on the older model once approved.",
+    "Send the staff message once approved."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Test the vendor's fixed update on a few older laptops."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Roll out the fixed update and close the remaining tickets."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Failed-connection tickets",
+   "target": "Back to a normal week"
+  },
+  {
+   "name": "Older-model laptops connecting",
+   "target": "All of them"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The rollback removes a security fix.",
+   "mitigation": "Ask the vendor which fix the update carried before rolling back."
+  },
+  {
+   "risk": "Other models start failing.",
+   "mitigation": "Watch tickets by model every day this week."
+  }
+ ],
+ "work": [
+  {
+   "kind": "case_file",
+   "subject": "VPN connection failures after the update",
+   "facts": [
+    "Failed-connection tickets reached [F1] this week against a normal [F2].",
+    "[F3] of the tickets come from staff on the older laptop model.",
+    "The failures began after the VPN update."
+   ],
+   "evidence": [
+    "Ticket counts by laptop model from the help desk queue.",
+    "The update's release notes."
+   ],
+   "open_questions": [
+    "Does the failure happen on the older model only when away from the office network?",
+    "Does the update carry a security fix the rollback would remove?"
+   ],
+   "for_decision": "Should the IT manager approve rolling back the update on the older laptop model while the vendor investigates?"
+  },
+  {
+   "kind": "draft",
+   "title": "Message to affected staff",
+   "for": "Staff on the older laptop model, email for the IT manager to approve before sending",
+   "body": [
+    "We know some of you cannot connect to the VPN since the latest update.",
+    "Most reports come from the older laptop model. We are working on a fix and will write again when it is ready.",
+    "Until then, please use the office network or web mail, and contact the help desk if you are blocked."
+   ]
+  }
+ ]
+}

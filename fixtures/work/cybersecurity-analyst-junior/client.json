@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 127 worked example). Not a real company.",
+ "roles": [
+  "cybersecurity-analyst-junior"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our email gateway flagged 1,240 phishing emails last week, and 40 staff clicked a link in them.",
+ "answers": {
+  "common.decision": "What the security lead should do about staff who entered passwords; the security lead decides.",
+  "common.deadline": "Today.",
+  "common.audience": "The security lead.",
+  "common.materials": "6 of those staff entered their passwords on the fake page. We have 1,000 staff in total.",
+  "risk-audit-controls.framework": "Our incident response policy.",
+  "risk-audit-controls.scope": "Last week's phishing campaign and the staff who clicked."
+ }
+}

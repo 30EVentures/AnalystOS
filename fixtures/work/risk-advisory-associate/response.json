@@ -1,0 +1,204 @@
+{
+ "answer": "Test exit plans for the [F3] payments suppliers first: [F2] critical suppliers, [F5] of the total, have no tested exit plan.",
+ "exec_summary": [
+  "[F2] of [F1] critical suppliers have no tested exit plan, [F5] of the total.",
+  "[F3] of them support payments, where an outage costs about [F4] an hour.",
+  "The other [F6] support less urgent services."
+ ],
+ "situation": "A firm that depends on critical suppliers and must show it could replace them.",
+ "complication": "Many critical suppliers have exit plans that have never been tested.",
+ "key_question": "Which critical supplier risks should be fixed first?",
+ "titles": {
+  "situation": "Many critical suppliers lack a tested exit plan.",
+  "options": "Two ways to close the exit plan gap.",
+  "recommendation": "Test the payments suppliers' exit plans first.",
+  "roadmap": "Payments first, then the rest by impact.",
+  "kpis": "Two measures show the gap is closing.",
+  "risks": "The main risk is a payments supplier failing before its test."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Critical suppliers",
+   "value": 40,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We rely on 40 critical suppliers"
+  },
+  {
+   "id": "F2",
+   "label": "Critical suppliers with no tested exit plan",
+   "value": 12,
+   "unit": "count",
+   "basis": "client",
+   "quote": "12 of them have no tested exit plan"
+  },
+  {
+   "id": "F3",
+   "label": "Untested suppliers supporting payments",
+   "value": 4,
+   "unit": "count",
+   "basis": "client",
+   "quote": "4 of those"
+  },
+  {
+   "id": "F4",
+   "label": "Cost of a payments outage per hour",
+   "value": 75000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "costs us about $75,000 an hour"
+  },
+  {
+   "id": "F5",
+   "label": "Share of critical suppliers untested",
+   "value": 30,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Untested suppliers outside payments",
+   "value": 8,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F3"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "The size of the gap",
+   "finding": "Many critical suppliers have no tested exit plan.",
+   "points": [
+    "[F2] suppliers, [F5], have no tested exit plan."
+   ],
+   "hypotheses": [
+    {
+     "text": "Written exit plans would work without testing.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The board cannot rely on untested plans.",
+   "chart": {
+    "title": "Critical suppliers and untested ones.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "Critical",
+     "Untested"
+    ]
+   }
+  },
+  {
+   "branch": "Where impact is highest",
+   "finding": "Payments suppliers carry the highest outage cost.",
+   "points": [
+    "[F3] untested suppliers support payments.",
+    "A payments outage costs about [F4] an hour."
+   ],
+   "hypotheses": [
+    {
+     "text": "Payments suppliers have backup arrangements.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Testing these first removes the most impact soonest."
+  }
+ ],
+ "options": [
+  {
+   "name": "Payments first",
+   "description": "Test the payments suppliers' exit plans first, then the rest by impact.",
+   "effort": "medium"
+  },
+  {
+   "name": "Test all at once",
+   "description": "Test every untested exit plan in one programme.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Payments first",
+  "rationale": "It tests the plans where an outage costs most without new hires; the chief risk officer decides the order."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Agree test dates with the payments suppliers."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Run the payments exit tests and record what failed."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Schedule tests for the other suppliers by impact."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Critical suppliers with a tested exit plan",
+   "target": "All of them"
+  },
+  {
+   "name": "Payments suppliers tested",
+   "target": "All of them first"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "A payments supplier fails before its test.",
+   "mitigation": "Confirm a manual fallback for payments now."
+  },
+  {
+   "risk": "A supplier will not take part in a test.",
+   "mitigation": "Raise it at the next contract review."
+  }
+ ],
+ "work": [
+  {
+   "kind": "register",
+   "title": "Critical supplier exit risk register",
+   "rows": [
+    {
+     "item": "Payments suppliers with no tested exit plan: [F3].",
+     "rating": "high",
+     "owner": "Head of payments",
+     "status": "open",
+     "action": "Test each exit plan and record what fails."
+    },
+    {
+     "item": "A payments outage costs about [F4] an hour.",
+     "rating": "high",
+     "owner": "Chief operating officer",
+     "status": "open",
+     "action": "Confirm a manual payments fallback while tests run."
+    },
+    {
+     "item": "Other suppliers with no tested exit plan: [F6].",
+     "rating": "medium",
+     "owner": "Third-party risk lead",
+     "status": "open",
+     "action": "Schedule exit tests by impact."
+    }
+   ]
+  }
+ ]
+}

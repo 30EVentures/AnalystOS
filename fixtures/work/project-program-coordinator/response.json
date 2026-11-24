@@ -1,0 +1,225 @@
+{
+ "answer": "Accept the quotes for approval and keep the remaining [F5] as contingency: they use [F6] of the budget, and [F4] desks must be ready first.",
+ "exec_summary": [
+  "The move covers [F1] staff on a budget of [F2].",
+  "Quotes so far total [F3], [F6] of the budget, leaving [F5].",
+  "[F4] staff, [F7] of those moving, need new desks before the move."
+ ],
+ "situation": "A business moving its staff to a new office.",
+ "complication": "Quotes are in, desks must be ready before the move, and the budget has little room left.",
+ "key_question": "What plan gets every team moved on budget?",
+ "titles": {
+  "situation": "The office move is next quarter.",
+  "options": "Two ways to run the move.",
+  "recommendation": "Approve the quotes, hold contingency, and set up desks first.",
+  "roadmap": "Desks first, then the move, then the snags.",
+  "kpis": "Two measures show the move went well.",
+  "risks": "The main risk is desks not ready on the day."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Staff moving",
+   "value": 120,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We are moving 120 staff"
+  },
+  {
+   "id": "F2",
+   "label": "Move budget",
+   "value": 180000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "the budget is $180,000"
+  },
+  {
+   "id": "F3",
+   "label": "Quotes so far",
+   "value": 153000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Quotes so far total $153,000"
+  },
+  {
+   "id": "F4",
+   "label": "Staff needing new desks",
+   "value": 30,
+   "unit": "count",
+   "basis": "client",
+   "quote": "30 staff need new desks"
+  },
+  {
+   "id": "F5",
+   "label": "Budget left after the quotes",
+   "value": 27000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F3"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Share of budget used by quotes",
+   "value": 85,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F3",
+    "F2"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Share of movers needing new desks",
+   "value": 25,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F4",
+    "F1"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "The budget",
+   "finding": "The quotes leave a modest contingency.",
+   "points": [
+    "Quotes use [F6] of the budget, leaving [F5]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The quotes cover every cost of the move.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Hold what is left as contingency rather than spending it.",
+   "chart": {
+    "title": "Quotes use most of the move budget.",
+    "figure_ids": [
+     "F2",
+     "F3"
+    ],
+    "labels": [
+     "Budget",
+     "Quotes"
+    ]
+   }
+  },
+  {
+   "branch": "What must be ready first",
+   "finding": "Some staff cannot move until their desks are set up.",
+   "points": [
+    "[F4] staff need new desks before the move."
+   ],
+   "hypotheses": [
+    {
+     "text": "The furniture supplier can deliver in time.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Desk set-up is the first task on the plan."
+  }
+ ],
+ "options": [
+  {
+   "name": "Approve and hold contingency",
+   "description": "Accept the quotes for approval and keep the rest of the budget as contingency.",
+   "effort": "low"
+  },
+  {
+   "name": "Seek more quotes",
+   "description": "Ask for more quotes before approving any.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Approve and hold contingency",
+  "rationale": "It keeps the move on track with [F5] in reserve; the office manager approves every quote and message."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Send the quotes to the office manager for approval.",
+    "Order the new desks."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Set up desks and send the move guide to staff once approved."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Run the move and close the snag list."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Move cost",
+   "target": "Within the budget"
+  },
+  {
+   "name": "Staff working at a ready desk on the first day",
+   "target": "All of them"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Desks arrive late.",
+   "mitigation": "Confirm delivery with the supplier before the move date is fixed."
+  },
+  {
+   "risk": "An unquoted cost appears.",
+   "mitigation": "Pay it from the contingency and report it to the office manager."
+  }
+ ],
+ "work": [
+  {
+   "kind": "plan",
+   "title": "Office move plan",
+   "steps": [
+    {
+     "when": "Week one",
+     "task": "Send the quotes totalling [F3] to the office manager for approval.",
+     "owner": "Project coordinator",
+     "done_when": "The office manager has approved or rejected each quote."
+    },
+    {
+     "when": "Week two",
+     "task": "Order and schedule set-up of desks for [F4] staff.",
+     "owner": "Facilities lead",
+     "done_when": "The supplier has confirmed a delivery date before the move."
+    },
+    {
+     "when": "Week before the move",
+     "task": "Send the approved move guide to every team.",
+     "owner": "Project coordinator",
+     "done_when": "Every team lead has confirmed their team has it."
+    },
+    {
+     "when": "Move weekend",
+     "task": "Move [F1] staff with the movers.",
+     "owner": "Facilities lead",
+     "done_when": "Every desk is in place and connected."
+    },
+    {
+     "when": "Week after the move",
+     "task": "Close the snag list and report spend against [F2].",
+     "owner": "Project coordinator",
+     "done_when": "The office manager has the final cost report."
+    }
+   ]
+  }
+ ]
+}

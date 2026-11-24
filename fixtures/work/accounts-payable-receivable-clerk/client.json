@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 127 worked example). Not a real company.",
+ "roles": [
+  "accounts-payable-receivable-clerk"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our ledger shows $44,700 owed to our main packaging supplier, but their month-end statement says we owe $52,900.",
+ "answers": {
+  "common.decision": "Which entries to post and what to ask the supplier; the controller approves.",
+  "common.deadline": "Month-end close this week.",
+  "common.audience": "The controller.",
+  "common.materials": "An invoice for $7,400 is on their statement but not yet entered in our ledger. We sent a payment of $2,600 on the last day of the month that is not on their statement. They issued a credit note for $1,800 that we have not recorded.",
+  "accounting-operations.systems": "Our accounting system, standard chart of accounts.",
+  "accounting-operations.approver": "The controller approves all entries and supplier emails."
+ }
+}

@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 127 worked example). Not a real company.",
+ "roles": [
+  "trade-support-middle-office-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our trading system shows $1,240,000 of cash for the fund, but the custodian shows $1,169,500.",
+ "answers": {
+  "common.decision": "Whether to book the fee and how to chase the failed trade; the operations manager approves.",
+  "common.deadline": "Before tomorrow's net asset value is struck.",
+  "common.audience": "The operations manager.",
+  "common.materials": "A sale for $56,000 failed to settle at the custodian. The custodian charged a $14,500 fee we have not booked.",
+  "accounting-operations.systems": "Our trading system and the custodian's cash statement.",
+  "accounting-operations.approver": "The operations manager approves all bookings."
+ }
+}

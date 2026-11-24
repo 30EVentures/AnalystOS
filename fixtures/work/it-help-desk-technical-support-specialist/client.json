@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 127 worked example). Not a real company.",
+ "roles": [
+  "it-help-desk-technical-support-specialist"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Since the VPN update we have had 260 tickets about failed connections this week, against a normal 60.",
+ "answers": {
+  "common.decision": "Whether to roll back the update on the affected laptops; the IT manager approves.",
+  "common.deadline": "Today.",
+  "common.audience": "The IT manager.",
+  "common.materials": "195 of the tickets come from staff on the older laptop model.",
+  "software-it.codebase": "Our VPN client and laptop fleet; no code change is involved.",
+  "software-it.done": "Staff on the older laptop model can connect again."
+ }
+}

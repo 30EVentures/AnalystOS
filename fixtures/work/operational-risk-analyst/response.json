@@ -1,0 +1,239 @@
+{
+ "answer": "Put manual payment errors first: they caused [F6] of last quarter's [F2] in losses, which ran [F7] above appetite.",
+ "exec_summary": [
+  "Losses reached [F2] against an appetite of [F5], [F7] over.",
+  "Manual payment errors caused [F3] events and [F4] of the losses, [F6] of the total.",
+  "Events rose to [F1] from [F8], [F9] more than the quarter before."
+ ],
+ "situation": "A firm that records every operational loss event and reports them to its risk committee.",
+ "complication": "Losses broke the quarterly appetite and most of them came from one cause.",
+ "key_question": "Which operational risks should the risk committee prioritise after last quarter's losses?",
+ "titles": {
+  "situation": "Operational losses broke appetite last quarter.",
+  "options": "Two ways to bring losses back within appetite.",
+  "recommendation": "Fix manual payment errors first.",
+  "roadmap": "Fix payments first, then watch the trend.",
+  "kpis": "Two measures show whether losses are back within appetite.",
+  "risks": "The main risk is fixing one cause while another grows."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Loss events last quarter",
+   "value": 18,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We had 18 operational loss events"
+  },
+  {
+   "id": "F2",
+   "label": "Operational losses last quarter",
+   "value": 412000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "totalling $412,000"
+  },
+  {
+   "id": "F3",
+   "label": "Events from manual payment errors",
+   "value": 7,
+   "unit": "count",
+   "basis": "client",
+   "quote": "Manual payment errors caused 7 of the events"
+  },
+  {
+   "id": "F4",
+   "label": "Losses from manual payment errors",
+   "value": 247200,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "$247,200 of the losses"
+  },
+  {
+   "id": "F5",
+   "label": "Quarterly loss appetite",
+   "value": 300000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Our risk appetite for operational losses is $300,000"
+  },
+  {
+   "id": "F6",
+   "label": "Share of losses from manual payment errors",
+   "value": 60,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F4",
+    "F2"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Losses above appetite",
+   "value": 112000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F5"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Loss events the quarter before",
+   "value": 11,
+   "unit": "count",
+   "basis": "client",
+   "quote": "up from 11 the quarter before"
+  },
+  {
+   "id": "F9",
+   "label": "More events than the quarter before",
+   "value": 7,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F8"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Against appetite",
+   "finding": "Losses ran well above the quarterly appetite.",
+   "points": [
+    "Losses of [F2] exceeded the appetite of [F5] by [F7]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The breach came from one large event.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "The committee needs a plan to bring losses back within appetite.",
+   "chart": {
+    "title": "Losses ran above the quarterly appetite.",
+    "figure_ids": [
+     "F2",
+     "F5"
+    ],
+    "labels": [
+     "Losses",
+     "Appetite"
+    ]
+   }
+  },
+  {
+   "branch": "Where losses came from",
+   "finding": "Manual payment errors drove most of the losses.",
+   "points": [
+    "Manual payment errors caused [F6] of losses.",
+    "Events rose by [F9] on the quarter before."
+   ],
+   "hypotheses": [
+    {
+     "text": "Better reporting explains the rise in events.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Fixing manual payments addresses most of the loss."
+  }
+ ],
+ "options": [
+  {
+   "name": "Fix payments first",
+   "description": "Add a second check on manual payments and track errors weekly.",
+   "effort": "medium"
+  },
+  {
+   "name": "Review every process",
+   "description": "Run a full review of every process with loss events.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Fix payments first",
+  "rationale": "It targets the cause of [F6] of losses and can start before the next quarter; the risk committee decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Agree a second check on manual payments with payments operations."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Track payment errors weekly and report them to the risk lead."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Report to the risk committee whether losses are back within appetite."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Quarterly operational losses",
+   "target": "Within appetite"
+  },
+  {
+   "name": "Manual payment errors",
+   "target": "Falling each month"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "A second check slows payments.",
+   "mitigation": "Apply it only above an agreed amount."
+  },
+  {
+   "risk": "Another cause grows while payments are fixed.",
+   "mitigation": "Review the full register every month."
+  }
+ ],
+ "work": [
+  {
+   "kind": "register",
+   "title": "Operational risk register: last quarter's loss events",
+   "rows": [
+    {
+     "item": "Manual payment errors: [F3] events and [F4] of losses.",
+     "rating": "high",
+     "owner": "Head of payments operations",
+     "status": "open",
+     "action": "Add a second check on manual payments above an agreed amount."
+    },
+    {
+     "item": "Losses of [F2] exceeded appetite by [F7].",
+     "rating": "high",
+     "owner": "Chief risk officer",
+     "status": "open",
+     "action": "Report the breach to the risk committee with this recovery plan."
+    },
+    {
+     "item": "Loss events rose to [F1] from [F8].",
+     "rating": "medium",
+     "owner": "Operational risk lead",
+     "status": "in progress",
+     "action": "Check whether more events or better reporting drove the rise."
+    },
+    {
+     "item": "Events outside manual payments are spread across several processes.",
+     "rating": "low",
+     "owner": "Operational risk lead",
+     "status": "open",
+     "action": "Review their causes again at quarter end."
+    }
+   ]
+  }
+ ]
+}

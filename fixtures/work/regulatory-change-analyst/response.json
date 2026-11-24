@@ -1,0 +1,204 @@
+{
+ "answer": "Start with the [F3] complaints policies and budget about [F6] for outside review: the regulation touches [F5] of our policies.",
+ "exec_summary": [
+  "The regulation affects [F1] of our [F2] internal policies, [F5].",
+  "[F3] of the affected policies cover customer complaints.",
+  "At about [F4] each, outside review of all affected policies costs about [F6]."
+ ],
+ "situation": "A payments firm keeping its internal policies in line with regulation.",
+ "complication": "A new regulation changes requirements that many of our policies rely on.",
+ "key_question": "Which policy changes does the new regulation require, and where should we start?",
+ "titles": {
+  "situation": "A new payments regulation affects many policies.",
+  "options": "Two ways to update the affected policies.",
+  "recommendation": "Start with the complaints policies and phase the rest.",
+  "roadmap": "Complaints first, then the remaining policies.",
+  "kpis": "Two measures show the changes land in time.",
+  "risks": "The main risk is a policy missed before the regulation takes effect."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Policies affected by the regulation",
+   "value": 9,
+   "unit": "count",
+   "basis": "client",
+   "quote": "affects 9 of our"
+  },
+  {
+   "id": "F2",
+   "label": "Internal policies",
+   "value": 25,
+   "unit": "count",
+   "basis": "client",
+   "quote": "our 25 internal policies"
+  },
+  {
+   "id": "F3",
+   "label": "Affected policies covering complaints",
+   "value": 3,
+   "unit": "count",
+   "basis": "client",
+   "quote": "3 of the affected policies cover customer complaints"
+  },
+  {
+   "id": "F4",
+   "label": "Outside legal review per policy update",
+   "value": 8000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "cost about $8,000 in outside legal review"
+  },
+  {
+   "id": "F5",
+   "label": "Share of policies affected",
+   "value": 36,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Likely outside review cost",
+   "value": 72000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F1",
+    "F4"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "What the regulation touches",
+   "finding": "Many of our policies need changes.",
+   "points": [
+    "[F1] of [F2] policies are affected."
+   ],
+   "hypotheses": [
+    {
+     "text": "Only the complaints policies are affected.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "The work needs a plan, not a single update.",
+   "chart": {
+    "title": "Many of our internal policies are affected.",
+    "figure_ids": [
+     "F2",
+     "F1"
+    ],
+    "labels": [
+     "All policies",
+     "Affected"
+    ]
+   }
+  },
+  {
+   "branch": "Cost and order",
+   "finding": "Complaints policies are the clearest place to start.",
+   "points": [
+    "[F3] affected policies cover complaints.",
+    "Outside review is likely about [F6]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Outside review can be avoided for minor changes.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Start with complaints and budget for outside review."
+  }
+ ],
+ "options": [
+  {
+   "name": "Complaints first",
+   "description": "Update the complaints policies first, then the rest in order of impact.",
+   "effort": "medium"
+  },
+  {
+   "name": "All at once",
+   "description": "Update every affected policy together.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Complaints first",
+  "rationale": "It starts where customer impact is clearest and spreads the [F6] review cost; the head of compliance decides the order."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Map each requirement of the regulation to the affected policies."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Draft updates to the complaints policies for outside review."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Plan updates to the remaining policies."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Affected policies updated",
+   "target": "All before the regulation takes effect"
+  },
+  {
+   "name": "Outside review spend",
+   "target": "Within the agreed budget"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "A requirement is missed.",
+   "mitigation": "Have a second analyst check the requirement map."
+  },
+  {
+   "risk": "Outside review costs more than planned.",
+   "mitigation": "Agree a fixed fee per policy in advance."
+  }
+ ],
+ "work": [
+  {
+   "kind": "register",
+   "title": "Regulatory change register: new payments regulation",
+   "rows": [
+    {
+     "item": "Complaints policies affected: [F3].",
+     "rating": "high",
+     "owner": "Head of complaints",
+     "status": "open",
+     "action": "Draft updated policies for outside review first."
+    },
+    {
+     "item": "Other affected policies: [F1] in total, [F5] of the library.",
+     "rating": "medium",
+     "owner": "Compliance policy lead",
+     "status": "open",
+     "action": "Map each requirement to a policy and set an order."
+    },
+    {
+     "item": "Outside review budget of about [F6].",
+     "rating": "medium",
+     "owner": "Head of compliance",
+     "status": "in progress",
+     "action": "Agree a fixed fee per policy with outside counsel."
+    }
+   ]
+  }
+ ]
+}

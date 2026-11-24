@@ -1,0 +1,215 @@
+{
+ "answer": "Put the [F4] contracts that need written notice in front of counsel first: [F2] contracts worth [F3] a year renew automatically this quarter.",
+ "exec_summary": [
+  "[F2] of [F1] supplier contracts renew automatically before the end of next quarter, [F5] of the total.",
+  "They are worth [F3] a year.",
+  "[F4] need written notice to cancel and their windows close first; the other [F6] do not."
+ ],
+ "situation": "A business with a register of supplier contracts that renew automatically.",
+ "complication": "Several contracts will renew on their old terms unless someone acts in time.",
+ "key_question": "Which automatic renewals need action before their notice windows close?",
+ "titles": {
+  "situation": "Supplier contracts are about to renew automatically.",
+  "options": "Two ways to handle this quarter's renewals.",
+  "recommendation": "Review the notice contracts with counsel first.",
+  "roadmap": "Clear the notice deadlines first, then the rest.",
+  "kpis": "Two measures show no renewal slips through.",
+  "risks": "The main risk is missing a notice window."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Supplier contracts",
+   "value": 70,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We have 70 supplier contracts"
+  },
+  {
+   "id": "F2",
+   "label": "Contracts renewing automatically",
+   "value": 14,
+   "unit": "count",
+   "basis": "client",
+   "quote": "14 renew automatically"
+  },
+  {
+   "id": "F3",
+   "label": "Annual value of renewing contracts",
+   "value": 1260000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "worth $1,260,000 a year"
+  },
+  {
+   "id": "F4",
+   "label": "Renewals needing written notice to cancel",
+   "value": 5,
+   "unit": "count",
+   "basis": "client",
+   "quote": "5 of them need written notice"
+  },
+  {
+   "id": "F5",
+   "label": "Share of contracts renewing",
+   "value": 20,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Renewals not needing written notice",
+   "value": 9,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F4"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "What renews",
+   "finding": "A large share of contracts renew this quarter.",
+   "points": [
+    "[F2] contracts worth [F3] a year renew automatically."
+   ],
+   "hypotheses": [
+    {
+     "text": "Every renewal is still wanted.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Each owner should confirm whether to renew, renegotiate or cancel.",
+   "chart": {
+    "title": "Many supplier contracts renew this quarter.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "All contracts",
+     "Renewing"
+    ]
+   }
+  },
+  {
+   "branch": "What needs notice",
+   "finding": "Some contracts can only be stopped by written notice.",
+   "points": [
+    "[F4] need written notice and their windows close first."
+   ],
+   "hypotheses": [
+    {
+     "text": "Email notice is enough for these contracts.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Notices for these contracts must reach counsel first."
+  }
+ ],
+ "options": [
+  {
+   "name": "Notice contracts first",
+   "description": "Review the notice contracts with counsel now, then the rest by renewal date.",
+   "effort": "low"
+  },
+  {
+   "name": "Review all together",
+   "description": "Review every renewal at once before acting on any.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Notice contracts first",
+  "rationale": "It protects the earliest deadlines without delaying the rest; counsel decides and signs every notice."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Confirm notice terms in each of the notice contracts.",
+    "Send the notice template to counsel."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Ask each contract owner whether to renew, renegotiate or cancel."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Update the contract register with every decision."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Notice windows missed",
+   "target": "None"
+  },
+  {
+   "name": "Renewals with an owner decision",
+   "target": "All of them before renewal"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "A notice is sent in the wrong form.",
+   "mitigation": "Check each contract's notice clause before counsel signs."
+  },
+  {
+   "risk": "An owner does not reply in time.",
+   "mitigation": "Escalate to the owner's manager after one reminder."
+  }
+ ],
+ "work": [
+  {
+   "kind": "register",
+   "title": "Automatic renewal register: this quarter",
+   "rows": [
+    {
+     "item": "Renewals needing written notice to cancel: [F4].",
+     "rating": "high",
+     "owner": "Legal counsel",
+     "status": "open",
+     "action": "Confirm each notice clause and prepare notices for counsel to sign."
+    },
+    {
+     "item": "Renewals not needing notice: [F6].",
+     "rating": "medium",
+     "owner": "Each contract owner",
+     "status": "open",
+     "action": "Ask each owner whether to renew, renegotiate or cancel."
+    },
+    {
+     "item": "Annual value at stake: [F3].",
+     "rating": "medium",
+     "owner": "Procurement lead",
+     "status": "in progress",
+     "action": "Compare prices with the market before any renewal."
+    }
+   ]
+  },
+  {
+   "kind": "draft",
+   "title": "Notice of non-renewal (template)",
+   "for": "A supplier, letter for counsel to review and sign",
+   "body": [
+    "We refer to our agreement with you, which renews automatically unless notice is given.",
+    "This letter gives notice that we do not wish the agreement to renew at the end of its current term.",
+    "Please confirm receipt of this notice in writing.",
+    "Signed by an authorised signatory after legal review."
+   ]
+  }
+ ]
+}

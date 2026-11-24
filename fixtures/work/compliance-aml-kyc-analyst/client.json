@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 127 worked example). Not a real company.",
+ "roles": [
+  "compliance-aml-kyc-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We have 4,800 customer files due for KYC refresh this year and 1,200 are already overdue.",
+ "answers": {
+  "common.decision": "How to work the overdue files and what to restrict; the money laundering reporting officer decides.",
+  "common.deadline": "The next compliance committee.",
+  "common.audience": "The money laundering reporting officer.",
+  "common.materials": "360 of the overdue files are high-risk customers. Our team completes about 400 refreshes a month.",
+  "financial-crime.case": "Customer due diligence refreshes under our KYC policy.",
+  "financial-crime.decider": "The money laundering reporting officer decides any restriction."
+ }
+}

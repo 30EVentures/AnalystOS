@@ -1,0 +1,239 @@
+{
+ "answer": "The [F5] cash break is fully explained by a failed sale and an unbooked fee: chase the sale and book the fee once the operations manager approves.",
+ "exec_summary": [
+  "Our system shows [F1] of fund cash against the custodian's [F2], a break of [F5].",
+  "A failed sale of [F3] and a custodian fee of [F4] explain [F6] of it.",
+  "That leaves [F7] unexplained, so the break is fully understood."
+ ],
+ "situation": "A fund whose middle office checks its cash against the custodian every day.",
+ "complication": "Fund cash in our system and at the custodian disagree before the net asset value is struck.",
+ "key_question": "What explains the cash break with the custodian, and what should be done before the net asset value is struck?",
+ "titles": {
+  "situation": "Our fund cash and the custodian's disagree.",
+  "options": "Two ways to deal with the break before the net asset value is struck.",
+  "recommendation": "Chase the failed sale and book the fee for approval.",
+  "roadmap": "Clear the break now, then catch failed trades earlier.",
+  "kpis": "Two measures show breaks are caught and cleared.",
+  "risks": "The main risk is the failed sale failing again."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Fund cash in our trading system",
+   "value": 1240000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Our trading system shows $1,240,000 of cash"
+  },
+  {
+   "id": "F2",
+   "label": "Fund cash at the custodian",
+   "value": 1169500,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "the custodian shows $1,169,500"
+  },
+  {
+   "id": "F3",
+   "label": "Sale that failed to settle",
+   "value": 56000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "A sale for $56,000 failed to settle"
+  },
+  {
+   "id": "F4",
+   "label": "Custodian fee not booked",
+   "value": 14500,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "a $14,500 fee we have not booked"
+  },
+  {
+   "id": "F5",
+   "label": "Cash break",
+   "value": 70500,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Break explained by known items",
+   "value": 70500,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "sum",
+   "inputs": [
+    "F3",
+    "F4"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Unexplained break",
+   "value": 0,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F5",
+    "F6"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "The failed sale",
+   "finding": "Our system counts sale proceeds the custodian never received.",
+   "points": [
+    "The failed sale accounts for [F3] of the break."
+   ],
+   "hypotheses": [
+    {
+     "text": "The counterparty has already paid.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Chase the counterparty and decide whether to reverse the expected cash.",
+   "chart": {
+    "title": "Fund cash in our system and at the custodian.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "Our system",
+     "Custodian"
+    ]
+   }
+  },
+  {
+   "branch": "The unbooked fee",
+   "finding": "The custodian charged a fee our system does not show.",
+   "points": [
+    "The fee accounts for [F4] of the break."
+   ],
+   "hypotheses": [
+    {
+     "text": "The fee is a custodian error.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Book the fee for approval and check it against the custody agreement."
+  }
+ ],
+ "options": [
+  {
+   "name": "Chase and book",
+   "description": "Chase the failed sale with the counterparty and book the fee for approval.",
+   "effort": "low"
+  },
+  {
+   "name": "Reverse the sale cash",
+   "description": "Take the expected sale cash out of our system until it settles.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Chase and book",
+  "rationale": "It clears all of the [F5] break with the least change to the books; the operations manager approves every booking."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Chase the counterparty on the failed sale.",
+    "Book the custodian fee once approved."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Report failed trades to the operations manager the same day."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Review with the operations manager how many breaks stayed open overnight."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Unexplained cash break at the custodian",
+   "target": "Nothing before the net asset value is struck"
+  },
+  {
+   "name": "Failed trades reported the same day",
+   "target": "Every failed trade"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The sale fails again tomorrow.",
+   "mitigation": "Ask the counterparty for a settlement date and escalate if it slips."
+  },
+  {
+   "risk": "The fee is wrong.",
+   "mitigation": "Check it against the custody agreement before booking."
+  }
+ ],
+ "work": [
+  {
+   "kind": "case_file",
+   "subject": "Failed sale and unbooked fee in the fund's cash break",
+   "facts": [
+    "Our system shows [F1] of fund cash and the custodian shows [F2].",
+    "A sale of [F3] failed to settle at the custodian.",
+    "The custodian charged a fee of [F4] that our system does not show."
+   ],
+   "evidence": [
+    "The custodian's cash statement.",
+    "Our trading system's cash and trade records."
+   ],
+   "open_questions": [
+    "Why did the sale fail, and when will the counterparty settle?",
+    "Does the custody agreement allow the fee?"
+   ],
+   "for_decision": "Should the operations manager approve booking the fee and chasing the sale, or reverse the expected sale cash until it settles?"
+  },
+  {
+   "kind": "reconciliation",
+   "title": "Fund cash against the custodian",
+   "side_a": {
+    "label": "Fund cash in our trading system",
+    "figure_id": "F1"
+   },
+   "side_b": {
+    "label": "Fund cash at the custodian",
+    "figure_id": "F2"
+   },
+   "items": [
+    {
+     "label": "Sale that failed to settle",
+     "figure_id": "F3",
+     "effect": "subtract_from_a"
+    },
+    {
+     "label": "Custodian fee not booked",
+     "figure_id": "F4",
+     "effect": "subtract_from_a"
+    }
+   ],
+   "entries": [
+    {
+     "debit": "Custody fees",
+     "credit": "Cash at custodian",
+     "figure_id": "F4",
+     "memo": "Book the custodian fee of [F4]; for the operations manager's approval."
+    }
+   ]
+  }
+ ]
+}

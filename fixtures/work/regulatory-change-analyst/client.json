@@ -1,0 +1,18 @@
+{
+ "note": "A synthetic client (Slice 127 worked example). Not a real company.",
+ "roles": [
+  "regulatory-change-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "A new payments regulation takes effect next year and affects 9 of our 25 internal policies.",
+ "answers": {
+  "common.decision": "Which policy changes to start first; the head of compliance decides.",
+  "common.deadline": "End of this quarter.",
+  "common.audience": "The head of compliance.",
+  "common.materials": "3 of the affected policies cover customer complaints. Each policy update has cost about $8,000 in outside legal review.",
+  "research-reporting.scope": "The new payments regulation and our internal policy library."
+ }
+}

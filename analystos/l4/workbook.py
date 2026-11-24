@@ -133,7 +133,7 @@ def _work_sheet(wb, n, item, figures, row_of, own):
         lines += [(l["label"], l["figure_id"], l["effect"]) for l in item.get("items", [])]
         lines.append((item["side_b"]["label"], item["side_b"]["figure_id"], "side B"))
         for label, fid, effect in lines:
-            ws.append([label, f"=Inputs!{VALUE_COL}{row_of[fid]}", effect.replace("_", " ")])
+            ws.append([label, f"=Inputs!{VALUE_COL}{row_of[fid]}", deck.EFFECT_TEXT.get(effect, effect)])
             own.add((ws.title, f"B{ws.max_row}"))
         a = [f"B{start}"] + [("+" if EFFECT_SIGN[e][1] > 0 else "-") + f"B{start + i + 1}"
                              for i, (_, _, e) in enumerate(lines[1:-1]) if EFFECT_SIGN[e][0] == "a"]

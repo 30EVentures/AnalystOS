@@ -68,7 +68,7 @@ class ApiV2Test(unittest.TestCase):
         tested = {r["id"]: r["tested"] for r in doc["roles"]}
         self.assertEqual(tested["management-consulting-analyst"], "mock")
         self.assertEqual(tested["financial-equity-research-analyst"], "mock-family")
-        self.assertEqual(sum(v == "mock" for v in tested.values()), 13)
+        self.assertEqual(sum(v == "mock" for v in tested.values()), 23)  # Slice 127: 10 work examples
 
     def test_hiring_returns_a_verified_deck(self):
         response = self.post(body())

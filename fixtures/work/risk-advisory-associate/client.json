@@ -1,0 +1,20 @@
+{
+ "note": "A synthetic client (Slice 127 worked example). Not a real company.",
+ "roles": [
+  "risk-advisory-associate"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We rely on 40 critical suppliers, and 12 of them have no tested exit plan.",
+ "answers": {
+  "common.decision": "Which supplier risks to fix first; the chief risk officer decides.",
+  "common.deadline": "The next board risk meeting.",
+  "common.audience": "The chief risk officer.",
+  "common.materials": "4 of those 12 suppliers support our payments. A payments outage costs us about $75,000 an hour.",
+  "consulting.current-state": "Supplier exit plans are written but most have never been tested.",
+  "consulting.success": "Every critical supplier has a tested exit plan.",
+  "consulting.constraints": "No new hires this year."
+ }
+}

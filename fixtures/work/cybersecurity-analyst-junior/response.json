@@ -1,0 +1,195 @@
+{
+ "answer": "Treat the [F3] staff who entered passwords as compromised accounts for the security lead to act on today; the other clicks need a lighter check.",
+ "exec_summary": [
+  "The gateway flagged [F1] phishing emails last week.",
+  "[F2] staff clicked a link, [F5] of all staff.",
+  "[F3] of them entered passwords, [F6] of those who clicked."
+ ],
+ "situation": "A firm whose email gateway flags phishing and whose security team investigates clicks.",
+ "complication": "Some staff entered passwords on a fake page, so their accounts may be in an attacker's hands.",
+ "key_question": "What should happen to the accounts of staff who clicked last week's phishing links?",
+ "titles": {
+  "situation": "A phishing campaign reached staff last week.",
+  "options": "Two ways to deal with the exposed accounts.",
+  "recommendation": "Reset and review the accounts that entered passwords today.",
+  "roadmap": "Contain today, then reduce clicks over time.",
+  "kpis": "Two measures show the campaign is contained.",
+  "risks": "The main risk is an attacker already using an account."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Phishing emails flagged last week",
+   "value": 1240,
+   "unit": "count",
+   "basis": "client",
+   "quote": "flagged 1,240 phishing emails"
+  },
+  {
+   "id": "F2",
+   "label": "Staff who clicked a link",
+   "value": 40,
+   "unit": "count",
+   "basis": "client",
+   "quote": "40 staff clicked a link"
+  },
+  {
+   "id": "F3",
+   "label": "Staff who entered passwords",
+   "value": 6,
+   "unit": "count",
+   "basis": "client",
+   "quote": "6 of those staff entered their passwords"
+  },
+  {
+   "id": "F4",
+   "label": "Staff in total",
+   "value": 1000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We have 1,000 staff in total"
+  },
+  {
+   "id": "F5",
+   "label": "Share of staff who clicked",
+   "value": 4,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F4"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Share of clickers who entered passwords",
+   "value": 15,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F3",
+    "F2"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Who is exposed",
+   "finding": "A small group entered passwords and is most exposed.",
+   "points": [
+    "[F3] staff entered passwords on the fake page."
+   ],
+   "hypotheses": [
+    {
+     "text": "No attacker has used the passwords yet.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "These accounts need resets and a sign-in review today.",
+   "chart": {
+    "title": "Clicks and passwords entered.",
+    "figure_ids": [
+     "F2",
+     "F3"
+    ],
+    "labels": [
+     "Clicked",
+     "Entered password"
+    ]
+   }
+  },
+  {
+   "branch": "How far it spread",
+   "finding": "Clicks reached a small share of staff.",
+   "points": [
+    "[F2] staff clicked, [F5] of all staff."
+   ],
+   "hypotheses": [
+    {
+     "text": "The campaign targeted one team.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Staff who only clicked need a lighter device check."
+  }
+ ],
+ "options": [
+  {
+   "name": "Reset and review",
+   "description": "Force password resets and review sign-ins for staff who entered passwords.",
+   "effort": "low"
+  },
+  {
+   "name": "Wait for alerts",
+   "description": "Watch the accounts and act only if suspicious sign-ins appear.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Reset and review",
+  "rationale": "It closes the exposure for the [F3] accounts today; the security lead decides and acts."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Reset passwords and review sign-ins for the exposed accounts once the security lead decides.",
+    "Check devices of staff who only clicked."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Run a phishing awareness refresher for the teams that clicked most."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Run a follow-up phishing test and compare clicks."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Exposed accounts reset",
+   "target": "All of them today"
+  },
+  {
+   "name": "Staff who click in the next test",
+   "target": "Fewer than this campaign"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "An attacker has already signed in.",
+   "mitigation": "Review sign-in history before and after each reset."
+  },
+  {
+   "risk": "Staff miss the reset message.",
+   "mitigation": "Ask managers to confirm each person has reset."
+  }
+ ],
+ "work": [
+  {
+   "kind": "case_file",
+   "subject": "Phishing campaign: staff who entered passwords",
+   "facts": [
+    "The email gateway flagged [F1] phishing emails last week.",
+    "[F2] staff clicked a link and [F3] entered passwords on the fake page.",
+    "That is [F6] of the staff who clicked."
+   ],
+   "evidence": [
+    "The email gateway's flag and click records for the week.",
+    "The client's count of staff who entered passwords."
+   ],
+   "open_questions": [
+    "Has any exposed account signed in from an unusual place since?",
+    "Do the exposed accounts have access to payment or admin systems?"
+   ],
+   "for_decision": "Should the security lead force password resets and a sign-in review today for the staff who entered passwords?"
+  }
+ ]
+}

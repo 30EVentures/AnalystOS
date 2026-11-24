@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 127 worked example). Not a real company.",
+ "roles": [
+  "paralegal-contracts-administrator"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We have 70 supplier contracts, and 14 renew automatically before the end of next quarter.",
+ "answers": {
+  "common.decision": "Which renewals to stop or renegotiate; legal counsel decides.",
+  "common.deadline": "Before the first notice window closes.",
+  "common.audience": "Legal counsel.",
+  "common.materials": "The renewing contracts are worth $1,260,000 a year in total. 5 of them need written notice to cancel, and their notice windows close first.",
+  "legal-contracts-procurement.documents": "Our supplier contracts and the contract register.",
+  "legal-contracts-procurement.reviewer": "Legal counsel reviews and signs every notice."
+ }
+}

@@ -1,0 +1,233 @@
+{
+ "answer": "Work the overdue files in risk order, high-risk first: [F3] high-risk files are overdue, and the backlog alone equals [F6] of the team's capacity.",
+ "exec_summary": [
+  "[F2] of [F1] files due this year are overdue, [F5] of the total.",
+  "[F3] of the overdue files are high-risk customers, [F7] of the overdue files.",
+  "At about [F4] refreshes a month, the overdue files equal [F6] of capacity, before any new files fall due."
+ ],
+ "situation": "A bank whose KYC team refreshes customer due diligence on a schedule.",
+ "complication": "Many of this year's refreshes are already overdue, including high-risk customers.",
+ "key_question": "How should the overdue KYC refreshes be worked, and what needs the reporting officer's decision?",
+ "titles": {
+  "situation": "A large share of KYC refreshes are overdue.",
+  "options": "Two ways to bring refreshes back on schedule.",
+  "recommendation": "Work overdue files in risk order, high-risk first.",
+  "roadmap": "Clear high-risk files first, then the rest.",
+  "kpis": "Two measures show the backlog is under control.",
+  "risks": "The main risk is a high-risk customer acting while overdue."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Customer files due for refresh this year",
+   "value": 4800,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We have 4,800 customer files due"
+  },
+  {
+   "id": "F2",
+   "label": "Files already overdue",
+   "value": 1200,
+   "unit": "count",
+   "basis": "client",
+   "quote": "1,200 are already overdue"
+  },
+  {
+   "id": "F3",
+   "label": "Overdue files for high-risk customers",
+   "value": 360,
+   "unit": "count",
+   "basis": "client",
+   "quote": "360 of the overdue files are high-risk"
+  },
+  {
+   "id": "F4",
+   "label": "Refreshes completed per month",
+   "value": 400,
+   "unit": "count",
+   "basis": "client",
+   "quote": "completes about 400 refreshes a month"
+  },
+  {
+   "id": "F5",
+   "label": "Share of this year's files overdue",
+   "value": 25,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Overdue files in months of team capacity",
+   "value": 3,
+   "unit": "months",
+   "basis": "computed",
+   "operation": "ratio",
+   "inputs": [
+    "F2",
+    "F4"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Share of overdue files that are high-risk",
+   "value": 30,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F3",
+    "F2"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "The size of the backlog",
+   "finding": "Many of this year's files are already overdue.",
+   "points": [
+    "[F2] files are overdue, [F5] of those due."
+   ],
+   "hypotheses": [
+    {
+     "text": "Today's pace alone will clear the backlog.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The order of work decides where risk sits while the backlog clears.",
+   "chart": {
+    "title": "Files due and overdue.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "Due this year",
+     "Overdue"
+    ]
+   }
+  },
+  {
+   "branch": "Where the risk sits",
+   "finding": "Many overdue files are high-risk customers.",
+   "points": [
+    "[F3] overdue files are high-risk.",
+    "The overdue files alone equal [F6] of today's capacity."
+   ],
+   "hypotheses": [
+    {
+     "text": "High-risk files are already being worked first.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Working high-risk files first removes the most risk soonest."
+  }
+ ],
+ "options": [
+  {
+   "name": "Risk-ordered queue",
+   "description": "Refresh high-risk overdue files first, then the rest by due date.",
+   "effort": "low"
+  },
+  {
+   "name": "Temporary reviewers",
+   "description": "Add reviewers to clear every overdue file faster.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Risk-ordered queue",
+  "rationale": "It removes the highest risk first without new hires; the reporting officer decides any restriction on overdue accounts."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Move high-risk overdue files to the front of the queue."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Report overdue high-risk files to the reporting officer each week."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Review with the reporting officer whether temporary reviewers are still needed."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Overdue high-risk files",
+   "target": "Falling every week"
+  },
+  {
+   "name": "Overdue files in total",
+   "target": "Falling each month"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "A high-risk customer moves money while overdue.",
+   "mitigation": "Flag overdue high-risk accounts for transaction monitoring."
+  },
+  {
+   "risk": "Lower-risk files fall further behind.",
+   "mitigation": "Keep a share of each week for the oldest files."
+  }
+ ],
+ "work": [
+  {
+   "kind": "register",
+   "title": "Overdue KYC refresh register",
+   "rows": [
+    {
+     "item": "High-risk customers overdue: [F3] files.",
+     "rating": "high",
+     "owner": "Head of KYC",
+     "status": "open",
+     "action": "Refresh these first and refer any restriction to the reporting officer."
+    },
+    {
+     "item": "Overdue files in total: [F2], [F5] of this year's.",
+     "rating": "medium",
+     "owner": "KYC team lead",
+     "status": "in progress",
+     "action": "Work the rest of the queue by due date."
+    },
+    {
+     "item": "Overdue files equal [F6] of today's capacity, before new files fall due.",
+     "rating": "medium",
+     "owner": "Compliance manager",
+     "status": "open",
+     "action": "Ask the committee whether temporary reviewers are needed."
+    }
+   ]
+  },
+  {
+   "kind": "case_file",
+   "subject": "Overdue high-risk customer files",
+   "facts": [
+    "[F3] high-risk customer files are past their refresh date.",
+    "They are [F7] of the [F2] overdue files.",
+    "The team completes about [F4] refreshes a month."
+   ],
+   "evidence": [
+    "The client's count of overdue files by risk rating.",
+    "The client's monthly completion count."
+   ],
+   "open_questions": [
+    "Have any overdue high-risk customers had unusual activity since their due date?"
+   ],
+   "for_decision": "Should the money laundering reporting officer approve the risk-ordered queue and decide whether to restrict activity on overdue high-risk accounts?"
+  }
+ ]
+}

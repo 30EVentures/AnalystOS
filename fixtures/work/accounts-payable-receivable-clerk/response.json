@@ -1,0 +1,276 @@
+{
+ "answer": "Post the missing invoice and credit note for the controller's approval and ask the supplier to confirm our payment: together they explain the whole [F6] gap.",
+ "exec_summary": [
+  "The supplier's statement shows [F1] against our ledger's [F2], a gap of [F6].",
+  "Our payment of [F4] is not on their statement yet, which leaves their side at [F7].",
+  "An unentered invoice of [F3] and an unrecorded credit note of [F5] bring our ledger to [F9], so nothing is left unexplained."
+ ],
+ "situation": "A business reconciling its account with its main packaging supplier at month end.",
+ "complication": "The supplier's statement and our ledger disagree, so the payable balance cannot be closed.",
+ "key_question": "What explains the gap between the supplier's statement and our ledger, and what should be posted?",
+ "titles": {
+  "situation": "The supplier's statement and our ledger disagree.",
+  "options": "Two ways to close the supplier account this month.",
+  "recommendation": "Post the missing items for approval and confirm the payment with the supplier.",
+  "roadmap": "Close this month, then stop the same items slipping again.",
+  "kpis": "Two measures show the account stays reconciled.",
+  "risks": "The main risk is posting an item the supplier later disputes."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Supplier statement balance",
+   "value": 52900,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "their month-end statement says we owe $52,900"
+  },
+  {
+   "id": "F2",
+   "label": "Ledger balance owed to the supplier",
+   "value": 44700,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Our ledger shows $44,700"
+  },
+  {
+   "id": "F3",
+   "label": "Invoice not yet entered in our ledger",
+   "value": 7400,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "An invoice for $7,400"
+  },
+  {
+   "id": "F4",
+   "label": "Our payment not yet on their statement",
+   "value": 2600,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "We sent a payment of $2,600"
+  },
+  {
+   "id": "F5",
+   "label": "Credit note not yet recorded",
+   "value": 1800,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "a credit note for $1,800"
+  },
+  {
+   "id": "F6",
+   "label": "Gap before reconciling",
+   "value": 8200,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Supplier balance after our payment",
+   "value": 50300,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F4"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Ledger balance with the missing invoice",
+   "value": 52100,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "sum",
+   "inputs": [
+    "F2",
+    "F3"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Adjusted ledger balance",
+   "value": 50300,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F8",
+    "F5"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Remaining difference",
+   "value": 0,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F7",
+    "F9"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Items on their side only",
+   "finding": "Our latest payment has not reached their statement.",
+   "points": [
+    "Taking our payment of [F4] off their balance leaves [F7]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The supplier has lost our payment.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Ask the supplier to confirm the payment rather than paying again.",
+   "chart": {
+    "title": "Their balance and ours before reconciling.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "Supplier",
+     "Ledger"
+    ]
+   }
+  },
+  {
+   "branch": "Items on our side only",
+   "finding": "We have not entered one invoice or one credit note.",
+   "points": [
+    "The missing invoice adds [F3] to what we owe.",
+    "The missing credit note takes [F5] off it, leaving [F9]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The gap comes from a pricing dispute.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "Once both are posted the balances agree with [F10] left over."
+  }
+ ],
+ "options": [
+  {
+   "name": "Post and confirm",
+   "description": "Post the invoice and credit note for approval and ask the supplier to confirm our payment.",
+   "effort": "low"
+  },
+  {
+   "name": "Wait for next statement",
+   "description": "Leave the gap open and check again when the next statement arrives.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Post and confirm",
+  "rationale": "It explains the whole [F6] gap now and keeps the month-end close on time; nothing is posted or sent until the controller approves."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Post the invoice and credit note once the controller approves.",
+    "Send the supplier email once approved."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Match supplier statements to the ledger every month before close."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Review with the controller whether any supplier gaps remain open."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Unexplained difference on the supplier account",
+   "target": "Nothing at month end"
+  },
+  {
+   "name": "Supplier invoices entered before close",
+   "target": "All invoices received"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The supplier disputes the credit note.",
+   "mitigation": "Ask them to confirm it in the same email before posting."
+  },
+  {
+   "risk": "Our payment was sent to the wrong account.",
+   "mitigation": "Check the payment details against the supplier's bank letter."
+  }
+ ],
+ "work": [
+  {
+   "kind": "reconciliation",
+   "title": "Packaging supplier statement reconciliation",
+   "side_a": {
+    "label": "Supplier statement balance",
+    "figure_id": "F1"
+   },
+   "side_b": {
+    "label": "Ledger balance owed",
+    "figure_id": "F2"
+   },
+   "items": [
+    {
+     "label": "Our payment not yet on their statement",
+     "figure_id": "F4",
+     "effect": "subtract_from_a"
+    },
+    {
+     "label": "Invoice not yet entered",
+     "figure_id": "F3",
+     "effect": "add_to_b"
+    },
+    {
+     "label": "Credit note not yet recorded",
+     "figure_id": "F5",
+     "effect": "subtract_from_b"
+    }
+   ],
+   "entries": [
+    {
+     "debit": "Packaging costs",
+     "credit": "Accounts payable",
+     "figure_id": "F3",
+     "memo": "Enter the supplier invoice of [F3] shown on their statement; for the controller's approval."
+    },
+    {
+     "debit": "Accounts payable",
+     "credit": "Packaging costs",
+     "figure_id": "F5",
+     "memo": "Record the supplier's credit note of [F5]; for the controller's approval."
+    }
+   ]
+  },
+  {
+   "kind": "draft",
+   "title": "Email to the supplier's accounts team",
+   "for": "The supplier's accounts team, email for the controller to approve before sending",
+   "body": [
+    "Hello, we are reconciling our account with you for month end.",
+    "Your statement shows [F1]. We sent a payment of [F4] on the last day of the month that is not on your statement yet; could you confirm it has reached you?",
+    "Could you also send a copy of the invoice for [F3] and confirm the credit note for [F5], so we can enter both?",
+    "Thank you, the accounts payable team."
+   ]
+  }
+ ]
+}

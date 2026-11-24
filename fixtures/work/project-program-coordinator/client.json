@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 127 worked example). Not a real company.",
+ "roles": [
+  "project-program-coordinator"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We are moving 120 staff to a new office next quarter and the budget is $180,000.",
+ "answers": {
+  "common.decision": "Which quotes to accept and the move plan; the office manager approves.",
+  "common.deadline": "Next quarter.",
+  "common.audience": "The office manager.",
+  "common.materials": "Quotes so far total $153,000. 30 staff need new desks set up before the move.",
+  "sales-customer-coordination.targets": "The movers, the furniture supplier and every team moving.",
+  "sales-customer-coordination.approver": "The office manager approves quotes and staff messages."
+ }
+}

@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 127 worked example). Not a real company.",
+ "roles": [
+  "operational-risk-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We had 18 operational loss events last quarter totalling $412,000, up from 11 the quarter before.",
+ "answers": {
+  "common.decision": "What the risk committee should prioritise; the committee decides.",
+  "common.deadline": "The next risk committee.",
+  "common.audience": "The risk committee.",
+  "common.materials": "Manual payment errors caused 7 of the events and $247,200 of the losses. Our risk appetite for operational losses is $300,000 a quarter.",
+  "risk-audit-controls.framework": "Our operational risk framework and loss event policy.",
+  "risk-audit-controls.scope": "All operational loss events recorded last quarter."
+ }
+}

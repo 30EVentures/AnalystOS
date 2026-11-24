@@ -2,6 +2,24 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-24 — Slice 127: a realistic example for every work kind
+
+Slice 126 tested all 40 work-owing roles with synthetic work; 11 (family, kind)
+pairs still had no realistic example. Written now for 10 roles, each with its
+own synthetic client in `fixtures/work/<role id>/`, so the examples read like the
+role's real output: a supplier statement reconciliation and supplier email, a
+custodian cash break, a loss-event register, a phishing case file, an overdue
+KYC register and case file, a renewal register and non-renewal notice, a VPN
+incident case file and staff message, an office move plan, a critical supplier
+register and a regulatory change register. Writing them through the real
+verifier caught wording the model could also produce ("a quarter of",
+"close to a third", two numbers in one quote, three-word chart titles), so the
+examples are proof the rules allow good work, not just that they refuse bad
+work. A coverage test now fails if any (family, kind) pair loses its example.
+These 10 roles' catalog entries now name their own example ("mock") rather
+than the family's ("mock-family"): 23 own, 50 family. Still no live-model
+work product; that is a paid run for the owner to approve.
+
 ## 2026-11-23 — Slice 111: the homepage's test figure says what it counts
 
 A fresh-context review of Slice 108 found two wrong figures on the homepage.

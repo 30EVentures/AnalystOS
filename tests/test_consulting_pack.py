@@ -318,7 +318,8 @@ class VerifyRefusesTest(unittest.TestCase):
         self.assertEqual(c.number_problems("t", "Since 2015 churn has risen.", figures, {"2015"}), [])
         self.assertTrue(c.number_problems("t", "Since 2015 churn has risen.", figures, set()))
         # Recent years after a time word, and bare whole numbers up to twelve, need no tag ...
-        self.assertEqual(c.number_problems("t", "Hire 2 analysts in 2026.", figures), [])
+        self.assertEqual(c.number_problems("t", "Hire two analysts in 2026.", figures), [])
+        self.assertTrue(c.number_problems("t", "Hire 2 analysts in 2026.", figures))  # digits: Slice 120
         # ... but not with a unit, scale or currency beside them.
         for text in ("Churn rose 3 points.", "Grow 5% now.", "Save 2 million.", "A 3x return.", "Up 4 percent.",
                      "Spend 9 dollars.", "Hire 20 people."):

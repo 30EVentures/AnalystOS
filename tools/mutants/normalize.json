@@ -2,10 +2,20 @@
  {"name": "strip a number even when it does not state its figure", "old": "            if tokens and states(tokens[-1], figure):", "new": "            if tokens:"},
  {"name": "kind ignored when deciding a number states its figure", "old": "    if token.kind not in _KIND_FOR_UNIT.get(figure.get(\"unit\"), set()):\n        return False", "new": "    if False:\n        return False"},
  {"name": "5% gap ignored", "old": "    return token.value == 0 if fv == 0 else abs(token.value - fv) / abs(fv) <= 0.05", "new": "    return True"},
- {"name": "ambiguous quote narrowed anyway", "old": "    if len(candidates) != 1:\n        return None, None", "new": "    if not candidates:\n        return None, None"},
- {"name": "computed value trusted", "old": "                            fig[\"value\"] = result", "new": "                            pass"},
  {"name": "unexpected figure fields kept", "old": "                    if key not in _FIGURE_KEYS[basis]:\n                        del fig[key]", "new": "                    if False:\n                        del fig[key]"},
  {"name": "unused figures kept", "old": "        doc[\"figures\"] = _drop_unused(doc)", "new": "        pass"},
  {"name": "charted figures dropped as unused", "old": "            used.update(x for x in chart[\"figure_ids\"] if isinstance(x, str))", "new": "            pass"},
- {"name": "durations left as digits", "old": "            return _durations(strip_redundant_numbers(value, figure_map))", "new": "            return strip_redundant_numbers(value, figure_map)"}
+ {"name": "a quote matched regardless of unit (the PR #100 gap)", "old": "    return unit not in _UNITS or unit in _UNITS_FOR_KIND.get(token.kind, set())", "new": "    return True"},
+ {"name": "nested unknown fields kept", "old": "                doc[key] = _drop_unknown(doc[key], schema[\"properties\"][key])", "new": "                pass"},
+ {"name": "option name not matched", "old": "    if len(inside) == 1:\n        rec[\"option\"] = inside[0]", "new": "    if False:\n        rec[\"option\"] = inside[0]"},
+ {"name": "ambiguous option name matched", "old": "    if len(inside) == 1:", "new": "    if inside:"},
+ {"name": "a restating parenthetical kept", "old": "                    pos = paren.end()", "new": "                    pass"},
+ {"name": "a parenthetical removed though it does not state the figure", "old": "                        inner[0], figure):\n                    pos = paren.end()", "new": "                        inner[0], figure) or True:\n                    pos = paren.end()"},
+ {"name": "an option matched without its label (inversion)", "old": "    inside = [n for n in names if n.strip().lower() == bare]", "new": "    inside = [n for n in names if n.strip().lower() in said]"},
+ {"name": "unit aliases ignored", "old": "                fig[\"unit\"] = _UNIT_ALIASES[fig[\"unit\"].strip().lower()]", "new": "                pass"},
+ {"name": "an unknown unit replaced from the quote", "old": "                    if fig.get(\"unit\") is None:  # filled only when absent; never overridden", "new": "                    if fig.get(\"unit\") not in _UNITS:"},
+ {"name": "a two-number quote matched (cutting back)", "old": "    if len(every) != 1 or every[0].value is None:", "new": "    if not every or every[0].value is None:"},
+ {"name": "x100 match for any unit", "old": "    if unit == \"percent\" and token.kind == \"percent\":", "new": "    if True:"},
+ {"name": "a value filled or matched in another unit (fifth review)", "old": "    if target is None or not _fits(token, unit):", "new": "    if target is None:"},
+ {"name": "months after a tag kept", "old": "    \"months\": re.compile(r\"\\s*months?\\b\", re.IGNORECASE),\n", "new": ""}
 ]

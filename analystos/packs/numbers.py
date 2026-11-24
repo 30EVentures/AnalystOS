@@ -39,14 +39,21 @@ _YEAR_RE = re.compile(r"\b(?:in|since|during|until|before|after|through|Q[1-4]|H
 # Digits: \d is Unicode-aware, and float() reads any Unicode decimal digit.
 _DIGIT_RE = re.compile(
     r"(?P<cur>\$)?(?P<num>\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?|\.\d+)"
-    r"(?:\s?(?P<suf>%|percent\b|per cent\b|percentage points?\b|pp\b|points?\b|pts\b"
-    r"|bn\b|billion\b|million\b|thousand\b|[kKmMB]\b|x\b))?"
+    r"(?:(?:\s?|-(?=(?i:bn|billions?|millions?|thousands?|trillions?|mm|mn|mln|mio|mill?)\b))"
+    r"(?P<suf>%|percent\b|per cent\b|percentage points?\b|pp\b|points?\b|pts\b"
+    r"|(?i:bn|billions?|millions?|thousands?|trillions?|mm|mn|mln|mio|mill?|crores?|lakhs?)\b"
+    r"|[kKmMB]\b|x\b))?"
 )
-_SCALE = {"k": 1e3, "K": 1e3, "thousand": 1e3, "m": 1e6, "M": 1e6, "million": 1e6,
-          "B": 1e9, "bn": 1e9, "billion": 1e9}
+_SCALE = {"k": 1e3, "K": 1e3, "thousand": 1e3, "m": 1e6, "M": 1e6, "million": 1e6, "mm": 1e6, "mn": 1e6,
+          "mln": 1e6, "mio": 1e6, "B": 1e9, "bn": 1e9, "billion": 1e9, "trillion": 1e12, "lakh": 1e5,
+          "lakhs": 1e5, "crore": 1e7, "crores": 1e7, "millions": 1e6, "billions": 1e9, "thousands": 1e3,
+          "trillions": 1e12, "mil": 1e6, "mill": 1e6}  # word scales in any case (Slice 120): "Million", "MM"
 _KIND = {"%": "percent", "percent": "percent", "per cent": "percent", "pp": "points", "point": "points",
          "points": "points", "pts": "points", "percentage point": "points", "percentage points": "points",
          "x": "ratio"}
+
+_SPELLED_SCALES = {"thousand", "thousands", "million", "millions", "billion", "billions", "trillion", "trillions",
+                   "crore", "crores", "lakh", "lakhs"}
 
 SMALL_WORDS = ("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
                "eleven", "twelve")
@@ -100,7 +107,7 @@ def find_numbers(text):
             dec = "." + dec
         places = len(dec) - 1 if dec else 0
         suf = m.group("suf")
-        scale = _SCALE.get(suf, 1.0) if suf else 1.0
+        scale = (_SCALE.get(suf) or _SCALE.get(suf.lower(), 1.0)) if suf else 1.0
         try:
             value = float((raw.replace(",", "") or "0") + dec) * scale
         except ValueError:
@@ -110,6 +117,10 @@ def find_numbers(text):
         before2 = masked[start - 2] if start > 1 else " "
         if before and before in "-−" and not before2.isalnum() and value is not None:
             value, start = -value, start - 1
+        if suf and suf.lower() in _SPELLED_SCALES and re.match(r"\s*[-\u2010\u2011\u2013]\s*[^\W\d_]", masked[end:]):
+            # "12 million-dollar contracts" (12) or "$3 billion-plus" (3e9)? A spelled-out scale joined to the next
+            # word is ambiguous: no value, so a quote holding it is refused rather than read either way.
+            value = None
         kind = _KIND.get(suf.lower() if suf and suf not in ("M", "B", "K") else suf) if suf else None
         if m.group("cur"):
             kind = "usd"

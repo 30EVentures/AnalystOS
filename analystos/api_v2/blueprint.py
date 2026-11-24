@@ -68,8 +68,9 @@ def catalog():
     return jsonify({
         "format": "analystos-v2-catalog/1",
         "pricing": "Price: to be determined. No price has been set for any role, and nothing is charged through this API.",
-        "testing": "tested = 'mock': checked on worked examples in development, with no model call; "
-                   "'live': checked with the production model.",
+        "testing": "tested = 'mock': checked on a worked example written for this role, in development, with no "
+                   "model call; 'mock-family': checked the same way on a worked example written for another role "
+                   "in the same family; 'live': checked with the production model.",
         "families": [{"id": f["id"], "title": f["title"], "skill": f["skill"]} for f in cat["families"]],
         "roles": roles,
     })

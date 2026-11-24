@@ -131,3 +131,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 117 | every role on the verified pipeline, each family with a worked example | [spec](slice-117/spec.md) |
 | 118 | the website: hire any of the 73 roles | [spec](slice-118/spec.md) |
 | 119 | survive the live model's natural writing (first paid test failed) | [spec](slice-119/spec.md) |
+| 120 | close the release review of PR #100 before the second paid test | [spec](slice-120/spec.md) |

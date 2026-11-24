@@ -24,6 +24,39 @@ No generator owned the hero's spec figure. It had been typed by hand and was
 frozen since about Slice 49. It now has its own `site_counts.py` pattern,
 generated from the same `count_specs()` as the evidence card.
 
+## 2026-11-23 — Slice 120: the release review of PR #100 failed it; close it before the second paid test
+
+The owner merged PR #100 (Slice 119) before its fresh-context release review
+finished, and the review then failed it: six ways the normaliser could make a
+wrong deck pass (narrowing cut "a third of" off "420 seats"; "$12.2" quoted out
+of "$12.2 Million" printed as $12.20; recomputing hid reversed inputs; unit
+matching ignored the kind of number; bare digits 0-12 beside tags; "90 days"
+rewritten anywhere). Slice 119's entry below and its PR said the normaliser
+"cannot change the delivered numbers" and that normalising "never makes a wrong
+number acceptable": both were false, because its own tests covered only friendly
+cases. Fixed in Slice 120 (see specs/slice-120). A second fresh review of the fix
+failed it again on two partly closed blockers (a quote cut across "40% of our
+850", written in digits; "$12.2-million" and "$12.2 millions") and one new hole
+("of" taken as a time word), and those are fixed too. What the normaliser now
+does to numbers, stated exactly: it never fills or recomputes a computed
+figure's value; it never cuts or changes a client quote, and never rescales or fills
+in a value: the one value it changes is a percent stored as a fraction (0.07
+with a quote saying "7%" becomes 7). A fifth review found the rescaling turned
+"12 million-dollar contracts" (value 12) into 12,000,000, and the sixth that the
+first fix made "$2bn-a-year" read as $2; now abbreviations always scale and a
+spelled-out scale joined to the next word is ambiguous and refused; it fills a unit only when none is given
+and maps aliases ("%", "USD"); and on a computed figure it sets the unit to the
+only one its operation allows and turns a "ratio" declared as a percent into
+percent_of_total (the value is still checked). Cutting a two-number quote down
+to one number was removed after four reviews in a row each found a phrasing
+where the cut misled ("340 out of our 850", "3 times the $1,200", "a 25% discount
+to the $1,200", "$1,200 every 3 months"): such a quote is now refused with
+guidance and fixed by the model on the repair request. The cost: slips it used to fix
+(a drifted calculation, "90 days", a missing value) now go to the one repair
+request; that path is tested only with a replayed correct second answer, so
+whether the live model fixes them is unmeasured. Lesson, again: no merge
+before the review.
+
 ## 2026-11-23 — Slice 119: survive the live model's natural writing (the first paid test failed)
 
 The one paid test of Management Consulting Analyst (owner's consent, at most

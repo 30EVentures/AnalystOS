@@ -1,10 +1,10 @@
 {
- "answer": "Flag and fix only the loans that skip the income check until the app makes it mandatory, then review past loans without one: [F3] of sampled loans had no verified income, and those loans are in arrears far more often.",
+ "answer": "Hold payout on any application without verified income until a lending team leader verifies it, until the app makes the check mandatory, then review past loans without one: [F3] of sampled loans had no verified income, and those loans are in arrears far more often.",
  "exec_summary": [
   "[F2] of [F1] sampled loans had no income verification, [F3] of the sample.",
   "[F5] of those loans are in arrears, against [F8] of loans with a check.",
   "At about [F9] loans a month, that rate means about [F10] new loans a month without a check.",
-  "Checking only those loans, rather than every loan, fits a team of two compliance staff."
+  "Holding only those applications keeps the checks with lending team leaders and leaves the two compliance staff free to review past loans."
  ],
  "situation": "An online lender whose rules and policy require verified income on every loan.",
  "complication": "Staff can skip the income check, and many sampled loans have none.",
@@ -166,17 +166,17 @@
    ],
    "hypotheses": [
     {
-     "text": "Lending team leaders can verify the flagged loans.",
+     "text": "Lending team leaders can verify the held applications.",
      "verdict": "untested"
     }
    ],
-   "so_what": "Targeting flagged loans keeps the interim fix within the team's reach."
+   "so_what": "Holding only those applications keeps the interim fix within the team's reach."
   }
  ],
  "options": [
   {
-   "name": "Flag and enforce",
-   "description": "List loans written without verified income each day for lending team leaders to verify, and make the field mandatory in the next app release.",
+   "name": "Hold and enforce",
+   "description": "List applications without verified income each day and hold payout until a lending team leader verifies income; make the field mandatory in the next app release.",
    "effort": "medium"
   },
   {
@@ -186,14 +186,14 @@
   }
  ],
  "recommendation": {
-  "option": "Flag and enforce",
+  "option": "Hold and enforce",
   "rationale": "It targets the estimated [F10] loans a month that skip the check instead of all [F9], so lending team leaders can carry it and the two compliance staff can review past loans; the head of compliance decides."
  },
  "roadmap": [
   {
    "horizon": "First 30 days",
    "actions": [
-    "Start a daily list of loans written without verified income for lending team leaders to verify.",
+    "Start a daily list of applications without verified income and hold their payout until a lending team leader verifies income.",
     "Present the findings to the board risk committee within the six weeks."
    ]
   },
@@ -240,7 +240,7 @@
      "rating": "high",
      "owner": "Head of lending operations",
      "status": "open",
-     "action": "Send a daily list of loans without verified income to lending team leaders to verify."
+     "action": "Hold payout on applications without verified income until a lending team leader verifies it."
     },
     {
      "item": "Loans without a check: [F5] in arrears against [F8] with a check.",

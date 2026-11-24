@@ -175,6 +175,22 @@ class DistinctTest(unittest.TestCase):
         dirs = list(EXAMPLES) + [d for d in (ROOT / "fixtures" / "roles").iterdir() if d.is_dir()]
         return dirs + [ROOT / "fixtures" / "consulting" / "churn-clinics"]
 
+    def test_no_sentence_prints_two_different_values_the_same(self):
+        # Slice 129 re-review: "moves from [F8] to [F9]" printed "from 20 to 20" (19.95 rounded).
+        from analystos.l4 import deck
+        tag = re.compile(r"\[(F[1-9][0-9]{0,2})\]")
+        for directory in self.all_examples():
+            _, response = load(directory)
+            figures = {f["id"]: f for f in response["figures"]}
+            texts = [t for _, t in c._texts(response)] + [t for _, t in work.work_texts(response.get("work"))]
+            for text in texts:
+                ids = list(dict.fromkeys(tag.findall(text or "")))
+                for i, a in enumerate(ids):
+                    for b in ids[i + 1:]:
+                        if figures[a]["value"] != figures[b]["value"]:
+                            with self.subTest(example=directory.name, text=text):
+                                self.assertNotEqual(deck.format_value(figures[a]), deck.format_value(figures[b]))
+
     def test_every_client_problem_and_answer_is_different(self):
         problems, answers, questions = set(), set(), set()
         for directory in self.all_examples():
@@ -223,11 +239,29 @@ class SignWordTest(unittest.TestCase):
         problems = c.verify_content(c._normalize(response), "", None)
         self.assertTrue(any("double negative" in p for p in problems), problems)
 
+    def test_the_verifier_runs_it_on_work_text_too(self):
+        directory = ROOT / "fixtures" / "work" / "customer-success-associate"
+        _, response = load(directory)
+        response["work"][0]["body"][0] = "Active users fell [F1] since the last review."
+        response["figures"] = [{"id": "F1", "label": "x", "value": -40, "unit": "percent", "basis": "assumption",
+                                "rationale": "a test value"}] + [f for f in response["figures"] if f["id"] != "F1"]
+        problems = c.verify_content(c._normalize(response), "", None)
+        self.assertTrue(any(p.startswith("work[0]") and "double negative" in p for p in problems), problems)
+
     def test_one_point_is_singular(self):
         from analystos.l4 import deck
         self.assertEqual(deck.format_value({"value": 1, "unit": "points"}), "1 pt")
         self.assertEqual(deck.format_value({"value": -1, "unit": "points"}), "-1 pt")
         self.assertEqual(deck.format_value({"value": 2, "unit": "points"}), "2 pts")
+        self.assertEqual(deck.format_value({"value": 1.04, "unit": "points"}), "1 pt")  # chosen on the printed text
+        self.assertEqual(deck.format_value({"value": 1.5, "unit": "points"}), "1.5 pts")
+        from analystos.l4 import workbook
+        self.assertTrue(workbook.NUMBER_FORMATS["points"].startswith('[=1]0" pt"'))
+
+    def test_dollars_per_item_may_be_dollars(self):
+        self.assertIn("usd", c.derived_units("ratio", ["usd", "count"]))
+        self.assertNotIn("usd", c.derived_units("ratio", ["usd", "usd"]))
+        self.assertNotIn("usd", c.derived_units("ratio", ["count", "usd"]))
 
 
 class CoverageTest(unittest.TestCase):

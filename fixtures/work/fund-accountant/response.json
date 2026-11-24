@@ -84,9 +84,9 @@
   },
   {
    "id": "F8",
-   "label": "Draft value per share in dollars",
+   "label": "Draft value per share",
    "value": 20,
-   "unit": "other",
+   "unit": "usd",
    "basis": "computed",
    "operation": "ratio",
    "inputs": [
@@ -96,9 +96,9 @@
   },
   {
    "id": "F9",
-   "label": "Corrected value per share in dollars",
+   "label": "Corrected value per share",
    "value": 19.95,
-   "unit": "other",
+   "unit": "usd",
    "basis": "computed",
    "operation": "ratio",
    "inputs": [

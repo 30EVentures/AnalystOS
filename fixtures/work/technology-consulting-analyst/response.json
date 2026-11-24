@@ -1,5 +1,5 @@
 {
- "answer": "Recommend the cloud suite: over the comparison period it costs about [F7] against [F1] for new servers, both fit the [F9] budget, and it ends hand patching, which may be behind last year's outages but is untested.",
+ "answer": "Recommend the cloud suite: over the comparison period it costs about [F7] against [F1] for new servers, both fit the [F9] budget, and it ends hand patching; whether hand patching caused last year's outages is untested.",
  "exec_summary": [
   "New servers with support cost [F1].",
   "The cloud suite costs [F5] over [F4] plus a [F6] migration, about [F7] in all.",
@@ -158,7 +158,7 @@
      "verdict": "supported"
     }
    ],
-   "so_what": "The cloud better meets the firm's own success measures."
+   "so_what": "The cloud ends hand patching; whether that cuts outages is untested."
   }
  ],
  "options": [

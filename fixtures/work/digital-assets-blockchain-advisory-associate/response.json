@@ -1,5 +1,5 @@
 {
- "answer": "Do not switch supplier payments yet: the saving is real per payment, but only suppliers receiving [F9] a year accept stablecoins, so the reachable saving is about [F10] a year against wire costs of [F3].",
+ "answer": "Do not switch supplier payments yet: the provider's quote is lower per payment, but only suppliers receiving [F9] a year accept stablecoins, so the reachable saving is about [F10] a year against wire costs of [F3].",
  "exec_summary": [
   "Wires cost about [F2] of [F1], about [F3] a year.",
   "The provider quotes [F4], a gap of [F5].",

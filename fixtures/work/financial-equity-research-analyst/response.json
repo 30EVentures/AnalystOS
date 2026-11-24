@@ -1,9 +1,9 @@
 {
- "answer": "The company is growing but earning less on each sale and carries net debt of [F10] times operating profit: revenue rose [F5] while the operating margin fell to [F7]. It merits a full review before the registered analyst sets any rating or price target.",
+ "answer": "The company is growing but earning less on each sale and carries net debt of [F10] operating profit: revenue rose [F5] while the operating margin fell to [F7]. It merits a full review before the registered analyst sets any rating or price target.",
  "exec_summary": [
   "Revenue grew [F5] to [F2].",
   "Operating profit fell to [F4], so the operating margin dropped from [F6] to [F7], a change of [F8].",
-  "Net debt of [F9] is [F10] times operating profit.",
+  "Net debt of [F9] is [F10] operating profit.",
   "Any rating or price target stays with the registered research analyst."
  ],
  "situation": "A listed appliance maker whose latest annual report shows higher sales and lower profit.",
@@ -134,7 +134,7 @@
      "verdict": "untested"
     },
     {
-     "text": "Margin fell while revenue grew.",
+     "text": "Costs grew faster than revenue.",
      "verdict": "supported"
     }
    ],

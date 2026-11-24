@@ -1,5 +1,5 @@
 {
- "answer": "The book ran at a loss ratio of [F8] against a priced [F3], costing [F12]; both more claims and larger claims drove it, so prepare a rate review for the appointed actuary to decide.",
+ "answer": "The book ran at a loss ratio of [F8] against a priced [F3], costing [F12]; the number of claims and the average claim both rose, so prepare a rate review for the appointed actuary to decide.",
  "exec_summary": [
   "Claims of [F1] on premium of [F2] give a loss ratio of [F8].",
   "That is [F9] above the priced target, about [F12] of extra claims.",
@@ -163,7 +163,7 @@
   },
   {
    "branch": "What drove the claims",
-   "finding": "Both claim frequency and claim size rose.",
+   "finding": "The number of claims and the average claim both rose.",
    "points": [
     "Claim counts rose by [F10], from [F4] to [F5].",
     "The average claim rose by [F11], from [F6] to [F7]."
@@ -175,6 +175,10 @@
     },
     {
      "text": "Higher vet fees explain the larger claims.",
+     "verdict": "untested"
+    },
+    {
+     "text": "Part of the rise in claim count is growth in policies rather than higher frequency.",
      "verdict": "untested"
     }
    ],
@@ -206,7 +210,7 @@
  ],
  "recommendation": {
   "option": "Prepare a rate review",
-  "rationale": "The book ran [F9] above its priced loss ratio, about [F12] of claims, and both drivers rose; the appointed actuary decides any rate change before filings are due."
+  "rationale": "The book ran [F9] above its priced loss ratio, about [F12] of claims, and both the number of claims and the average claim rose; the appointed actuary decides any rate change before filings are due."
  },
  "roadmap": [
   {

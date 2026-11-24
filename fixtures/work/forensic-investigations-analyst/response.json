@@ -1,5 +1,5 @@
 {
- "answer": "Preserve the records and put the file to the general counsel: [F2] went to a supplier sharing an employee's bank account, [F7] of the category's spend.",
+ "answer": "Propose a preservation list and put the file to the general counsel: [F2] went to a supplier sharing an employee's bank account, [F7] of the category's spend.",
  "exec_summary": [
   "Internal audit found [F1] payments totalling [F2] to the supplier.",
   "The supplier's bank account matches an employee's.",
@@ -12,7 +12,7 @@
  "titles": {
   "situation": "Supplier payments went to an account matching an employee's.",
   "options": "Two ways to take the matter forward.",
-  "recommendation": "Preserve the records and put the file to counsel.",
+  "recommendation": "Propose what to preserve and put the file to counsel.",
   "roadmap": "Secure the evidence first, then close the control gap.",
   "kpis": "Two measures show the matter is handled properly.",
   "risks": "The main risk is losing evidence before a decision."
@@ -145,8 +145,8 @@
  ],
  "options": [
   {
-   "name": "Preserve and refer",
-   "description": "Preserve records and access logs and put the file to the general counsel.",
+   "name": "Propose preservation and refer",
+   "description": "Propose a list of records and access logs to preserve and put the file to the general counsel.",
    "effort": "low"
   },
   {
@@ -156,14 +156,14 @@
   }
  ],
  "recommendation": {
-  "option": "Preserve and refer",
+  "option": "Propose preservation and refer",
   "rationale": "It secures the evidence behind [F2] of payments before anyone is alerted; the general counsel decides any next step and any conclusion about individuals."
  },
  "roadmap": [
   {
    "horizon": "First 30 days",
    "actions": [
-    "Preserve payment, invoice and supplier set-up records.",
+    "Propose to the general counsel which payment, invoice and supplier set-up records to preserve.",
     "Put the file to the general counsel."
    ]
   },
@@ -182,7 +182,7 @@
  ],
  "kpis": [
   {
-   "name": "Records preserved before any interview",
+   "name": "Preservation list with counsel before any interview",
    "target": "All of them"
   },
   {
@@ -193,7 +193,7 @@
  "risks": [
   {
    "risk": "Evidence is changed or deleted.",
-   "mitigation": "Preserve records and logs before anyone is told."
+   "mitigation": "Ask counsel to decide on preservation before anyone is told."
   },
   {
    "risk": "A person is named before the facts are confirmed.",

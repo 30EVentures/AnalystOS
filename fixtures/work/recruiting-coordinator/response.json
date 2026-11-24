@@ -9,7 +9,7 @@
  "complication": "Screened candidates outnumber the panels the free manager hours allow, and some booked candidates do not attend.",
  "key_question": "How should the panel interviews be scheduled so every screened candidate is seen in time?",
  "titles": {
-  "situation": "Screened candidates outnumber free interview hours.",
+  "situation": "Screened candidates outnumber the panels the free hours allow.",
   "options": "Two ways to fit the interviews in.",
   "recommendation": "Add panel hours and confirm every booking with a reminder.",
   "roadmap": "Book interviews, run them, then report attendance.",
@@ -162,7 +162,7 @@
  ],
  "recommendation": {
   "option": "More hours and reminders",
-  "rationale": "It gives all [F2] candidates a slot and protects panel time from no-shows; the manager approves every booking and message and decides who is hired."
+  "rationale": "Once enough panel hours are approved it gives all [F2] candidates a slot and protects panel time from no-shows; the manager approves every booking and message and decides who is hired."
  },
  "roadmap": [
   {

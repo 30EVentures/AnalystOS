@@ -1,5 +1,5 @@
 {
- "answer": "Churn is the likely lever, to be confirmed: it took [F4], equal to [F10] of new revenue won and more than the [F9] shortfall, but splitting the miss between acquisition and churn needs the plan's own assumptions for each.",
+ "answer": "Net new revenue was [F8] against a plan of [F5], a shortfall of [F9]; churn took [F4], or [F10] of new revenue won. Which side missed needs the plan's own assumptions for gross new revenue and churn.",
  "exec_summary": [
   "New customers added [F7] of annual recurring revenue.",
   "Churn took away [F4], leaving net new revenue of [F8] against a plan of [F5], a shortfall of [F9].",
@@ -11,7 +11,7 @@
  "titles": {
   "situation": "Net new recurring revenue missed plan last year.",
   "options": "Three ways to close the gap to plan next year.",
-  "recommendation": "Confirm the split against the plan, then likely focus on churn.",
+  "recommendation": "Confirm the split against the plan before shifting effort.",
   "roadmap": "Get the plan's assumptions first, then size churn before the plan is due.",
   "kpis": "Two measures show whether the leak is closing.",
   "risks": "The main risk is cutting acquisition while fixing churn."
@@ -151,7 +151,7 @@
      "verdict": "untested"
     }
    ],
-   "so_what": "Churn is the likely lever, to be confirmed against the plan's churn assumption.",
+   "so_what": "Churn's share of the miss is confirmed only against the plan's churn assumption.",
    "chart": {
     "title": "Churn took a large share of the new revenue won.",
     "figure_ids": [
@@ -186,7 +186,7 @@
  ],
  "recommendation": {
   "option": "Confirm the split, then retention",
-  "rationale": "Churn of [F4] is larger than the whole [F9] shortfall, so it is the likely lever, but the plan's own assumptions must confirm which side missed before effort shifts; the chief revenue officer decides."
+  "rationale": "Which side missed cannot be known until the plan's own assumptions for gross new revenue and churn are in hand; splitting the [F9] shortfall comes before any shift in effort, and the chief revenue officer decides."
  },
  "roadmap": [
   {
@@ -199,7 +199,7 @@
   {
    "horizon": "Days 31-60",
    "actions": [
-    "Agree a retention target with the customer success lead."
+    "If the split shows churn missed, agree a retention target with the customer success lead."
    ]
   },
   {

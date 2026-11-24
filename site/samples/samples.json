@@ -5191,7 +5191,7 @@
        "ref": "F12"
       },
       {
-       "t": "; both more claims and larger claims drove it, so prepare a rate review for the appointed actuary to decide."
+       "t": "; the number of claims and the average claim both rose, so prepare a rate review for the appointed actuary to decide."
       }
      ],
      "bullets": [
@@ -5390,7 +5390,7 @@
         "ref": "F12"
        },
        {
-        "t": " of claims, and both drivers rose; the appointed actuary decides any rate change before filings are due."
+        "t": " of claims, and both the number of claims and the average claim rose; the appointed actuary decides any rate change before filings are due."
        }
       ]
      ]
@@ -6289,7 +6289,7 @@
       {
        "v": "$256,000",
        "ref": "F14",
-       "label": "Cost of turnover above the company rate",
+       "label": "Cost of leavers in excess of the company rate",
        "basis": "calculated"
       },
       {
@@ -7448,7 +7448,7 @@
         "ref": "F11"
        },
        {
-        "t": " to spare; an NPV at the hurdle rate, once asset lives are known, should confirm the choice before the CFO decides."
+        "t": " to spare; an NPV at the hurdle rate, once asset lives are known, will test the choice before the CFO decides."
        }
       ]
      ]
@@ -8546,7 +8546,7 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Measure every promotion against held-back stores using loyalty-card data: it covers "
+       "t": "Measure each major promotion against held-back stores using loyalty-card data: it covers "
       },
       {
        "v": "65%",
@@ -8599,7 +8599,7 @@
         "ref": "F4"
        },
        {
-        "t": " of sales, enough to measure most promotions."
+        "t": " of sales, which may be enough to measure major promotions."
        }
       ],
       [
@@ -9178,7 +9178,7 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Do not switch supplier payments yet: the saving is real per payment, but only suppliers receiving "
+       "t": "Do not switch supplier payments yet: the provider's quote is lower per payment, but only suppliers receiving "
       },
       {
        "v": "$1,500,000",
@@ -9683,14 +9683,14 @@
       ],
       [
        {
-        "t": "It lifts measured emissions above the framework's "
+        "t": "It would lift measured emissions above the framework's "
        },
        {
         "v": "95%",
         "ref": "F8"
        },
        {
-        "t": " and is achievable before the report is due; the finance director signs off."
+        "t": " if the missing data can be collected before the report is due; the finance director signs off."
        }
       ]
      ]
@@ -10831,7 +10831,7 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Preserve the records and put the file to the general counsel: "
+       "t": "Propose a preservation list and put the file to the general counsel: "
       },
       {
        "v": "$312,000",
@@ -10973,13 +10973,13 @@
      "heading": "The recommendation",
      "title": [
       {
-       "t": "Preserve the records and put the file to counsel."
+       "t": "Propose what to preserve and put the file to counsel."
       }
      ],
      "bullets": [
       [
        {
-        "t": "Recommended: Preserve and refer"
+        "t": "Recommended: Propose preservation and refer"
        }
       ],
       [
@@ -11187,14 +11187,14 @@
        "t": " gap; correcting both for the fund controller's approval moves the value per share from "
       },
       {
-       "v": "20",
+       "v": "$20",
        "ref": "F8"
       },
       {
        "t": " to "
       },
       {
-       "v": "20",
+       "v": "$19.95",
        "ref": "F9"
       },
       {
@@ -11261,15 +11261,15 @@
        "basis": "calculated"
       },
       {
-       "v": "20",
+       "v": "$20",
        "ref": "F8",
-       "label": "Draft value per share in dollars",
+       "label": "Draft value per share",
        "basis": "calculated"
       },
       {
-       "v": "20",
+       "v": "$19.95",
        "ref": "F9",
-       "label": "Corrected value per share in dollars",
+       "label": "Corrected value per share",
        "basis": "calculated"
       }
      ]
@@ -17416,21 +17416,21 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Fix bank connection first: finishing setup lifts month-one activity from "
-      },
-      {
-       "v": "10%",
-       "ref": "F4"
-      },
-      {
-       "t": " to "
+       "t": "Confirm the quit step in event data, then likely fix bank connection: users who finish setup are active at "
       },
       {
        "v": "60%",
        "ref": "F3"
       },
       {
-       "t": ", and bank connection drives "
+       "t": " a month later against "
+      },
+      {
+       "v": "10%",
+       "ref": "F4"
+      },
+      {
+       "t": ", and bank connection is "
       },
       {
        "v": "60%",
@@ -17522,15 +17522,15 @@
      ],
      "tiles": [
       {
-       "v": "10%",
-       "ref": "F4",
-       "label": "Active after a month, did not finish setup",
-       "basis": "client data"
-      },
-      {
        "v": "60%",
        "ref": "F3",
        "label": "Active after a month, finished setup",
+       "basis": "client data"
+      },
+      {
+       "v": "10%",
+       "ref": "F4",
+       "label": "Active after a month, did not finish setup",
        "basis": "client data"
       },
       {
@@ -18342,10 +18342,10 @@
        "def test_percent_code_reduces_total():",
        "    cart = apply_discount(make_cart(10000), \"SAVE10\", today=date(2026, 1, 15))",
        "    assert cart.total_cents == 9000",
-       "def test_percent_code_rounds_half_up_to_whole_cents():",
-       "    # Expected rule, to confirm: round half a cent up. 995 less ten percent is 895.5."
+       "def test_percent_code_rounds_total_half_up_to_whole_cents():",
+       "    # Expected rule, to confirm: the discounted total is rounded, half a cent up."
       ],
-      "more": 12
+      "more": 17
      }
     },
     {
@@ -19003,7 +19003,7 @@
       ],
       [
        {
-        "t": "It gives all "
+        "t": "Once enough panel hours are approved it gives all "
        },
        {
         "v": "60",
@@ -19589,7 +19589,7 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Flag and fix only the loans that skip the income check until the app makes it mandatory, then review past loans without one: "
+       "t": "Hold payout on any application without verified income until a lending team leader verifies it, until the app makes the check mandatory, then review past loans without one: "
       },
       {
        "v": "12.5%",
@@ -19743,7 +19743,7 @@
      "bullets": [
       [
        {
-        "t": "Recommended: Flag and enforce"
+        "t": "Recommended: Hold and enforce"
        }
       ],
       [
@@ -20258,28 +20258,42 @@
      "heading": "The answer first",
      "title": [
       {
-       "t": "Churn is the likely lever, to be confirmed: it took "
+       "t": "Net new revenue was "
       },
       {
-       "v": "$1,200,000",
-       "ref": "F4"
+       "v": "$1,800,000",
+       "ref": "F8"
       },
       {
-       "t": ", equal to "
+       "t": " against a plan of "
       },
       {
-       "v": "40%",
-       "ref": "F10"
+       "v": "$2,500,000",
+       "ref": "F5"
       },
       {
-       "t": " of new revenue won and more than the "
+       "t": ", a shortfall of "
       },
       {
        "v": "$700,000",
        "ref": "F9"
       },
       {
-       "t": " shortfall, but splitting the miss between acquisition and churn needs the plan's own assumptions for each."
+       "t": "; churn took "
+      },
+      {
+       "v": "$1,200,000",
+       "ref": "F4"
+      },
+      {
+       "t": ", or "
+      },
+      {
+       "v": "40%",
+       "ref": "F10"
+      },
+      {
+       "t": " of new revenue won. Which side missed needs the plan's own assumptions for gross new revenue and churn."
       }
      ],
      "bullets": [
@@ -20336,16 +20350,16 @@
      ],
      "tiles": [
       {
-       "v": "$1,200,000",
-       "ref": "F4",
-       "label": "Recurring revenue lost to churn",
-       "basis": "client data"
+       "v": "$1,800,000",
+       "ref": "F8",
+       "label": "Net new recurring revenue",
+       "basis": "calculated"
       },
       {
-       "v": "40%",
-       "ref": "F10",
-       "label": "Churn as a share of new revenue",
-       "basis": "calculated"
+       "v": "$2,500,000",
+       "ref": "F5",
+       "label": "Plan for net new recurring revenue",
+       "basis": "client data"
       },
       {
        "v": "$700,000",
@@ -20432,7 +20446,7 @@
      "heading": "The recommendation",
      "title": [
       {
-       "t": "Confirm the split against the plan, then likely focus on churn."
+       "t": "Confirm the split against the plan before shifting effort."
       }
      ],
      "bullets": [
@@ -20443,21 +20457,14 @@
       ],
       [
        {
-        "t": "Churn of "
-       },
-       {
-        "v": "$1,200,000",
-        "ref": "F4"
-       },
-       {
-        "t": " is larger than the whole "
+        "t": "Which side missed cannot be known until the plan's own assumptions for gross new revenue and churn are in hand; splitting the "
        },
        {
         "v": "$700,000",
         "ref": "F9"
        },
        {
-        "t": " shortfall, so it is the likely lever, but the plan's own assumptions must confirm which side missed before effort shifts; the chief revenue officer decides."
+        "t": " shortfall comes before any shift in effort, and the chief revenue officer decides."
        }
       ]
      ]
@@ -21819,7 +21826,7 @@
        ],
        [
         {
-         "t": "Search ad one. Headline: Online Booking for Clinics. Second headline: Patients Book Themselves. Description: Online booking software for clinic managers. Patients choose a time online, and your team spends less time on the phone."
+         "t": "Search ad one. Headline: Online Booking for Clinics. Second headline: Patients Book Themselves. Description: Online booking software for clinic managers. Patients choose a time online. {Confirm any time-saving claim before use.}"
         }
        ],
        [
@@ -22287,7 +22294,7 @@
        "ref": "F8"
       },
       {
-       "t": " late deliveries left it late, and late deliveries cost about "
+       "t": " late deliveries left the warehouse late, and late deliveries cost about "
       },
       {
        "v": "$126,000",
@@ -22821,7 +22828,7 @@
        ],
        [
         {
-         "t": "What you need: {essential requirement one}; {essential requirement two}; {essential requirement three}; {essential requirement four}; {essential requirement five}. The hiring manager fills these in from the essentials."
+         "t": "What you need: {essential requirement one}; {essential requirement two}; {essential requirement three}; {essential requirement four}; {essential requirement five}."
         }
        ],
        [
@@ -22970,7 +22977,7 @@
        "ref": "F11"
       },
       {
-       "t": "; the outside preparer reviews these positions and signs and files the return."
+       "t": "; the finance director approves the provision, and the outside preparer reviews the return positions, signs and files."
       }
      ],
      "bullets": [
@@ -23069,7 +23076,7 @@
       {
        "v": "$37,800",
        "ref": "F10",
-       "label": "Deferred tax on the depreciation timing difference",
+       "label": "Deferred tax on the depreciation temporary difference",
        "basis": "calculated"
       }
      ]
@@ -23488,17 +23495,17 @@
        ],
        [
         {
-         "t": "If the file opens with all the data in one column, open your spreadsheet program first and use its import option, choosing comma as the separator."
+         "t": "If the file opens with all the data in one column, open your spreadsheet program first and use its import option. {Confirm the file type and the separator to choose.}"
         }
        ],
        [
         {
-         "t": "If some invoices are missing, check the date range and filters. The export includes only what the report shows on screen."
+         "t": "If some invoices are missing, check the date range and filters. {Confirm whether the export includes only what the report shows on screen.}"
         }
        ],
        [
         {
-         "t": "Still stuck? Contact support from the Help menu and tell us which report you were exporting."
+         "t": "Still stuck? Contact support {from where support is reached} and say which report you were exporting."
         }
        ]
       ]
@@ -23630,7 +23637,7 @@
        "ref": "F9"
       },
       {
-       "t": " budget, and it ends hand patching, which may be behind last year's outages but is untested."
+       "t": " budget, and it ends hand patching; whether hand patching caused last year's outages is untested."
       }
      ],
      "bullets": [
@@ -25291,7 +25298,7 @@
        ],
        [
         {
-         "t": "Our guidelines refer warehouses valued over "
+         "t": "The insurer's guidelines refer warehouses valued over "
         },
         {
          "v": "$5,000,000",

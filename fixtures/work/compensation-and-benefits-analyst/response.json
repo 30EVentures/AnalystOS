@@ -4,7 +4,7 @@
   "Median engineer pay is [F1] against a market median of [F2], [F4] below.",
   "As a rough sizing, closing the median gap for all [F5] engineers would cost about [F6] a year.",
   "Engineer turnover was [F7] against [F8] for the company, [F9] higher.",
-  "About [F10] engineers left, costing about [F12] to replace; about [F13] of them, costing about [F14], were above the company rate."
+  "About [F10] engineers left, costing about [F12] to replace; about [F13] of those leavers, costing about [F14], are the excess over the company's turnover rate."
  ],
  "situation": "An employer reviewing engineering pay against the market ahead of its annual pay review.",
  "complication": "Engineers are paid below market and leave faster than the rest of the company.",
@@ -140,7 +140,7 @@
   },
   {
    "id": "F13",
-   "label": "Engineer leavers above the company rate",
+   "label": "Engineer leavers in excess of the company rate",
    "value": 6.4,
    "unit": "count",
    "basis": "computed",
@@ -152,7 +152,7 @@
   },
   {
    "id": "F14",
-   "label": "Cost of turnover above the company rate",
+   "label": "Cost of leavers in excess of the company rate",
    "value": 256000,
    "unit": "usd",
    "basis": "computed",

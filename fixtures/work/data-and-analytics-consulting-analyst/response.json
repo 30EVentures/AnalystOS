@@ -1,8 +1,8 @@
 {
- "answer": "Measure every promotion against held-back stores using loyalty-card data: it covers [F4] of sales, and cutting spend on promotions that do not pay off by [F5] would save up to [F6] a year.",
+ "answer": "Measure each major promotion against held-back stores using loyalty-card data: it covers [F4] of sales, and cutting spend on promotions that do not pay off by [F5] would save up to [F6] a year.",
  "exec_summary": [
   "The chain spends [F2] a year on about [F3] promotions.",
-  "The loyalty card covers [F4] of sales, enough to measure most promotions.",
+  "The loyalty card covers [F4] of sales, which may be enough to measure major promotions.",
   "The chain held back [F7] stores once, [F8] of the chain, but never repeated the test.",
   "The target cut of [F5] is worth up to [F6] a year."
  ],
@@ -94,7 +94,7 @@
  "issue_tree": [
   {
    "branch": "The data",
-   "finding": "Loyalty-card data is enough to measure most promotions.",
+   "finding": "Loyalty-card data may be enough to measure major promotions.",
    "points": [
     "The card covers [F4] of sales.",
     "The data already sits in the chain's data warehouse."

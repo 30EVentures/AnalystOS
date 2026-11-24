@@ -183,9 +183,9 @@
     "You can export any report to a spreadsheet file to share it or work with the numbers yourself.",
     "To export a report: open {Reports menu name} from the main menu. Choose the report you want, such as {a common report}. Set the date range and any filters, then select {Apply button name}. Select {Export button and its position} and choose the spreadsheet option. The file downloads to your computer.",
     "If the export button is greyed out, run the report first. {Confirm that export needs a report with results.}",
-    "If the file opens with all the data in one column, open your spreadsheet program first and use its import option, choosing comma as the separator.",
-    "If some invoices are missing, check the date range and filters. The export includes only what the report shows on screen.",
-    "Still stuck? Contact support from the Help menu and tell us which report you were exporting."
+    "If the file opens with all the data in one column, open your spreadsheet program first and use its import option. {Confirm the file type and the separator to choose.}",
+    "If some invoices are missing, check the date range and filters. {Confirm whether the export includes only what the report shows on screen.}",
+    "Still stuck? Contact support {from where support is reached} and say which report you were exporting."
    ]
   }
  ]

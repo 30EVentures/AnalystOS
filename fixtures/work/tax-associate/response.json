@@ -1,10 +1,10 @@
 {
- "answer": "On these numbers current tax is about [F7], leaving about [F9] due after estimated payments, and deferred tax of about [F10] brings the total tax expense to about [F11]; the outside preparer reviews these positions and signs and files the return.",
+ "answer": "On these numbers current tax is about [F7], leaving about [F9] due after estimated payments, and deferred tax of about [F10] brings the total tax expense to about [F11]; the finance director approves the provision, and the outside preparer reviews the return positions, signs and files.",
  "exec_summary": [
   "Profit before tax of [F1] plus non-deductible entertainment of [F2] gives [F4].",
   "Extra tax depreciation of [F3] brings taxable income to [F5].",
   "At [F6], current tax is about [F7] against [F8] already paid, leaving [F9].",
-  "The extra depreciation is a timing difference, so deferred tax of about [F10] is provided as well."
+  "The extra depreciation is a temporary difference, so deferred tax of about [F10] is provided as well."
  ],
  "situation": "A company closing its financial year and preparing its corporate tax computation.",
  "complication": "Estimated payments made during the year do not cover the tax the computation shows.",
@@ -108,7 +108,7 @@
   },
   {
    "id": "F10",
-   "label": "Deferred tax on the depreciation timing difference",
+   "label": "Deferred tax on the depreciation temporary difference",
    "value": 37800,
    "unit": "usd",
    "basis": "computed",
@@ -182,7 +182,7 @@
    ],
    "hypotheses": [
     {
-     "text": "The timing difference reverses in later years.",
+     "text": "There are other temporary differences to provide for.",
      "verdict": "untested"
     }
    ],

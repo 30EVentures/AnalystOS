@@ -1,5 +1,5 @@
 {
- "answer": "Fix bank connection first: finishing setup lifts month-one activity from [F4] to [F3], and bank connection drives [F9] of setup tickets.",
+ "answer": "Confirm the quit step in event data, then likely fix bank connection: users who finish setup are active at [F3] a month later against [F4], and bank connection is [F9] of setup tickets.",
  "exec_summary": [
   "Of [F2] sign-ups, only [F7] finished setup and [F8] did not.",
   "Users who finish setup stay active at [F3] against [F4] for those who do not, a gap of [F10].",

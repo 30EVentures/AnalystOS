@@ -210,7 +210,8 @@ Common mistakes that get content rejected:
   three months", "in the first month".
 - Digits for small counts ("2 analysts"): write "two analysts".
 - A number next to a tag in any form ("[F2] (7%)", "7% monthly [F2]",
-  "fell 8 points [F12]"): write only the tag; a fall is a negative figure.
+  "fell 8 points [F12]"): write only the tag, as "changed by [F12]" with F12
+  at -8, or "fell [F12]" with F12 at 8 as the size of the fall.
 - Digits in a name or label ("clinics under 10 staff"): use words.
 - Dates: "by the end of 2026", "in March 2025" are fine; "mid-2026" too.
 - recommendation.option must be exactly one option's name, nothing added.
@@ -483,7 +484,10 @@ def derived_units(op, units):
             return set()
         return {"points"} if units[0] in ("percent", "points") else {units[0]}
     if op == "ratio":
-        return plain if len(units) == 2 else set()
+        if len(units) != 2:
+            return set()
+        # dollars per item (value per share, cost per lead) is still dollars (Slice 129)
+        return plain | {"usd"} if list(units) == ["usd", "count"] else plain
     if op in ("growth_percent", "percent_of_total"):
         return {"percent"} if len(units) == 2 and units[0] == units[1] else set()
     if op == "product":

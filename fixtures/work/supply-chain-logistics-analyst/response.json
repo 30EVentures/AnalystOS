@@ -1,5 +1,5 @@
 {
- "answer": "Fix dispatch at the main warehouse first: [F9] of last quarter's [F8] late deliveries left it late, and late deliveries cost about [F10].",
+ "answer": "Fix dispatch at the main warehouse first: [F9] of last quarter's [F8] late deliveries left the warehouse late, and late deliveries cost about [F10].",
  "exec_summary": [
   "On-time delivery fell from [F1] to [F2], a fall of [F6].",
   "Of [F3] deliveries, [F8] were late, costing about [F10].",

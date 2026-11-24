@@ -12,7 +12,7 @@
   "situation": "Two projects compete for one capital budget.",
   "options": "Three ways to use this year's capital budget.",
   "recommendation": "Fund the packing line this year and defer the racking.",
-  "roadmap": "Approve the packing line now, then plan the racking for next year.",
+  "roadmap": "Test each project's NPV, then put the packing line to the CFO.",
   "kpis": "Two measures show whether the chosen project delivers.",
   "risks": "The main risk is the labour savings arriving late."
  },
@@ -195,7 +195,7 @@
      "verdict": "untested"
     }
    ],
-   "so_what": "On payback the packing line is stronger; an NPV at the hurdle rate will confirm it.",
+   "so_what": "On payback the packing line is stronger; an NPV at the hurdle rate will test it.",
    "chart": {
     "title": "The packing line pays back faster than the racking.",
     "figure_ids": [
@@ -228,7 +228,7 @@
  ],
  "recommendation": {
   "option": "Packing line first",
-  "rationale": "It pays back in [F12] years against [F13] for the racking and fits the budget with [F11] to spare; an NPV at the hurdle rate, once asset lives are known, should confirm the choice before the CFO decides."
+  "rationale": "It pays back in [F12] years against [F13] for the racking and fits the budget with [F11] to spare; an NPV at the hurdle rate, once asset lives are known, will test the choice before the CFO decides."
  },
  "roadmap": [
   {

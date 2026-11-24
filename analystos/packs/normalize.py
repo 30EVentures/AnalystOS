@@ -11,10 +11,10 @@ it did change it, each now a regression test (tests/test_normalize.py):
   precision shown, within 5%, the right kind) is removed, as is a matching unit
   or currency beside the tag; code prints the verified value instead. A number
   that does not state its figure is left in place, so the verifier refuses it.
-- A client quote is never cut or changed. When it states exactly one number and
-  that number is the figure's value in the figure's unit (as given, as a percent
-  stored as a fraction, or with the quote's scale word), the figure takes that
-  number's value as written. A quote with two numbers is left whole for the
+- A client quote is never cut or changed. When it states exactly one number,
+  in the figure's unit, and the value is that percent stored as a fraction
+  (0.07 for "7%"), the value becomes 7. No other value is changed, rescaled or
+  filled in. A quote with two numbers is left whole for the
   verifier to refuse (the repair request tells the model to quote only the words
   around one number). The declared unit is never overridden; a quote that is not
   the client's words is left for the verifier to refuse.
@@ -58,6 +58,7 @@ _UNIT_AFTER = {
     "points": re.compile(r"\s*(?:percentage points?\b|points?\b|pts\b|pp\b)", re.IGNORECASE),
     "usd": re.compile(r"\s*(?:USD\b|dollars?\b)", re.IGNORECASE),
     "ratio": re.compile(r"\s*(?:x\b|times\b)", re.IGNORECASE),
+    "months": re.compile(r"\s*months?\b", re.IGNORECASE),
 }
 _PAREN_AFTER = re.compile(r"\s*\(\s*([^()\[\]]{1,20}?)\s*\)")
 _USD_BEFORE = re.compile(r"(?:\$|\bUSD)\s*$")
@@ -133,7 +134,6 @@ def strip_redundant_numbers(text, figures):
 _OPTION_LABEL = re.compile(r"^\s*(?:option|choice)?\s*(?:[a-z]|[0-9]{1,2})?\s*[:.)\u2013\u2014-]\s+", re.IGNORECASE)
 _UNIT_ALIASES = {"%": "percent", "pct": "percent", "percentage": "percent", "$": "usd", "dollars": "usd", "dollar": "usd",
                  "pts": "points", "pp": "points", "percentage points": "points", "x": "ratio", "times": "ratio"}
-_SCALED = re.compile(r"[kKmMB]$|thousand|million|billion|trillion|bn|mm|mn|mln|mio|mill?|crores?|lakhs?", re.IGNORECASE)
 _UNITS_FOR_KIND = {"percent": {"percent"}, "points": {"points"}, "usd": {"usd"}, "ratio": {"ratio"},
                    None: {"count", "months", "other"}}
 _UNITS = {"percent", "points", "usd", "ratio", "count", "months", "other"}
@@ -146,9 +146,8 @@ def _fits(token, unit):
 
 def narrow_quote(quote, value, unit=None):
     """``(quote, token)`` when ``quote`` states exactly one number and that number is the
-    figure's ``value`` in its unit - as given, as a percent stored as a fraction (0.07 for
-    7%), or with the quote's own scale word ("$12.2 million" stored as 12.2) - else
-    ``(None, None)``. The quote itself is never changed: Slice 120 removed cutting a quote
+    figure's ``value`` in its unit - as given, or as a percent stored as a fraction (0.07
+    for 7%) - else ``(None, None)``. Nothing is rescaled or filled in. The quote itself is never changed: Slice 120 removed cutting a quote
     down to one number after four release reviews each found a phrasing where the cut
     piece misled ("340 out of our 850", "a 25% discount to the $1,200", "$1,200 every
     3 months"). A quote with two numbers is refused by the verifier and fixed by the
@@ -157,13 +156,12 @@ def narrow_quote(quote, value, unit=None):
     if len(every) != 1 or every[0].value is None:
         return None, None
     token, target = every[0], _number(value)
-    if target is None:
-        return (quote, token) if _fits(token, unit) else (None, None)
-    forms = [target] if _fits(token, unit) else []
+    if target is None or not _fits(token, unit):
+        return None, None  # no value, or another unit: nothing is filled in; the verifier refuses
+    forms = [target]
     if unit == "percent" and token.kind == "percent":
         forms.append(target * 100)               # a percent stored as a fraction (0.07 for 7%)
-    if _SCALED.search(token.text) and _fits(token, unit):
-        forms += [target * 1e3, target * 1e6, target * 1e9]  # "$12.2 million" stored as 12.2
+    # No rescaling (fifth review): "12 million-dollar contracts" or "a 7m runway" would turn a right value wrong.
     if any(math.isclose(token.value, f, rel_tol=1e-9, abs_tol=1e-9) for f in forms):
         return quote, token
     return None, None

@@ -41,7 +41,8 @@ _DIGIT_RE = re.compile(
     r"(?P<cur>\$)?(?P<num>\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?|\.\d+)"
     r"(?:(?:\s?|-(?=(?i:bn|billions?|millions?|thousands?|trillions?|mm|mn|mln|mio|mill?)\b))"
     r"(?P<suf>%|percent\b|per cent\b|percentage points?\b|pp\b|points?\b|pts\b"
-    r"|(?i:bn|billions?|millions?|thousands?|trillions?|mm|mn|mln|mio|mill?|crores?|lakhs?)\b|[kKmMB]\b|x\b))?"
+    r"|(?i:bn|billions?|millions?|thousands?|trillions?|mm|mn|mln|mio|mill?|crores?|lakhs?)\b(?!-[^\W\d_])"
+    r"|[kKmMB]\b|x\b))?"  # "12 million-dollar": the word scale belongs to the next noun; "1k-seat" is 1,000
 )
 _SCALE = {"k": 1e3, "K": 1e3, "thousand": 1e3, "m": 1e6, "M": 1e6, "million": 1e6, "mm": 1e6, "mn": 1e6,
           "mln": 1e6, "mio": 1e6, "B": 1e9, "bn": 1e9, "billion": 1e9, "trillion": 1e12, "lakh": 1e5,

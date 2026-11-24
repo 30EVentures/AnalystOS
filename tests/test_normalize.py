@@ -188,7 +188,8 @@ class NormalisingNeverWeakensTest(unittest.TestCase):
         self.assertEqual(narrow_quote("to 7% in two quarters", 0.07, "percent")[1].value, 7)  # a percent as a fraction
         self.assertEqual(narrow_quote("to 7% in two quarters", 0.07), (None, None))         # x100 only for percent
         self.assertEqual(narrow_quote("to 7% in two quarters", 5, "percent"), (None, None))  # no match
-        self.assertEqual(narrow_quote("about $9.6 million in revenue", 9.6)[1].value, 9600000)
+        self.assertEqual(narrow_quote("about $9.6 million in revenue", 9.6, "usd"), (None, None))  # never rescaled
+        self.assertEqual(narrow_quote("about $9.6 million in revenue", 9.6e6, "usd")[1].value, 9.6e6)
 
     def test_a_wrong_computed_value_is_left_for_the_verifier(self):
         # Slice 120: recomputing over the model's value hid reversed and wrong inputs.
@@ -280,9 +281,11 @@ class ReviewOfPr100Test(unittest.TestCase):
         response["figures"].append({"id": "F16", "label": "Pipeline value", "value": 12.2, "unit": "usd",
                                     "basis": "client", "quote": "The pipeline was worth $12.2 Million last year"})
         response["answer"] += " The pipeline was worth [F16]."
-        out = normalize(response)  # 12.2 with "Million" in the quote is read as 12.2 million, never $12.20
-        self.assertEqual(c.verify_content(out, c.client_text_of(self.engagement(client))), [])
-        self.assertAlmostEqual(next(f for f in out["figures"] if f["id"] == "F16")["value"], 12.2e6)
+        # 12.2 against "$12.2 Million" is refused (never $12.20, never rescaled by code); 12.2 million passes.
+        problems = c.verify_content(normalize(response), c.client_text_of(self.engagement(client)))
+        self.assertTrue(any("F16" in p for p in problems), problems)
+        next(f for f in response["figures"] if f["id"] == "F16")["value"] = find_numbers("$12.2 Million")[0].value
+        self.assertEqual(c.verify_content(normalize(response), c.client_text_of(self.engagement(client))), [])
 
     def test_a_quote_cannot_cut_a_grouped_number_a_sign_or_a_currency(self):
         for client, quote in (("We have 12 200 trial users.", "200 trial users"),
@@ -386,6 +389,20 @@ class SecondReviewTest(unittest.TestCase):
                                    ("we have 850 customers paying on average $1,200 per month", 1200, "usd")):
             with self.subTest(quote=quote):
                 self.assertEqual(narrow_quote(quote, value, unit), (None, None))
+
+    def test_a_scale_word_on_the_next_noun_never_scales_the_number(self):
+        # Fifth review: "12 million-dollar contracts" became "12,000,000 contracts".
+        self.assertEqual([t.value for t in find_numbers("We signed 12 million-dollar contracts")][:1], [12])
+        self.assertEqual(find_numbers("We sell 1k-seat licences")[0].value, 1000)  # a glued letter scales the number
+        for quote, value, unit in (("We signed 12 million-dollar contracts last year", 12, "count"),
+                                   ("We sell 1k-seat licences", 1, "count"), ("We have a 7m runway", 7, "months")):
+            with self.subTest(quote=quote):
+                fig = {"id": "F1", "label": "x", "value": value, "unit": unit, "basis": "client", "quote": quote}
+                out = normalize({"figures": [fig], "answer": "[F1]"})["figures"][0]
+                self.assertEqual(out["value"], value)  # never rescaled
+                self.assertTrue(c.verify_content({"figures": [out], "answer": "[F1]"}, quote + "."))
+        self.assertEqual(strip_redundant_numbers("A runway of [F1] months.", {"F1": {"value": 7, "unit": "months"}}),
+                         "A runway of [F1].")
 
     def test_hyphenated_plural_and_short_scale_words(self):
         for text in ("$12.2-million", "$12.2 millions", "$12.2 mil", "$12.2 Mill."):

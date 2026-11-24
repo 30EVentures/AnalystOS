@@ -90,6 +90,17 @@ two-number sentences, as in the first paid test, the run needs its second call.
 Open, judged not realistic enough to block: "Tier 1, [F5] customers" and
 "Plan 3 of the hires" pass with a numbered name before punctuation or "of".
 
+## Fifth review (same day): no rescaling
+
+The short review of a7e5cba found one blocker in the scale rule: "We signed 12
+million-dollar contracts" with the correct value 12 was rescaled to 12,000,000,
+and "a 7m runway" to 7,000,000 months. Fixed twice over: the number reader no
+longer lets a scale word that belongs to the next noun ("million-dollar") scale
+the number (a glued letter still does: "1k-seat" is 1,000), and the normaliser
+no longer rescales or fills in any value - the only value it changes is a
+percent stored as a fraction (0.07 with a quote saying "7%"). "[F1] months" no
+longer prints "months months".
+
 ## Results (2026-11-23)
 
 - Every blocker case from the review: a regression test that fails on main

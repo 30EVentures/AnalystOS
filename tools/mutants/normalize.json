@@ -15,8 +15,7 @@
  {"name": "unit aliases ignored", "old": "                fig[\"unit\"] = _UNIT_ALIASES[fig[\"unit\"].strip().lower()]", "new": "                pass"},
  {"name": "an unknown unit replaced from the quote", "old": "                    if fig.get(\"unit\") is None:  # filled only when absent; never overridden", "new": "                    if fig.get(\"unit\") not in _UNITS:"},
  {"name": "a two-number quote matched (cutting back)", "old": "    if len(every) != 1 or every[0].value is None:", "new": "    if not every or every[0].value is None:"},
- {"name": "a quote matched to any unit", "old": "        return (quote, token) if _fits(token, unit) else (None, None)", "new": "        return quote, token", "equivalent": "only reached when the figure has no value; the declared unit is never changed, so the verifier still refuses a quote whose number is not that unit"},
  {"name": "x100 match for any unit", "old": "    if unit == \"percent\" and token.kind == \"percent\":", "new": "    if True:"},
- {"name": "scale match without a scale word", "old": "    if _SCALED.search(token.text) and _fits(token, unit):", "new": "    if _fits(token, unit):"},
- {"name": "a quote of another unit matched", "old": "    forms = [target] if _fits(token, unit) else []", "new": "    forms = [target]"}
+ {"name": "a value filled or matched in another unit (fifth review)", "old": "    if target is None or not _fits(token, unit):", "new": "    if target is None:"},
+ {"name": "months after a tag kept", "old": "    \"months\": re.compile(r\"\\s*months?\\b\", re.IGNORECASE),\n", "new": ""}
 ]

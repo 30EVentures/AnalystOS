@@ -137,3 +137,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 123 | role-specific output formats, phase 1: memo and workbook | [spec](slice-123/spec.md) |
 | 124 | wire the role formats into hiring and the homepage | [spec](slice-124/spec.md) |
 | 125 | deck quality: what a board reader caught in the first live deck | [spec](slice-125/spec.md) |
+| 126 | role-written work products (phase 2), framework | [spec](slice-126/spec.md) |

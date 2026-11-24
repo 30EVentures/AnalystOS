@@ -174,7 +174,7 @@ def _client_unit(token, declared):
 
 
 TOP_LEVEL_KEYS = {"answer", "exec_summary", "situation", "complication", "key_question", "titles", "figures",
-                  "issue_tree", "options", "recommendation", "roadmap", "kpis", "risks"}
+                  "issue_tree", "options", "recommendation", "roadmap", "kpis", "risks", "work"}
 
 
 def _drop_unknown(value, schema):
@@ -188,6 +188,24 @@ def _drop_unknown(value, schema):
     if isinstance(value, list) and isinstance(schema.get("items"), dict):
         return [_drop_unknown(v, schema["items"]) for v in value]
     return value
+
+
+def _lower_work_enums(doc):
+    """"High" is "high": work products' fixed choices are compared in lower case (Slice 126 review)."""
+    for item in doc.get("work") or []:
+        if not isinstance(item, dict):
+            continue
+        for key in ("kind", "language"):
+            if isinstance(item.get(key), str):
+                item[key] = item[key].strip().lower()
+        for row in item.get("rows") or []:
+            if isinstance(row, dict):
+                for key in ("rating", "status"):
+                    if isinstance(row.get(key), str):
+                        row[key] = row[key].strip().lower()
+        for line in item.get("items") or []:
+            if isinstance(line, dict) and isinstance(line.get("effect"), str):
+                line["effect"] = line["effect"].strip().lower()
 
 
 def _match_option(doc):
@@ -225,6 +243,7 @@ def normalize_content(content, derived_units, recompute, operations, schema=None
             if key != "figures" and key in schema["properties"]:
                 doc[key] = _drop_unknown(doc[key], schema["properties"][key])
     _match_option(doc)
+    _lower_work_enums(doc)
     figures = doc.get("figures")
     if isinstance(figures, list):
         fixed, by_id = [], {}
@@ -278,7 +297,8 @@ def normalize_content(content, derived_units, recompute, operations, schema=None
             return [clean(v) for v in value]
         if isinstance(value, dict):
             return {k: (v if k in ("quote", "id", "inputs", "figure_ids", "operation", "basis", "unit", "verdict",
-                                   "effort", "horizon", "label") else clean(v)) for k, v in value.items()}
+                                   "effort", "horizon", "label", "kind", "code", "language", "figure_id", "effect",
+                                   "rating", "status") else clean(v)) for k, v in value.items()}
         return value
 
     for key in list(doc):

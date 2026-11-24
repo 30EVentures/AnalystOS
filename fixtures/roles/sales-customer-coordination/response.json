@@ -1,186 +1,198 @@
 {
- "answer": "Focus outreach on larger clinics: they reply at [F3] against [F1] overall, so messages written for them go to the sales manager for approval first.",
- "exec_summary": [
-  "The list replies at [F1], about [F5] replies a month.",
-  "Larger clinics reply at [F3] and make up [F4] of the list.",
-  "The [F6] larger clinics emailed each month would produce about [F7] replies at their rate."
- ],
- "situation": "A software company emailing dental clinics to book sales meetings.",
- "complication": "Replies are low, and every clinic gets the same message.",
- "key_question": "Which clinics should outreach focus on, and with what message?",
- "titles": {
-  "situation": "One message goes to every clinic, and few reply.",
-  "options": "Two ways to raise the number of meetings.",
-  "recommendation": "Prioritise larger clinics with a message written for them.",
-  "roadmap": "Draft, approve and test the new outreach within a month.",
-  "kpis": "Two measures show whether outreach is improving.",
-  "risks": "Narrowing the list could shrink the pipeline if messages miss."
- },
- "figures": [
-  {
-   "id": "F1",
-   "label": "Reply rate, whole list",
-   "value": 1.5,
-   "unit": "percent",
-   "basis": "client",
-   "quote": "get a 1.5% reply rate"
+  "answer": "Focus outreach on larger clinics: they reply at [F3] against [F1] overall, so messages written for them go to the sales manager for approval first.",
+  "exec_summary": [
+    "The list replies at [F1], about [F5] replies a month.",
+    "Larger clinics reply at [F3] and make up [F4] of the list.",
+    "The [F6] larger clinics emailed each month would produce about [F7] replies at their rate."
+  ],
+  "situation": "A software company emailing dental clinics to book sales meetings.",
+  "complication": "Replies are low, and every clinic gets the same message.",
+  "key_question": "Which clinics should outreach focus on, and with what message?",
+  "titles": {
+    "situation": "One message goes to every clinic, and few reply.",
+    "options": "Two ways to raise the number of meetings.",
+    "recommendation": "Prioritise larger clinics with a message written for them.",
+    "roadmap": "Draft, approve and test the new outreach within a month.",
+    "kpis": "Two measures show whether outreach is improving.",
+    "risks": "Narrowing the list could shrink the pipeline if messages miss."
   },
-  {
-   "id": "F2",
-   "label": "Clinics emailed per month",
-   "value": 2000,
-   "unit": "count",
-   "basis": "client",
-   "quote": "We email 2,000 clinics a month"
-  },
-  {
-   "id": "F3",
-   "label": "Reply rate, larger clinics",
-   "value": 4,
-   "unit": "percent",
-   "basis": "client",
-   "quote": "reply at 4%"
-  },
-  {
-   "id": "F4",
-   "label": "Larger clinics, share of the list",
-   "value": 30,
-   "unit": "percent",
-   "basis": "client",
-   "quote": "About 30% of our list"
-  },
-  {
-   "id": "F5",
-   "label": "Replies per month now",
-   "value": 30,
-   "unit": "count",
-   "basis": "computed",
-   "operation": "percent_of",
-   "inputs": [
-    "F2",
-    "F1"
-   ]
-  },
-  {
-   "id": "F6",
-   "label": "Larger clinics emailed per month",
-   "value": 600,
-   "unit": "count",
-   "basis": "computed",
-   "operation": "percent_of",
-   "inputs": [
-    "F2",
-    "F4"
-   ]
-  },
-  {
-   "id": "F7",
-   "label": "Replies per month from larger clinics",
-   "value": 24,
-   "unit": "count",
-   "basis": "computed",
-   "operation": "percent_of",
-   "inputs": [
-    "F6",
-    "F3"
-   ]
-  }
- ],
- "issue_tree": [
-  {
-   "branch": "Who replies",
-   "finding": "Larger clinics reply far more often than the list overall.",
-   "points": [
-    "Larger clinics reply at [F3] against [F1] overall."
-   ],
-   "hypotheses": [
+  "figures": [
     {
-     "text": "Practice size predicts replies.",
-     "verdict": "supported"
-    }
-   ],
-   "so_what": "The list should be worked in order of practice size.",
-   "chart": {
-    "title": "Larger clinics reply far more often than the list overall.",
-    "figure_ids": [
-     "F1",
-     "F3"
-    ],
-    "labels": [
-     "Whole list",
-     "Larger clinics"
-    ]
-   }
-  },
-  {
-   "branch": "What that is worth",
-   "finding": "Larger clinics already account for most replies.",
-   "points": [
-    "About [F7] of about [F5] monthly replies could come from larger clinics."
-   ],
-   "hypotheses": [
+      "id": "F1",
+      "label": "Reply rate, whole list",
+      "value": 1.5,
+      "unit": "percent",
+      "basis": "client",
+      "quote": "get a 1.5% reply rate"
+    },
     {
-     "text": "A message written for larger clinics would raise replies further.",
-     "verdict": "untested"
+      "id": "F2",
+      "label": "Clinics emailed per month",
+      "value": 2000,
+      "unit": "count",
+      "basis": "client",
+      "quote": "We email 2,000 clinics a month"
+    },
+    {
+      "id": "F3",
+      "label": "Reply rate, larger clinics",
+      "value": 4,
+      "unit": "percent",
+      "basis": "client",
+      "quote": "reply at 4%"
+    },
+    {
+      "id": "F4",
+      "label": "Larger clinics, share of the list",
+      "value": 30,
+      "unit": "percent",
+      "basis": "client",
+      "quote": "About 30% of our list"
+    },
+    {
+      "id": "F5",
+      "label": "Replies per month now",
+      "value": 30,
+      "unit": "count",
+      "basis": "computed",
+      "operation": "percent_of",
+      "inputs": [
+        "F2",
+        "F1"
+      ]
+    },
+    {
+      "id": "F6",
+      "label": "Larger clinics emailed per month",
+      "value": 600,
+      "unit": "count",
+      "basis": "computed",
+      "operation": "percent_of",
+      "inputs": [
+        "F2",
+        "F4"
+      ]
+    },
+    {
+      "id": "F7",
+      "label": "Replies per month from larger clinics",
+      "value": 24,
+      "unit": "count",
+      "basis": "computed",
+      "operation": "percent_of",
+      "inputs": [
+        "F6",
+        "F3"
+      ]
     }
-   ],
-   "so_what": "A tailored message for larger clinics is the next test."
-  }
- ],
- "options": [
-  {
-   "name": "Larger-clinic focus",
-   "description": "Send larger clinics a tailored message first, and keep a lighter cadence for the rest.",
-   "effort": "low"
+  ],
+  "issue_tree": [
+    {
+      "branch": "Who replies",
+      "finding": "Larger clinics reply far more often than the list overall.",
+      "points": [
+        "Larger clinics reply at [F3] against [F1] overall."
+      ],
+      "hypotheses": [
+        {
+          "text": "Practice size predicts replies.",
+          "verdict": "supported"
+        }
+      ],
+      "so_what": "The list should be worked in order of practice size.",
+      "chart": {
+        "title": "Larger clinics reply far more often than the list overall.",
+        "figure_ids": [
+          "F1",
+          "F3"
+        ],
+        "labels": [
+          "Whole list",
+          "Larger clinics"
+        ]
+      }
+    },
+    {
+      "branch": "What that is worth",
+      "finding": "Larger clinics already account for most replies.",
+      "points": [
+        "About [F7] of about [F5] monthly replies could come from larger clinics."
+      ],
+      "hypotheses": [
+        {
+          "text": "A message written for larger clinics would raise replies further.",
+          "verdict": "untested"
+        }
+      ],
+      "so_what": "A tailored message for larger clinics is the next test."
+    }
+  ],
+  "options": [
+    {
+      "name": "Larger-clinic focus",
+      "description": "Send larger clinics a tailored message first, and keep a lighter cadence for the rest.",
+      "effort": "low"
+    },
+    {
+      "name": "Send more emails",
+      "description": "Raise the monthly volume with today's message.",
+      "effort": "low"
+    }
+  ],
+  "recommendation": {
+    "option": "Larger-clinic focus",
+    "rationale": "It concentrates effort where replies run at [F3]; every message is drafted for the sales manager to approve before sending."
   },
-  {
-   "name": "Send more emails",
-   "description": "Raise the monthly volume with today's message.",
-   "effort": "low"
-  }
- ],
- "recommendation": {
-  "option": "Larger-clinic focus",
-  "rationale": "It concentrates effort where replies run at [F3]; every message is drafted for the sales manager to approve before sending."
- },
- "roadmap": [
-  {
-   "horizon": "First 30 days",
-   "actions": [
-    "Draft a message for larger clinics for the sales manager to approve."
-   ]
-  },
-  {
-   "horizon": "Days 31-60",
-   "actions": [
-    "Send the approved message to larger clinics first."
-   ]
-  },
-  {
-   "horizon": "Days 61-90",
-   "actions": [
-    "Compare replies with the [F1] baseline."
-   ]
-  }
- ],
- "kpis": [
-  {
-   "name": "Reply rate",
-   "target": "Above today's [F1]"
-  },
-  {
-   "name": "Meetings booked per month",
-   "target": "Rising each month"
-  }
- ],
- "risks": [
-  {
-   "risk": "The tailored message underperforms.",
-   "mitigation": "Test it against the current message on a small group."
-  },
-  {
-   "risk": "Smaller clinics are neglected.",
-   "mitigation": "Keep a lighter cadence for them."
-  }
- ]
+  "roadmap": [
+    {
+      "horizon": "First 30 days",
+      "actions": [
+        "Draft a message for larger clinics for the sales manager to approve."
+      ]
+    },
+    {
+      "horizon": "Days 31-60",
+      "actions": [
+        "Send the approved message to larger clinics first."
+      ]
+    },
+    {
+      "horizon": "Days 61-90",
+      "actions": [
+        "Compare replies with the [F1] baseline."
+      ]
+    }
+  ],
+  "kpis": [
+    {
+      "name": "Reply rate",
+      "target": "Above today's [F1]"
+    },
+    {
+      "name": "Meetings booked per month",
+      "target": "Rising each month"
+    }
+  ],
+  "risks": [
+    {
+      "risk": "The tailored message underperforms.",
+      "mitigation": "Test it against the current message on a small group."
+    },
+    {
+      "risk": "Smaller clinics are neglected.",
+      "mitigation": "Keep a lighter cadence for them."
+    }
+  ],
+  "work": [
+    {
+      "kind": "draft",
+      "title": "Outreach email to larger dental practices",
+      "for": "Practice managers at larger dental clinics, email",
+      "body": [
+        "Subject: Fewer empty chairs at your practice",
+        "Hi there, in a busy multi-chair practice every cancelled slot costs you. Our scheduling software fills cancellations from your waiting list and sends reminders patients actually answer.",
+        "Would a short call next week help? I can show you how practices like yours keep their calendars full."
+      ]
+    }
+  ]
 }

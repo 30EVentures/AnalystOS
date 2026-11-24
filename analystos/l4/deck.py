@@ -33,6 +33,7 @@ from pptx.util import Emu, Inches, Pt
 
 from analystos.catalog import load_catalog
 from analystos.l3.engagement import validate_engagement
+from analystos.packs import work as work_products
 from analystos.packs.consulting import check_deck_spec, client_text_of
 
 # The figures of the deck being drawn, so every [F#] tag is printed from its verified value.
@@ -522,6 +523,74 @@ def _two_column_table_slide(key, headers, fields, widths):
     return render
 
 
+EFFECT_TEXT = {"add_to_a": "adds to side A", "subtract_from_a": "comes off side A",
+               "add_to_b": "adds to side B", "subtract_from_b": "comes off side B"}
+
+
+def _work_slide(prs, spec, s, number, total):
+    """One role-written work product (Slice 126), every number printed from its figure."""
+    item = s["work"]
+    slide = _frame(prs, spec, s["title"], s["figure_ids"], number, total)
+    kind = item["kind"]
+    width, height = CONTENT_W, SLIDE_H - BODY_TOP - Inches(0.9)
+    if kind == "draft":
+        _, frame = _textbox(slide, MARGIN, BODY_TOP, width, height)
+        _run(frame.paragraphs[0], f"For: {item['for']}", 12, MUTED)
+        for paragraph_text in item["body"]:
+            paragraph = frame.add_paragraph()
+            paragraph.space_before = Pt(8)
+            _rich(paragraph, paragraph_text, 13, INK)
+    elif kind == "register":
+        rows = [[r["item"], r["rating"].title(), r["owner"], r["status"].title(), r["action"]] for r in item["rows"]]
+        _table(slide, rows, [4, 1.1, 2, 1.3, 4], BODY_TOP, ["Item", "Rating", "Owner", "Status", "Action"], 11)
+    elif kind == "case_file":
+        _, frame = _textbox(slide, MARGIN, BODY_TOP, width, height)
+        first = True
+        for heading, key in (("Facts", "facts"), ("Evidence", "evidence"), ("Open questions", "open_questions")):
+            if not item.get(key):
+                continue
+            paragraph = frame.paragraphs[0] if first else frame.add_paragraph()
+            first = False
+            _run(paragraph, heading, 12, ACCENT, bold=True)
+            for line in item[key]:
+                _bullet(frame, line, 12)
+        paragraph = frame.add_paragraph()
+        paragraph.space_before = Pt(8)
+        _run(paragraph, "For decision by a qualified person: ", 12, ACCENT, bold=True)
+        _rich(paragraph, item["for_decision"], 12, INK)
+    elif kind == "reconciliation":
+        rows = [[item["side_a"]["label"], f"[{item['side_a']['figure_id']}]", "side A"]]
+        rows += [[line["label"], f"[{line['figure_id']}]", EFFECT_TEXT[line["effect"]]] for line in item.get("items", [])]
+        rows.append([item["side_b"]["label"], f"[{item['side_b']['figure_id']}]", "side B"])
+        rows += [[f"Proposed entry: debit {e['debit']}, credit {e['credit']}", f"[{e['figure_id']}]", e["memo"]]
+                 for e in item.get("entries", [])]
+        _table(slide, rows, [4, 1.6, 5], BODY_TOP, ["Line", "Amount", "Effect"], 12)
+        _, frame = _textbox(slide, MARGIN, SLIDE_H - Inches(1.2), width, Inches(0.4))
+        _run(frame.paragraphs[0], "The sides agree once every item is applied; code checked this on the verified "
+                                  "figures. Entries are proposals for approval.", 11, MUTED)
+    elif kind == "plan":
+        rows = [[st["when"], st["task"], st["owner"], st["done_when"]] for st in item["steps"]]
+        _table(slide, rows, [1.6, 4.5, 2.2, 3.5], BODY_TOP, ["When", "Task", "Owner", "Done when"], 12)
+    elif kind == "code":
+        lines = item["code"].splitlines()
+        _, frame = _textbox(slide, MARGIN, BODY_TOP - Inches(0.1), width, Inches(0.4))
+        _run(frame.paragraphs[0], work_products.LANGUAGE_NAMES[item["language"]] + " \u00b7 ", 11, MUTED)
+        _rich(frame.paragraphs[0], item["purpose"], 11, MUTED)
+        note = "  \u2014  Draft: not run or reviewed. Numbers inside the code are not figures."
+        if len(lines) > 40:
+            note += " Showing the first forty lines; the full code is in the source file."
+        _run(frame.paragraphs[0], note, 11, MUTED)
+        _, frame = _textbox(slide, MARGIN, BODY_TOP + Inches(0.4), width, height - Inches(0.4))
+        for i, line in enumerate(lines[:40]):
+            paragraph = frame.paragraphs[0] if i == 0 else frame.add_paragraph()
+            run = paragraph.add_run()
+            run.text = line
+            run.font.size = Pt(10)
+            run.font.name = "Courier New"
+            run.font.color.rgb = INK
+    return slide
+
+
 def formula(operation, inputs):
     """A calculated figure's formula, written the way a reader checks it by hand."""
     a = inputs
@@ -579,6 +648,7 @@ RENDERERS = {
     "roadmap": _roadmap_slide,
     "kpis": _two_column_table_slide("kpis", ["Measure", "Target"], ["name", "target"], [4, 7]),
     "risks": _two_column_table_slide("risks", ["Risk", "Mitigation"], ["risk", "mitigation"], [5, 6]),
+    "work": _work_slide,
 }
 
 
@@ -606,6 +676,8 @@ def checked_role(spec, engagement, catalog=None):
     roles = {r["id"]: r for r in catalog["roles"]}
     if spec["role"] not in roles or spec["role"] not in engagement["roles"]:
         raise ValueError("refusing to render: the role is not one this engagement asked for")
+    if spec.get("work_kinds", []) != work_products.required_kinds(roles[spec["role"]]):
+        raise ValueError("refusing to render: the spec's work products are not the ones this role delivers")
     return roles[spec["role"]]
 
 

@@ -1,0 +1,12 @@
+[
+ {"name": "a reconciliation need not balance", "old": "    if not problems and abs(adjusted[\"a\"] - adjusted[\"b\"]) > BALANCE_TOLERANCE:", "new": "    if False:"},
+ {"name": "a subtracting item adds", "old": "            adjusted[side] += -value if line[\"effect\"].startswith(\"subtract\") else value", "new": "            adjusted[side] += value"},
+ {"name": "a case file may decide", "old": "    if not isinstance(decision, str) or not decision.rstrip().endswith(\"?\"):", "new": "    if not isinstance(decision, str):"},
+ {"name": "work prose not number-checked", "old": "            problems += number_problems(where, text, figures, client_years)", "new": "            pass"},
+ {"name": "work names not label-checked", "old": "            problems += label_problems(where, text, client_years)", "new": "            pass"},
+ {"name": "a missing kind is allowed", "old": "        problems.append(f\"work must include a {kind}; this role delivers one\")", "new": "        pass"},
+ {"name": "a kind not owed is allowed", "old": "        if kind not in owed:\n            problems.append(f\"{w}: a {kind} is not part of this role's output\")\n            continue", "new": "        if False:\n            continue"},
+ {"name": "fields of another kind allowed", "old": "        extra = set(item) - FIELDS[kind]", "new": "        extra = set()"},
+ {"name": "entries need not be usd", "old": "        elif figures[entry[\"figure_id\"]].get(\"unit\") != \"usd\":", "new": "        elif False:"},
+ {"name": "work allowed for a role that owes none", "old": "        return [\"work is not part of this role's output; leave it out\"]", "new": "        return []"}
+]

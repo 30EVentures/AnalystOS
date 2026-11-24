@@ -61,7 +61,9 @@ _LARGE_WORDS = ("thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eigh
                 "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety",
                 "hundreds?", "thousands?", "millions?", "billions?", "trillions?", "dozens?")
 _MULTIPLIERS = (r"doubl(?:e|ed|es|ing)", r"tripl(?:e|ed|es|ing)", r"quadrupl(?:e|ed|es|ing)",
-                r"twice", r"thrice", r"half", r"halv(?:e|ed|es|ing)", r"\w+fold", r"thirds?")
+                r"twice", r"thrice", r"half", r"halv(?:e|ed|es|ing)", r"\w+fold", r"thirds", r"third(?=\s+of\b)")
+# "Third," alone is an ordinal in a list (Slice 126: drafts); "a third", "two thirds" and "third of" stay
+# quantities (the fractions pattern below and the lookahead here).
 _UNIT_AFTER = r"\s*(?:-\s*)?(?:%|percent\b|per cent\b|pct\b|bps\b|percentage points?\b|points?\b|pts\b|dollars?\b|x\b|times\b)"
 _ANY_NUMBER_WORD = r"(?:" + "|".join(SMALL_WORDS + _LARGE_WORDS) + r")"
 _FRACTIONS = (r"\b(?:a|an|one|two|three|four|five|six|seven|eight|nine|ten)[- ]"

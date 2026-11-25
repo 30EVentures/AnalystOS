@@ -1,6 +1,6 @@
 {
- "format": "analystos-samples/1",
- "note": "Worked examples for synthetic clients, verified and drawn by AnalystOS with a replayed answer; no model call. Values are printed exactly as in each deck.",
+ "format": "analystos-samples/2",
+ "note": "Worked examples for synthetic clients, verified and drawn by AnalystOS with a replayed answer; no model call. Values are printed exactly as in each file. A role without its own example is shown on its family's.",
  "samples": [
   {
    "family": {
@@ -277,38 +277,41 @@
      }
     }
    ],
-   "others": [
+   "roles": [
     {
-     "id": "financial-equity-research-analyst",
-     "title": "Financial / Equity Research Analyst",
-     "deliverables": [
-      "report",
-      "workbook"
-     ]
-    },
-    {
-     "id": "policy-analyst-research-assistant",
-     "title": "Policy Analyst / Research Assistant",
-     "deliverables": [
-      "brief",
-      "memo"
-     ]
+     "id": "market-research-analyst",
+     "title": "Market Research Analyst",
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Word memo. Also planned: brief, deck.",
+     "own_sample": true
     },
     {
      "id": "regulatory-change-analyst",
      "title": "Regulatory Change Analyst",
-     "deliverables": [
-      "brief",
-      "register"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Word memo, with its register inside. Also planned: brief.",
+     "own_sample": true
+    },
+    {
+     "id": "financial-equity-research-analyst",
+     "title": "Financial / Equity Research Analyst",
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Word memo. Also planned: report, workbook.",
+     "own_sample": false
+    },
+    {
+     "id": "policy-analyst-research-assistant",
+     "title": "Policy Analyst / Research Assistant",
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Word memo. Also planned: brief.",
+     "own_sample": false
     },
     {
      "id": "esg-sustainability-reporting-analyst",
      "title": "ESG / Sustainability Reporting Analyst",
-     "deliverables": [
-      "report",
-      "workbook"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Word memo. Also planned: report, workbook.",
+     "own_sample": false
     }
    ]
   },
@@ -612,62 +615,62 @@
      }
     }
    ],
-   "others": [
+   "roles": [
     {
-     "id": "business-analyst",
-     "title": "Business Analyst",
-     "deliverables": [
-      "brief",
-      "deck"
-     ]
+     "id": "management-consulting-analyst",
+     "title": "Management Consulting Analyst",
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified PowerPoint deck.",
+     "own_sample": true
     },
     {
      "id": "risk-advisory-associate",
      "title": "Risk Advisory Associate",
-     "deliverables": [
-      "deck",
-      "register"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified PowerPoint deck, with its register inside.",
+     "own_sample": true
+    },
+    {
+     "id": "business-analyst",
+     "title": "Business Analyst",
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified PowerPoint deck. Also planned: brief.",
+     "own_sample": false
     },
     {
      "id": "technology-consulting-analyst",
      "title": "Technology Consulting Analyst",
-     "deliverables": [
-      "deck",
-      "brief"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified PowerPoint deck. Also planned: brief.",
+     "own_sample": false
     },
     {
      "id": "regulatory-compliance-advisory-associate",
      "title": "Regulatory / Compliance Advisory Associate",
-     "deliverables": [
-      "deck",
-      "register"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified PowerPoint deck, with its register inside.",
+     "own_sample": false
     },
     {
      "id": "process-improvement-operations-consulting-analyst",
      "title": "Process Improvement / Operations Consulting Analyst",
-     "deliverables": [
-      "deck",
-      "workbook"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified PowerPoint deck. Also planned: workbook.",
+     "own_sample": false
     },
     {
      "id": "data-and-analytics-consulting-analyst",
      "title": "Data & Analytics Consulting Analyst",
-     "deliverables": [
-      "deck",
-      "workbook"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified PowerPoint deck. Also planned: workbook.",
+     "own_sample": false
     },
     {
      "id": "digital-assets-blockchain-advisory-associate",
      "title": "Digital Assets / Blockchain Advisory Associate",
-     "deliverables": [
-      "deck",
-      "brief"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified PowerPoint deck. Also planned: brief.",
+     "own_sample": false
     }
    ]
   },
@@ -944,86 +947,83 @@
      }
     }
    ],
-   "others": [
+   "roles": [
+    {
+     "id": "fpa-analyst",
+     "title": "Financial Planning & Analysis (FP&A) Analyst",
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: memo.",
+     "own_sample": true
+    },
     {
      "id": "credit-analyst",
      "title": "Credit Analyst",
-     "deliverables": [
-      "workbook",
-      "memo"
-     ]
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: memo.",
+     "own_sample": false
     },
     {
      "id": "investment-banking-analyst",
      "title": "Investment Banking Analyst",
-     "deliverables": [
-      "workbook",
-      "deck"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: deck.",
+     "own_sample": false
     },
     {
      "id": "financial-advisory-transaction-services-analyst",
      "title": "Financial Advisory / Transaction Services Analyst",
-     "deliverables": [
-      "workbook",
-      "report"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: report.",
+     "own_sample": false
     },
     {
      "id": "corporate-finance-analyst",
      "title": "Corporate Finance Analyst",
-     "deliverables": [
-      "workbook",
-      "memo"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: memo.",
+     "own_sample": false
     },
     {
      "id": "treasury-analyst",
      "title": "Treasury Analyst",
-     "deliverables": [
-      "workbook",
-      "memo"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: memo.",
+     "own_sample": false
     },
     {
      "id": "pricing-analyst",
      "title": "Pricing Analyst",
-     "deliverables": [
-      "workbook",
-      "memo"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: memo.",
+     "own_sample": false
     },
     {
      "id": "real-estate-analyst",
      "title": "Real Estate Analyst",
-     "deliverables": [
-      "workbook",
-      "memo"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: memo.",
+     "own_sample": false
     },
     {
      "id": "market-risk-analyst",
      "title": "Market Risk Analyst",
-     "deliverables": [
-      "workbook",
-      "report"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: report.",
+     "own_sample": false
     },
     {
      "id": "model-validation-analyst",
      "title": "Model Validation Analyst",
-     "deliverables": [
-      "report",
-      "workbook"
-     ]
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: report.",
+     "own_sample": false
     },
     {
      "id": "actuarial-analyst",
      "title": "Actuarial Analyst",
-     "deliverables": [
-      "workbook",
-      "memo"
-     ]
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: memo.",
+     "own_sample": false
     }
    ]
   },
@@ -1309,54 +1309,55 @@
      }
     }
    ],
-   "others": [
+   "roles": [
+    {
+     "id": "data-bi-analyst",
+     "title": "Data / BI Analyst",
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: report.",
+     "own_sample": true
+    },
     {
      "id": "sales-operations-analyst",
      "title": "Sales Operations Analyst",
-     "deliverables": [
-      "workbook",
-      "report"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: report.",
+     "own_sample": false
     },
     {
      "id": "revenue-operations-analyst",
      "title": "Revenue Operations Analyst",
-     "deliverables": [
-      "workbook",
-      "report"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: report.",
+     "own_sample": false
     },
     {
      "id": "product-analyst-associate-product-manager",
      "title": "Product Analyst / Associate Product Manager",
-     "deliverables": [
-      "report",
-      "brief"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: report, brief.",
+     "own_sample": false
     },
     {
      "id": "supply-chain-logistics-analyst",
      "title": "Supply Chain / Logistics Analyst",
-     "deliverables": [
-      "workbook",
-      "report"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: report.",
+     "own_sample": false
     },
     {
      "id": "demand-planning-analyst",
      "title": "Demand Planning Analyst",
-     "deliverables": [
-      "workbook",
-      "report"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: report.",
+     "own_sample": false
     },
     {
      "id": "hr-analyst-people-analytics",
      "title": "HR Analyst (People Analytics)",
-     "deliverables": [
-      "workbook",
-      "report"
-     ]
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: report.",
+     "own_sample": false
     }
    ]
   },
@@ -1377,7 +1378,7 @@
    "problem": "Our bank balance and our ledger cash balance do not agree at month end. The bank shows $84,200 and the ledger shows $79,950.",
    "file": "samples/accounting-operations.xlsx",
    "format": "workbook",
-   "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: reconciliation.",
+   "delivers": "Delivers today: a verified Excel workbook with live formulas, with its reconciliation inside.",
    "slide_count": 14,
    "figure_count": 9,
    "slides": [
@@ -1563,6 +1564,58 @@
      ]
     },
     {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "reconciliation",
+      "title": [
+       {
+        "t": "Reconciliation: October bank reconciliation"
+       }
+      ],
+      "lines": [
+       {
+        "label": "Bank statement balance",
+        "v": "$84,200",
+        "ref": "F1",
+        "effect": "side A"
+       },
+       {
+        "label": "Deposits in transit",
+        "v": "$3,100",
+        "ref": "F3",
+        "effect": "adds to side A"
+       },
+       {
+        "label": "Uncleared cheques",
+        "v": "$1,850",
+        "ref": "F4",
+        "effect": "comes off side A"
+       },
+       {
+        "label": "Customer payment not yet recorded",
+        "v": "$5,500",
+        "ref": "F5",
+        "effect": "adds to side B"
+       },
+       {
+        "label": "Ledger cash balance",
+        "v": "$79,950",
+        "ref": "F2",
+        "effect": "side B"
+       }
+      ],
+      "entries": [
+       {
+        "debit": "Cash",
+        "credit": "Accounts receivable",
+        "v": "$5,500",
+        "ref": "F5"
+       }
+      ]
+     }
+    },
+    {
      "kind": "sources",
      "heading": "Where every number comes from",
      "rows": [
@@ -1640,62 +1693,62 @@
      }
     }
    ],
-   "others": [
+   "roles": [
+    {
+     "id": "staff-accountant-bookkeeper",
+     "title": "Staff Accountant / Bookkeeper",
+     "boundary": "Drafts only; you approve before anything happens.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas, with its reconciliation inside.",
+     "own_sample": true
+    },
     {
      "id": "accounts-payable-receivable-clerk",
      "title": "Accounts Payable / Receivable Clerk",
-     "deliverables": [
-      "reconciliation",
-      "draft"
-     ]
-    },
-    {
-     "id": "payroll-specialist",
-     "title": "Payroll Specialist",
-     "deliverables": [
-      "reconciliation",
-      "workbook"
-     ]
-    },
-    {
-     "id": "tax-associate",
-     "title": "Tax Associate",
-     "deliverables": [
-      "workbook",
-      "memo"
-     ]
-    },
-    {
-     "id": "fund-accountant",
-     "title": "Fund Accountant",
-     "deliverables": [
-      "reconciliation",
-      "report"
-     ]
+     "boundary": "Drafts only; you approve before anything happens.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas, with its draft and reconciliation inside.",
+     "own_sample": true
     },
     {
      "id": "trade-support-middle-office-analyst",
      "title": "Trade Support / Middle Office Analyst",
-     "deliverables": [
-      "reconciliation",
-      "case-file"
-     ]
+     "boundary": "Drafts only; you approve before anything happens.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas, with its case file and reconciliation inside.",
+     "own_sample": true
+    },
+    {
+     "id": "payroll-specialist",
+     "title": "Payroll Specialist",
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas, with its reconciliation inside.",
+     "own_sample": false
+    },
+    {
+     "id": "tax-associate",
+     "title": "Tax Associate",
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: memo.",
+     "own_sample": false
+    },
+    {
+     "id": "fund-accountant",
+     "title": "Fund Accountant",
+     "boundary": "Drafts only; you approve before anything happens.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas, with its reconciliation inside. Also planned: report.",
+     "own_sample": false
     },
     {
      "id": "operations-analyst-banking-capital-markets",
      "title": "Operations Analyst (Banking / Capital Markets)",
-     "deliverables": [
-      "reconciliation",
-      "report"
-     ]
+     "boundary": "Drafts only; you approve before anything happens.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas, with its reconciliation inside. Also planned: report.",
+     "own_sample": false
     },
     {
      "id": "regulatory-reporting-analyst",
      "title": "Regulatory Reporting Analyst",
-     "deliverables": [
-      "report",
-      "workbook"
-     ]
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Excel workbook with live formulas. Also planned: report.",
+     "own_sample": false
     }
    ]
   },
@@ -1961,54 +2014,55 @@
      }
     }
    ],
-   "others": [
+   "roles": [
     {
-     "id": "audit-associate-external-audit",
-     "title": "Audit Associate (External Audit)",
-     "deliverables": [
-      "workbook",
-      "register"
-     ]
+     "id": "internal-audit-associate",
+     "title": "Internal Audit Associate",
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Word memo. Also planned: workbook, report.",
+     "own_sample": true
     },
     {
      "id": "operational-risk-analyst",
      "title": "Operational Risk Analyst",
-     "deliverables": [
-      "register",
-      "report"
-     ]
-    },
-    {
-     "id": "third-party-vendor-risk-analyst",
-     "title": "Third-Party / Vendor Risk Analyst",
-     "deliverables": [
-      "register",
-      "report"
-     ]
-    },
-    {
-     "id": "information-security-grc-analyst",
-     "title": "Information Security / GRC Analyst",
-     "deliverables": [
-      "register",
-      "report"
-     ]
-    },
-    {
-     "id": "privacy-data-protection-analyst",
-     "title": "Privacy / Data Protection Analyst",
-     "deliverables": [
-      "register",
-      "report"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Word memo, with its register inside. Also planned: report.",
+     "own_sample": true
     },
     {
      "id": "cybersecurity-analyst-junior",
      "title": "Cybersecurity Analyst (junior)",
-     "deliverables": [
-      "report",
-      "case-file"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Word memo, with its case file inside. Also planned: report.",
+     "own_sample": true
+    },
+    {
+     "id": "audit-associate-external-audit",
+     "title": "Audit Associate (External Audit)",
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Word memo, with its register inside. Also planned: workbook.",
+     "own_sample": false
+    },
+    {
+     "id": "third-party-vendor-risk-analyst",
+     "title": "Third-Party / Vendor Risk Analyst",
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Word memo, with its register inside. Also planned: report.",
+     "own_sample": false
+    },
+    {
+     "id": "information-security-grc-analyst",
+     "title": "Information Security / GRC Analyst",
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Word memo, with its register inside. Also planned: report.",
+     "own_sample": false
+    },
+    {
+     "id": "privacy-data-protection-analyst",
+     "title": "Privacy / Data Protection Analyst",
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Word memo, with its register inside. Also planned: report.",
+     "own_sample": false
     }
    ]
   },
@@ -2028,7 +2082,7 @@
    "problem": "Our card fraud alerts have grown and analysts cannot keep up. We had 3,000 alerts last month.",
    "file": "samples/financial-crime.docx",
    "format": "memo",
-   "delivers": "Delivers today: a verified Word memo. Also planned: case-file.",
+   "delivers": "Delivers today: a verified Word memo, with its case file inside.",
    "slide_count": 13,
    "figure_count": 7,
    "slides": [
@@ -2216,6 +2270,75 @@
      ]
     },
     {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "case_file",
+      "title": [
+       {
+        "t": "Case file: Card alert backlog: unreviewed alerts this month"
+       }
+      ],
+      "facts": [
+       [
+        {
+         "t": "Alerts reached "
+        },
+        {
+         "v": "3,000",
+         "ref": "F1"
+        },
+        {
+         "t": " last month while analysts close about "
+        },
+        {
+         "v": "2,200",
+         "ref": "F2"
+        },
+        {
+         "t": " a month."
+        }
+       ],
+       [
+        {
+         "t": "That leaves about "
+        },
+        {
+         "v": "800",
+         "ref": "F5"
+        },
+        {
+         "t": " alerts a month unreviewed."
+        }
+       ],
+       [
+        {
+         "t": "About "
+        },
+        {
+         "v": "4%",
+         "ref": "F3"
+        },
+        {
+         "t": " of alerts turn out to be real fraud, with an average confirmed loss of "
+        },
+        {
+         "v": "$900",
+         "ref": "F4"
+        },
+        {
+         "t": "."
+        }
+       ]
+      ],
+      "for_decision": [
+       {
+        "t": "Should the fraud manager approve a risk-ranked queue that reviews the highest-loss alerts first, and which alerts may wait?"
+       }
+      ]
+     }
+    },
+    {
      "kind": "sources",
      "heading": "Where every number comes from",
      "rows": [
@@ -2293,37 +2416,41 @@
      }
     }
    ],
-   "others": [
+   "roles": [
+    {
+     "id": "fraud-analyst",
+     "title": "Fraud Analyst",
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Word memo, with its case file inside.",
+     "own_sample": true
+    },
     {
      "id": "compliance-aml-kyc-analyst",
      "title": "Compliance / AML / KYC Analyst",
-     "deliverables": [
-      "case-file",
-      "register"
-     ]
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Word memo, with its case file and register inside.",
+     "own_sample": true
     },
     {
      "id": "sanctions-screening-analyst",
      "title": "Sanctions Screening Analyst",
-     "deliverables": [
-      "case-file"
-     ]
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Word memo, with its case file inside.",
+     "own_sample": false
     },
     {
      "id": "financial-crime-investigator-junior",
      "title": "Financial Crime Investigator (junior)",
-     "deliverables": [
-      "case-file",
-      "report"
-     ]
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Word memo, with its case file inside. Also planned: report.",
+     "own_sample": false
     },
     {
      "id": "forensic-investigations-analyst",
      "title": "Forensic / Investigations Analyst",
-     "deliverables": [
-      "case-file",
-      "report"
-     ]
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Word memo, with its case file inside. Also planned: report.",
+     "own_sample": false
     }
    ]
   },
@@ -2344,7 +2471,7 @@
    "problem": "Our cloud hosting contract renews next month at $240,000 a year. We want to know whether to renegotiate or switch.",
    "file": "samples/legal-contracts-procurement.docx",
    "format": "memo",
-   "delivers": "Delivers today: a verified Word memo. Also planned: register.",
+   "delivers": "Delivers today: a verified Word memo, with its register inside.",
    "slide_count": 13,
    "figure_count": 8,
    "slides": [
@@ -2544,6 +2671,81 @@
      ]
     },
     {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "register",
+      "title": [
+       {
+        "t": "Register: Hosting renewal: negotiation register"
+       }
+      ],
+      "rows": [
+       {
+        "item": [
+         {
+          "t": "The contract allows a "
+         },
+         {
+          "v": "5%",
+          "ref": "F3"
+         },
+         {
+          "t": " annual price increase."
+         }
+        ],
+        "rating": "high",
+        "owner": "Head of procurement",
+        "status": "open"
+       },
+       {
+        "item": [
+         {
+          "t": "A competitor quoted "
+         },
+         {
+          "v": "$198,000",
+          "ref": "F2"
+         },
+         {
+          "t": " a year for the same capacity."
+         }
+        ],
+        "rating": "medium",
+        "owner": "Head of procurement",
+        "status": "open"
+       },
+       {
+        "item": [
+         {
+          "t": "Switching carries a one-time migration cost of "
+         },
+         {
+          "v": "$60,000",
+          "ref": "F4"
+         },
+         {
+          "t": "."
+         }
+        ],
+        "rating": "medium",
+        "owner": "Chief technology officer",
+        "status": "open"
+       },
+       {
+        "item": [
+         {
+          "t": "Any amended contract terms."
+         }
+        ],
+        "rating": "low",
+        "owner": "General counsel",
+        "status": "open"
+       }
+      ]
+     }
+    },
+    {
      "kind": "sources",
      "heading": "Where every number comes from",
      "rows": [
@@ -2621,38 +2823,41 @@
      }
     }
    ],
-   "others": [
+   "roles": [
+    {
+     "id": "contract-procurement-analyst",
+     "title": "Contract / Procurement Analyst",
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Word memo, with its register inside.",
+     "own_sample": true
+    },
     {
      "id": "paralegal-contracts-administrator",
      "title": "Paralegal / Contracts Administrator",
-     "deliverables": [
-      "draft",
-      "register"
-     ]
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Word memo, with its draft and register inside.",
+     "own_sample": true
     },
     {
      "id": "legal-operations-analyst",
      "title": "Legal Operations Analyst",
-     "deliverables": [
-      "report",
-      "workbook"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Word memo. Also planned: report, workbook.",
+     "own_sample": false
     },
     {
      "id": "procurement-assistant",
      "title": "Procurement Assistant",
-     "deliverables": [
-      "draft",
-      "workbook"
-     ]
+     "boundary": "Drafts only; you approve before anything happens.",
+     "delivers": "Delivers today: a verified Word memo, with its draft inside. Also planned: workbook.",
+     "own_sample": false
     },
     {
      "id": "grants-administrator",
      "title": "Grants Administrator",
-     "deliverables": [
-      "draft",
-      "workbook"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Word memo, with its draft inside. Also planned: workbook.",
+     "own_sample": false
     }
    ]
   },
@@ -2672,7 +2877,7 @@
    "problem": "Our customer newsletter's open rate fell from 38% to 24% this year. We want a content plan to win readers back.",
    "file": "samples/content-communications.pptx",
    "format": "deck",
-   "delivers": "Delivers today: a verified PowerPoint deck. Also planned: draft.",
+   "delivers": "Delivers today: a verified PowerPoint deck, with its draft inside.",
    "slide_count": 14,
    "figure_count": 7,
    "slides": [
@@ -2867,6 +3072,94 @@
      ]
     },
     {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "draft",
+      "title": [
+       {
+        "t": "Draft: Next issue: lead with a practical how-to"
+       }
+      ],
+      "for": "Small business owners, email newsletter",
+      "paras": [
+       [
+        {
+         "t": "Subject line: Get paid faster this month, in three simple steps"
+        }
+       ],
+       [
+        {
+         "t": "Hi there, late invoices are the quiet cash drain every small business knows. This issue is short and practical: three things you can set up this afternoon."
+        }
+       ],
+       [
+        {
+         "t": "First, send invoices the day the work is done, not at month end. Second, offer one easy way to pay and put the link at the top. Third, set a friendly reminder for the day before the due date."
+        }
+       ],
+       [
+        {
+         "t": "That's it. Reply and tell us which one you tried; the best tips go in a future issue."
+        }
+       ]
+      ]
+     }
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "draft",
+      "title": [
+       {
+        "t": "Draft: Plan note for the marketing lead"
+       }
+      ],
+      "for": "Marketing lead, internal note",
+      "paras": [
+       [
+        {
+         "t": "How-to issues open at "
+        },
+        {
+         "v": "41%",
+         "ref": "F4"
+        },
+        {
+         "t": " against "
+        },
+        {
+         "v": "24%",
+         "ref": "F2"
+        },
+        {
+         "t": " for the newsletter as a whole, so the next quarter leads every issue with one practical how-to piece."
+        }
+       ],
+       [
+        {
+         "t": "At the how-to rate an issue would reach about "
+        },
+        {
+         "v": "4,920",
+         "ref": "F7"
+        },
+        {
+         "t": " readers instead of about "
+        },
+        {
+         "v": "2,880",
+         "ref": "F6"
+        },
+        {
+         "t": " today."
+        }
+       ]
+      ]
+     }
+    },
+    {
      "kind": "sources",
      "heading": "Where every number comes from",
      "rows": [
@@ -2944,36 +3237,41 @@
      }
     }
    ],
-   "others": [
+   "roles": [
+    {
+     "id": "content-writer-copywriter",
+     "title": "Content Writer / Copywriter",
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified PowerPoint deck, with its draft inside.",
+     "own_sample": true
+    },
     {
      "id": "seo-sem-specialist",
      "title": "SEO / SEM Specialist",
-     "deliverables": [
-      "report",
-      "draft"
-     ]
+     "boundary": "Drafts only; you approve before anything happens.",
+     "delivers": "Delivers today: a verified PowerPoint deck, with its draft inside. Also planned: report.",
+     "own_sample": false
     },
     {
      "id": "social-media-coordinator",
      "title": "Social Media Coordinator",
-     "deliverables": [
-      "draft"
-     ]
+     "boundary": "Drafts only; you approve before anything happens.",
+     "delivers": "Delivers today: a verified PowerPoint deck, with its draft inside.",
+     "own_sample": false
     },
     {
      "id": "corporate-communications-coordinator",
      "title": "Corporate Communications Coordinator",
-     "deliverables": [
-      "draft",
-      "brief"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified PowerPoint deck, with its draft inside. Also planned: brief.",
+     "own_sample": false
     },
     {
      "id": "technical-writer",
      "title": "Technical Writer",
-     "deliverables": [
-      "draft"
-     ]
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified PowerPoint deck, with its draft inside.",
+     "own_sample": false
     }
    ]
   },
@@ -2994,7 +3292,7 @@
    "problem": "New hires take too long to become productive. Our onboarding takes 10 weeks on average and we want to cut it.",
    "file": "samples/people-hr.docx",
    "format": "memo",
-   "delivers": "Delivers today: a verified Word memo. Also planned: plan, draft.",
+   "delivers": "Delivers today: a verified Word memo, with its draft and plan inside.",
    "slide_count": 14,
    "figure_count": 5,
    "slides": [
@@ -3175,6 +3473,98 @@
      ]
     },
     {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "plan",
+      "title": [
+       {
+        "t": "Plan: Buddy program rollout"
+       }
+      ],
+      "steps": [
+       {
+        "when": "Week one",
+        "task": [
+         {
+          "t": "Name a buddy for every new hire starting next month."
+         }
+        ],
+        "owner": "Team leads"
+       },
+       {
+        "when": "Week two",
+        "task": [
+         {
+          "t": "Brief buddies on the first-week checklist."
+         }
+        ],
+        "owner": "Learning and development coordinator"
+       },
+       {
+        "when": "Month one",
+        "task": [
+         {
+          "t": "Track weeks to full productivity for buddied hires against the "
+         },
+         {
+          "v": "10",
+          "ref": "F1"
+         },
+         {
+          "t": " week average."
+         }
+        ],
+        "owner": "Learning and development coordinator"
+       }
+      ]
+     }
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "draft",
+      "title": [
+       {
+        "t": "Draft: Note to team leads: buddy program"
+       }
+      ],
+      "for": "Team leads, email",
+      "paras": [
+       [
+        {
+         "t": "New hires with a buddy reached full productivity in "
+        },
+        {
+         "v": "7",
+         "ref": "F3"
+        },
+        {
+         "t": " weeks, against "
+        },
+        {
+         "v": "10",
+         "ref": "F1"
+        },
+        {
+         "t": " weeks on average."
+        }
+       ],
+       [
+        {
+         "t": "From next month every new starter gets a buddy from their own team for their first weeks. We'll send you the checklist and a short guide this week."
+        }
+       ],
+       [
+        {
+         "t": "Questions or a better candidate in mind? Reply to this note and we'll sort it out together."
+        }
+       ]
+      ]
+     }
+    },
+    {
      "kind": "sources",
      "heading": "Where every number comes from",
      "rows": [
@@ -3241,30 +3631,34 @@
      }
     }
    ],
-   "others": [
+   "roles": [
+    {
+     "id": "learning-and-development-coordinator",
+     "title": "Learning & Development Coordinator",
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified Word memo, with its draft and plan inside.",
+     "own_sample": true
+    },
     {
      "id": "recruiting-coordinator",
      "title": "Recruiting Coordinator",
-     "deliverables": [
-      "draft",
-      "plan"
-     ]
+     "boundary": "Drafts only; you approve before anything happens.",
+     "delivers": "Delivers today: a verified Word memo, with its draft and plan inside.",
+     "own_sample": false
     },
     {
      "id": "talent-acquisition-associate",
      "title": "Talent Acquisition Associate",
-     "deliverables": [
-      "brief",
-      "draft"
-     ]
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Word memo, with its draft inside. Also planned: brief.",
+     "own_sample": false
     },
     {
      "id": "compensation-and-benefits-analyst",
      "title": "Compensation & Benefits Analyst",
-     "deliverables": [
-      "workbook",
-      "memo"
-     ]
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Word memo. Also planned: workbook.",
+     "own_sample": false
     }
    ]
   },
@@ -3284,7 +3678,7 @@
    "problem": "Our customer dashboard takes 6.5 seconds to load and customers complain. We want it under 2 seconds.",
    "file": "samples/software-it.pptx",
    "format": "deck",
-   "delivers": "Delivers today: a verified PowerPoint deck. Also planned: code.",
+   "delivers": "Delivers today: a verified PowerPoint deck, with its draft code inside.",
    "slide_count": 13,
    "figure_count": 6,
    "slides": [
@@ -3465,6 +3859,42 @@
      ]
     },
     {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "code",
+      "title": [
+       {
+        "t": "Draft code: Python"
+       }
+      ],
+      "language": "Python",
+      "purpose": [
+       {
+        "t": "Replace the dashboard's slow per-widget queries with one indexed query, for the engineering lead to review."
+       }
+      ],
+      "lines": [
+       "# Draft: one query for the whole dashboard instead of one per widget.",
+       "def load_dashboard(db, customer_id):",
+       "    rows = db.execute(",
+       "        \"\"\"",
+       "        SELECT widget_id, SUM(amount) AS total",
+       "        FROM events",
+       "        WHERE customer_id = %s",
+       "        GROUP BY widget_id",
+       "        \"\"\",",
+       "        (customer_id,),",
+       "    )",
+       "    return {row.widget_id: row.total for row in rows}",
+       "",
+       "# Migration to review before running: index the filter column.",
+       "# CREATE INDEX CONCURRENTLY idx_events_customer ON events (customer_id);"
+      ],
+      "more": 0
+     }
+    },
+    {
      "kind": "sources",
      "heading": "Where every number comes from",
      "rows": [
@@ -3542,22 +3972,27 @@
      }
     }
    ],
-   "others": [
+   "roles": [
     {
-     "id": "qa-test-analyst",
-     "title": "QA / Test Analyst",
-     "deliverables": [
-      "code",
-      "report"
-     ]
+     "id": "junior-software-developer",
+     "title": "Junior Software Developer",
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified PowerPoint deck, with its draft code inside.",
+     "own_sample": true
     },
     {
      "id": "it-help-desk-technical-support-specialist",
      "title": "IT Help Desk / Technical Support Specialist",
-     "deliverables": [
-      "draft",
-      "case-file"
-     ]
+     "boundary": "Drafts only; you approve before anything happens.",
+     "delivers": "Delivers today: a verified PowerPoint deck, with its case file and draft inside.",
+     "own_sample": true
+    },
+    {
+     "id": "qa-test-analyst",
+     "title": "QA / Test Analyst",
+     "boundary": "Delivers analysis; acts on nothing.",
+     "delivers": "Delivers today: a verified PowerPoint deck, with its draft code inside. Also planned: report.",
+     "own_sample": false
     }
    ]
   },
@@ -3578,7 +4013,7 @@
    "problem": "We need help preparing a water damage claim file. The policyholder claims $18,000 for a burst pipe.",
    "file": "samples/insurance.docx",
    "format": "memo",
-   "delivers": "Delivers today: a verified Word memo. Also planned: case-file, workbook.",
+   "delivers": "Delivers today: a verified Word memo, with its case file inside. Also planned: workbook.",
    "slide_count": 13,
    "figure_count": 6,
    "slides": [
@@ -3778,6 +4213,94 @@
      ]
     },
     {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "case_file",
+      "title": [
+       {
+        "t": "Case file: Water damage claim: burst pipe"
+       }
+      ],
+      "facts": [
+       [
+        {
+         "t": "The policyholder claims "
+        },
+        {
+         "v": "$18,000",
+         "ref": "F1"
+        },
+        {
+         "t": " for a burst pipe."
+        }
+       ],
+       [
+        {
+         "t": "The repair estimate is "
+        },
+        {
+         "v": "$14,500",
+         "ref": "F3"
+        },
+        {
+         "t": ", which is "
+        },
+        {
+         "v": "$3,500",
+         "ref": "F5"
+        },
+        {
+         "t": " below the claim."
+        }
+       ],
+       [
+        {
+         "t": "The policy deductible is "
+        },
+        {
+         "v": "$1,000",
+         "ref": "F2"
+        },
+        {
+         "t": "; the estimate after the deductible is "
+        },
+        {
+         "v": "$13,500",
+         "ref": "F6"
+        },
+        {
+         "t": "."
+        }
+       ],
+       [
+        {
+         "t": "The leak was reported "
+        },
+        {
+         "v": "3",
+         "ref": "F4"
+        },
+        {
+         "t": " days after it started."
+        }
+       ]
+      ],
+      "for_decision": [
+       {
+        "t": "Should the licensed adjuster pay the claim, and at what amount, given the estimate after the deductible of "
+       },
+       {
+        "v": "$13,500",
+        "ref": "F6"
+       },
+       {
+        "t": "?"
+       }
+      ]
+     }
+    },
+    {
      "kind": "sources",
      "heading": "Where every number comes from",
      "rows": [
@@ -3855,14 +4378,20 @@
      }
     }
    ],
-   "others": [
+   "roles": [
+    {
+     "id": "claims-adjuster",
+     "title": "Claims Adjuster",
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Word memo, with its case file inside. Also planned: workbook.",
+     "own_sample": true
+    },
     {
      "id": "underwriting-assistant",
      "title": "Underwriting Assistant",
-     "deliverables": [
-      "case-file",
-      "workbook"
-     ]
+     "boundary": "Prepares the decision; a qualified person decides.",
+     "delivers": "Delivers today: a verified Word memo, with its case file inside. Also planned: workbook.",
+     "own_sample": false
     }
    ]
   },
@@ -3883,7 +4412,7 @@
    "problem": "We sell scheduling software to dental clinics. Our outbound emails get a 1.5% reply rate and we need more meetings.",
    "file": "samples/sales-customer-coordination.pptx",
    "format": "deck",
-   "delivers": "Delivers today: a verified PowerPoint deck. Also planned: brief, draft.",
+   "delivers": "Delivers today: a verified PowerPoint deck, with its draft inside. Also planned: brief.",
    "slide_count": 13,
    "figure_count": 7,
    "slides": [
@@ -4071,6 +4600,36 @@
      ]
     },
     {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "draft",
+      "title": [
+       {
+        "t": "Draft: Outreach email to larger dental practices"
+       }
+      ],
+      "for": "Practice managers at larger dental clinics, email",
+      "paras": [
+       [
+        {
+         "t": "Subject: Fewer empty chairs at your practice"
+        }
+       ],
+       [
+        {
+         "t": "Hi there, in a busy multi-chair practice every cancelled slot costs you. Our scheduling software fills cancellations from your waiting list and sends reminders patients actually answer."
+        }
+       ],
+       [
+        {
+         "t": "Would a short call next week help? I can show you how practices like yours keep their calendars full."
+        }
+       ]
+      ]
+     }
+    },
+    {
      "kind": "sources",
      "heading": "Where every number comes from",
      "rows": [
@@ -4148,24 +4707,3763 @@
      }
     }
    ],
-   "others": [
+   "roles": [
     {
-     "id": "customer-success-associate",
-     "title": "Customer Success Associate",
-     "deliverables": [
-      "report",
-      "draft"
-     ]
+     "id": "sales-development-representative-sdr",
+     "title": "Sales Development Representative (SDR)",
+     "boundary": "Drafts only; you approve before anything happens.",
+     "delivers": "Delivers today: a verified PowerPoint deck, with its draft inside. Also planned: brief.",
+     "own_sample": true
     },
     {
      "id": "project-program-coordinator",
      "title": "Project / Program Coordinator",
-     "deliverables": [
-      "plan",
-      "report"
-     ]
+     "boundary": "Drafts only; you approve before anything happens.",
+     "delivers": "Delivers today: a verified PowerPoint deck, with its plan inside. Also planned: report.",
+     "own_sample": true
+    },
+    {
+     "id": "customer-success-associate",
+     "title": "Customer Success Associate",
+     "boundary": "Drafts only; you approve before anything happens.",
+     "delivers": "Delivers today: a verified PowerPoint deck, with its draft inside. Also planned: report.",
+     "own_sample": false
     }
    ]
   }
- ]
+ ],
+ "roles": {
+  "accounts-payable-receivable-clerk": {
+   "family": {
+    "id": "accounting-operations",
+    "title": "Accounting and finance operations"
+   },
+   "role": {
+    "id": "accounts-payable-receivable-clerk",
+    "title": "Accounts Payable / Receivable Clerk",
+    "boundary": "Drafts only; you approve before anything happens.",
+    "deliverables": [
+     "reconciliation",
+     "draft"
+    ]
+   },
+   "problem": "Our ledger shows $44,700 owed to our main packaging supplier, but their month-end statement says we owe $52,900.",
+   "file": "samples/roles/accounts-payable-receivable-clerk.xlsx",
+   "format": "workbook",
+   "delivers": "Delivers today: a verified Excel workbook with live formulas, with its draft and reconciliation inside.",
+   "slide_count": 15,
+   "figure_count": 10,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Post the missing invoice and credit note for the controller's approval and ask the supplier to confirm our payment: together they explain the whole "
+      },
+      {
+       "v": "$8,200",
+       "ref": "F6"
+      },
+      {
+       "t": " gap."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "The supplier's statement shows "
+       },
+       {
+        "v": "$52,900",
+        "ref": "F1"
+       },
+       {
+        "t": " against our ledger's "
+       },
+       {
+        "v": "$44,700",
+        "ref": "F2"
+       },
+       {
+        "t": ", a gap of "
+       },
+       {
+        "v": "$8,200",
+        "ref": "F6"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "Our payment of "
+       },
+       {
+        "v": "$2,600",
+        "ref": "F4"
+       },
+       {
+        "t": " is not on their statement yet, which leaves their side at "
+       },
+       {
+        "v": "$50,300",
+        "ref": "F7"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "An unentered invoice of "
+       },
+       {
+        "v": "$7,400",
+        "ref": "F3"
+       },
+       {
+        "t": " and an unrecorded credit note of "
+       },
+       {
+        "v": "$1,800",
+        "ref": "F5"
+       },
+       {
+        "t": " bring our ledger to "
+       },
+       {
+        "v": "$50,300",
+        "ref": "F9"
+       },
+       {
+        "t": ", so nothing is left unexplained."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "$8,200",
+       "ref": "F6",
+       "label": "Gap before reconciling",
+       "basis": "calculated"
+      },
+      {
+       "v": "$52,900",
+       "ref": "F1",
+       "label": "Supplier statement balance",
+       "basis": "client data"
+      },
+      {
+       "v": "$44,700",
+       "ref": "F2",
+       "label": "Ledger balance owed to the supplier",
+       "basis": "client data"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "Our latest payment has not reached their statement."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Taking our payment of "
+       },
+       {
+        "v": "$2,600",
+        "ref": "F4"
+       },
+       {
+        "t": " off their balance leaves "
+       },
+       {
+        "v": "$50,300",
+        "ref": "F7"
+       },
+       {
+        "t": "."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Their balance and ours before reconciling."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Supplier",
+        "v": "$52,900",
+        "ref": "F1",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Ledger",
+        "v": "$44,700",
+        "ref": "F2",
+        "share": 0.845,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Post the missing items for approval and confirm the payment with the supplier."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Post and confirm"
+       }
+      ],
+      [
+       {
+        "t": "It explains the whole "
+       },
+       {
+        "v": "$8,200",
+        "ref": "F6"
+       },
+       {
+        "t": " gap now and keeps the month-end close on time; nothing is posted or sent until the controller approves."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "reconciliation",
+      "title": [
+       {
+        "t": "Reconciliation: Packaging supplier statement reconciliation"
+       }
+      ],
+      "lines": [
+       {
+        "label": "Supplier statement balance",
+        "v": "$52,900",
+        "ref": "F1",
+        "effect": "side A"
+       },
+       {
+        "label": "Our payment not yet on their statement",
+        "v": "$2,600",
+        "ref": "F4",
+        "effect": "comes off side A"
+       },
+       {
+        "label": "Invoice not yet entered",
+        "v": "$7,400",
+        "ref": "F3",
+        "effect": "adds to side B"
+       },
+       {
+        "label": "Credit note not yet recorded",
+        "v": "$1,800",
+        "ref": "F5",
+        "effect": "comes off side B"
+       },
+       {
+        "label": "Ledger balance owed",
+        "v": "$44,700",
+        "ref": "F2",
+        "effect": "side B"
+       }
+      ],
+      "entries": [
+       {
+        "debit": "Packaging costs",
+        "credit": "Accounts payable",
+        "v": "$7,400",
+        "ref": "F3"
+       },
+       {
+        "debit": "Accounts payable",
+        "credit": "Packaging costs",
+        "v": "$1,800",
+        "ref": "F5"
+       }
+      ]
+     }
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "draft",
+      "title": [
+       {
+        "t": "Draft: Email to the supplier's accounts team"
+       }
+      ],
+      "for": "The supplier's accounts team, email for the controller to approve before sending",
+      "paras": [
+       [
+        {
+         "t": "Hello, we are reconciling our account with you for month end."
+        }
+       ],
+       [
+        {
+         "t": "Your statement shows "
+        },
+        {
+         "v": "$52,900",
+         "ref": "F1"
+        },
+        {
+         "t": ". We sent a payment of "
+        },
+        {
+         "v": "$2,600",
+         "ref": "F4"
+        },
+        {
+         "t": " on the last day of the month that is not on your statement yet; could you confirm it has reached you?"
+        }
+       ],
+       [
+        {
+         "t": "Could you also send a copy of the invoice for "
+        },
+        {
+         "v": "$7,400",
+         "ref": "F3"
+        },
+        {
+         "t": " and confirm the credit note for "
+        },
+        {
+         "v": "$1,800",
+         "ref": "F5"
+        },
+        {
+         "t": ", so we can enter both?"
+        }
+       ],
+       [
+        {
+         "t": "Thank you, the accounts payable team."
+        }
+       ]
+      ]
+     }
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Supplier statement balance",
+       "v": "$52,900",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “their month-end statement says we owe $52,900”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Ledger balance owed to the supplier",
+       "v": "$44,700",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “Our ledger shows $44,700”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Invoice not yet entered in our ledger",
+       "v": "$7,400",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “An invoice for $7,400”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Our payment not yet on their statement",
+       "v": "$2,600",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “We sent a payment of $2,600”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Credit note not yet recorded",
+       "v": "$1,800",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “a credit note for $1,800”"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Gap before reconciling",
+       "v": "$8,200",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F1 − F2"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 5,
+      "computed": 5,
+      "assumption": 0
+     }
+    }
+   ]
+  },
+  "compliance-aml-kyc-analyst": {
+   "family": {
+    "id": "financial-crime",
+    "title": "Financial crime"
+   },
+   "role": {
+    "id": "compliance-aml-kyc-analyst",
+    "title": "Compliance / AML / KYC Analyst",
+    "boundary": "Prepares the decision; a qualified person decides.",
+    "deliverables": [
+     "case-file",
+     "register"
+    ]
+   },
+   "problem": "We have 4,800 customer files due for KYC refresh this year and 1,200 are already overdue.",
+   "file": "samples/roles/compliance-aml-kyc-analyst.docx",
+   "format": "memo",
+   "delivers": "Delivers today: a verified Word memo, with its case file and register inside.",
+   "slide_count": 14,
+   "figure_count": 7,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Work the overdue files in risk order, high-risk first: "
+      },
+      {
+       "v": "360",
+       "ref": "F3"
+      },
+      {
+       "t": " high-risk files are overdue, and the backlog alone equals "
+      },
+      {
+       "v": "3 months",
+       "ref": "F6"
+      },
+      {
+       "t": " of the team's capacity."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "v": "1,200",
+        "ref": "F2"
+       },
+       {
+        "t": " of "
+       },
+       {
+        "v": "4,800",
+        "ref": "F1"
+       },
+       {
+        "t": " files due this year are overdue, "
+       },
+       {
+        "v": "25%",
+        "ref": "F5"
+       },
+       {
+        "t": " of the total."
+       }
+      ],
+      [
+       {
+        "v": "360",
+        "ref": "F3"
+       },
+       {
+        "t": " of the overdue files are high-risk customers, "
+       },
+       {
+        "v": "30%",
+        "ref": "F7"
+       },
+       {
+        "t": " of the overdue files."
+       }
+      ],
+      [
+       {
+        "t": "At about "
+       },
+       {
+        "v": "400",
+        "ref": "F4"
+       },
+       {
+        "t": " refreshes a month, the overdue files equal "
+       },
+       {
+        "v": "3 months",
+        "ref": "F6"
+       },
+       {
+        "t": " of capacity, before any new files fall due."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "360",
+       "ref": "F3",
+       "label": "Overdue files for high-risk customers",
+       "basis": "client data"
+      },
+      {
+       "v": "3 months",
+       "ref": "F6",
+       "label": "Overdue files in months of team capacity",
+       "basis": "calculated"
+      },
+      {
+       "v": "1,200",
+       "ref": "F2",
+       "label": "Files already overdue",
+       "basis": "client data"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "Many of this year's files are already overdue."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "v": "1,200",
+        "ref": "F2"
+       },
+       {
+        "t": " files are overdue, "
+       },
+       {
+        "v": "25%",
+        "ref": "F5"
+       },
+       {
+        "t": " of those due."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Files due and overdue."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Due this year",
+        "v": "4,800",
+        "ref": "F1",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Overdue",
+        "v": "1,200",
+        "ref": "F2",
+        "share": 0.25,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Work overdue files in risk order, high-risk first."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Risk-ordered queue"
+       }
+      ],
+      [
+       {
+        "t": "It removes the highest risk first without new hires; the reporting officer decides any restriction on overdue accounts."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "register",
+      "title": [
+       {
+        "t": "Register: Overdue KYC refresh register"
+       }
+      ],
+      "rows": [
+       {
+        "item": [
+         {
+          "t": "High-risk customers overdue: "
+         },
+         {
+          "v": "360",
+          "ref": "F3"
+         },
+         {
+          "t": " files."
+         }
+        ],
+        "rating": "high",
+        "owner": "Head of KYC",
+        "status": "open"
+       },
+       {
+        "item": [
+         {
+          "t": "Overdue files in total: "
+         },
+         {
+          "v": "1,200",
+          "ref": "F2"
+         },
+         {
+          "t": ", "
+         },
+         {
+          "v": "25%",
+          "ref": "F5"
+         },
+         {
+          "t": " of this year's."
+         }
+        ],
+        "rating": "medium",
+        "owner": "KYC team lead",
+        "status": "in progress"
+       },
+       {
+        "item": [
+         {
+          "t": "Overdue files equal "
+         },
+         {
+          "v": "3 months",
+          "ref": "F6"
+         },
+         {
+          "t": " of today's capacity, before new files fall due."
+         }
+        ],
+        "rating": "medium",
+        "owner": "Compliance manager",
+        "status": "open"
+       }
+      ]
+     }
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "case_file",
+      "title": [
+       {
+        "t": "Case file: Overdue high-risk customer files"
+       }
+      ],
+      "facts": [
+       [
+        {
+         "v": "360",
+         "ref": "F3"
+        },
+        {
+         "t": " high-risk customer files are past their refresh date."
+        }
+       ],
+       [
+        {
+         "t": "They are "
+        },
+        {
+         "v": "30%",
+         "ref": "F7"
+        },
+        {
+         "t": " of the "
+        },
+        {
+         "v": "1,200",
+         "ref": "F2"
+        },
+        {
+         "t": " overdue files."
+        }
+       ],
+       [
+        {
+         "t": "The team completes about "
+        },
+        {
+         "v": "400",
+         "ref": "F4"
+        },
+        {
+         "t": " refreshes a month."
+        }
+       ]
+      ],
+      "for_decision": [
+       {
+        "t": "Should the money laundering reporting officer approve the risk-ordered queue and decide whether to restrict activity on overdue high-risk accounts?"
+       }
+      ]
+     }
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Customer files due for refresh this year",
+       "v": "4,800",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “We have 4,800 customer files due”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Files already overdue",
+       "v": "1,200",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “1,200 are already overdue”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Overdue files for high-risk customers",
+       "v": "360",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “360 of the overdue files are high-risk”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Refreshes completed per month",
+       "v": "400",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “completes about 400 refreshes a month”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Share of this year's files overdue",
+       "v": "25%",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F2 ÷ F1 × 100"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Overdue files in months of team capacity",
+       "v": "3 months",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F2 ÷ F4"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 4,
+      "computed": 3,
+      "assumption": 0
+     }
+    }
+   ]
+  },
+  "cybersecurity-analyst-junior": {
+   "family": {
+    "id": "risk-audit-controls",
+    "title": "Risk, audit and controls"
+   },
+   "role": {
+    "id": "cybersecurity-analyst-junior",
+    "title": "Cybersecurity Analyst (junior)",
+    "boundary": "Delivers analysis; acts on nothing.",
+    "deliverables": [
+     "report",
+     "case-file"
+    ]
+   },
+   "problem": "Our email gateway flagged 1,240 phishing emails last week, and 40 staff clicked a link in them.",
+   "file": "samples/roles/cybersecurity-analyst-junior.docx",
+   "format": "memo",
+   "delivers": "Delivers today: a verified Word memo, with its case file inside. Also planned: report.",
+   "slide_count": 13,
+   "figure_count": 6,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Treat the "
+      },
+      {
+       "v": "6",
+       "ref": "F3"
+      },
+      {
+       "t": " staff who entered passwords as compromised accounts for the security lead to act on today; the other clicks need a lighter check."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "The gateway flagged "
+       },
+       {
+        "v": "1,240",
+        "ref": "F1"
+       },
+       {
+        "t": " phishing emails last week."
+       }
+      ],
+      [
+       {
+        "v": "40",
+        "ref": "F2"
+       },
+       {
+        "t": " staff clicked a link, "
+       },
+       {
+        "v": "4%",
+        "ref": "F5"
+       },
+       {
+        "t": " of all staff."
+       }
+      ],
+      [
+       {
+        "v": "6",
+        "ref": "F3"
+       },
+       {
+        "t": " of them entered passwords, "
+       },
+       {
+        "v": "15%",
+        "ref": "F6"
+       },
+       {
+        "t": " of those who clicked."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "6",
+       "ref": "F3",
+       "label": "Staff who entered passwords",
+       "basis": "client data"
+      },
+      {
+       "v": "1,240",
+       "ref": "F1",
+       "label": "Phishing emails flagged last week",
+       "basis": "client data"
+      },
+      {
+       "v": "40",
+       "ref": "F2",
+       "label": "Staff who clicked a link",
+       "basis": "client data"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "A small group entered passwords and is most exposed."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "v": "6",
+        "ref": "F3"
+       },
+       {
+        "t": " staff entered passwords on the fake page."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Clicks and passwords entered."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Clicked",
+        "v": "40",
+        "ref": "F2",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Entered password",
+        "v": "6",
+        "ref": "F3",
+        "share": 0.15,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Reset and review the accounts that entered passwords today."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Reset and review"
+       }
+      ],
+      [
+       {
+        "t": "It closes the exposure for the "
+       },
+       {
+        "v": "6",
+        "ref": "F3"
+       },
+       {
+        "t": " accounts today; the security lead decides and acts."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "case_file",
+      "title": [
+       {
+        "t": "Case file: Phishing campaign: staff who entered passwords"
+       }
+      ],
+      "facts": [
+       [
+        {
+         "t": "The email gateway flagged "
+        },
+        {
+         "v": "1,240",
+         "ref": "F1"
+        },
+        {
+         "t": " phishing emails last week."
+        }
+       ],
+       [
+        {
+         "v": "40",
+         "ref": "F2"
+        },
+        {
+         "t": " staff clicked a link and "
+        },
+        {
+         "v": "6",
+         "ref": "F3"
+        },
+        {
+         "t": " entered passwords on the fake page."
+        }
+       ],
+       [
+        {
+         "t": "That is "
+        },
+        {
+         "v": "15%",
+         "ref": "F6"
+        },
+        {
+         "t": " of the staff who clicked."
+        }
+       ]
+      ],
+      "for_decision": [
+       {
+        "t": "Should the security lead force password resets and a sign-in review today for the staff who entered passwords?"
+       }
+      ]
+     }
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Phishing emails flagged last week",
+       "v": "1,240",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “flagged 1,240 phishing emails”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Staff who clicked a link",
+       "v": "40",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “40 staff clicked a link”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Staff who entered passwords",
+       "v": "6",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “6 of those staff entered their passwords”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Staff in total",
+       "v": "1,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “We have 1,000 staff in total”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Share of staff who clicked",
+       "v": "4%",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F2 ÷ F4 × 100"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Share of clickers who entered passwords",
+       "v": "15%",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F3 ÷ F2 × 100"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 4,
+      "computed": 2,
+      "assumption": 0
+     }
+    }
+   ]
+  },
+  "it-help-desk-technical-support-specialist": {
+   "family": {
+    "id": "software-it",
+    "title": "Software and IT"
+   },
+   "role": {
+    "id": "it-help-desk-technical-support-specialist",
+    "title": "IT Help Desk / Technical Support Specialist",
+    "boundary": "Drafts only; you approve before anything happens.",
+    "deliverables": [
+     "draft",
+     "case-file"
+    ]
+   },
+   "problem": "Since the VPN update we have had 260 tickets about failed connections this week, against a normal 60.",
+   "file": "samples/roles/it-help-desk-technical-support-specialist.pptx",
+   "format": "deck",
+   "delivers": "Delivers today: a verified PowerPoint deck, with its case file and draft inside.",
+   "slide_count": 14,
+   "figure_count": 5,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Ask the IT manager to approve rolling back the update on the older laptop model: it accounts for "
+      },
+      {
+       "v": "75%",
+       "ref": "F5"
+      },
+      {
+       "t": " of tickets, which are "
+      },
+      {
+       "v": "200",
+       "ref": "F4"
+      },
+      {
+       "t": " above normal."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Failed-connection tickets reached "
+       },
+       {
+        "v": "260",
+        "ref": "F1"
+       },
+       {
+        "t": " this week against a normal "
+       },
+       {
+        "v": "60",
+        "ref": "F2"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "That is "
+       },
+       {
+        "v": "200",
+        "ref": "F4"
+       },
+       {
+        "t": " more than normal."
+       }
+      ],
+      [
+       {
+        "v": "195",
+        "ref": "F3"
+       },
+       {
+        "t": " tickets, "
+       },
+       {
+        "v": "75%",
+        "ref": "F5"
+       },
+       {
+        "t": " of them, come from the older laptop model."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "75%",
+       "ref": "F5",
+       "label": "Share of tickets from the older laptop model",
+       "basis": "calculated"
+      },
+      {
+       "v": "200",
+       "ref": "F4",
+       "label": "Tickets above a normal week",
+       "basis": "calculated"
+      },
+      {
+       "v": "260",
+       "ref": "F1",
+       "label": "Failed-connection tickets this week",
+       "basis": "client data"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "Tickets rose sharply after the update."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Tickets are "
+       },
+       {
+        "v": "200",
+        "ref": "F4"
+       },
+       {
+        "t": " above a normal week."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Tickets this week and in a normal week."
+       }
+      ],
+      "bars": [
+       {
+        "label": "This week",
+        "v": "260",
+        "ref": "F1",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Normal",
+        "v": "60",
+        "ref": "F2",
+        "share": 0.2308,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Roll back the update on the older laptop model, with approval."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Roll back on the older model"
+       }
+      ],
+      [
+       {
+        "t": "It targets the laptop model behind "
+       },
+       {
+        "v": "75%",
+        "ref": "F5"
+       },
+       {
+        "t": " of tickets today; the IT manager approves before anything changes."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "case_file",
+      "title": [
+       {
+        "t": "Case file: VPN connection failures after the update"
+       }
+      ],
+      "facts": [
+       [
+        {
+         "t": "Failed-connection tickets reached "
+        },
+        {
+         "v": "260",
+         "ref": "F1"
+        },
+        {
+         "t": " this week against a normal "
+        },
+        {
+         "v": "60",
+         "ref": "F2"
+        },
+        {
+         "t": "."
+        }
+       ],
+       [
+        {
+         "v": "195",
+         "ref": "F3"
+        },
+        {
+         "t": " of the tickets come from staff on the older laptop model."
+        }
+       ],
+       [
+        {
+         "t": "The client reports the failures began after the VPN update."
+        }
+       ]
+      ],
+      "for_decision": [
+       {
+        "t": "Should the IT manager approve rolling back the update on the older laptop model while the vendor investigates?"
+       }
+      ]
+     }
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "draft",
+      "title": [
+       {
+        "t": "Draft: Message to affected staff"
+       }
+      ],
+      "for": "Staff on the older laptop model, email for the IT manager to approve before sending",
+      "paras": [
+       [
+        {
+         "t": "We know some of you cannot connect to the VPN since the latest update."
+        }
+       ],
+       [
+        {
+         "t": "Most reports come from the older laptop model. We are working on a fix and will write again when it is ready."
+        }
+       ],
+       [
+        {
+         "t": "Until then, please use the office network or web mail, and contact the help desk if you are blocked."
+        }
+       ]
+      ]
+     }
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Failed-connection tickets this week",
+       "v": "260",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “260 tickets about failed connections”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Failed-connection tickets in a normal week",
+       "v": "60",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “against a normal 60”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Tickets from the older laptop model",
+       "v": "195",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “195 of the tickets come from staff on the older laptop model”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Tickets above a normal week",
+       "v": "200",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F1 − F2"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Share of tickets from the older laptop model",
+       "v": "75%",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F3 ÷ F1 × 100"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 3,
+      "computed": 2,
+      "assumption": 0
+     }
+    }
+   ]
+  },
+  "operational-risk-analyst": {
+   "family": {
+    "id": "risk-audit-controls",
+    "title": "Risk, audit and controls"
+   },
+   "role": {
+    "id": "operational-risk-analyst",
+    "title": "Operational Risk Analyst",
+    "boundary": "Delivers analysis; acts on nothing.",
+    "deliverables": [
+     "register",
+     "report"
+    ]
+   },
+   "problem": "We had 18 operational loss events last quarter totalling $412,000, up from 11 the quarter before.",
+   "file": "samples/roles/operational-risk-analyst.docx",
+   "format": "memo",
+   "delivers": "Delivers today: a verified Word memo, with its register inside. Also planned: report.",
+   "slide_count": 14,
+   "figure_count": 9,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Put manual payment errors first: they caused "
+      },
+      {
+       "v": "60%",
+       "ref": "F6"
+      },
+      {
+       "t": " of last quarter's "
+      },
+      {
+       "v": "$412,000",
+       "ref": "F2"
+      },
+      {
+       "t": " in losses, which ran "
+      },
+      {
+       "v": "$112,000",
+       "ref": "F7"
+      },
+      {
+       "t": " above appetite."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Losses reached "
+       },
+       {
+        "v": "$412,000",
+        "ref": "F2"
+       },
+       {
+        "t": " against an appetite of "
+       },
+       {
+        "v": "$300,000",
+        "ref": "F5"
+       },
+       {
+        "t": ", "
+       },
+       {
+        "v": "$112,000",
+        "ref": "F7"
+       },
+       {
+        "t": " over."
+       }
+      ],
+      [
+       {
+        "t": "Manual payment errors caused "
+       },
+       {
+        "v": "7",
+        "ref": "F3"
+       },
+       {
+        "t": " events and "
+       },
+       {
+        "v": "$247,200",
+        "ref": "F4"
+       },
+       {
+        "t": " of the losses, "
+       },
+       {
+        "v": "60%",
+        "ref": "F6"
+       },
+       {
+        "t": " of the total."
+       }
+      ],
+      [
+       {
+        "t": "Events rose to "
+       },
+       {
+        "v": "18",
+        "ref": "F1"
+       },
+       {
+        "t": " from "
+       },
+       {
+        "v": "11",
+        "ref": "F8"
+       },
+       {
+        "t": ", "
+       },
+       {
+        "v": "7",
+        "ref": "F9"
+       },
+       {
+        "t": " more than the quarter before."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "60%",
+       "ref": "F6",
+       "label": "Share of losses from manual payment errors",
+       "basis": "calculated"
+      },
+      {
+       "v": "$412,000",
+       "ref": "F2",
+       "label": "Operational losses last quarter",
+       "basis": "client data"
+      },
+      {
+       "v": "$112,000",
+       "ref": "F7",
+       "label": "Losses above appetite",
+       "basis": "calculated"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "Losses ran well above the quarterly appetite."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Losses of "
+       },
+       {
+        "v": "$412,000",
+        "ref": "F2"
+       },
+       {
+        "t": " exceeded the appetite of "
+       },
+       {
+        "v": "$300,000",
+        "ref": "F5"
+       },
+       {
+        "t": " by "
+       },
+       {
+        "v": "$112,000",
+        "ref": "F7"
+       },
+       {
+        "t": "."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Losses ran above the quarterly appetite."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Losses",
+        "v": "$412,000",
+        "ref": "F2",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Appetite",
+        "v": "$300,000",
+        "ref": "F5",
+        "share": 0.7282,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Fix manual payment errors first."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Fix payments first"
+       }
+      ],
+      [
+       {
+        "t": "It targets the cause of "
+       },
+       {
+        "v": "60%",
+        "ref": "F6"
+       },
+       {
+        "t": " of losses and can start before the next quarter; the risk committee decides."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "register",
+      "title": [
+       {
+        "t": "Register: Operational risk register: last quarter's loss events"
+       }
+      ],
+      "rows": [
+       {
+        "item": [
+         {
+          "t": "Manual payment errors: "
+         },
+         {
+          "v": "7",
+          "ref": "F3"
+         },
+         {
+          "t": " events and "
+         },
+         {
+          "v": "$247,200",
+          "ref": "F4"
+         },
+         {
+          "t": " of losses."
+         }
+        ],
+        "rating": "high",
+        "owner": "Head of payments operations",
+        "status": "open"
+       },
+       {
+        "item": [
+         {
+          "t": "Losses of "
+         },
+         {
+          "v": "$412,000",
+          "ref": "F2"
+         },
+         {
+          "t": " exceeded appetite by "
+         },
+         {
+          "v": "$112,000",
+          "ref": "F7"
+         },
+         {
+          "t": "."
+         }
+        ],
+        "rating": "high",
+        "owner": "Chief risk officer",
+        "status": "open"
+       },
+       {
+        "item": [
+         {
+          "t": "Loss events rose to "
+         },
+         {
+          "v": "18",
+          "ref": "F1"
+         },
+         {
+          "t": " from "
+         },
+         {
+          "v": "11",
+          "ref": "F8"
+         },
+         {
+          "t": "."
+         }
+        ],
+        "rating": "medium",
+        "owner": "Operational risk lead",
+        "status": "in progress"
+       },
+       {
+        "item": [
+         {
+          "t": "Loss events outside manual payments: causes not yet analysed."
+         }
+        ],
+        "rating": "medium",
+        "owner": "Operational risk lead",
+        "status": "open"
+       }
+      ]
+     }
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Loss events last quarter",
+       "v": "18",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “We had 18 operational loss events”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Operational losses last quarter",
+       "v": "$412,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “totalling $412,000”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Events from manual payment errors",
+       "v": "7",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “Manual payment errors caused 7 of the events”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Losses from manual payment errors",
+       "v": "$247,200",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “$247,200 of the losses”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Quarterly loss appetite",
+       "v": "$300,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “Our risk appetite for operational losses is $300,000”"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Share of losses from manual payment errors",
+       "v": "60%",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F4 ÷ F2 × 100"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 6,
+      "computed": 3,
+      "assumption": 0
+     }
+    }
+   ]
+  },
+  "paralegal-contracts-administrator": {
+   "family": {
+    "id": "legal-contracts-procurement",
+    "title": "Legal, contracts and procurement"
+   },
+   "role": {
+    "id": "paralegal-contracts-administrator",
+    "title": "Paralegal / Contracts Administrator",
+    "boundary": "Prepares the decision; a qualified person decides.",
+    "deliverables": [
+     "draft",
+     "register"
+    ]
+   },
+   "problem": "We have 70 supplier contracts, and 14 renew automatically before the end of next quarter.",
+   "file": "samples/roles/paralegal-contracts-administrator.docx",
+   "format": "memo",
+   "delivers": "Delivers today: a verified Word memo, with its draft and register inside.",
+   "slide_count": 14,
+   "figure_count": 6,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Put the "
+      },
+      {
+       "v": "5",
+       "ref": "F4"
+      },
+      {
+       "t": " contracts that need written notice in front of counsel first: "
+      },
+      {
+       "v": "14",
+       "ref": "F2"
+      },
+      {
+       "t": " contracts worth "
+      },
+      {
+       "v": "$1,260,000",
+       "ref": "F3"
+      },
+      {
+       "t": " a year renew automatically before the end of next quarter."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "v": "14",
+        "ref": "F2"
+       },
+       {
+        "t": " of "
+       },
+       {
+        "v": "70",
+        "ref": "F1"
+       },
+       {
+        "t": " supplier contracts renew automatically before the end of next quarter, "
+       },
+       {
+        "v": "20%",
+        "ref": "F5"
+       },
+       {
+        "t": " of the total."
+       }
+      ],
+      [
+       {
+        "t": "They are worth "
+       },
+       {
+        "v": "$1,260,000",
+        "ref": "F3"
+       },
+       {
+        "t": " a year."
+       }
+      ],
+      [
+       {
+        "v": "5",
+        "ref": "F4"
+       },
+       {
+        "t": " need written notice to cancel and their windows close first; the other "
+       },
+       {
+        "v": "9",
+        "ref": "F6"
+       },
+       {
+        "t": " do not."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "5",
+       "ref": "F4",
+       "label": "Renewals needing written notice to cancel",
+       "basis": "client data"
+      },
+      {
+       "v": "14",
+       "ref": "F2",
+       "label": "Contracts renewing automatically",
+       "basis": "client data"
+      },
+      {
+       "v": "$1,260,000",
+       "ref": "F3",
+       "label": "Annual value of renewing contracts",
+       "basis": "client data"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "A large share of contracts renew before the end of next quarter."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "v": "14",
+        "ref": "F2"
+       },
+       {
+        "t": " contracts worth "
+       },
+       {
+        "v": "$1,260,000",
+        "ref": "F3"
+       },
+       {
+        "t": " a year renew automatically."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Many supplier contracts renew before the end of next quarter."
+       }
+      ],
+      "bars": [
+       {
+        "label": "All contracts",
+        "v": "70",
+        "ref": "F1",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Renewing",
+        "v": "14",
+        "ref": "F2",
+        "share": 0.2,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Review the notice contracts with counsel first."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Notice contracts first"
+       }
+      ],
+      [
+       {
+        "t": "It protects the earliest deadlines without delaying the rest; counsel decides and signs every notice."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "register",
+      "title": [
+       {
+        "t": "Register: Automatic renewal register: renewals before the end of next quarter"
+       }
+      ],
+      "rows": [
+       {
+        "item": [
+         {
+          "t": "Renewals needing written notice to cancel: "
+         },
+         {
+          "v": "5",
+          "ref": "F4"
+         },
+         {
+          "t": "."
+         }
+        ],
+        "rating": "high",
+        "owner": "Legal counsel",
+        "status": "open"
+       },
+       {
+        "item": [
+         {
+          "t": "Renewals not needing notice: "
+         },
+         {
+          "v": "9",
+          "ref": "F6"
+         },
+         {
+          "t": "."
+         }
+        ],
+        "rating": "medium",
+        "owner": "Each contract owner",
+        "status": "open"
+       },
+       {
+        "item": [
+         {
+          "t": "Annual value at stake: "
+         },
+         {
+          "v": "$1,260,000",
+          "ref": "F3"
+         },
+         {
+          "t": "."
+         }
+        ],
+        "rating": "medium",
+        "owner": "Procurement lead",
+        "status": "in progress"
+       }
+      ]
+     }
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "draft",
+      "title": [
+       {
+        "t": "Draft: Notice of non-renewal (template)"
+       }
+      ],
+      "for": "A supplier, letter for counsel to review and sign",
+      "paras": [
+       [
+        {
+         "t": "We refer to our agreement with you, which renews automatically unless notice is given."
+        }
+       ],
+       [
+        {
+         "t": "This letter gives notice that we do not wish the agreement to renew at the end of its current term."
+        }
+       ],
+       [
+        {
+         "t": "Please confirm receipt of this notice in writing."
+        }
+       ],
+       [
+        {
+         "t": "Yours faithfully, for and on behalf of the company."
+        }
+       ]
+      ]
+     }
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Supplier contracts",
+       "v": "70",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “We have 70 supplier contracts”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Contracts renewing automatically",
+       "v": "14",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “14 renew automatically”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Annual value of renewing contracts",
+       "v": "$1,260,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “worth $1,260,000 a year”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Renewals needing written notice to cancel",
+       "v": "5",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “5 of them need written notice”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Share of contracts renewing",
+       "v": "20%",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F2 ÷ F1 × 100"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Renewals not needing written notice",
+       "v": "9",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F2 − F4"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 4,
+      "computed": 2,
+      "assumption": 0
+     }
+    }
+   ]
+  },
+  "project-program-coordinator": {
+   "family": {
+    "id": "sales-customer-coordination",
+    "title": "Sales, customer and coordination"
+   },
+   "role": {
+    "id": "project-program-coordinator",
+    "title": "Project / Program Coordinator",
+    "boundary": "Drafts only; you approve before anything happens.",
+    "deliverables": [
+     "plan",
+     "report"
+    ]
+   },
+   "problem": "We are moving 120 staff to a new office next quarter and the budget is $180,000.",
+   "file": "samples/roles/project-program-coordinator.pptx",
+   "format": "deck",
+   "delivers": "Delivers today: a verified PowerPoint deck, with its plan inside. Also planned: report.",
+   "slide_count": 13,
+   "figure_count": 7,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Accept the quotes for approval and keep the remaining "
+      },
+      {
+       "v": "$27,000",
+       "ref": "F5"
+      },
+      {
+       "t": " as contingency: they use "
+      },
+      {
+       "v": "85%",
+       "ref": "F6"
+      },
+      {
+       "t": " of the budget, and "
+      },
+      {
+       "v": "30",
+       "ref": "F4"
+      },
+      {
+       "t": " desks must be ready first."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "The move covers "
+       },
+       {
+        "v": "120",
+        "ref": "F1"
+       },
+       {
+        "t": " staff on a budget of "
+       },
+       {
+        "v": "$180,000",
+        "ref": "F2"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "Quotes so far total "
+       },
+       {
+        "v": "$153,000",
+        "ref": "F3"
+       },
+       {
+        "t": ", "
+       },
+       {
+        "v": "85%",
+        "ref": "F6"
+       },
+       {
+        "t": " of the budget, leaving "
+       },
+       {
+        "v": "$27,000",
+        "ref": "F5"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "v": "30",
+        "ref": "F4"
+       },
+       {
+        "t": " staff, "
+       },
+       {
+        "v": "25%",
+        "ref": "F7"
+       },
+       {
+        "t": " of those moving, need new desks before the move."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "$27,000",
+       "ref": "F5",
+       "label": "Budget left after the quotes",
+       "basis": "calculated"
+      },
+      {
+       "v": "85%",
+       "ref": "F6",
+       "label": "Share of budget used by quotes",
+       "basis": "calculated"
+      },
+      {
+       "v": "30",
+       "ref": "F4",
+       "label": "Staff needing new desks",
+       "basis": "client data"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "The quotes leave a modest contingency."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Quotes use "
+       },
+       {
+        "v": "85%",
+        "ref": "F6"
+       },
+       {
+        "t": " of the budget, leaving "
+       },
+       {
+        "v": "$27,000",
+        "ref": "F5"
+       },
+       {
+        "t": "."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Quotes use most of the move budget."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Budget",
+        "v": "$180,000",
+        "ref": "F2",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Quotes",
+        "v": "$153,000",
+        "ref": "F3",
+        "share": 0.85,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Approve the quotes, hold contingency, and set up desks first."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Approve and hold contingency"
+       }
+      ],
+      [
+       {
+        "t": "It keeps the move on track with "
+       },
+       {
+        "v": "$27,000",
+        "ref": "F5"
+       },
+       {
+        "t": " in reserve; the office manager approves every quote and message."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "plan",
+      "title": [
+       {
+        "t": "Plan: Office move plan"
+       }
+      ],
+      "steps": [
+       {
+        "when": "Week one",
+        "task": [
+         {
+          "t": "Send the quotes totalling "
+         },
+         {
+          "v": "$153,000",
+          "ref": "F3"
+         },
+         {
+          "t": " to the office manager for approval."
+         }
+        ],
+        "owner": "Project coordinator"
+       },
+       {
+        "when": "Week two",
+        "task": [
+         {
+          "t": "Order and schedule set-up of desks for "
+         },
+         {
+          "v": "30",
+          "ref": "F4"
+         },
+         {
+          "t": " staff."
+         }
+        ],
+        "owner": "Facilities lead"
+       },
+       {
+        "when": "Week before the move",
+        "task": [
+         {
+          "t": "Send the approved move guide to every team."
+         }
+        ],
+        "owner": "Project coordinator"
+       },
+       {
+        "when": "Move weekend",
+        "task": [
+         {
+          "t": "Move "
+         },
+         {
+          "v": "120",
+          "ref": "F1"
+         },
+         {
+          "t": " staff with the movers."
+         }
+        ],
+        "owner": "Facilities lead"
+       },
+       {
+        "when": "Week after the move",
+        "task": [
+         {
+          "t": "Close the snag list and report spend against "
+         },
+         {
+          "v": "$180,000",
+          "ref": "F2"
+         },
+         {
+          "t": "."
+         }
+        ],
+        "owner": "Project coordinator"
+       }
+      ]
+     }
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Staff moving",
+       "v": "120",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “We are moving 120 staff”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Move budget",
+       "v": "$180,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “the budget is $180,000”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Quotes so far",
+       "v": "$153,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “Quotes so far total $153,000”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Staff needing new desks",
+       "v": "30",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “30 staff need new desks”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Budget left after the quotes",
+       "v": "$27,000",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F2 − F3"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Share of budget used by quotes",
+       "v": "85%",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F3 ÷ F2 × 100"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 4,
+      "computed": 3,
+      "assumption": 0
+     }
+    }
+   ]
+  },
+  "regulatory-change-analyst": {
+   "family": {
+    "id": "research-reporting",
+    "title": "Research and reporting"
+   },
+   "role": {
+    "id": "regulatory-change-analyst",
+    "title": "Regulatory Change Analyst",
+    "boundary": "Delivers analysis; acts on nothing.",
+    "deliverables": [
+     "brief",
+     "register"
+    ]
+   },
+   "problem": "A new payments regulation takes effect next year and affects 9 of our 25 internal policies.",
+   "file": "samples/roles/regulatory-change-analyst.docx",
+   "format": "memo",
+   "delivers": "Delivers today: a verified Word memo, with its register inside. Also planned: brief.",
+   "slide_count": 13,
+   "figure_count": 6,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Start with the "
+      },
+      {
+       "v": "3",
+       "ref": "F3"
+      },
+      {
+       "t": " complaints policies and budget about "
+      },
+      {
+       "v": "$72,000",
+       "ref": "F6"
+      },
+      {
+       "t": " for outside review: the regulation touches "
+      },
+      {
+       "v": "36%",
+       "ref": "F5"
+      },
+      {
+       "t": " of our policies."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "The regulation affects "
+       },
+       {
+        "v": "9",
+        "ref": "F1"
+       },
+       {
+        "t": " of our "
+       },
+       {
+        "v": "25",
+        "ref": "F2"
+       },
+       {
+        "t": " internal policies, "
+       },
+       {
+        "v": "36%",
+        "ref": "F5"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "v": "3",
+        "ref": "F3"
+       },
+       {
+        "t": " of the affected policies cover customer complaints."
+       }
+      ],
+      [
+       {
+        "t": "At about "
+       },
+       {
+        "v": "$8,000",
+        "ref": "F4"
+       },
+       {
+        "t": " each, outside review of all affected policies costs about "
+       },
+       {
+        "v": "$72,000",
+        "ref": "F6"
+       },
+       {
+        "t": "."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "3",
+       "ref": "F3",
+       "label": "Affected policies covering complaints",
+       "basis": "client data"
+      },
+      {
+       "v": "$72,000",
+       "ref": "F6",
+       "label": "Likely outside review cost",
+       "basis": "calculated"
+      },
+      {
+       "v": "36%",
+       "ref": "F5",
+       "label": "Share of policies affected",
+       "basis": "calculated"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "Many of our policies need changes."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "v": "9",
+        "ref": "F1"
+       },
+       {
+        "t": " of "
+       },
+       {
+        "v": "25",
+        "ref": "F2"
+       },
+       {
+        "t": " policies are affected."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Many of our internal policies are affected."
+       }
+      ],
+      "bars": [
+       {
+        "label": "All policies",
+        "v": "25",
+        "ref": "F2",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Affected",
+        "v": "9",
+        "ref": "F1",
+        "share": 0.36,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Start with the complaints policies and phase the rest."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Complaints first"
+       }
+      ],
+      [
+       {
+        "t": "It starts where customer impact is clearest and spreads the "
+       },
+       {
+        "v": "$72,000",
+        "ref": "F6"
+       },
+       {
+        "t": " review cost; the head of compliance decides the order."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "register",
+      "title": [
+       {
+        "t": "Register: Regulatory change register: new payments regulation"
+       }
+      ],
+      "rows": [
+       {
+        "item": [
+         {
+          "t": "Complaints policies affected: "
+         },
+         {
+          "v": "3",
+          "ref": "F3"
+         },
+         {
+          "t": "."
+         }
+        ],
+        "rating": "high",
+        "owner": "Head of complaints",
+        "status": "open"
+       },
+       {
+        "item": [
+         {
+          "t": "All affected policies: "
+         },
+         {
+          "v": "9",
+          "ref": "F1"
+         },
+         {
+          "t": ", "
+         },
+         {
+          "v": "36%",
+          "ref": "F5"
+         },
+         {
+          "t": " of the library."
+         }
+        ],
+        "rating": "medium",
+        "owner": "Compliance policy lead",
+        "status": "open"
+       },
+       {
+        "item": [
+         {
+          "t": "Outside review budget of about "
+         },
+         {
+          "v": "$72,000",
+          "ref": "F6"
+         },
+         {
+          "t": "."
+         }
+        ],
+        "rating": "medium",
+        "owner": "Head of compliance",
+        "status": "in progress"
+       }
+      ]
+     }
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Policies affected by the regulation",
+       "v": "9",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “affects 9 of our”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Internal policies",
+       "v": "25",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “our 25 internal policies”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Affected policies covering complaints",
+       "v": "3",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “3 of the affected policies cover customer complaints”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Outside legal review per policy update",
+       "v": "$8,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “cost about $8,000 in outside legal review”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Share of policies affected",
+       "v": "36%",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F1 ÷ F2 × 100"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Likely outside review cost",
+       "v": "$72,000",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F1 × F4"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 4,
+      "computed": 2,
+      "assumption": 0
+     }
+    }
+   ]
+  },
+  "risk-advisory-associate": {
+   "family": {
+    "id": "consulting",
+    "title": "Consulting"
+   },
+   "role": {
+    "id": "risk-advisory-associate",
+    "title": "Risk Advisory Associate",
+    "boundary": "Delivers analysis; acts on nothing.",
+    "deliverables": [
+     "deck",
+     "register"
+    ]
+   },
+   "problem": "We rely on 40 critical suppliers, and 12 of them have no tested exit plan.",
+   "file": "samples/roles/risk-advisory-associate.pptx",
+   "format": "deck",
+   "delivers": "Delivers today: a verified PowerPoint deck, with its register inside.",
+   "slide_count": 13,
+   "figure_count": 6,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "Test exit plans for the "
+      },
+      {
+       "v": "4",
+       "ref": "F3"
+      },
+      {
+       "t": " payments suppliers first: "
+      },
+      {
+       "v": "12",
+       "ref": "F2"
+      },
+      {
+       "t": " critical suppliers, "
+      },
+      {
+       "v": "30%",
+       "ref": "F5"
+      },
+      {
+       "t": " of the total, have no tested exit plan."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "v": "12",
+        "ref": "F2"
+       },
+       {
+        "t": " of "
+       },
+       {
+        "v": "40",
+        "ref": "F1"
+       },
+       {
+        "t": " critical suppliers have no tested exit plan, "
+       },
+       {
+        "v": "30%",
+        "ref": "F5"
+       },
+       {
+        "t": " of the total."
+       }
+      ],
+      [
+       {
+        "v": "4",
+        "ref": "F3"
+       },
+       {
+        "t": " of them support payments, where an outage costs about "
+       },
+       {
+        "v": "$75,000",
+        "ref": "F4"
+       },
+       {
+        "t": " an hour."
+       }
+      ],
+      [
+       {
+        "t": "The other "
+       },
+       {
+        "v": "8",
+        "ref": "F6"
+       },
+       {
+        "t": " support other critical services."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "4",
+       "ref": "F3",
+       "label": "Untested suppliers supporting payments",
+       "basis": "client data"
+      },
+      {
+       "v": "12",
+       "ref": "F2",
+       "label": "Critical suppliers with no tested exit plan",
+       "basis": "client data"
+      },
+      {
+       "v": "30%",
+       "ref": "F5",
+       "label": "Share of critical suppliers untested",
+       "basis": "calculated"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "Many critical suppliers have no tested exit plan."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "v": "12",
+        "ref": "F2"
+       },
+       {
+        "t": " suppliers, "
+       },
+       {
+        "v": "30%",
+        "ref": "F5"
+       },
+       {
+        "t": ", have no tested exit plan."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Critical suppliers and untested ones."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Critical",
+        "v": "40",
+        "ref": "F1",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Untested",
+        "v": "12",
+        "ref": "F2",
+        "share": 0.3,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Test the payments suppliers' exit plans first."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Payments first"
+       }
+      ],
+      [
+       {
+        "t": "It tests the plans where an outage costs most without new hires; the chief risk officer decides the order."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "register",
+      "title": [
+       {
+        "t": "Register: Critical supplier exit risk register"
+       }
+      ],
+      "rows": [
+       {
+        "item": [
+         {
+          "t": "Payments suppliers with no tested exit plan: "
+         },
+         {
+          "v": "4",
+          "ref": "F3"
+         },
+         {
+          "t": "."
+         }
+        ],
+        "rating": "high",
+        "owner": "Head of payments",
+        "status": "open"
+       },
+       {
+        "item": [
+         {
+          "t": "A payments outage costs about "
+         },
+         {
+          "v": "$75,000",
+          "ref": "F4"
+         },
+         {
+          "t": " an hour."
+         }
+        ],
+        "rating": "high",
+        "owner": "Chief operating officer",
+        "status": "open"
+       },
+       {
+        "item": [
+         {
+          "t": "Other suppliers with no tested exit plan: "
+         },
+         {
+          "v": "8",
+          "ref": "F6"
+         },
+         {
+          "t": "."
+         }
+        ],
+        "rating": "medium",
+        "owner": "Third-party risk lead",
+        "status": "open"
+       }
+      ]
+     }
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Critical suppliers",
+       "v": "40",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “We rely on 40 critical suppliers”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Critical suppliers with no tested exit plan",
+       "v": "12",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “12 of them have no tested exit plan”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Untested suppliers supporting payments",
+       "v": "4",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “4 of those”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Cost of a payments outage per hour",
+       "v": "$75,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “costs us about $75,000 an hour”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Share of critical suppliers untested",
+       "v": "30%",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F2 ÷ F1 × 100"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Untested suppliers outside payments",
+       "v": "8",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F2 − F3"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 4,
+      "computed": 2,
+      "assumption": 0
+     }
+    }
+   ]
+  },
+  "trade-support-middle-office-analyst": {
+   "family": {
+    "id": "accounting-operations",
+    "title": "Accounting and finance operations"
+   },
+   "role": {
+    "id": "trade-support-middle-office-analyst",
+    "title": "Trade Support / Middle Office Analyst",
+    "boundary": "Drafts only; you approve before anything happens.",
+    "deliverables": [
+     "reconciliation",
+     "case-file"
+    ]
+   },
+   "problem": "Our trading system shows $1,240,000 of cash for the fund, but the custodian shows $1,169,500.",
+   "file": "samples/roles/trade-support-middle-office-analyst.xlsx",
+   "format": "workbook",
+   "delivers": "Delivers today: a verified Excel workbook with live formulas, with its case file and reconciliation inside.",
+   "slide_count": 14,
+   "figure_count": 7,
+   "slides": [
+    {
+     "kind": "summary",
+     "heading": "The answer first",
+     "title": [
+      {
+       "t": "The "
+      },
+      {
+       "v": "$70,500",
+       "ref": "F5"
+      },
+      {
+       "t": " cash break is fully explained by a failed sale and an unbooked fee: chase the sale and book the fee once the operations manager approves."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Our system shows "
+       },
+       {
+        "v": "$1,240,000",
+        "ref": "F1"
+       },
+       {
+        "t": " of fund cash against the custodian's "
+       },
+       {
+        "v": "$1,169,500",
+        "ref": "F2"
+       },
+       {
+        "t": ", a break of "
+       },
+       {
+        "v": "$70,500",
+        "ref": "F5"
+       },
+       {
+        "t": "."
+       }
+      ],
+      [
+       {
+        "t": "A failed sale of "
+       },
+       {
+        "v": "$56,000",
+        "ref": "F3"
+       },
+       {
+        "t": " and a custodian fee of "
+       },
+       {
+        "v": "$14,500",
+        "ref": "F4"
+       },
+       {
+        "t": " explain "
+       },
+       {
+        "v": "$70,500",
+        "ref": "F6"
+       },
+       {
+        "t": " of it."
+       }
+      ],
+      [
+       {
+        "t": "That leaves "
+       },
+       {
+        "v": "$0",
+        "ref": "F7"
+       },
+       {
+        "t": " unexplained, so the break is fully understood."
+       }
+      ]
+     ],
+     "tiles": [
+      {
+       "v": "$70,500",
+       "ref": "F5",
+       "label": "Cash break",
+       "basis": "calculated"
+      },
+      {
+       "v": "$1,240,000",
+       "ref": "F1",
+       "label": "Fund cash in our trading system",
+       "basis": "client data"
+      },
+      {
+       "v": "$1,169,500",
+       "ref": "F2",
+       "label": "Fund cash at the custodian",
+       "basis": "client data"
+      }
+     ]
+    },
+    {
+     "kind": "finding",
+     "heading": "A finding, with its chart",
+     "title": [
+      {
+       "t": "Our system counts sale proceeds the custodian never received."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "The failed sale accounts for "
+       },
+       {
+        "v": "$56,000",
+        "ref": "F3"
+       },
+       {
+        "t": " of the break."
+       }
+      ]
+     ],
+     "chart": {
+      "title": [
+       {
+        "t": "Fund cash in our system and at the custodian."
+       }
+      ],
+      "bars": [
+       {
+        "label": "Our system",
+        "v": "$1,240,000",
+        "ref": "F1",
+        "share": 1.0,
+        "assumption": false
+       },
+       {
+        "label": "Custodian",
+        "v": "$1,169,500",
+        "ref": "F2",
+        "share": 0.9431,
+        "assumption": false
+       }
+      ]
+     }
+    },
+    {
+     "kind": "recommendation",
+     "heading": "The recommendation",
+     "title": [
+      {
+       "t": "Chase the failed sale and book the fee for approval."
+      }
+     ],
+     "bullets": [
+      [
+       {
+        "t": "Recommended: Chase and book"
+       }
+      ],
+      [
+       {
+        "t": "It explains all of the "
+       },
+       {
+        "v": "$70,500",
+        "ref": "F5"
+       },
+       {
+        "t": " break: booking the fee clears "
+       },
+       {
+        "v": "$14,500",
+        "ref": "F4"
+       },
+       {
+        "t": ", and the failed sale of "
+       },
+       {
+        "v": "$56,000",
+        "ref": "F3"
+       },
+       {
+        "t": " stays a reconciling item until it settles; the operations manager approves every booking."
+       }
+      ]
+     ]
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "case_file",
+      "title": [
+       {
+        "t": "Case file: Failed sale and unbooked fee in the fund's cash break"
+       }
+      ],
+      "facts": [
+       [
+        {
+         "t": "Our system shows "
+        },
+        {
+         "v": "$1,240,000",
+         "ref": "F1"
+        },
+        {
+         "t": " of fund cash and the custodian shows "
+        },
+        {
+         "v": "$1,169,500",
+         "ref": "F2"
+        },
+        {
+         "t": "."
+        }
+       ],
+       [
+        {
+         "t": "Our system counts the failed sale's proceeds as cash although the custodian has not received them."
+        }
+       ],
+       [
+        {
+         "t": "A sale of "
+        },
+        {
+         "v": "$56,000",
+         "ref": "F3"
+        },
+        {
+         "t": " failed to settle at the custodian."
+        }
+       ],
+       [
+        {
+         "t": "The custodian charged a fee of "
+        },
+        {
+         "v": "$14,500",
+         "ref": "F4"
+        },
+        {
+         "t": " that our system does not show."
+        }
+       ]
+      ],
+      "for_decision": [
+       {
+        "t": "Should the operations manager approve booking the fee and chasing the sale, or reverse the expected sale cash until it settles?"
+       }
+      ]
+     }
+    },
+    {
+     "kind": "work",
+     "heading": "The role's own work",
+     "work": {
+      "kind": "reconciliation",
+      "title": [
+       {
+        "t": "Reconciliation: Fund cash against the custodian"
+       }
+      ],
+      "lines": [
+       {
+        "label": "Fund cash in our trading system",
+        "v": "$1,240,000",
+        "ref": "F1",
+        "effect": "side A"
+       },
+       {
+        "label": "Sale that failed to settle",
+        "v": "$56,000",
+        "ref": "F3",
+        "effect": "comes off side A"
+       },
+       {
+        "label": "Custodian fee not booked",
+        "v": "$14,500",
+        "ref": "F4",
+        "effect": "comes off side A"
+       },
+       {
+        "label": "Fund cash at the custodian",
+        "v": "$1,169,500",
+        "ref": "F2",
+        "effect": "side B"
+       }
+      ],
+      "entries": [
+       {
+        "debit": "Custody fees",
+        "credit": "Cash at custodian",
+        "v": "$14,500",
+        "ref": "F4"
+       }
+      ]
+     }
+    },
+    {
+     "kind": "sources",
+     "heading": "Where every number comes from",
+     "rows": [
+      {
+       "ref": "F1",
+       "label": "Fund cash in our trading system",
+       "v": "$1,240,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “Our trading system shows $1,240,000 of cash”"
+        }
+       ]
+      },
+      {
+       "ref": "F2",
+       "label": "Fund cash at the custodian",
+       "v": "$1,169,500",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “the custodian shows $1,169,500”"
+        }
+       ]
+      },
+      {
+       "ref": "F3",
+       "label": "Sale that failed to settle",
+       "v": "$56,000",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “A sale for $56,000 failed to settle”"
+        }
+       ]
+      },
+      {
+       "ref": "F4",
+       "label": "Custodian fee not booked",
+       "v": "$14,500",
+       "basis": "client",
+       "source": [
+        {
+         "t": "Client's words: “a $14,500 fee we have not booked”"
+        }
+       ]
+      },
+      {
+       "ref": "F5",
+       "label": "Cash break",
+       "v": "$70,500",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F1 − F2"
+        }
+       ]
+      },
+      {
+       "ref": "F6",
+       "label": "Break explained by known items",
+       "v": "$70,500",
+       "basis": "computed",
+       "source": [
+        {
+         "t": "Calculated: F3 + F4"
+        }
+       ]
+      }
+     ],
+     "counts": {
+      "client": 4,
+      "computed": 3,
+      "assumption": 0
+     }
+    }
+   ]
+  }
+ }
 }

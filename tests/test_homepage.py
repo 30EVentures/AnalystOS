@@ -34,7 +34,7 @@ class HomepageTest(unittest.TestCase):
             self.assertIn(family["title"], PAGE)
 
     def test_the_slide_preview_shows_the_sample_decks_verified_figures(self):
-        spec = DECKS["consulting"][0]
+        spec = DECKS["consulting.pptx"][0]
         figures = {f["id"]: f for f in spec["content"]["figures"]}
         preview = re.search(r'<div class="slide".*?</figure>', PAGE, re.S).group(0)
         for value, fid in re.findall(r'<span class="n">([^<]+)</span><span class="ref">(F\d+)</span>', preview):
@@ -83,11 +83,14 @@ class RoleExplorerTest(unittest.TestCase):
                 self.assertEqual(sample["format"], formats.format_of(role)["name"])  # Slice 124: the role's own format
                 self.assertTrue(sample["file"].endswith("." + formats.format_of(role)["extension"]))
                 self.assertIn(build_samples.DELIVERS[sample["format"]], sample["delivers"])  # matches the download
-                self.assertEqual([s["kind"] for s in sample["slides"]], ["summary", "finding", "recommendation", "sources"])
+                kinds = [s["kind"] for s in sample["slides"]]
+                works = len(sample["slides"]) - 4
+                self.assertEqual(kinds, ["summary", "finding", "recommendation"] + ["work"] * works + ["sources"])
+                self.assertEqual(works, min(2, len(DECKS[sample["file"][len("samples/"):]][0]["content"].get("work", []))))
 
     def test_every_number_shown_is_the_verified_value(self):
-        for sample in DOC["samples"]:
-            spec = DECKS[sample["family"]["id"]][0]
+        for sample in DOC["samples"] + list(DOC["roles"].values()):
+            spec = DECKS[sample["file"][len("samples/"):]][0]
             figures = {f["id"]: f for f in spec["content"]["figures"]}
             shown = []
 
@@ -101,7 +104,7 @@ class RoleExplorerTest(unittest.TestCase):
                     for value in node:
                         walk(value)
             walk(sample["slides"])
-            with self.subTest(family=sample["family"]["id"]):
+            with self.subTest(file=sample["file"]):
                 self.assertGreater(len(shown), 5)
                 for value, ref in shown:
                     self.assertEqual(value, deck.format_value(figures[ref]), ref)
@@ -111,14 +114,77 @@ class RoleExplorerTest(unittest.TestCase):
         self.assertNotRegex(text, r"\[F\d+\]")
         self.assertNotIn("<", text)
 
-    def test_hire_links_name_real_roles_in_the_family(self):
+    def test_every_role_is_listed_once_in_its_own_family(self):
         catalog = load_catalog()
         roles = {r["id"]: r for r in catalog["roles"]}
+        listed = []
         for sample in DOC["samples"]:
             family = sample["family"]["id"]
-            ids = [sample["role"]["id"]] + [o["id"] for o in sample["others"]]
+            ids = [r["id"] for r in sample["roles"]]
+            listed += ids
             with self.subTest(family=family):
+                self.assertEqual(ids[0], sample["role"]["id"])  # the family example's role first
                 self.assertEqual(sorted(ids), sorted(r for r, v in roles.items() if v["family"] == family))
+        self.assertEqual(sorted(listed), sorted(roles))
+
+
+class RoleSamplesTest(unittest.TestCase):
+    """Slice 128: a role with its own worked example shows it; every other role says it shows its family's."""
+
+    def test_own_sample_is_true_exactly_for_roles_with_an_example(self):
+        family_roles = {s["role"]["id"] for s in DOC["samples"]}
+        work_roles = {d.name for d in (ROOT / "fixtures" / "work").iterdir() if d.is_dir()}
+        self.assertEqual(set(DOC["roles"]), work_roles)
+        for sample in DOC["samples"]:
+            for r in sample["roles"]:
+                with self.subTest(role=r["id"]):
+                    self.assertEqual(r["own_sample"], r["id"] in family_roles | work_roles)
+        self.assertEqual(sum(r["own_sample"] for s in DOC["samples"] for r in s["roles"]), 23)
+
+    def test_each_role_sample_is_its_own_file_in_its_own_format(self):
+        catalog = {r["id"]: r for r in load_catalog()["roles"]}
+        for role_id, sample in DOC["roles"].items():
+            fmt = formats.format_of(catalog[role_id])
+            with self.subTest(role=role_id):
+                self.assertEqual(sample["role"]["id"], role_id)
+                self.assertEqual(sample["file"], f"samples/roles/{role_id}.{fmt['extension']}")
+                self.assertTrue((SITE / sample["file"]).is_file())
+                self.assertEqual(sample["format"], fmt["name"])
+                self.assertIn("work", [s["kind"] for s in sample["slides"]])
+
+    def test_delivered_work_is_never_called_planned(self):
+        for sample in DOC["samples"]:
+            for r in sample["roles"]:
+                planned = r["delivers"].split("Also planned:")[1] if "Also planned:" in r["delivers"] else ""
+                for word in ("draft", "register", "case-file", "reconciliation", "plan,", "code"):
+                    with self.subTest(role=r["id"], word=word):
+                        self.assertNotIn(word, planned)
+        clerk = next(r for s in DOC["samples"] for r in s["roles"] if r["id"] == "accounts-payable-receivable-clerk")
+        self.assertIn("with its draft and reconciliation inside", clerk["delivers"])
+
+    def test_the_page_says_when_a_role_is_shown_on_its_familys_example(self):
+        self.assertIn("No sample of its own yet: this is the family", PAGE)
+        self.assertIn("own[r.id] || fam", PAGE)
+        self.assertIn("'Work by the ' + sample.role.title", PAGE)  # a borrowed work page is never "the role's own"
+
+    def test_published_files_name_only_analystos(self):
+        from docx import Document
+        from openpyxl import load_workbook
+        from pptx import Presentation
+        for path in sorted((SITE / "samples").rglob("*")):
+            if path.suffix == ".pptx":
+                props = Presentation(str(path)).core_properties
+                people = (props.author, props.last_modified_by)
+            elif path.suffix == ".docx":
+                props = Document(str(path)).core_properties
+                people = (props.author, props.last_modified_by)
+            elif path.suffix == ".xlsx":
+                props = load_workbook(str(path)).properties
+                people = (props.creator, props.lastModifiedBy)
+            else:
+                continue
+            with self.subTest(file=path.name):
+                self.assertEqual(people, ("AnalystOS", "AnalystOS"))
 
     def test_it_says_which_format_each_family_delivers(self):
         # Slice 124: the statement must match the catalog's formats, family by family.
@@ -127,7 +193,7 @@ class RoleExplorerTest(unittest.TestCase):
         names = {"memo": "Word memo", "workbook": "Excel workbook", "deck": "deck for"}
         for fmt, phrase in names.items():
             self.assertIn(phrase, statement)
-        self.assertIn("Roles in the same family share one example.", PAGE)
+        self.assertIn("Roles with a worked example of their own show it", PAGE)
         families = {f["id"] for f in catalog["families"]}
         self.assertEqual(set(formats.FAMILY_FORMAT), families)
 
@@ -136,8 +202,8 @@ class RoleExplorerTest(unittest.TestCase):
         for unsafe in ("innerHTML", "outerHTML", "insertAdjacentHTML", "document.write", "eval("):
             self.assertNotIn(unsafe, script)
         self.assertIn("textContent", script)
-        self.assertIn("encodeURIComponent(s.role.id)", script)
-        self.assertIn("textContent = s.delivers", script)
+        self.assertIn("encodeURIComponent(r.id)", script)
+        self.assertIn("textContent = r.delivers", script)
         self.assertNotIn("a verified analysis deck", script)  # never hard-coded again
 
 

@@ -706,6 +706,7 @@ def render_deck(spec, engagement, catalog=None):
         props = prs.core_properties
         props.title = spec["content"]["key_question"][:250]
         props.author = "AnalystOS"
+        props.last_modified_by = "AnalystOS"  # never the library template's author
         props.subject = role["title"]
         props.keywords = f"{SPEC_FORMAT}; engagement {spec['engagement_id']}; spec sha256 {spec_digest(spec)}"
         props.comments = ("Every number shown is printed from a figure traced to the client's own words, "

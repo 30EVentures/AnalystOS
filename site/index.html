@@ -104,7 +104,19 @@ footer a{color:var(--muted)}
 .who h3{font-size:24px;margin-bottom:12px}
 .asked{font-size:15.5px}
 .others{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
-.others a{display:inline-block;font-size:13.5px;margin:0 10px 6px 0;color:var(--muted)}
+.rolechips{display:flex;flex-wrap:wrap;gap:6px}
+.rchip{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:5px 11px;font:500 13px var(--sans);cursor:pointer;text-align:left}
+.rchip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.rchip .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--tick);margin-right:6px;vertical-align:1px}
+.rchip[aria-pressed="true"] .dot{background:var(--bg)}
+.rchip.borrow{color:var(--muted);border-style:dashed}
+.rchip.borrow[aria-pressed="true"]{color:var(--bg)}
+.borrowed{border:1px dashed var(--muted);border-radius:8px;padding:7px 10px;margin:0 0 10px;font-size:13px;color:var(--ink);background:var(--paper)}
+.shared{background:var(--bg);border-radius:8px;padding:8px 10px}
+.wk p{margin:0 0 7px}
+.wk .src td:first-child{white-space:normal}
+.wk .lab{font-size:11px;font-weight:600;color:var(--tick);margin:8px 0 3px}
+.wk pre{margin:6px 0 0;padding:8px;background:var(--paper);border:1px solid var(--line);border-radius:6px;font:11.5px/1.45 ui-monospace,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
 .viewer .slide.big{aspect-ratio:auto;min-height:340px;overflow:visible;font-size:13.5px;background:var(--bg)}
 .slide .h{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .bars{display:flex;align-items:flex-end;gap:14px;height:120px;margin-top:auto;padding:0 4px;border-bottom:1px solid var(--line)}
@@ -208,7 +220,7 @@ footer a{color:var(--muted)}
 
 <section class="band" id="samples">
   <h2>See what a specialist produces</h2>
-  <p class="muted lead">Pick a family. Preview what one of its specialists delivered, download the real file, or hire that role.</p>
+  <p class="muted lead">Pick a family, then a role. Preview what that specialist delivered, download the real file, or hire the role.</p>
   <p class="today"><strong>Each family delivers in its own format:</strong> a Word memo for legal, research, audit, HR, insurance and financial crime; an Excel workbook with live formulas for finance, accounting and data; a deck for consulting, content, sales and software. Roles whose job is writing or tracking also deliver that work inside it: drafts, registers, case files, reconciliations, plans or draft code.</p>
   <div class="fams" role="tablist" aria-label="Role families" id="fams"></div>
   <div class="explorer" id="explorer" role="tabpanel" hidden>
@@ -216,6 +228,7 @@ footer a{color:var(--muted)}
       <p class="eyebrow" id="exFamily"></p>
       <h3 id="exRole"></h3>
       <p class="asked"><span class="muted">The client asked:</span> <span id="exProblem"></span></p>
+      <p class="fine shared" id="exShared" hidden></p>
       <p class="fine" id="exBoundary"></p>
       <p class="fine" id="exToday"></p>
       <div class="actions">
@@ -223,9 +236,10 @@ footer a{color:var(--muted)}
         <a class="btn ghost" id="exDeck" href="#" download>Download this sample</a>
       </div>
       <p class="fine" id="exCount"></p>
-      <div class="others" id="exOthersWrap"><p class="fine" style="margin:0 0 6px">Other roles in this family:</p><div id="exOthers"></div></div>
+      <div class="others"><p class="fine" style="margin:0 0 6px">Roles in this family (<span class="dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--tick)"></span> has its own sample):</p><div class="rolechips" id="exRoles"></div></div>
     </div>
     <div class="viewer">
+      <p class="borrowed" id="exBorrowed" hidden></p>
       <div class="slide big" id="exSlide" aria-live="polite"></div>
       <div class="pager">
         <button type="button" class="pg" id="exPrev" aria-label="Previous slide">&larr;</button>
@@ -235,7 +249,7 @@ footer a{color:var(--muted)}
     </div>
   </div>
   <noscript><p>Samples: <a href="samples/consulting.pptx">Consulting (deck)</a>, <a href="samples/finance-modeling.xlsx">Finance and modeling (workbook)</a>, <a href="samples/legal-contracts-procurement.docx">Legal, contracts and procurement (memo)</a>, and one for every family in <a href="samples/samples.json">samples.json</a>.</p></noscript>
-  <p class="fine" style="margin-top:12px">Each sample is a worked example for a synthetic client, verified and drawn by AnalystOS. Roles in the same family share one example.</p>
+  <p class="fine" style="margin-top:12px">Each sample is a worked example for a synthetic client, verified and drawn by AnalystOS. Roles with a worked example of their own show it; the others show their family&rsquo;s example and say so.</p>
 </section>
 
 <section class="band" id="roles">
@@ -255,7 +269,7 @@ footer a{color:var(--muted)}
   // Builds the role explorer from samples/samples.json with textContent only: no HTML is ever parsed from the data.
   var fams = document.getElementById('fams'), box = document.getElementById('explorer');
   var slideEl = document.getElementById('exSlide'), whereEl = document.getElementById('exWhere');
-  var data = [], current = 0, page = 0;
+  var data = [], own = {}, current = 0, page = 0, role = null, shown = null;
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
   function rich(parent, segs) {
     segs.forEach(function (s) {
@@ -265,12 +279,51 @@ footer a{color:var(--muted)}
     return parent;
   }
   function bullets(list) { var ul = el('ul'); list.forEach(function (b) { ul.appendChild(rich(el('li'), b)); }); return ul; }
+  function cell(tr, text, cls) { tr.appendChild(el('td', cls || null, text)); return tr; }
+  function drawWork(w) {
+    var box = el('div', 'wk');
+    if (w.kind === 'draft') {
+      box.appendChild(el('div', 'fine', 'For: ' + w['for']));
+      w.paras.forEach(function (p) { box.appendChild(rich(el('p'), p)); });
+    } else if (w.kind === 'register') {
+      var t = el('table', 'src');
+      w.rows.forEach(function (r) { var tr = el('tr'); tr.appendChild(rich(el('td'), r.item)); cell(tr, r.rating); cell(tr, r.owner); cell(tr, r.status); t.appendChild(tr); });
+      box.appendChild(t);
+    } else if (w.kind === 'case_file') {
+      box.appendChild(el('div', 'lab', 'Facts')); box.appendChild(bullets(w.facts));
+      box.appendChild(el('div', 'lab', 'For decision by a qualified person')); box.appendChild(rich(el('p'), w.for_decision));
+    } else if (w.kind === 'reconciliation') {
+      var rt = el('table', 'src');
+      w.lines.forEach(function (l) { var tr = el('tr'); cell(tr, l.label); cell(tr, l.v, 'n'); cell(tr, l.effect); rt.appendChild(tr); });
+      box.appendChild(rt);
+      box.appendChild(el('div', 'fine', 'The sides agree once every item is applied; code checked this on the verified figures.'));
+      if (w.entries.length) {
+        box.appendChild(el('div', 'lab', 'Proposed entries, for approval'));
+        var et = el('table', 'src');
+        w.entries.forEach(function (e) { var tr = el('tr'); cell(tr, 'Dr ' + e.debit); cell(tr, 'Cr ' + e.credit); cell(tr, e.v, 'n'); et.appendChild(tr); });
+        box.appendChild(et);
+      }
+    } else if (w.kind === 'plan') {
+      var pt = el('table', 'src');
+      w.steps.forEach(function (st) { var tr = el('tr'); cell(tr, st.when); tr.appendChild(rich(el('td'), st.task)); cell(tr, st.owner); pt.appendChild(tr); });
+      box.appendChild(pt);
+    } else if (w.kind === 'code') {
+      box.appendChild(rich(el('div', 'fine'), w.purpose));
+      box.appendChild(el('div', 'fine', 'Draft: not run or reviewed.'));
+      box.appendChild(el('pre', null, w.lines.join('\n') + (w.more ? '\n\u2026 ' + w.more + (w.more === 1 ? ' more line' : ' more lines') + ' in the file' : '')));
+    }
+    return box;
+  }
   function drawSlide() {
-    var sample = data[current], s = sample.slides[page];
+    var sample = shown, s = sample.slides[page];
     slideEl.textContent = '';
-    slideEl.appendChild(el('div', 'h', s.heading));
-    slideEl.appendChild(rich(el('div', 't'), s.title || []));
-    if (s.kind === 'summary') {
+    var mine = !role || role.id === sample.role.id;
+    var heading = s.kind === 'work' && !mine ? 'Work by the ' + sample.role.title : s.heading;
+    slideEl.appendChild(el('div', 'h', heading));
+    slideEl.appendChild(rich(el('div', 't'), s.title || (s.work ? s.work.title : [])));
+    if (s.kind === 'work') {
+      slideEl.appendChild(drawWork(s.work));
+    } else if (s.kind === 'summary') {
       slideEl.appendChild(bullets(s.bullets));
       var tiles = el('div', 'tiles');
       s.tiles.forEach(function (t) { var d = el('div', 'tile'); d.appendChild(el('b', null, t.v)); d.appendChild(el('span', null, t.label + ' \u00b7 ' + t.basis)); tiles.appendChild(d); });
@@ -297,31 +350,49 @@ footer a{color:var(--muted)}
       var c = s.counts;
       slideEl.appendChild(el('div', 'fine', c.client + ' from the client\u2019s words \u00b7 ' + c.computed + ' calculated \u00b7 ' + c.assumption + ' labelled assumptions'));
     }
-    whereEl.textContent = (page + 1) + ' of ' + sample.slides.length + ' \u00b7 ' + s.heading;
+    whereEl.textContent = (page + 1) + ' of ' + sample.slides.length + ' \u00b7 ' + heading;
+  }
+  function pick(r) {
+    // A role shows its own sample when it has one; otherwise its family's, and says so.
+    var fam = data[current];
+    role = r; page = 0;
+    shown = r.id === fam.role.id ? fam : (own[r.id] || fam);
+    document.getElementById('exRole').textContent = r.title;
+    document.getElementById('exProblem').textContent = shown.problem;
+    document.getElementById('exBoundary').textContent = r.boundary;
+    document.getElementById('exToday').textContent = r.delivers;  // built from the role's format
+    document.getElementById('exHire').href = 'hire.html?role=' + encodeURIComponent(r.id);
+    var shared = document.getElementById('exShared'), borrowed = document.getElementById('exBorrowed');
+    shared.hidden = borrowed.hidden = r.own_sample;
+    shared.textContent = r.own_sample ? '' : 'No sample of its own yet: this is the family\u2019s example, written for the ' + fam.role.title + '.';
+    borrowed.textContent = r.own_sample ? '' : 'Showing the ' + fam.role.title + '\u2019s sample. The ' + r.title + ' has no sample of its own yet.';
+    var kind = {memo: 'Word memo', workbook: 'Excel workbook', deck: 'PowerPoint deck'}[shown.format] || shown.format;
+    var dl = document.getElementById('exDeck'); dl.href = shown.file; dl.textContent = 'Download this ' + shown.format;
+    document.getElementById('exCount').textContent = 'The full ' + kind + ': ' + shown.figure_count + ' figures, each traced' +
+      (shown.format === 'workbook' ? '; calculations are live formulas.' : shown.format === 'deck' ? ', ' + shown.slide_count + ' slides.' : '.');
+    Array.prototype.forEach.call(document.getElementById('exRoles').children, function (b) {
+      b.setAttribute('aria-pressed', b.dataset.role === r.id ? 'true' : 'false');
+    });
+    drawSlide();
   }
   function show(i) {
-    current = i; page = 0;
+    current = i;
     var s = data[i];
     Array.prototype.forEach.call(fams.children, function (b, k) {
       b.setAttribute('aria-selected', k === i ? 'true' : 'false'); b.tabIndex = k === i ? 0 : -1;
     });
     box.setAttribute('aria-labelledby', 'tab-' + s.family.id);
     document.getElementById('exFamily').textContent = s.family.title;
-    document.getElementById('exRole').textContent = s.role.title;
-    document.getElementById('exProblem').textContent = s.problem;
-    document.getElementById('exBoundary').textContent = s.role.boundary;
-    document.getElementById('exToday').textContent = s.delivers;  // built from the role's format
-    document.getElementById('exHire').href = 'hire.html?role=' + encodeURIComponent(s.role.id);
-    var kind = {memo: 'Word memo', workbook: 'Excel workbook', deck: 'PowerPoint deck'}[s.format] || s.format;
-    var dl = document.getElementById('exDeck'); dl.href = s.file; dl.textContent = 'Download this ' + s.format;
-    document.getElementById('exCount').textContent = 'The full ' + kind + ': ' + s.figure_count + ' figures, each traced' +
-      (s.format === 'workbook' ? '; calculations are live formulas.' : s.format === 'deck' ? ', ' + s.slide_count + ' slides.' : '.');
-    var others = document.getElementById('exOthers'); others.textContent = '';
-    s.others.forEach(function (o) { var a = el('a', null, o.title); a.href = 'hire.html?role=' + encodeURIComponent(o.id); others.appendChild(a); });
-    document.getElementById('exOthersWrap').hidden = !s.others.length;
-    drawSlide();
+    var chips = document.getElementById('exRoles'); chips.textContent = '';
+    s.roles.forEach(function (r) {
+      var b = el('button', r.own_sample ? 'rchip' : 'rchip borrow'); b.type = 'button'; b.dataset.role = r.id;
+      if (r.own_sample) b.appendChild(el('span', 'dot'));
+      b.appendChild(document.createTextNode(r.title));
+      b.addEventListener('click', function () { pick(r); }); chips.appendChild(b);
+    });
+    pick(s.roles[0]);
   }
-  function step(d) { var n = data[current].slides.length; page = (page + d + n) % n; drawSlide(); }
+  function step(d) { var n = shown.slides.length; page = (page + d + n) % n; drawSlide(); }
   document.getElementById('exPrev').addEventListener('click', function () { step(-1); });
   document.getElementById('exNext').addEventListener('click', function () { step(1); });
   document.querySelector('.viewer').addEventListener('keydown', function (e) {
@@ -333,7 +404,7 @@ footer a{color:var(--muted)}
     show(next); fams.children[next].focus(); e.preventDefault();
   });
   fetch('samples/samples.json').then(function (r) { return r.json(); }).then(function (doc) {
-    data = doc.samples;
+    data = doc.samples; own = doc.roles || {};
     data.forEach(function (s, i) {
       var b = el('button', 'fam', s.family.title); b.type = 'button'; b.setAttribute('role', 'tab');
       b.setAttribute('aria-controls', 'explorer'); b.id = 'tab-' + s.family.id;

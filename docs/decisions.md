@@ -2,6 +2,16 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-24 — Slice 128: each role shows its own sample when it has one
+
+The role explorer showed one sample per family, so picking the AP/AR clerk showed the
+bookkeeper's bank reconciliation. Now each of the 23 roles with a worked example of
+its own shows it, and the other 50 show their family's with a line saying so, rather
+than implying the sample is theirs. The preview gains pages for the role's own work
+(the email, register or case file), because that is what differs most between roles
+in one family. Fixed in passing: the "delivers today" line called delivered work
+products "Also planned", stale since Slice 126.
+
 ## 2026-11-24 — Slice 127: a realistic example for every work kind
 
 Slice 126 tested all 40 work-owing roles with synthetic work; 11 (family, kind)

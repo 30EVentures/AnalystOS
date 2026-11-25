@@ -1,0 +1,238 @@
+{
+ "answer": "Ask the paying customers for the missing beneficiary dates of birth today, so the sanctions compliance officer can clear or escalate the [F3] open matches holding [F5].",
+ "exec_summary": [
+  "Screening [F1] outgoing payments produced [F2] potential matches, [F6] of payments.",
+  "[F7] matches are resolved and [F3] are still open.",
+  "[F4] of the open matches, [F8] of them, lack the beneficiary's date of birth.",
+  "Payments of [F5] are held until each open match is cleared or escalated."
+ ],
+ "situation": "A payments team that screens every outgoing payment against the sanctions lists overnight.",
+ "complication": "Open potential matches are holding payments, and most cannot be assessed without a date of birth.",
+ "key_question": "What does the sanctions compliance officer need to clear or escalate each open potential match?",
+ "titles": {
+  "situation": "Open potential matches are holding outgoing payments.",
+  "options": "Two ways to work the open matches before the cut-off.",
+  "recommendation": "Collect the missing dates of birth, then put each match to the officer.",
+  "roadmap": "Clear today's open matches, then stop the gap recurring.",
+  "kpis": "Two measures show matches are resolved on time.",
+  "risks": "The main risk is releasing a payment to a true match."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Outgoing payments screened overnight",
+   "value": 8000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "screening of 8,000 outgoing payments"
+  },
+  {
+   "id": "F2",
+   "label": "Potential matches",
+   "value": 64,
+   "unit": "count",
+   "basis": "client",
+   "quote": "produced 64 potential matches"
+  },
+  {
+   "id": "F3",
+   "label": "Potential matches still unresolved",
+   "value": 16,
+   "unit": "count",
+   "basis": "client",
+   "quote": "16 are still unresolved"
+  },
+  {
+   "id": "F4",
+   "label": "Unresolved matches missing a date of birth",
+   "value": 12,
+   "unit": "count",
+   "basis": "client",
+   "quote": "12 of the unresolved matches"
+  },
+  {
+   "id": "F5",
+   "label": "Payments held for unresolved matches",
+   "value": 384000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "total $384,000"
+  },
+  {
+   "id": "F6",
+   "label": "Share of payments producing a potential match",
+   "value": 0.8,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Potential matches already resolved",
+   "value": 48,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F3"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Share of open matches missing a date of birth",
+   "value": 75,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F4",
+    "F3"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Where the queue stands",
+   "finding": "Most potential matches are resolved but some still hold payments.",
+   "points": [
+    "[F7] of [F2] potential matches are resolved.",
+    "[F3] remain open and hold [F5] of payments."
+   ],
+   "hypotheses": [
+    {
+     "text": "The open matches are concentrated in one corridor.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The open matches must be cleared or escalated before the cut-off.",
+   "chart": {
+    "title": "Resolved and open potential matches from overnight screening.",
+    "figure_ids": [
+     "F7",
+     "F3"
+    ],
+    "labels": [
+     "Resolved",
+     "Open"
+    ]
+   }
+  },
+  {
+   "branch": "What is missing",
+   "finding": "Most open matches cannot be assessed without a date of birth.",
+   "points": [
+    "[F4] open matches, [F8], lack the beneficiary's date of birth."
+   ],
+   "hypotheses": [
+    {
+     "text": "A date of birth would separate most open matches from the listed names.",
+     "verdict": "untested"
+    },
+    {
+     "text": "Name similarity alone is enough to escalate these matches.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Collecting dates of birth is the fastest route to a decision."
+  },
+  {
+   "branch": "What is at stake",
+   "finding": "Held payments affect customers until each match is decided.",
+   "points": [
+    "Held payments total [F5]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Customers will accept a short delay while details are checked.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Customers should hear why their payment is held and what is needed."
+  }
+ ],
+ "options": [
+  {
+   "name": "Request details, then decide",
+   "description": "Ask paying customers for each beneficiary's date of birth and put each match to the officer with the answer.",
+   "effort": "low"
+  },
+  {
+   "name": "Escalate all open matches",
+   "description": "Send every open match to the officer now on the name evidence alone.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Request details, then decide",
+  "rationale": "It gives the officer the one fact missing for [F8] of open matches; the officer clears or escalates each one, and nothing is released before that."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Request missing dates of birth before the cut-off.",
+    "Put each open match to the officer with its facts."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Add a date of birth check to beneficiary set-up for new payees."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Review with the officer how many matches stayed open past the cut-off."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Open potential matches at the cut-off",
+   "target": "None without a decision"
+  },
+  {
+   "name": "Open matches missing a date of birth",
+   "target": "Falling each week"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "A true match is released in error.",
+   "mitigation": "Release nothing until the officer records a decision on the match."
+  },
+  {
+   "risk": "Customers do not reply in time.",
+   "mitigation": "Keep the payment held and tell the customer what is needed."
+  }
+ ],
+ "work": [
+  {
+   "kind": "case_file",
+   "subject": "Open potential sanctions matches from overnight payment screening",
+   "facts": [
+    "Overnight screening of [F1] outgoing payments produced [F2] potential matches.",
+    "[F3] potential matches are still open and hold payments of [F5].",
+    "[F4] of the open matches name a beneficiary whose date of birth is not on file.",
+    "The remaining open matches have a date of birth on file."
+   ],
+   "evidence": [
+    "The overnight screening results for outgoing payments.",
+    "The client's list of held payments for the open matches.",
+    "Beneficiary details held on file for each payment."
+   ],
+   "open_questions": [
+    "Does each beneficiary's date of birth differ from the listed person's?",
+    "Do any open matches share an address or country with the listed name?",
+    "Has any of these beneficiaries been cleared against the same name before?"
+   ],
+   "for_decision": "Should the sanctions compliance officer clear or escalate each open potential match once the missing dates of birth are in?"
+  }
+ ]
+}

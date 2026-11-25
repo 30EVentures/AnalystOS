@@ -1,0 +1,255 @@
+{
+ "answer": "Add a check against recent sales before next season's forecast is locked: summer was over-forecast by [F7], costing [F8], and winter under-forecast by [F10], leaving stores out of stock.",
+ "exec_summary": [
+  "Summer forecast [F1] units against sales of [F2], an excess of [F6].",
+  "That over-forecast of [F7] cost about [F8] to hold and mark down.",
+  "Winter forecast [F4] against sales of [F5], a shortfall of [F9], or [F10]."
+ ],
+ "situation": "A retailer that forecasts each seasonal range before buying stock.",
+ "complication": "Forecasts missed in both directions, leaving excess stock in summer and empty shelves in winter.",
+ "key_question": "How large were last season's forecast errors, and how should the forecast change before next season?",
+ "titles": {
+  "situation": "Last season's forecasts missed in both directions.",
+  "options": "Two ways to improve next season's forecast.",
+  "recommendation": "Review forecasts against recent sales before buying.",
+  "roadmap": "Change the process before the forecast is locked, then track error weekly.",
+  "kpis": "Two measures show the forecast is improving.",
+  "risks": "The main risk is overcorrecting and running short."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Summer range forecast units",
+   "value": 50000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "forecast for the summer range was 50,000 units"
+  },
+  {
+   "id": "F2",
+   "label": "Summer range units sold",
+   "value": 40000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "we sold 40,000"
+  },
+  {
+   "id": "F3",
+   "label": "Cost per unsold unit",
+   "value": 6,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "costs $6 to hold and mark down"
+  },
+  {
+   "id": "F4",
+   "label": "Winter range forecast units",
+   "value": 27000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "we forecast 27,000 units"
+  },
+  {
+   "id": "F5",
+   "label": "Winter range units sold",
+   "value": 30000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "sold 30,000"
+  },
+  {
+   "id": "F6",
+   "label": "Summer units over forecast",
+   "value": 10000,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Summer forecast error against sales",
+   "value": 25,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F6",
+    "F2"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Cost of unsold summer units",
+   "value": 60000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F6",
+    "F3"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Winter units under forecast",
+   "value": 3000,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F5",
+    "F4"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Winter forecast error against sales",
+   "value": 10,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F9",
+    "F5"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Summer over-forecast",
+   "finding": "Summer was forecast well above what sold, and the excess cost money.",
+   "points": [
+    "Forecast [F1] against sales of [F2] left [F6] units over.",
+    "Those units cost about [F8]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The summer forecast was too high.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "Over-forecasting ties up cash in stock that must be marked down.",
+   "chart": {
+    "title": "Summer forecast ran well above units sold.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "Forecast",
+     "Sold"
+    ]
+   }
+  },
+  {
+   "branch": "Winter under-forecast",
+   "finding": "Winter was forecast below demand and stores ran out.",
+   "points": [
+    "Forecast [F4] against sales of [F5], a shortfall of [F9]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Stockouts cost sales beyond the units sold.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Under-forecasting loses sales the stock-outs hide.",
+   "chart": {
+    "title": "Winter sales ran above the forecast.",
+    "figure_ids": [
+     "F4",
+     "F5"
+    ],
+    "labels": [
+     "Forecast",
+     "Sold"
+    ]
+   }
+  },
+  {
+   "branch": "Pattern across ranges",
+   "finding": "The errors run in opposite directions, so a single fixed adjustment would not work.",
+   "points": [
+    "Summer error was [F7] and winter error [F10]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Forecasts are biased the same way every season.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "The process needs a check against recent sales, not a fixed uplift or cut.",
+   "chart": {
+    "title": "Summer error was larger than winter error.",
+    "figure_ids": [
+     "F7",
+     "F10"
+    ],
+    "labels": [
+     "Summer",
+     "Winter"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Recent-sales review",
+   "description": "Check each range's forecast against recent weekly sales before the buy is locked.",
+   "effort": "low"
+  },
+  {
+   "name": "Smaller first buys",
+   "description": "Buy less up front and reorder in season as sales show.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Recent-sales review",
+  "rationale": "It catches errors like the summer's [F7] and the winter's [F10] before stock is bought, and costs little; the supply chain director decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Agree the review step with the buying team before next season's forecast is locked."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Track weekly forecast error by range and store."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Report forecast error and markdown cost against last season."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Forecast error against sales",
+   "target": "Below [F10] for every range"
+  },
+  {
+   "name": "Cost of unsold units",
+   "target": "Below [F8]"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Overcorrecting leaves stores short.",
+   "mitigation": "Review both over- and under-forecast ranges together."
+  },
+  {
+   "risk": "Store-level stock-outs hide true demand.",
+   "mitigation": "Flag weeks with stock-outs before using sales as demand."
+  }
+ ]
+}

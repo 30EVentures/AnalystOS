@@ -1,0 +1,227 @@
+{
+ "answer": "Propose a preservation list and put the file to the general counsel: [F2] went to a supplier sharing an employee's bank account, [F7] of the category's spend.",
+ "exec_summary": [
+  "Internal audit found [F1] payments totalling [F2] to the supplier.",
+  "The supplier's bank account matches an employee's.",
+  "[F3] of the payments, [F6], were approved by the same manager.",
+  "Every invoice was below the [F4] approval limit."
+ ],
+ "situation": "A business whose internal audit reviews supplier payments.",
+ "complication": "A supplier's bank account matches an employee's, and its invoices all sat below the approval limit.",
+ "key_question": "What does the evidence show about the payments, and what does the general counsel need to decide?",
+ "titles": {
+  "situation": "Supplier payments went to an account matching an employee's.",
+  "options": "Two ways to take the matter forward.",
+  "recommendation": "Propose what to preserve and put the file to counsel.",
+  "roadmap": "Put preservation to counsel first, then close the control gap.",
+  "kpis": "Two measures show the matter is handled properly.",
+  "risks": "The main risk is losing evidence before a decision."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Payments to the supplier",
+   "value": 40,
+   "unit": "count",
+   "basis": "client",
+   "quote": "found 40 payments"
+  },
+  {
+   "id": "F2",
+   "label": "Value of payments to the supplier",
+   "value": 312000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "totalling $312,000"
+  },
+  {
+   "id": "F3",
+   "label": "Payments approved by the same manager",
+   "value": 36,
+   "unit": "count",
+   "basis": "client",
+   "quote": "36 of the payments"
+  },
+  {
+   "id": "F4",
+   "label": "Approval limit",
+   "value": 10000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "below the $10,000 approval limit"
+  },
+  {
+   "id": "F5",
+   "label": "Category spend over the same period",
+   "value": 1560000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "was $1,560,000 over the same period"
+  },
+  {
+   "id": "F6",
+   "label": "Share of payments approved by the same manager",
+   "value": 90,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F3",
+    "F1"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Share of category spend paid to the supplier",
+   "value": 20,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F5"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "The payments",
+   "finding": "The supplier received a large share of the category's spend.",
+   "points": [
+    "[F1] payments totalled [F2], [F7] of category spend."
+   ],
+   "hypotheses": [
+    {
+     "text": "The supplier delivered the goods it invoiced.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Delivery records should be checked against each invoice.",
+   "chart": {
+    "title": "Supplier payments within the category's spend.",
+    "figure_ids": [
+     "F5",
+     "F2"
+    ],
+    "labels": [
+     "Category spend",
+     "This supplier"
+    ]
+   }
+  },
+  {
+   "branch": "The approvals",
+   "finding": "One manager approved almost every payment, each under the limit.",
+   "points": [
+    "[F3] payments, [F6], had the same approver.",
+    "Every invoice was below [F4]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Invoices were sized to avoid a second approval.",
+     "verdict": "untested"
+    },
+    {
+     "text": "The manager was the usual approver for this category.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The approval pattern needs explaining before anyone draws conclusions."
+  },
+  {
+   "branch": "The bank account match",
+   "finding": "The supplier's bank account matches an employee's.",
+   "points": [
+    "Internal audit found the match in the supplier's bank details."
+   ],
+   "hypotheses": [
+    {
+     "text": "The match is a data entry error.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Confirming the match is the first evidence task."
+  }
+ ],
+ "options": [
+  {
+   "name": "Propose preservation and refer",
+   "description": "Propose a list of records and access logs to preserve and put the file to the general counsel.",
+   "effort": "low"
+  },
+  {
+   "name": "Interview staff now",
+   "description": "Interview the employee and the approving manager before preserving records.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Propose preservation and refer",
+  "rationale": "It puts preservation of the records behind [F2] of payments to counsel before anyone is alerted; the general counsel decides any next step and any conclusion about individuals."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Propose to the general counsel which payment, invoice and supplier set-up records to preserve.",
+    "Put the file to the general counsel."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Carry out the steps the general counsel decides."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Report the approval control gap to the audit committee."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Preservation list with counsel before any interview",
+   "target": "Agreed before any interview"
+  },
+  {
+   "name": "Payments checked against delivery records",
+   "target": "Every payment"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Evidence is changed or deleted.",
+   "mitigation": "Ask counsel to decide on preservation before anyone is told."
+  },
+  {
+   "risk": "A person is named before the facts are confirmed.",
+   "mitigation": "Keep the file to facts and leave conclusions to the general counsel."
+  }
+ ],
+ "work": [
+  {
+   "kind": "case_file",
+   "subject": "Supplier payments to a bank account matching an employee's",
+   "facts": [
+    "Internal audit found [F1] payments totalling [F2] to the supplier.",
+    "The supplier's bank account matches an employee's bank account.",
+    "[F3] of the payments were approved by the same manager.",
+    "Every invoice was below the [F4] approval limit.",
+    "The supplier received [F7] of spend in its category over the same period."
+   ],
+   "evidence": [
+    "Internal audit's payment and bank detail findings.",
+    "The supplier's invoices and approval records.",
+    "Category spend records for the same period."
+   ],
+   "open_questions": [
+    "Who added the supplier and its bank details, and when were they changed?",
+    "Were the goods or services on each invoice delivered?",
+    "Is the account match confirmed with the bank?"
+   ],
+   "for_decision": "Should the general counsel open a formal investigation and decide who, if anyone, is interviewed?"
+  }
+ ]
+}

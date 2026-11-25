@@ -1,0 +1,249 @@
+{
+ "answer": "Open the renewal with a check-in and reporting help, for the customer success manager to approve: active users fell by [F8] and the customer pays about [F10] a year for unused seats.",
+ "exec_summary": [
+  "Active users fell from [F1] to [F2], a fall of [F7] users or [F8].",
+  "The customer pays for [F4] seats at [F3] each, about [F6] a year.",
+  "[F9] seats sit unused, worth about [F10] a year.",
+  "They opened [F5] support tickets last quarter, most about reporting."
+ ],
+ "situation": "A software business whose largest customer renews next quarter.",
+ "complication": "The customer's usage has fallen sharply ahead of renewal, and reporting causes most of their tickets.",
+ "key_question": "How should the largest customer's renewal be approached given falling usage?",
+ "titles": {
+  "situation": "Usage at the largest customer fell this year.",
+  "options": "Two ways to approach the renewal.",
+  "recommendation": "Check in early and offer reporting help before renewal.",
+  "roadmap": "Check in, fix reporting, then discuss renewal terms.",
+  "kpis": "Two measures show the account is healthier.",
+  "risks": "The main risk is the customer cutting seats at renewal."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Active users at the start of the year",
+   "value": 250,
+   "unit": "count",
+   "basis": "client",
+   "quote": "fell from 250"
+  },
+  {
+   "id": "F2",
+   "label": "Active users now",
+   "value": 150,
+   "unit": "count",
+   "basis": "client",
+   "quote": "to 150 this year"
+  },
+  {
+   "id": "F3",
+   "label": "Price per seat per year",
+   "value": 384,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "at $384 a seat"
+  },
+  {
+   "id": "F4",
+   "label": "Seats paid for",
+   "value": 250,
+   "unit": "count",
+   "basis": "client",
+   "quote": "pay for 250 seats"
+  },
+  {
+   "id": "F5",
+   "label": "Support tickets last quarter",
+   "value": 18,
+   "unit": "count",
+   "basis": "client",
+   "quote": "opened 18 support tickets"
+  },
+  {
+   "id": "F6",
+   "label": "Annual contract value",
+   "value": 96000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F4",
+    "F3"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Fall in active users",
+   "value": 100,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Fall in active users as a share of the start",
+   "value": 40,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F7",
+    "F1"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Unused seats",
+   "value": 100,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F4",
+    "F2"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Annual spend on unused seats",
+   "value": 38400,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F9",
+    "F3"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Usage",
+   "finding": "Active use fell sharply this year.",
+   "points": [
+    "Active users fell from [F1] to [F2]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Staff left the customer's business.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The customer may question paying for unused seats at renewal.",
+   "chart": {
+    "title": "Active users fell sharply this year.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "Start of year",
+     "Now"
+    ]
+   }
+  },
+  {
+   "branch": "Value at risk",
+   "finding": "A large slice of the contract pays for unused seats.",
+   "points": [
+    "[F9] seats are unused, about [F10] of the [F6] contract."
+   ],
+   "hypotheses": [
+    {
+     "text": "The customer will cut seats at renewal.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Raising usage protects the renewal better than a discount."
+  },
+  {
+   "branch": "Friction",
+   "finding": "Reporting problems drive the customer's support tickets.",
+   "points": [
+    "[F5] tickets last quarter, most about reporting."
+   ],
+   "hypotheses": [
+    {
+     "text": "Reporting problems caused users to stop logging in.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "A reporting session addresses the clearest pain point."
+  }
+ ],
+ "options": [
+  {
+   "name": "Early check-in with reporting help",
+   "description": "Email the customer's operations lead to offer a usage review and reporting session.",
+   "effort": "low"
+  },
+  {
+   "name": "Renewal discount",
+   "description": "Offer a discount at renewal to keep all seats.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Early check-in with reporting help",
+  "rationale": "It tackles the usage drop behind about [F10] of unused spend before renewal talks; the customer success manager approves every message."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Send the check-in email to the customer success manager for approval.",
+    "Prepare a usage review by team."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Run the reporting session and close the open reporting tickets."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Bring usage and seat options to the renewal discussion before renewal."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Active users at the customer",
+   "target": "Rising before renewal"
+  },
+  {
+   "name": "Open reporting tickets",
+   "target": "None before renewal"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The customer cuts seats anyway.",
+   "mitigation": "Show a right-sized seat count rather than wait to be asked."
+  },
+  {
+   "risk": "The operations lead does not reply.",
+   "mitigation": "Ask the account's executive sponsor for an introduction."
+  }
+ ],
+ "work": [
+  {
+   "kind": "draft",
+   "title": "Check-in email to the customer's operations lead",
+   "for": "The customer's operations lead, email for the customer success manager to approve before sending",
+   "body": [
+    "Subject: A quick check-in before your renewal",
+    "Hi, I hope things are going well at your end. With your renewal coming up next quarter, I wanted to check in on how the platform is working for your team.",
+    "Looking at your account, fewer people have been logging in this year, and several recent support requests were about reporting. I'd like to help with both.",
+    "Could we set up a short call? I can walk through usage by team and run a reporting session for your managers, showing the reports your team asks about most.",
+    "If it would help, we can also review whether your seat count still fits how your team works today.",
+    "Let me know a time that suits you. Best regards, your customer success team."
+   ]
+  }
+ ]
+}

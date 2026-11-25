@@ -1,0 +1,18 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "technical-writer"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our support team answered 900 tickets last month about exporting reports, out of 3,600 tickets in total.",
+ "answers": {
+  "common.decision": "How to fix the export help content; the support manager decides what gets published.",
+  "common.deadline": "Next month.",
+  "common.audience": "The support manager.",
+  "common.materials": "The current export help article is rated helpful by 40% of readers. Each ticket costs us about $12 to answer.",
+  "content-communications.brief": "Customers using our invoicing software; plain, step by step, no jargon."
+ }
+}

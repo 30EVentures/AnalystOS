@@ -1,0 +1,20 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "regulatory-compliance-advisory-associate"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We are an online lender of small personal loans. The consumer credit rules and our own lending policy require an affordability check with verified income on every loan, and we are not sure we meet it.",
+ "answers": {
+  "common.decision": "What to fix and in what order; the head of compliance decides.",
+  "common.deadline": "The board risk committee in six weeks.",
+  "common.audience": "The head of compliance and the board risk committee.",
+  "common.materials": "Of the 40 loans without income checks, 10 are in arrears. Of the other 280 loans, 14 are in arrears. We write about 1,600 loans a month.",
+  "consulting.current-state": "We added an income field to the application in the spring, but staff can skip it. In a review of 320 loans, 40 had no income verification.",
+  "consulting.success": "Every new loan has a verified income check, and past loans without one are reviewed.",
+  "consulting.constraints": "Two compliance staff; no change to the loan app until its next release."
+ }
+}

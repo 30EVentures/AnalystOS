@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "model-validation-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our credit scoring model predicted a default rate of 2.5% for last year's loans, but 3.5% actually defaulted.",
+ "answers": {
+  "common.decision": "Whether the model can stay in use; the validation opinion is signed by our head of model risk, who is independent of the model's owner.",
+  "common.deadline": "The annual model review in six weeks.",
+  "common.audience": "The head of model risk and the model owner.",
+  "common.materials": "Last year we approved 12,000 loans using the model, with an average balance of $25,000. Our tolerance for the gap between predicted and actual default rates is 0.5 percentage points.",
+  "finance-modeling.purpose": "Test the model's predicted defaults against actual defaults.",
+  "finance-modeling.data": "Last year's loan-level predictions and outcomes from the model owner, in US dollars."
+ }
+}

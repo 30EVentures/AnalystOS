@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "corporate-finance-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our capital budget this year is $3,000,000 and two projects are competing for it.",
+ "answers": {
+  "common.decision": "Which project to fund this year; the CFO decides.",
+  "common.deadline": "The capital plan is due next month.",
+  "common.audience": "The CFO and the operating board.",
+  "common.materials": "An automated packing line costs $2,400,000 and would save $800,000 a year in labour. New warehouse racking costs $1,500,000 and would save $300,000 a year in storage. Our hurdle rate is 15%.",
+  "finance-modeling.purpose": "Compare the two projects' returns and fit them to the budget.",
+  "finance-modeling.data": "Project cost and savings estimates from the operations team, in US dollars."
+ }
+}

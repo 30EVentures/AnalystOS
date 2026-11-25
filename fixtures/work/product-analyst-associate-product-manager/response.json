@@ -1,0 +1,230 @@
+{
+ "answer": "Confirm the quit step in event data, then likely fix bank connection: users who finish setup are active at [F3] a month later against [F4], and bank connection is [F9] of setup tickets.",
+ "exec_summary": [
+  "Of [F2] sign-ups, only [F7] finished setup and [F8] did not.",
+  "Users who finish setup stay active at [F3] against [F4] for those who do not, a gap of [F10].",
+  "Bank connection caused [F5] of [F6] setup tickets, or [F9]."
+ ],
+ "situation": "A budgeting app whose new users must set up a first budget before they get value.",
+ "complication": "Most new users never finish setup, and those users rarely stay.",
+ "key_question": "Where do new users get stuck in setup, and what should the team fix first?",
+ "titles": {
+  "situation": "Most new users never finish setting up a budget.",
+  "options": "Two ways to raise setup completion.",
+  "recommendation": "Confirm the quit step, then fix bank connection.",
+  "roadmap": "Confirm the quit step in event data, then fix it and measure completion.",
+  "kpis": "Two measures show whether onboarding improved.",
+  "risks": "The main risk is fixing the step users complain about but not the one they quit at."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Share of new users who finish setup",
+   "value": 30,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "Only 30% of new users"
+  },
+  {
+   "id": "F2",
+   "label": "Sign-ups last month",
+   "value": 12000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We had 12,000 sign-ups"
+  },
+  {
+   "id": "F3",
+   "label": "Active after a month, finished setup",
+   "value": 60,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "60% are still active a month later"
+  },
+  {
+   "id": "F4",
+   "label": "Active after a month, did not finish setup",
+   "value": 10,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "for those who do not, 10% are still active"
+  },
+  {
+   "id": "F5",
+   "label": "Setup tickets about bank connection",
+   "value": 900,
+   "unit": "count",
+   "basis": "client",
+   "quote": "900 were about connecting a bank account"
+  },
+  {
+   "id": "F6",
+   "label": "Support tickets about setup",
+   "value": 1500,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We received 1,500 support tickets"
+  },
+  {
+   "id": "F7",
+   "label": "Sign-ups who finished setup",
+   "value": 3600,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Sign-ups who did not finish setup",
+   "value": 8400,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F7"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Bank connection share of setup tickets",
+   "value": 60,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F5",
+    "F6"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Activity gap from finishing setup",
+   "value": 50,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F3",
+    "F4"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Why setup matters",
+   "finding": "Users who finish setup are far more likely to stay.",
+   "points": [
+    "Month-one activity is [F3] for finishers and [F4] for the rest, a gap of [F10]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Finishing setup goes with staying active.",
+     "verdict": "supported"
+    },
+    {
+     "text": "Finishing setup causes users to stay.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Raising setup completion is the most promising lever on retention.",
+   "chart": {
+    "title": "Users who finish setup stay active far more often.",
+    "figure_ids": [
+     "F4",
+     "F3"
+    ],
+    "labels": [
+     "Did not finish",
+     "Finished setup"
+    ]
+   }
+  },
+  {
+   "branch": "Where users get stuck",
+   "finding": "Bank connection is the most common setup complaint.",
+   "points": [
+    "Only [F7] of [F2] sign-ups finished; [F8] did not.",
+    "Bank connection caused [F9] of setup tickets."
+   ],
+   "hypotheses": [
+    {
+     "text": "Bank connection is where most users quit setup.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Event data on the step where users quit will confirm the fix target.",
+   "chart": {
+    "title": "Bank connection drives most setup tickets.",
+    "figure_ids": [
+     "F6",
+     "F5"
+    ],
+    "labels": [
+     "All setup tickets",
+     "Bank connection"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Fix bank connection",
+   "description": "Check the quit step in event data, then fix the bank connection step and its errors.",
+   "effort": "medium"
+  },
+  {
+   "name": "Let users skip the bank step",
+   "description": "Let users build a budget by hand and connect a bank later.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Fix bank connection",
+  "rationale": "It is the source of [F9] of setup tickets, and finishing setup goes with activity of [F3] against [F4]; the head of product decides what goes into the sprint."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Find the step where non-finishers quit in last month's event data before sprint planning."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Build and test the bank connection fix."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Compare setup completion with [F1] after release."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Setup completion",
+   "target": "Above [F1]"
+  },
+  {
+   "name": "Bank connection tickets",
+   "target": "Below [F5]"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Users quit at a different step than they complain about.",
+   "mitigation": "Confirm the quit step in event data before building."
+  },
+  {
+   "risk": "The bank connection fix depends on outside providers.",
+   "mitigation": "List provider errors and raise the worst with each provider."
+  }
+ ]
+}

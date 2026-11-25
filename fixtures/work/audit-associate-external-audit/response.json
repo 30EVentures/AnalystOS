@@ -1,0 +1,255 @@
+{
+ "answer": "Follow up every disagreement and test the non-replies before fieldwork closes: a simple projection of the sample's exceptions gives about [F10], above performance materiality of [F11], so the engagement team needs these results to reach its conclusion.",
+ "exec_summary": [
+  "Confirmations went to [F2] balances covering [F3] of [F1] in receivables.",
+  "[F4] customers replied, [F5]; [F6] did not.",
+  "[F7] replies disagreed by [F8] in total, [F9] of the value sampled.",
+  "Any conclusion on receivables is the engagement team's."
+ ],
+ "situation": "An audit team testing a client's year-end trade receivables by confirmation.",
+ "complication": "Some customers disagree with the client's balances and others have not replied.",
+ "key_question": "What do the confirmation results show, and what must be done before the engagement team concludes?",
+ "titles": {
+  "situation": "Confirmations raised exceptions and gaps.",
+  "options": "Two ways to complete the receivables testing.",
+  "recommendation": "Resolve the exceptions and test the non-replies first.",
+  "roadmap": "Finish the follow-up before fieldwork closes, then hand over.",
+  "kpis": "Two measures show the testing is complete.",
+  "risks": "The main risk is concluding before exceptions are explained."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Year-end trade receivables",
+   "value": 12000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "trade receivables of $12,000,000"
+  },
+  {
+   "id": "F2",
+   "label": "Balances sent confirmations",
+   "value": 60,
+   "unit": "count",
+   "basis": "client",
+   "quote": "for 60 customer balances"
+  },
+  {
+   "id": "F3",
+   "label": "Value of balances sampled",
+   "value": 2400000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "covering $2,400,000"
+  },
+  {
+   "id": "F4",
+   "label": "Customers who replied",
+   "value": 48,
+   "unit": "count",
+   "basis": "client",
+   "quote": "48 customers replied"
+  },
+  {
+   "id": "F5",
+   "label": "Reply rate",
+   "value": 80,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F4",
+    "F2"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Balances with no reply",
+   "value": 12,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F4"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Replies that disagreed",
+   "value": 6,
+   "unit": "count",
+   "basis": "client",
+   "quote": "6 replies disagreed"
+  },
+  {
+   "id": "F8",
+   "label": "Total of the disagreements",
+   "value": 96000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "by a total of $96,000"
+  },
+  {
+   "id": "F9",
+   "label": "Disagreements as a share of value sampled",
+   "value": 4,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F8",
+    "F3"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Simple projection across receivables",
+   "value": 480000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F1",
+    "F9"
+   ]
+  },
+  {
+   "id": "F11",
+   "label": "Performance materiality",
+   "value": 300000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Performance materiality is $300,000"
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Exceptions",
+   "finding": "Some customers disagree with the client's balances.",
+   "points": [
+    "[F7] replies disagreed by [F8] in total.",
+    "Projected simply, that is about [F10] against materiality of [F11]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The differences are timing items such as cash in transit.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Each difference needs an explanation before any projection is relied on.",
+   "chart": {
+    "title": "Simple projection against performance materiality.",
+    "figure_ids": [
+     "F10",
+     "F11"
+    ],
+    "labels": [
+     "Projection",
+     "Materiality"
+    ]
+   }
+  },
+  {
+   "branch": "Non-replies",
+   "finding": "Some balances have no confirmation yet.",
+   "points": [
+    "[F6] customers did not reply."
+   ],
+   "hypotheses": [
+    {
+     "text": "The non-replied balances are correct.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Alternative procedures are needed for every non-reply."
+  }
+ ],
+ "options": [
+  {
+   "name": "Follow up first",
+   "description": "Investigate each disagreement and test non-replies with later cash and invoices.",
+   "effort": "medium"
+  },
+  {
+   "name": "Extend the sample now",
+   "description": "Send more confirmations before the exceptions are explained.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Follow up first",
+  "rationale": "Explained differences may shrink the [F10] projection, and the work is needed either way; the engagement team decides any conclusion or extension."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Ask the client to reconcile each disagreement and gather support.",
+    "Test non-replies against later cash receipts and invoices.",
+    "Hand the engagement manager the results before fieldwork closes, for a decision on extending the sample."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "File the working papers for the partner's review."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Note what to change in next year's confirmation planning."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Disagreements with an explanation",
+   "target": "All of them"
+  },
+  {
+   "name": "Non-replies covered by alternative procedures",
+   "target": "All of them"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Differences turn out to be real misstatements.",
+   "mitigation": "Report them to the engagement manager as soon as found."
+  },
+  {
+   "risk": "The client cannot support its balances.",
+   "mitigation": "Escalate to the engagement manager before fieldwork closes."
+  }
+ ],
+ "work": [
+  {
+   "kind": "register",
+   "title": "Receivables confirmation exceptions register",
+   "rows": [
+    {
+     "item": "Replies disagreeing: [F7] totalling [F8].",
+     "rating": "high",
+     "owner": "Audit senior",
+     "status": "open",
+     "action": "Obtain the client's reconciliation and support for each difference."
+    },
+    {
+     "item": "Balances with no reply: [F6].",
+     "rating": "medium",
+     "owner": "Audit associate",
+     "status": "open",
+     "action": "Test each against later cash receipts and invoices."
+    },
+    {
+     "item": "Simple projection of about [F10] against materiality of [F11].",
+     "rating": "high",
+     "owner": "Engagement manager",
+     "status": "open",
+     "action": "Decide whether the sample needs extending once differences are explained."
+    }
+   ]
+  }
+ ]
+}

@@ -110,12 +110,12 @@ class TheRealCatalogTest(unittest.TestCase):
 
     def test_every_role_is_available_on_a_worked_example_and_none_claims_a_live_test(self):
         # Owner's decision 2026-11-23: every role live today, proven by worked examples in the
-        # session; only one paid live test, which has not been run. "mock" only for a role
-        # a worked example was written for; every other role says "mock-family" (Slice 119).
+        # session, not by live model runs. "mock" only for a role a worked example was written
+        # for; since Slice 129 that is every role ("mock-family" would mark one that is not).
         own = set()
         for client in ROOT.glob("fixtures/*/*/client.json"):
             own.update(json.loads(client.read_text())["roles"])
-        self.assertEqual(len(own), 23)
+        self.assertEqual(len(own), 73)  # Slice 129: every role has its own example
         for role in CATALOG["roles"]:
             with self.subTest(role=role["id"]):
                 self.assertEqual(role["status"], "available")

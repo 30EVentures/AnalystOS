@@ -1,0 +1,269 @@
+{
+ "answer": "Do not release the bank file as it stands: it pays a duplicate of [F6] and misses [F5] for new starters. With both fixed it matches net pay exactly; the payroll manager decides on release.",
+ "exec_summary": [
+  "Gross pay of [F1] less tax of [F3] and pension of [F4] gives net pay of [F7].",
+  "The bank file totals [F2], a gap of [F8].",
+  "Missing new starters and a duplicate explain [F9], leaving [F10]."
+ ],
+ "situation": "A payroll team preparing this month's run for release to the bank.",
+ "complication": "The bank payment file does not match net pay in the payroll register.",
+ "key_question": "Why does the bank file differ from net pay, and is it ready to release?",
+ "titles": {
+  "situation": "The bank file and net pay disagree.",
+  "options": "Two ways to fix the bank file before pay day.",
+  "recommendation": "Correct the bank file for the payroll manager's decision.",
+  "roadmap": "Fix this run, then stop the same errors next month.",
+  "kpis": "Two measures show the bank file is right.",
+  "risks": "The main risk is a duplicate payment going out."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Gross pay in the payroll register",
+   "value": 520000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Gross pay in this month's payroll register is $520,000"
+  },
+  {
+   "id": "F2",
+   "label": "Bank payment file total",
+   "value": 406150,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "The bank payment file totals $406,150"
+  },
+  {
+   "id": "F3",
+   "label": "Tax withheld",
+   "value": 83200,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Tax withheld is $83,200"
+  },
+  {
+   "id": "F4",
+   "label": "Employee pension deductions",
+   "value": 26000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "pension deductions are $26,000"
+  },
+  {
+   "id": "F5",
+   "label": "New starters' net pay missing from the bank file",
+   "value": 6800,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "net pay of $6,800"
+  },
+  {
+   "id": "F6",
+   "label": "Duplicate payment in the bank file",
+   "value": 2150,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "a duplicate of $2,150"
+  },
+  {
+   "id": "F7",
+   "label": "Net pay in the register",
+   "value": 410800,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F3",
+    "F4"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Gap between net pay and the bank file",
+   "value": 4650,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F7",
+    "F2"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Gap explained by known items",
+   "value": 4650,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F5",
+    "F6"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Unexplained gap",
+   "value": 0,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F8",
+    "F9"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Gross to net",
+   "finding": "Deductions take gross pay down to net pay cleanly.",
+   "points": [
+    "Gross pay is [F1].",
+    "Tax of [F3] and pension of [F4] leave net pay of [F7]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The deductions are wrong.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Net pay in the register is the right target for the bank file.",
+   "chart": {
+    "title": "Net pay and the bank file before fixes.",
+    "figure_ids": [
+     "F7",
+     "F2"
+    ],
+    "labels": [
+     "Net pay",
+     "Bank file"
+    ]
+   }
+  },
+  {
+   "branch": "Bank file errors",
+   "finding": "The bank file misses new starters and duplicates one payment.",
+   "points": [
+    "New starters' pay of [F5] is missing.",
+    "A duplicate of [F6] is included.",
+    "Together they explain the gap with [F10] left."
+   ],
+   "hypotheses": [
+    {
+     "text": "The gap comes from a tax calculation error.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "Fixing both items makes the bank file match net pay."
+  }
+ ],
+ "options": [
+  {
+   "name": "Correct and release",
+   "description": "Remove the duplicate and add the new starters once their bank details are set up.",
+   "effort": "low"
+  },
+  {
+   "name": "Pay starters separately",
+   "description": "Remove the duplicate now and pay new starters in a separate run.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Correct and release",
+  "rationale": "It makes the bank file match net pay of [F7] exactly before pay day; the payroll manager decides whether to release it."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Remove the duplicate before pay day, for the payroll manager to review.",
+    "Add the new starters once their bank details are set up, or prepare a separate payment for the payroll manager to decide on."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Check every bank file against net pay before release."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Review with the payroll manager whether any bank file errors recurred."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Gap between net pay and the bank file",
+   "target": "Nothing at release"
+  },
+  {
+   "name": "New starters paid on their first pay day",
+   "target": "All of them"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The duplicate is paid before it is removed.",
+   "mitigation": "Hold release until the corrected file is checked."
+  },
+  {
+   "risk": "New starters' bank details arrive late.",
+   "mitigation": "Agree a separate payment for them with the payroll manager."
+  }
+ ],
+ "work": [
+  {
+   "kind": "reconciliation",
+   "title": "Gross pay to bank payment file",
+   "side_a": {
+    "label": "Gross pay in the payroll register",
+    "figure_id": "F1"
+   },
+   "side_b": {
+    "label": "Bank payment file total",
+    "figure_id": "F2"
+   },
+   "items": [
+    {
+     "label": "Tax withheld",
+     "figure_id": "F3",
+     "effect": "subtract_from_a"
+    },
+    {
+     "label": "Employee pension deductions",
+     "figure_id": "F4",
+     "effect": "subtract_from_a"
+    },
+    {
+     "label": "New starters missing from the bank file",
+     "figure_id": "F5",
+     "effect": "subtract_from_a"
+    },
+    {
+     "label": "Duplicate payment in the bank file",
+     "figure_id": "F6",
+     "effect": "subtract_from_b"
+    }
+   ],
+   "entries": [
+    {
+     "debit": "Wages expense",
+     "credit": "Payroll tax payable",
+     "figure_id": "F3",
+     "memo": "Record tax withheld of [F3] as owed to the tax authority; for the payroll manager's approval."
+    },
+    {
+     "debit": "Wages expense",
+     "credit": "Pension contributions payable",
+     "figure_id": "F4",
+     "memo": "Record employee pension deductions of [F4]; for the payroll manager's approval."
+    }
+   ]
+  }
+ ]
+}

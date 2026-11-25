@@ -1,0 +1,18 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "social-media-coordinator"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Engagement on our café chain's Instagram fell from 5% to 3% since spring.",
+ "answers": {
+  "common.decision": "What to post for the new location opening; the marketing lead approves every post.",
+  "common.deadline": "The opening next month.",
+  "common.audience": "The marketing lead.",
+  "common.materials": "Posts showing our staff and behind-the-scenes moments averaged 7% engagement. We have 18,000 followers.",
+  "content-communications.brief": "Local coffee lovers on Instagram; warm, friendly, short."
+ }
+}

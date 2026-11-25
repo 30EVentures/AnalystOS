@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "information-security-grc-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We need an assessment of our security controls against our information security policy before our customers audit us next quarter. We have 20 critical systems. Access reviews were completed this year for 14 of them.",
+ "answers": {
+  "common.decision": "Which gaps to fix first; the chief information security officer decides.",
+  "common.deadline": "Before next quarter's customer audits.",
+  "common.audience": "The chief information security officer.",
+  "common.materials": "Of our 1,500 servers, 135 are missing critical patches older than 30 days. Our policy allows no more than 2% of servers to miss critical patches. 300 remote users still sign in without multi-factor authentication, which our policy requires.",
+  "risk-audit-controls.framework": "Our information security policy, based on an international security standard.",
+  "risk-audit-controls.scope": "Access reviews, server patching and remote sign-in, this year."
+ }
+}

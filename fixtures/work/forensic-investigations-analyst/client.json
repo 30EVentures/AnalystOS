@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "forensic-investigations-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Internal audit found 40 payments totalling $312,000 to a supplier whose bank account matches an employee's.",
+ "answers": {
+  "common.decision": "Whether to open a formal investigation and what to preserve; the general counsel decides.",
+  "common.deadline": "The next audit committee.",
+  "common.audience": "The general counsel.",
+  "common.materials": "36 of the payments were approved by the same manager. Every invoice was below the $10,000 approval limit. Our total spend in that supplier's category was $1,560,000 over the same period.",
+  "financial-crime.case": "Supplier payments flagged by internal audit, under our fraud response policy.",
+  "financial-crime.decider": "The general counsel decides any conclusion about individuals and next steps."
+ }
+}

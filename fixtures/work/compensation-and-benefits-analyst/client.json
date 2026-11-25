@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "compensation-and-benefits-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our engineers' median salary is $108,000 against a market median of $120,000.",
+ "answers": {
+  "common.decision": "How to close the pay gap for engineers; the head of people decides any individual's pay.",
+  "common.deadline": "Next year's pay review.",
+  "common.audience": "The head of people and the finance director.",
+  "common.materials": "Engineering has 80 people. Voluntary turnover among engineers was 20% last year, against 12% across the company. Replacing an engineer costs us about $40,000 in recruiting and lost time.",
+  "people-hr.process": "Annual pay review for engineering, using our salary bands.",
+  "people-hr.decider": "The head of people decides any individual's pay, with the finance director's budget sign-off."
+ }
+}

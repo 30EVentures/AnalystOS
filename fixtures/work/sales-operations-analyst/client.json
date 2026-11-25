@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "sales-operations-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our West region closed 18% of its qualified opportunities last quarter, against 26% in the East.",
+ "answers": {
+  "common.decision": "Where to focus sales coaching and process fixes; the sales director decides.",
+  "common.deadline": "The quarterly sales review in two weeks.",
+  "common.audience": "The sales director and regional managers.",
+  "common.materials": "West had 500 qualified opportunities last quarter. The average deal is worth $40,000.",
+  "data-analytics.data": "CRM export of last quarter's opportunities by region, stage and outcome.",
+  "data-analytics.question": "Why the West converts fewer opportunities and what it costs."
+ }
+}

@@ -1,0 +1,18 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "seo-sem-specialist"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our paid search spend is $30,000 a month and our cost per lead rose from $60 to $75.",
+ "answers": {
+  "common.decision": "Which search changes to make; the marketing manager approves every page and ad change.",
+  "common.deadline": "Next month's campaign review.",
+  "common.audience": "The marketing manager.",
+  "common.materials": "Branded keywords take $6,000 of the monthly spend. Our main product page ranks for our core search term, but its page title is just the word Home.",
+  "content-communications.brief": "Clinic managers searching for online booking software; clear, plain, benefit-led copy."
+ }
+}

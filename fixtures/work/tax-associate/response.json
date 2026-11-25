@@ -1,0 +1,260 @@
+{
+ "answer": "On these numbers current tax is about [F7], leaving about [F9] due after estimated payments, and deferred tax of about [F10] brings the total tax expense to about [F11]; the finance director approves the provision, and the outside preparer reviews the return positions, signs and files.",
+ "exec_summary": [
+  "Profit before tax of [F1] plus non-deductible entertainment of [F2] gives [F4].",
+  "Extra tax depreciation of [F3] brings taxable income to [F5].",
+  "At [F6], current tax is about [F7] against [F8] already paid, leaving [F9].",
+  "The extra depreciation is a temporary difference, so deferred tax of about [F10] is provided as well."
+ ],
+ "situation": "A company closing its financial year and preparing its corporate tax computation.",
+ "complication": "Estimated payments made during the year do not cover the tax the computation shows.",
+ "key_question": "What tax should be provided for, and what does the preparer need to review?",
+ "titles": {
+  "situation": "Taxable income differs from accounting profit.",
+  "options": "Two ways to hand the computation to the preparer.",
+  "recommendation": "Send the full computation pack for the preparer to review.",
+  "roadmap": "Finish the pack, then plan next year's estimates.",
+  "kpis": "Two measures show the pack is ready.",
+  "risks": "The main risk is a position the preparer rejects."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Accounting profit before tax",
+   "value": 2400000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "profit before tax this year is $2,400,000"
+  },
+  {
+   "id": "F2",
+   "label": "Non-deductible entertainment",
+   "value": 60000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Entertainment costs of $60,000"
+  },
+  {
+   "id": "F3",
+   "label": "Tax depreciation above book depreciation",
+   "value": 180000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "exceeds book depreciation by $180,000"
+  },
+  {
+   "id": "F4",
+   "label": "Profit with entertainment added back",
+   "value": 2460000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "sum",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F5",
+   "label": "Taxable income",
+   "value": 2280000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F4",
+    "F3"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Tax rate",
+   "value": 21,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "The tax rate is 21%"
+  },
+  {
+   "id": "F7",
+   "label": "Current tax on taxable income",
+   "value": 478800,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F5",
+    "F6"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Estimated tax paid during the year",
+   "value": 400000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "We paid $400,000 in estimated tax"
+  },
+  {
+   "id": "F9",
+   "label": "Current tax still due",
+   "value": 78800,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F7",
+    "F8"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Deferred tax on the depreciation temporary difference",
+   "value": 37800,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F3",
+    "F6"
+   ]
+  },
+  {
+   "id": "F11",
+   "label": "Total tax expense",
+   "value": 516600,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "sum",
+   "inputs": [
+    "F7",
+    "F10"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Adjustments to profit",
+   "finding": "Two adjustments take profit to taxable income.",
+   "points": [
+    "Entertainment of [F2] is added back.",
+    "Tax depreciation above book depreciation takes off [F3]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Other costs are also not deductible.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The preparer should confirm both adjustments and look for others.",
+   "chart": {
+    "title": "Accounting profit and taxable income.",
+    "figure_ids": [
+     "F1",
+     "F5"
+    ],
+    "labels": [
+     "Accounting profit",
+     "Taxable income"
+    ]
+   }
+  },
+  {
+   "branch": "Current tax",
+   "finding": "Estimated payments fall short of the current tax computed.",
+   "points": [
+    "Current tax at [F6] is about [F7].",
+    "Estimated payments were [F8]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Estimated payments cover the year's tax.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "A balance of about [F9] should be provided for and planned for."
+  },
+  {
+   "branch": "Deferred tax",
+   "finding": "The extra depreciation creates a deferred tax liability.",
+   "points": [
+    "Tax depreciation runs ahead of the books by [F3].",
+    "At [F6], that gives deferred tax of about [F10]."
+   ],
+   "hypotheses": [
+    {
+     "text": "There are other temporary differences to provide for.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The provision should include deferred tax, not current tax alone.",
+   "chart": {
+    "title": "Current and deferred tax.",
+    "figure_ids": [
+     "F7",
+     "F10"
+    ],
+    "labels": [
+     "Current",
+     "Deferred"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Full pack",
+   "description": "Send the computation, current and deferred tax workings and support for each adjustment.",
+   "effort": "low"
+  },
+  {
+   "name": "Figures only",
+   "description": "Send the trial balance and let the preparer build the computation.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Full pack",
+  "rationale": "It lets the preparer test each position quickly and shows the [F9] balance and the [F10] deferred tax early; the preparer advises on the positions, signs as preparer and files."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Assemble the computation and support for each adjustment within the three weeks.",
+    "Send the pack to the preparer once the finance director has reviewed it."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Answer the preparer's questions and update the computation."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Plan next year's estimated payments from the final figures."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Adjustments with support attached",
+   "target": "All of them"
+  },
+  {
+   "name": "Preparer questions still open",
+   "target": "None at filing"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The preparer disagrees with an adjustment.",
+   "mitigation": "Attach the workings and support for each one."
+  },
+  {
+   "risk": "Other non-deductible costs are missed.",
+   "mitigation": "Review expense accounts for similar items before sending."
+  }
+ ]
+}

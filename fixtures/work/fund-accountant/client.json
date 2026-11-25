@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "fund-accountant"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our fund's draft net asset value tonight is $40,000,000, but our independent check of the fund's net assets comes to $39,900,000. The fund has 2,000,000 shares in issue.",
+ "answers": {
+  "common.decision": "Which corrections to book before the strike; the fund controller approves entries and the strike.",
+  "common.deadline": "Before tonight's net asset value strike.",
+  "common.audience": "The fund controller.",
+  "common.materials": "One corporate bond holding still carries last week's price; at today's independent price it is worth $90,000 less. The management fee is being accrued at last year's rate, which understates the accrual by $10,000.",
+  "accounting-operations.systems": "Our fund accounting system and the independent price feed, today's valuation, the fund's chart of accounts.",
+  "accounting-operations.approver": "The fund controller approves all entries and the net asset value strike."
+ }
+}

@@ -1,0 +1,204 @@
+{
+ "answer": "Lead the opening campaign with staff and behind-the-scenes posts, for the marketing lead's approval: they engage at [F3] against [F2] overall.",
+ "exec_summary": [
+  "Engagement fell from [F1] to [F2], a fall of [F5].",
+  "Staff and behind-the-scenes posts averaged [F3].",
+  "Across [F4] followers that is about [F7] engagements a post against [F6] at today's rate."
+ ],
+ "situation": "A café chain that posts on Instagram for local customers.",
+ "complication": "Engagement has fallen and a new location opens next month.",
+ "key_question": "What should the chain post to make the new location's opening land on Instagram?",
+ "titles": {
+  "situation": "Instagram engagement has fallen since spring.",
+  "options": "Two ways to promote the opening on Instagram.",
+  "recommendation": "Lead with staff and behind-the-scenes posts.",
+  "roadmap": "Build up to the opening, then keep the new style going.",
+  "kpis": "Two measures show the new posts work.",
+  "risks": "The main risk is posting before the opening is confirmed."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Engagement in spring",
+   "value": 5,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "fell from 5%"
+  },
+  {
+   "id": "F2",
+   "label": "Engagement now",
+   "value": 3,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "to 3% since spring"
+  },
+  {
+   "id": "F3",
+   "label": "Engagement on staff and behind-the-scenes posts",
+   "value": 7,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "averaged 7% engagement"
+  },
+  {
+   "id": "F4",
+   "label": "Followers",
+   "value": 18000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We have 18,000 followers"
+  },
+  {
+   "id": "F5",
+   "label": "Fall in engagement",
+   "value": 2,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Engagements per post at today's rate",
+   "value": 540,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F4",
+    "F2"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Engagements per post at the staff-post rate",
+   "value": 1260,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F4",
+    "F3"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "The decline",
+   "finding": "Engagement fell well below its spring level.",
+   "points": [
+    "Engagement fell from [F1] to [F2]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Fewer people see the chain's posts since spring.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The opening needs posts people respond to.",
+   "chart": {
+    "title": "Engagement now against spring and staff posts.",
+    "figure_ids": [
+     "F1",
+     "F2",
+     "F3"
+    ],
+    "labels": [
+     "Spring",
+     "Now",
+     "Staff posts"
+    ]
+   }
+  },
+  {
+   "branch": "What works",
+   "finding": "Staff and behind-the-scenes posts engage far better.",
+   "points": [
+    "They averaged [F3].",
+    "At that rate a post earns about [F7] engagements, against [F6]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Faces and real moments drive the higher engagement.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The opening campaign should feature the new team."
+  }
+ ],
+ "options": [
+  {
+   "name": "Staff-led opening posts",
+   "description": "Introduce the new team and show the fit-out in the run-up to the opening.",
+   "effort": "low"
+  },
+  {
+   "name": "Offer-led posts",
+   "description": "Lead with an opening discount in every post.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Staff-led opening posts",
+  "rationale": "Staff posts engage at [F3] against [F2] overall; the marketing lead approves each post before it goes up."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Send the opening posts to the marketing lead for approval.",
+    "Photograph the new team and the fit-out.",
+    "Post the approved run-up and opening-day posts before and on the opening next month."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Keep posting staff and behind-the-scenes content after the opening."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Compare engagement on staff posts with other posts."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Engagement on opening posts",
+   "target": "Above today's rate"
+  },
+  {
+   "name": "Staff and behind-the-scenes posts",
+   "target": "Most posts each week"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The opening date moves.",
+   "mitigation": "Name the date only once the marketing lead confirms it."
+  },
+  {
+   "risk": "Staff do not want to appear.",
+   "mitigation": "Ask each person first and use hands and coffee shots instead."
+  }
+ ],
+ "work": [
+  {
+   "kind": "draft",
+   "title": "Opening week posts for the new café",
+   "for": "Instagram followers, posts for the marketing lead to approve before posting",
+   "body": [
+    "Post one, photo of the new team behind the counter: Meet the crew behind our newest café. They can't wait to make your first coffee here. Say hi when you visit.",
+    "Post two, behind-the-scenes video of the fit-out: Our new café is nearly ready, and we wanted you to see it first.",
+    "Post three, close-up of the head barista: Meet the head barista at our new spot. Come in and ask for their favourite on the menu.",
+    "Post four, opening day: Doors open today at {address to confirm}. Come in, grab a coffee and meet the team. Tag a friend you'd bring along."
+   ]
+  }
+ ]
+}

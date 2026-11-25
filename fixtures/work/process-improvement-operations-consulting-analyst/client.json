@@ -1,0 +1,20 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "process-improvement-operations-consulting-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We are a hospital group. Our accounts payable team receives 5,000 supplier invoices a month, and only 3,500 are approved within our payment terms. Late payments cost us $14,000 a month in supplier late fees.",
+ "answers": {
+  "common.decision": "Which changes to make to invoice approval; the finance director decides.",
+  "common.deadline": "A plan in four weeks.",
+  "common.audience": "The finance director and the accounts payable manager.",
+  "common.materials": "An invoice takes 24 days on average from receipt to approval. Of that, 18 days are spent waiting in approvers' inboxes. 1,200 invoices a month have no purchase order, so the team has to find the right approver by email.",
+  "consulting.current-state": "Invoices are routed by email to budget holders. We sent reminder emails last quarter, which helped a little.",
+  "consulting.success": "Approve 95% of invoices within payment terms.",
+  "consulting.constraints": "No new finance system this year; changes to approval rules are allowed."
+ }
+}

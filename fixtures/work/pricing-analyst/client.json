@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "pricing-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Sales wants to cut the price of our premium coffee machine from $800 to $720 to win volume. It costs us $520 to make.",
+ "answers": {
+  "common.decision": "Whether to approve the price cut; the commercial director decides.",
+  "common.deadline": "The pricing committee meets next week.",
+  "common.audience": "The commercial director and the sales lead.",
+  "common.materials": "We sell 2,000 units a month at the current price. Sales expects the lower price to lift volume to 2,400 units a month.",
+  "finance-modeling.purpose": "Show what the price cut does to monthly gross margin.",
+  "finance-modeling.data": "Monthly unit sales, list price and unit cost for the machine, in US dollars."
+ }
+}

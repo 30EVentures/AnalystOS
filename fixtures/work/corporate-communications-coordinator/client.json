@@ -1,0 +1,18 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "corporate-communications-coordinator"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We are moving to a new benefits provider and must tell all 1,400 employees, but our last intranet announcement was read by only 35% of staff.",
+ "answers": {
+  "common.decision": "How to announce the change so everyone sees it; the head of people signs off the messages.",
+  "common.deadline": "Before enrolment opens next month.",
+  "common.audience": "The head of people.",
+  "common.materials": "Announcements emailed from a named leader were read by 70% of staff. 420 employees work in our warehouses without company email.",
+  "content-communications.brief": "All employees, including warehouse staff; plain, reassuring, practical."
+ }
+}

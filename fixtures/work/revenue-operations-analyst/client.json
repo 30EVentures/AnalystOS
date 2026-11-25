@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "revenue-operations-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We missed our plan for net new annual recurring revenue last year and need to know where revenue was lost.",
+ "answers": {
+  "common.decision": "Whether to put next year's effort into acquisition or retention; the chief revenue officer decides.",
+  "common.deadline": "Next year's revenue plan is due next month.",
+  "common.audience": "The chief revenue officer and the marketing, sales and customer success leads.",
+  "common.materials": "Marketing generated 4,000 leads and we won 200 new customers. The average new customer is worth $15,000 a year. We lost $1.2 million of annual recurring revenue to churn. Our plan was $2.5 million of net new annual recurring revenue.",
+  "data-analytics.data": "Marketing lead counts, CRM closed deals and billing churn records for last year.",
+  "data-analytics.question": "Where in the funnel and after the sale revenue was lost against plan."
+ }
+}

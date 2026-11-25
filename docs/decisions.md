@@ -2,6 +2,24 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-24 — Slice 129: a worked example for every one of the 73 roles
+
+After Slice 128 the owner saw five accounting roles show the same bookkeeper sample
+and asked for every role to have its own. 50 examples were written in one pass by
+three parallel writers working only in a scratch folder against one written brief
+and a checker that runs the repo's own test logic; each example was then re-checked
+here before entering the repo, and the whole set went through a fresh review. The
+catalog now marks all 73 roles as checked on their own example. One writer found a
+test-helper bug: a blank line in a code draft made the no-stray-numbers check
+replace the empty string and space out the whole text, so code digits could not be
+matched; fixed with a regression test. Four review rounds then checked the work itself, not
+just its numbers: overclaims (causes, product claims, promises, a yield passed off as a return,
+a wrong per-deposit threshold) were rewritten, and drafts use {placeholders} for what the client
+did not say. Two rules moved into the verifier because the live model could make the same
+mistakes: a direction word before a negative figure ("fell -40%") and a ratio followed by
+"times" ("4.00x times"); dollars per item may now be dollars. Still no live-model output for
+these roles.
+
 ## 2026-11-24 — Slice 128: each role shows its own sample when it has one
 
 The role explorer showed one sample per family, so picking the AP/AR clerk showed the

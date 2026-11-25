@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "policy-analyst-research-assistant"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our city council is weighing free bus passes for secondary school students. There are 24,000 secondary students in the city. Today 9,000 students buy a student pass at $30 a month.",
+ "answers": {
+  "common.decision": "Whether to offer free passes to every secondary student or only to low-income students; the council votes.",
+  "common.deadline": "The council's transport committee next month.",
+  "common.audience": "Council members on the transport committee.",
+  "common.materials": "Passes are sold for 10 months of the school year. The transit budget can absorb $2,000,000 a year in lost fares. Low-income students who qualify for free school meals number 6,000, and 2,400 of those students already buy a pass.",
+  "research-reporting.scope": "Secondary school students in the city, one school year.",
+  "research-reporting.sources": "The council's fare and school meal figures."
+ }
+}

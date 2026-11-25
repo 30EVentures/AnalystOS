@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "demand-planning-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our forecast for the summer range was 50,000 units but we sold 40,000.",
+ "answers": {
+  "common.decision": "How to change the forecasting process for next season; the supply chain director decides.",
+  "common.deadline": "Next season's forecast is locked in six weeks.",
+  "common.audience": "The supply chain director and the buying team.",
+  "common.materials": "Each unsold unit costs $6 to hold and mark down. For the winter range we forecast 27,000 units, sold 30,000 and ran out of stock in some stores.",
+  "data-analytics.data": "Weekly forecast and actual sales by range and store for both seasons.",
+  "data-analytics.question": "How large the forecast errors were and what they cost."
+ }
+}

@@ -1,0 +1,252 @@
+{
+ "answer": "The [F6] nostro break is fully explained by a mis-posted settlement, unbooked charges and an unapplied client receipt; correct them for approval, and fix the settlement instructions behind [F9] of this month's breaks.",
+ "exec_summary": [
+  "The bank's ledger shows [F1] against the correspondent's [F2], a break of [F6].",
+  "A settlement of [F3] sits on the wrong nostro and charges of [F4] are unbooked.",
+  "A client receipt of [F5] is not yet applied.",
+  "[F8] of this month's [F7] breaks came from instructions pointing to the wrong nostro."
+ ],
+ "situation": "A bank operations team reconciling its US dollar nostro with the correspondent every day.",
+ "complication": "The nostro is out by a material amount, and wrong settlement instructions keep causing breaks.",
+ "key_question": "What explains today's nostro break, and what fixes the breaks that keep recurring?",
+ "titles": {
+  "situation": "The bank's ledger and the correspondent disagree on the nostro.",
+  "options": "Two ways to stop the recurring breaks.",
+  "recommendation": "Correct today's items and fix the settlement instructions, for approval.",
+  "roadmap": "Clear today, then clean the instructions.",
+  "kpis": "Two measures show breaks are falling.",
+  "risks": "The main risk is changing an instruction wrongly."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Nostro balance in the bank's ledger",
+   "value": 8940000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "nostro account shows $8,940,000"
+  },
+  {
+   "id": "F2",
+   "label": "Nostro balance on the correspondent's statement",
+   "value": 8712000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "statement shows $8,712,000"
+  },
+  {
+   "id": "F3",
+   "label": "Settlement booked against a different nostro",
+   "value": 250000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "settlement of $250,000"
+  },
+  {
+   "id": "F4",
+   "label": "Correspondent charges not booked",
+   "value": 3000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Correspondent charges of $3,000"
+  },
+  {
+   "id": "F5",
+   "label": "Client receipt not applied",
+   "value": 25000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "A client receipt of $25,000"
+  },
+  {
+   "id": "F6",
+   "label": "Nostro break",
+   "value": 228000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Nostro breaks this month",
+   "value": 40,
+   "unit": "count",
+   "basis": "client",
+   "quote": "we had 40 nostro breaks"
+  },
+  {
+   "id": "F8",
+   "label": "Breaks from instructions pointing to the wrong nostro",
+   "value": 24,
+   "unit": "count",
+   "basis": "client",
+   "quote": "24 came from settlement instructions"
+  },
+  {
+   "id": "F9",
+   "label": "Share of breaks from wrong instructions",
+   "value": 60,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F8",
+    "F7"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Today's break",
+   "finding": "Three items explain the whole break.",
+   "points": [
+    "The mis-posted settlement of [F3] and charges of [F4] overstate the bank's ledger.",
+    "The unapplied receipt of [F5] understates it."
+   ],
+   "hypotheses": [
+    {
+     "text": "An unknown payment is behind the break.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "Booking the three items clears today's break.",
+   "chart": {
+    "title": "Nostro balance in the ledger and at the correspondent.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "Ledger",
+     "Correspondent"
+    ]
+   }
+  },
+  {
+   "branch": "Recurring breaks",
+   "finding": "Wrong settlement instructions cause most breaks.",
+   "points": [
+    "[F8] of [F7] breaks this month came from wrong instructions, [F9]."
+   ],
+   "hypotheses": [
+    {
+     "text": "A few instructions cause most of these breaks.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Cleaning the instructions removes the largest source of breaks."
+  }
+ ],
+ "options": [
+  {
+   "name": "Clean the instructions",
+   "description": "Correct today's items and review every instruction that caused a break.",
+   "effort": "medium"
+  },
+  {
+   "name": "Fix as found",
+   "description": "Correct each instruction only when it next causes a break.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Clean the instructions",
+  "rationale": "It clears the [F6] break today and targets the source of [F9] of breaks; the payment operations manager approves every booking and instruction change."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Book the three corrections before end of day once approved.",
+    "List the instructions behind this month's breaks."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Submit instruction corrections to the payment operations manager for approval."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Compare monthly breaks with this month's count."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Unexplained nostro break at end of day",
+   "target": "Nothing"
+  },
+  {
+   "name": "Breaks from wrong instructions",
+   "target": "Falling each month"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "An instruction is changed wrongly.",
+   "mitigation": "Have a second person check each change before approval."
+  },
+  {
+   "risk": "The client receipt belongs to another client.",
+   "mitigation": "Confirm the payer details before applying it."
+  }
+ ],
+ "work": [
+  {
+   "kind": "reconciliation",
+   "title": "US dollar nostro against the correspondent's statement",
+   "side_a": {
+    "label": "Nostro balance in the bank's ledger",
+    "figure_id": "F1"
+   },
+   "side_b": {
+    "label": "Nostro balance on the correspondent's statement",
+    "figure_id": "F2"
+   },
+   "items": [
+    {
+     "label": "Settlement booked against a different nostro",
+     "figure_id": "F3",
+     "effect": "subtract_from_a"
+    },
+    {
+     "label": "Correspondent charges not booked",
+     "figure_id": "F4",
+     "effect": "subtract_from_a"
+    },
+    {
+     "label": "Client receipt not applied",
+     "figure_id": "F5",
+     "effect": "add_to_a"
+    }
+   ],
+   "entries": [
+    {
+     "debit": "Other nostro account",
+     "credit": "US dollar nostro account",
+     "figure_id": "F3",
+     "memo": "Move the settlement of [F3] to the nostro the correspondent debited; for the payment operations manager's approval."
+    },
+    {
+     "debit": "Bank charges",
+     "credit": "US dollar nostro account",
+     "figure_id": "F4",
+     "memo": "Book correspondent charges of [F4]; for the payment operations manager's approval."
+    },
+    {
+     "debit": "US dollar nostro account",
+     "credit": "Client account",
+     "figure_id": "F5",
+     "memo": "Apply the client receipt of [F5] once the payer is confirmed; for the payment operations manager's approval."
+    }
+   ]
+  }
+ ]
+}

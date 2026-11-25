@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "payroll-specialist"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Gross pay in this month's payroll register is $520,000. The bank payment file totals $406,150, and we cannot match it to net pay.",
+ "answers": {
+  "common.decision": "Whether the bank file is ready to release; the payroll manager decides when payroll runs.",
+  "common.deadline": "Pay day in two days.",
+  "common.audience": "The payroll manager.",
+  "common.materials": "Tax withheld is $83,200 and employee pension deductions are $26,000. Two new starters' net pay of $6,800 is missing from the bank file because their bank details were not set up. One employee appears twice in the bank file, a duplicate of $2,150.",
+  "accounting-operations.systems": "Our payroll system and the bank payment file, this month's run, standard chart of accounts.",
+  "accounting-operations.approver": "The payroll manager approves entries and decides when payroll runs."
+ }
+}

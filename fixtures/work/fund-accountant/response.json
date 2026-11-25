@@ -1,0 +1,275 @@
+{
+ "answer": "A stale bond price and an under-accrued fee explain the whole [F5] gap; correcting both for the fund controller's approval moves the value per share from [F8] to [F9] before the strike.",
+ "exec_summary": [
+  "The draft value is [F1] against an independent check of [F2], a gap of [F5].",
+  "A bond still at last week's price overstates the draft by [F3].",
+  "The management fee accrual is short by [F4].",
+  "The gap is [F10] of the draft value; the fund controller approves the strike."
+ ],
+ "situation": "A fund that checks its draft net asset value against an independent calculation before each strike.",
+ "complication": "The draft value is higher than the independent check hours before the strike.",
+ "key_question": "What explains the gap in the draft net asset value, and what must be corrected before the strike?",
+ "titles": {
+  "situation": "The draft net asset value is overstated.",
+  "options": "Two ways to handle the gap before the strike.",
+  "recommendation": "Correct both items for approval before the strike.",
+  "roadmap": "Correct tonight, then stop stale prices and old fee rates recurring.",
+  "kpis": "Two measures show the value is clean at each strike.",
+  "risks": "The main risk is striking on a stale price."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Draft net asset value",
+   "value": 40000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "draft net asset value tonight is $40,000,000"
+  },
+  {
+   "id": "F2",
+   "label": "Independent check of net assets",
+   "value": 39900000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "comes to $39,900,000"
+  },
+  {
+   "id": "F3",
+   "label": "Bond overstatement from the stale price",
+   "value": 90000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "worth $90,000 less"
+  },
+  {
+   "id": "F4",
+   "label": "Management fee under-accrual",
+   "value": 10000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "understates the accrual by $10,000"
+  },
+  {
+   "id": "F5",
+   "label": "Gap between draft and check",
+   "value": 100000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Gap explained by the two items",
+   "value": 100000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "sum",
+   "inputs": [
+    "F3",
+    "F4"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Shares in issue",
+   "value": 2000000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "The fund has 2,000,000 shares"
+  },
+  {
+   "id": "F8",
+   "label": "Draft value per share",
+   "value": 20,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "ratio",
+   "inputs": [
+    "F1",
+    "F7"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Corrected value per share",
+   "value": 19.95,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "ratio",
+   "inputs": [
+    "F2",
+    "F7"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Gap as a share of the draft value",
+   "value": 0.25,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F5",
+    "F1"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Pricing",
+   "finding": "One bond still carries last week's price.",
+   "points": [
+    "At today's independent price the bond is worth [F3] less."
+   ],
+   "hypotheses": [
+    {
+     "text": "Other holdings also missed today's price.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Every holding's price date should be checked before the strike.",
+   "chart": {
+    "title": "Draft value and the independent check.",
+    "figure_ids": [
+     "F1",
+     "F2"
+    ],
+    "labels": [
+     "Draft",
+     "Independent check"
+    ]
+   }
+  },
+  {
+   "branch": "Expenses",
+   "finding": "The management fee is accrued at last year's rate.",
+   "points": [
+    "The accrual is short by [F4]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The new fee rate was never loaded into the system.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The fee rate in the system needs updating, not only tonight's accrual."
+  },
+  {
+   "branch": "Per share",
+   "finding": "Both items together explain the gap and lower the value per share.",
+   "points": [
+    "Together the two items come to [F6], the whole gap.",
+    "The value per share moves from [F8] to [F9]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The two items explain the whole gap.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "Correcting both brings the draft to the independent check."
+  }
+ ],
+ "options": [
+  {
+   "name": "Correct and strike",
+   "description": "Book both corrections for approval, then strike on the corrected value.",
+   "effort": "low"
+  },
+  {
+   "name": "Strike and correct later",
+   "description": "Strike on the draft and correct the value afterwards.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Correct and strike",
+  "rationale": "It removes the whole [F5] overstatement before any investor deals at the wrong price; the fund controller approves the entries and the strike."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Book both corrections tonight once the fund controller approves, before the strike.",
+    "Check every holding's price date."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Update the fee rate in the fund accounting system for the fund controller's approval."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Review with the fund controller any gaps found at each strike."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Unexplained gap at the strike",
+   "target": "Nothing"
+  },
+  {
+   "name": "Holdings priced on a past date at the strike",
+   "target": "None"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "A stale price is missed on another holding.",
+   "mitigation": "Flag any holding whose price date is not today."
+  },
+  {
+   "risk": "The fee correction is booked at the wrong rate.",
+   "mitigation": "Check the rate against the fund's fee terms first."
+  }
+ ],
+ "work": [
+  {
+   "kind": "reconciliation",
+   "title": "Draft net asset value against the independent check",
+   "side_a": {
+    "label": "Draft net asset value",
+    "figure_id": "F1"
+   },
+   "side_b": {
+    "label": "Independent check of net assets",
+    "figure_id": "F2"
+   },
+   "items": [
+    {
+     "label": "Bond overstatement from the stale price",
+     "figure_id": "F3",
+     "effect": "subtract_from_a"
+    },
+    {
+     "label": "Management fee under-accrual",
+     "figure_id": "F4",
+     "effect": "subtract_from_a"
+    }
+   ],
+   "entries": [
+    {
+     "debit": "Unrealised loss on investments",
+     "credit": "Investments at fair value",
+     "figure_id": "F3",
+     "memo": "Reprice the bond to today's independent price, lowering it by [F3]; for the fund controller's approval."
+    },
+    {
+     "debit": "Management fee expense",
+     "credit": "Accrued management fee",
+     "figure_id": "F4",
+     "memo": "Top up the management fee accrual by [F4] to the current rate; for the fund controller's approval."
+    }
+   ]
+  }
+ ]
+}

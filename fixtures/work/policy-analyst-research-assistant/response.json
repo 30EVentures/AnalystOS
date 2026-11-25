@@ -1,0 +1,229 @@
+{
+ "answer": "A free pass for every student would cost about [F6] a year in lost fares, above the [F7] the budget can absorb; a pass for low-income students costs about [F11] and fits.",
+ "exec_summary": [
+  "[F2] of the city's [F1] secondary students buy a pass at [F3] a month.",
+  "Making passes free for all would lose about [F6] in fares a year, [F8] over budget.",
+  "A free pass for the [F9] low-income students would lose about [F11], since [F10] of them already pay.",
+  "The council weighs reach against cost; the vote is the council's."
+ ],
+ "situation": "A city council considering free bus passes for secondary school students.",
+ "complication": "Free passes for everyone would lose more fare income than the transit budget can absorb.",
+ "key_question": "Which free-pass design fits the transit budget, and who does each one help?",
+ "titles": {
+  "situation": "Many secondary students already pay for bus passes.",
+  "options": "Two ways to offer free passes.",
+  "recommendation": "Start with free passes for low-income students.",
+  "roadmap": "Prepare the scheme, then measure who uses it.",
+  "kpis": "Two measures show whether the scheme works.",
+  "risks": "The main risks are cost overrun and low take-up."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Secondary students in the city",
+   "value": 24000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "There are 24,000 secondary students"
+  },
+  {
+   "id": "F2",
+   "label": "Students buying a pass today",
+   "value": 9000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "Today 9,000 students buy a student pass"
+  },
+  {
+   "id": "F3",
+   "label": "Monthly student pass price",
+   "value": 30,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "at $30 a month"
+  },
+  {
+   "id": "F4",
+   "label": "Months passes are sold each year",
+   "value": 10,
+   "unit": "months",
+   "basis": "client",
+   "quote": "sold for 10 months of the school year"
+  },
+  {
+   "id": "F5",
+   "label": "Share of students buying a pass",
+   "value": 37.5,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Yearly fares lost with free passes for all",
+   "value": 2700000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F2",
+    "F3",
+    "F4"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Lost fares the budget can absorb each year",
+   "value": 2000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "can absorb $2,000,000 a year"
+  },
+  {
+   "id": "F8",
+   "label": "Free passes for all, over budget",
+   "value": 700000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F6",
+    "F7"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Low-income secondary students",
+   "value": 6000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "free school meals number 6,000"
+  },
+  {
+   "id": "F10",
+   "label": "Low-income students already buying a pass",
+   "value": 2400,
+   "unit": "count",
+   "basis": "client",
+   "quote": "2,400 of those students already buy a pass"
+  },
+  {
+   "id": "F11",
+   "label": "Yearly fares lost with free passes for low-income students",
+   "value": 720000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F10",
+    "F3",
+    "F4"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Cost of each option",
+   "finding": "Only the low-income pass fits the fares the budget can absorb.",
+   "points": [
+    "Free passes for all lose about [F6] a year against a limit of [F7].",
+    "Free passes for low-income students lose about [F11]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Free passes for all fit the transit budget.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "Free passes for all need extra funding the council has not identified.",
+   "chart": {
+    "title": "Yearly fares lost against the budget limit.",
+    "figure_ids": [
+     "F6",
+     "F7",
+     "F11"
+    ],
+    "labels": [
+     "Free for all",
+     "Budget limit",
+     "Low-income only"
+    ]
+   }
+  },
+  {
+   "branch": "Who each option helps",
+   "finding": "Each option helps a different group of families.",
+   "points": [
+    "[F5] of students already buy a pass and would save its full price under free passes for all.",
+    "Of the [F9] low-income students, [F10] already pay; the rest do not buy a pass today."
+   ],
+   "hypotheses": [
+    {
+     "text": "Free passes raise bus use among low-income students.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The low-income pass targets the families least able to pay."
+  }
+ ],
+ "options": [
+  {
+   "name": "Free for all students",
+   "description": "Make passes free for every secondary student and fund the shortfall.",
+   "effort": "high"
+  },
+  {
+   "name": "Free for low-income students",
+   "description": "Make passes free for students who qualify for free school meals.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Free for low-income students",
+  "rationale": "It fits within the [F7] the budget can absorb and helps the families least able to pay; the council decides by vote."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Brief the transport committee on both options before its meeting next month."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "If the council approves, agree with schools how qualifying students get their pass."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Count passes issued and journeys made by qualifying students."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Qualifying students holding a free pass",
+   "target": "Most of those eligible"
+  },
+  {
+   "name": "Lost fares against the budget limit",
+   "target": "Within the limit"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Take-up is low because families do not know they qualify.",
+   "mitigation": "Issue passes through schools alongside free meals."
+  },
+  {
+   "risk": "Lost fares exceed the estimate.",
+   "mitigation": "Report fares lost each month to the transport committee."
+  }
+ ]
+}

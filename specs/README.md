@@ -140,3 +140,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 126 | role-written work products (phase 2), framework | [spec](slice-126/spec.md) |
 | 127 | realistic worked examples for every work kind (phase 2 loop) | [spec](slice-127/spec.md) |
 | 128 | per-role samples in the homepage role explorer | [spec](slice-128/spec.md) |
+| 129 | every role has a worked example and a sample of its own | [spec](slice-129/spec.md) |

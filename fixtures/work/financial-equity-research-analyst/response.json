@@ -1,0 +1,227 @@
+{
+ "answer": "The company is growing but earning less on each sale and carries net debt of [F10] operating profit: revenue rose [F5] while the operating margin fell to [F7]. It merits a full review before the registered analyst sets any rating or price target.",
+ "exec_summary": [
+  "Revenue grew [F5] to [F2].",
+  "Operating profit fell to [F4], so the operating margin dropped from [F6] to [F7], a change of [F8].",
+  "Net debt of [F9] is [F10] operating profit.",
+  "Any rating or price target stays with the registered research analyst."
+ ],
+ "situation": "A listed appliance maker whose latest annual report shows higher sales and lower profit.",
+ "complication": "Profit fell while sales rose, and debt now looks high against the profit that services it.",
+ "key_question": "What do the company's disclosures say about its margins and its debt, and does it need a full review?",
+ "titles": {
+  "situation": "Sales grew but profit fell at the appliance maker.",
+  "options": "Two ways to cover the company from here.",
+  "recommendation": "Run a full review of margins and debt before publishing.",
+  "roadmap": "Test the margin story first, then the balance sheet.",
+  "kpis": "Two measures will show whether margins recover.",
+  "risks": "The main risk is reading one year as a trend."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Revenue the year before",
+   "value": 800000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "up from $800 million the year before"
+  },
+  {
+   "id": "F2",
+   "label": "Revenue this year",
+   "value": 880000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "revenue of $880 million"
+  },
+  {
+   "id": "F3",
+   "label": "Operating profit the year before",
+   "value": 96000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "down from $96 million"
+  },
+  {
+   "id": "F4",
+   "label": "Operating profit this year",
+   "value": 79200000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Operating profit was $79.2 million"
+  },
+  {
+   "id": "F5",
+   "label": "Revenue growth",
+   "value": 10,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "growth_percent",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Operating margin the year before",
+   "value": 12,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F3",
+    "F1"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Operating margin this year",
+   "value": 9,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F4",
+    "F2"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Change in operating margin",
+   "value": -3,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F7",
+    "F6"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Net debt at year end",
+   "value": 316800000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "Net debt at year end was $316.8 million"
+  },
+  {
+   "id": "F10",
+   "label": "Net debt to operating profit",
+   "value": 4,
+   "unit": "ratio",
+   "basis": "computed",
+   "operation": "ratio",
+   "inputs": [
+    "F9",
+    "F4"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Growth and margins",
+   "finding": "Sales grew but the company kept less of each sale as profit.",
+   "points": [
+    "Revenue rose from [F1] to [F2], growth of [F5].",
+    "Operating profit fell from [F3] to [F4].",
+    "The operating margin moved from [F6] to [F7]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Raw material costs rising faster than prices explain the margin fall.",
+     "verdict": "untested"
+    },
+    {
+     "text": "Costs grew faster than revenue.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "The margin fall is the main question for the registered analyst's view.",
+   "chart": {
+    "title": "Operating margin fell over the year.",
+    "figure_ids": [
+     "F6",
+     "F7"
+    ],
+    "labels": [
+     "Year before",
+     "This year"
+    ]
+   }
+  },
+  {
+   "branch": "Debt",
+   "finding": "Net debt is high against the profit that services it.",
+   "points": [
+    "Net debt at year end was [F9].",
+    "That is [F10] this year's operating profit."
+   ],
+   "hypotheses": [
+    {
+     "text": "The company can cut debt from its own cash flow.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Debt leaves less room if margins keep falling."
+  }
+ ],
+ "options": [
+  {
+   "name": "Full review",
+   "description": "Rebuild margins by cost line and test debt capacity before anything is published.",
+   "effort": "medium"
+  },
+  {
+   "name": "Standard update",
+   "description": "Note the results in a short update and revisit at the next report.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Full review",
+  "rationale": "The margin changed by [F8] and net debt is [F10] operating profit; the registered analyst needs both tested before deciding any rating or price target."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Break down the margin fall by cost line from the annual report.",
+    "Hand the registered analyst a first view of the margin drivers within the two-week deadline."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Test how debt to profit moves if margins stay at this year's level."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Refresh the analysis when the company next reports."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Operating margin",
+   "target": "Back towards the year-before level"
+  },
+  {
+   "name": "Net debt to operating profit",
+   "target": "Falling at the next report"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "One year of results is read as a lasting trend.",
+   "mitigation": "Compare with earlier annual reports before concluding."
+  },
+  {
+   "risk": "Management's cost explanation is taken at face value.",
+   "mitigation": "Check it against the cost lines the report discloses."
+  }
+ ]
+}

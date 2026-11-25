@@ -1,0 +1,232 @@
+{
+ "answer": "Net new revenue was [F8] against a plan of [F5], a shortfall of [F9]; churn took [F4], or [F10] of new revenue won. Which side missed needs the plan's own assumptions for gross new revenue and churn.",
+ "exec_summary": [
+  "New customers added [F7] of annual recurring revenue.",
+  "Churn took away [F4], leaving net new revenue of [F8] against a plan of [F5], a shortfall of [F9].",
+  "The plan gives only a net figure, so which side fell short needs its assumptions for gross new revenue and churn."
+ ],
+ "situation": "A subscription business that tracks marketing leads, won customers and churn.",
+ "complication": "Net new recurring revenue missed plan, and the plan states only a net figure.",
+ "key_question": "Where was recurring revenue lost against plan, and which lever closes the gap fastest?",
+ "titles": {
+  "situation": "Net new recurring revenue missed plan last year.",
+  "options": "Three ways to close the gap to plan next year.",
+  "recommendation": "Confirm the split against the plan before shifting effort.",
+  "roadmap": "Get the plan's assumptions first, then size churn before the plan is due.",
+  "kpis": "Two measures show whether the leak is closing.",
+  "risks": "The main risk is cutting acquisition while fixing churn."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Marketing leads last year",
+   "value": 4000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "Marketing generated 4,000 leads"
+  },
+  {
+   "id": "F2",
+   "label": "New customers won",
+   "value": 200,
+   "unit": "count",
+   "basis": "client",
+   "quote": "we won 200 new customers"
+  },
+  {
+   "id": "F3",
+   "label": "Average new customer value a year",
+   "value": 15000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "worth $15,000 a year"
+  },
+  {
+   "id": "F4",
+   "label": "Recurring revenue lost to churn",
+   "value": 1200000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "lost $1.2 million of annual recurring revenue"
+  },
+  {
+   "id": "F5",
+   "label": "Plan for net new recurring revenue",
+   "value": 2500000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "plan was $2.5 million"
+  },
+  {
+   "id": "F6",
+   "label": "Lead-to-customer rate",
+   "value": 5,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "New recurring revenue won",
+   "value": 3000000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F2",
+    "F3"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Net new recurring revenue",
+   "value": 1800000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F7",
+    "F4"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Shortfall to plan",
+   "value": 700000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F5",
+    "F8"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Churn as a share of new revenue",
+   "value": 40,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F4",
+    "F7"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Acquisition",
+   "finding": "New business added recurring revenue, but the plan's own target for it is not known.",
+   "points": [
+    "Of [F1] leads, [F2] became customers, a rate of [F6].",
+    "They added [F7] of recurring revenue."
+   ],
+   "hypotheses": [
+    {
+     "text": "New business fell short of what the plan assumed.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Whether acquisition missed depends on the gross new revenue the plan assumed."
+  },
+  {
+   "branch": "Retention",
+   "finding": "Churn took away a large share of new revenue won.",
+   "points": [
+    "Churn of [F4] was [F10] of new revenue won.",
+    "Churn is larger than the whole [F9] shortfall to plan."
+   ],
+   "hypotheses": [
+    {
+     "text": "Churn above the plan's assumption explains the miss.",
+     "verdict": "untested"
+    },
+    {
+     "text": "Churn is concentrated in recently won customers.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Churn's share of the miss is confirmed only against the plan's churn assumption.",
+   "chart": {
+    "title": "Churn took a large share of the new revenue won.",
+    "figure_ids": [
+     "F7",
+     "F4",
+     "F8"
+    ],
+    "labels": [
+     "New revenue won",
+     "Churn",
+     "Net new revenue"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Confirm the split, then retention",
+   "description": "Split the shortfall using the plan's assumptions, then target the main churn causes with customer success if churn is the larger miss.",
+   "effort": "medium"
+  },
+  {
+   "name": "More leads",
+   "description": "Raise marketing spend to win more new customers.",
+   "effort": "high"
+  },
+  {
+   "name": "Both at once",
+   "description": "Split next year's extra effort evenly between acquisition and retention.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Confirm the split, then retention",
+  "rationale": "Which side missed cannot be known until the plan's own assumptions for gross new revenue and churn are in hand; splitting the [F9] shortfall comes before any shift in effort, and the chief revenue officer decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Get the plan's assumptions for gross new revenue and churn, and split the shortfall between them.",
+    "Join billing churn records to CRM deals to size churn by customer type before the plan is due."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "If the split shows churn missed, agree a retention target with the customer success lead."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Track monthly churn against the target and report net new revenue."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Recurring revenue lost to churn",
+   "target": "Below [F4] next year"
+  },
+  {
+   "name": "Net new recurring revenue",
+   "target": "At or above [F5]"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Acquisition slips while the team focuses on churn.",
+   "mitigation": "Keep the lead-to-customer rate in the monthly report."
+  },
+  {
+   "risk": "Churn records do not match CRM accounts.",
+   "mitigation": "Reconcile customer lists across both systems first."
+  }
+ ]
+}

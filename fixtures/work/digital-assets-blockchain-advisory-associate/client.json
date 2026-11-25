@@ -1,0 +1,20 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "digital-assets-blockchain-advisory-associate"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We are an importer paying overseas suppliers about $6,000,000 a year by international wire. Fees and currency spreads cost us about 2.5% of that. A stablecoin payment provider says it can do the same for a total cost of 0.8%.",
+ "answers": {
+  "common.decision": "Whether to pilot stablecoin payments to suppliers; the finance director decides.",
+  "common.deadline": "A recommendation in four weeks.",
+  "common.audience": "The finance director and our treasury team.",
+  "common.materials": "Only 4 of our 25 suppliers have said they would accept stablecoins. Those suppliers receive $1,500,000 of our payments a year.",
+  "consulting.current-state": "We have not used digital assets before. All supplier payments go by international wire through our bank.",
+  "consulting.success": "Lower payment costs without adding risks our bank or auditors object to.",
+  "consulting.constraints": "Treasury is two people; our bank must agree to any new payment route; we will not hold digital assets on our balance sheet."
+ }
+}

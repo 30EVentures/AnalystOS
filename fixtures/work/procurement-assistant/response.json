@@ -1,0 +1,195 @@
+{
+ "answer": "Draft a request for quotes for the procurement manager to approve, inviting several suppliers to quote for recycled paper delivered to every office: at today's price the annual cost of [F3] is [F5] over next year's budget.",
+ "exec_summary": [
+  "The business buys about [F1] reams a year at [F2] a ream.",
+  "That costs about [F3] a year.",
+  "Next year's budget is [F4], [F5] less.",
+  "The gap is [F6] of today's annual cost."
+ ],
+ "situation": "A business buying copy paper for all its offices from one supplier.",
+ "complication": "The contract ends next quarter, and today's price would overrun next year's budget.",
+ "key_question": "How should the business source copy paper next year to stay within budget?",
+ "titles": {
+  "situation": "Paper costs more than next year's budget allows.",
+  "options": "Two ways to source paper next year.",
+  "recommendation": "Request quotes from several suppliers before the contract ends.",
+  "roadmap": "Request quotes, compare them, then award before the contract ends.",
+  "kpis": "Two measures show the new contract meets the budget.",
+  "risks": "The main risk is the contract lapsing before a new one."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Reams bought per year",
+   "value": 20000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "about 20,000 reams"
+  },
+  {
+   "id": "F2",
+   "label": "Price per ream today",
+   "value": 5.4,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "at $5.40 a ream"
+  },
+  {
+   "id": "F3",
+   "label": "Annual paper cost at today's price",
+   "value": 108000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F4",
+   "label": "Paper budget for next year",
+   "value": 97200,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "budget for next year is $97,200"
+  },
+  {
+   "id": "F5",
+   "label": "Cost above budget",
+   "value": 10800,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F3",
+    "F4"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Gap as a share of today's cost",
+   "value": 10,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F5",
+    "F3"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Cost against budget",
+   "finding": "Today's price would overrun next year's budget.",
+   "points": [
+    "At [F2] a ream the year costs [F3] against a budget of [F4]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Today's supplier will match a lower market price.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The new contract needs a price that fits the budget.",
+   "chart": {
+    "title": "Annual paper cost against next year's budget.",
+    "figure_ids": [
+     "F3",
+     "F4"
+    ],
+    "labels": [
+     "Today's price",
+     "Budget"
+    ]
+   }
+  },
+  {
+   "branch": "What to ask suppliers for",
+   "finding": "Facilities needs recycled paper delivered to every office.",
+   "points": [
+    "Facilities wants recycled paper and delivery to all offices."
+   ],
+   "hypotheses": [
+    {
+     "text": "Recycled paper costs more than standard paper.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The request must state both needs so quotes compare fairly."
+  }
+ ],
+ "options": [
+  {
+   "name": "Request quotes",
+   "description": "Ask several suppliers, including today's, to quote on the same terms.",
+   "effort": "low"
+  },
+  {
+   "name": "Renew with today's supplier",
+   "description": "Ask today's supplier for a renewal at a lower price.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Request quotes",
+  "rationale": "Comparable quotes show whether the [F5] gap can close; the procurement manager approves the request before any supplier sees it."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Send the draft request to the procurement manager for approval.",
+    "List suppliers to invite."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Compare quotes on price, recycled content and delivery."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Recommend a supplier to the procurement manager before the contract ends."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Annual paper cost",
+   "target": "Within next year's budget"
+  },
+  {
+   "name": "Quotes received on the same terms",
+   "target": "Several before the award"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Too few suppliers reply.",
+   "mitigation": "Invite more suppliers than needed and follow up once."
+  },
+  {
+   "risk": "The contract lapses before an award.",
+   "mitigation": "Draft a request to today's supplier for a short extension, for the procurement manager to approve before it goes."
+  }
+ ],
+ "work": [
+  {
+   "kind": "draft",
+   "title": "Request for quotes: recycled copy paper",
+   "for": "Invited paper suppliers, email for the procurement manager to approve before sending",
+   "body": [
+    "Hello, we are inviting a small number of suppliers to quote for our copy paper supply for next year.",
+    "We use about [F1] reams a year of standard office copy paper. We would like recycled paper, delivered to each of our offices: {list of office addresses to confirm}.",
+    "Please quote a price per ream, the recycled content of the paper, your delivery charges if any, and how quickly you deliver after an order.",
+    "Please also tell us your payment terms and whether your price is fixed for the year.",
+    "We will compare all quotes on the same basis. Please reply to this email with your quote and any questions by {reply-by date to confirm}.",
+    "Thank you, the procurement team."
+   ]
+  }
+ ]
+}

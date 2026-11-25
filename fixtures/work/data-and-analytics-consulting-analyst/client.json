@@ -1,0 +1,20 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "data-and-analytics-consulting-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "We are a regional grocery chain with 30 stores. We spend $1,200,000 a year on in-store promotions and cannot tell which ones pay off.",
+ "answers": {
+  "common.decision": "How to use our data to judge promotions; the commercial director decides which to keep.",
+  "common.deadline": "A proposal in five weeks.",
+  "common.audience": "The commercial director and our two data analysts.",
+  "common.materials": "We run about 400 promotions a year. Our loyalty card covers 65% of sales.",
+  "consulting.current-state": "We once held back 3 stores from a promotion to compare sales, but never repeated it. Promotions are planned on buyers' judgment.",
+  "consulting.success": "Know each promotion's sales lift soon after it ends, and cut spend on promotions that do not pay off by 20%.",
+  "consulting.constraints": "Our data team is two analysts; the loyalty data already sits in our data warehouse."
+ }
+}

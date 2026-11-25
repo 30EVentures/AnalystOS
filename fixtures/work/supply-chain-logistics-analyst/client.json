@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "supply-chain-logistics-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our on-time delivery rate to stores fell from 95% to 86% last quarter.",
+ "answers": {
+  "common.decision": "Where to fix delivery performance first; the head of logistics decides.",
+  "common.deadline": "The logistics review at the end of next month.",
+  "common.audience": "The head of logistics and the warehouse manager.",
+  "common.materials": "We made 20,000 deliveries to stores last quarter. Of the late deliveries, 2,100 left our main warehouse late. Each late delivery costs us $45 in re-delivery and store penalties.",
+  "data-analytics.data": "Delivery records with planned and actual times, and warehouse dispatch logs.",
+  "data-analytics.question": "Why on-time delivery fell and where the late deliveries start."
+ }
+}

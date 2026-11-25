@@ -1,0 +1,213 @@
+{
+ "answer": "Announce by email from the head of people and brief warehouse supervisors for the [F4] staff without email: a named email would reach about [F7] of the [F6] email holders, against about [F8] readers for the last intranet post.",
+ "exec_summary": [
+  "The change must reach all [F1] employees.",
+  "The last intranet announcement was read by [F2] of staff, about [F8] people.",
+  "Emails from a named leader were read by [F3]; across the [F6] staff with email that is about [F7] people.",
+  "[F4] warehouse staff, [F5] of employees, have no company email."
+ ],
+ "situation": "An employer moving all staff to a new benefits provider.",
+ "complication": "Past intranet announcements reached few staff, and many warehouse staff have no company email.",
+ "key_question": "How should the benefits change be announced so every employee sees it before enrolment?",
+ "titles": {
+  "situation": "Intranet announcements reach few staff.",
+  "options": "Two ways to announce the benefits change.",
+  "recommendation": "Email from the head of people and brief warehouse supervisors.",
+  "roadmap": "Announce, brief supervisors, then remind before enrolment.",
+  "kpis": "Two measures show the message got through.",
+  "risks": "The main risk is warehouse staff missing enrolment."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Employees",
+   "value": 1400,
+   "unit": "count",
+   "basis": "client",
+   "quote": "all 1,400 employees"
+  },
+  {
+   "id": "F2",
+   "label": "Read rate for the last intranet announcement",
+   "value": 35,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "read by only 35% of staff"
+  },
+  {
+   "id": "F3",
+   "label": "Read rate for emails from a named leader",
+   "value": 70,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "were read by 70% of staff"
+  },
+  {
+   "id": "F4",
+   "label": "Warehouse employees without company email",
+   "value": 420,
+   "unit": "count",
+   "basis": "client",
+   "quote": "420 employees work in our warehouses"
+  },
+  {
+   "id": "F5",
+   "label": "Share of employees without company email",
+   "value": 30,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F4",
+    "F1"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Employees with company email",
+   "value": 980,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F4"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Email holders reached at the named email rate",
+   "value": 686,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F6",
+    "F3"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Employees reached at the intranet rate",
+   "value": 490,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Which channel gets read",
+   "finding": "Emails from a named leader are read far more than intranet posts.",
+   "points": [
+    "Named emails were read by [F3] against [F2] for the intranet."
+   ],
+   "hypotheses": [
+    {
+     "text": "Staff trust a message signed by a person they know.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The announcement should come from the head of people by email.",
+   "chart": {
+    "title": "Read rates by channel.",
+    "figure_ids": [
+     "F2",
+     "F3"
+    ],
+    "labels": [
+     "Intranet",
+     "Named email"
+    ]
+   }
+  },
+  {
+   "branch": "Who email misses",
+   "finding": "Many warehouse staff cannot get the email at all.",
+   "points": [
+    "[F4] warehouse staff, [F5], have no company email."
+   ],
+   "hypotheses": [
+    {
+     "text": "Warehouse supervisors can brief every shift.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Warehouse staff need a briefing and a printed notice."
+  }
+ ],
+ "options": [
+  {
+   "name": "Named email plus briefings",
+   "description": "Email from the head of people and give warehouse supervisors a briefing pack.",
+   "effort": "low"
+  },
+  {
+   "name": "Intranet post",
+   "description": "Post the change on the intranet as usual.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Named email plus briefings",
+  "rationale": "It uses the channel read by [F3] and reaches the [F4] staff without email; the head of people reviews every message."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Send the announcement and briefing pack to the head of people for review before enrolment opens."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Send a reminder before enrolment closes."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Check enrolment numbers and follow up with teams that lag."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Employees who read the announcement",
+   "target": "Most of them"
+  },
+  {
+   "name": "Warehouse shifts briefed",
+   "target": "Every shift before enrolment"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Staff worry the change cuts their cover.",
+   "mitigation": "Say plainly what stays the same and where to ask."
+  },
+  {
+   "risk": "A warehouse shift is missed.",
+   "mitigation": "Ask each supervisor to confirm every shift is briefed."
+  }
+ ],
+ "work": [
+  {
+   "kind": "draft",
+   "title": "Announcement: our new benefits provider",
+   "for": "All employees, email from the head of people for the head of people to review",
+   "body": [
+    "Subject: Your benefits are moving to a new provider",
+    "Hello everyone, I want to tell you about a change to how your benefits are run. From {start date for the head of people to confirm}, a new provider, {provider name to confirm}, will run our employee benefits.",
+    "{What stays the same and what changes for employees, for the head of people to confirm.} You will need to confirm your choices during enrolment.",
+    "Enrolment opens next month. We will send step-by-step instructions, and your manager or warehouse supervisor will walk through them with your team.",
+    "If you have questions, reply to this email or speak to the people team. Thank you, Head of People."
+   ]
+  }
+ ]
+}

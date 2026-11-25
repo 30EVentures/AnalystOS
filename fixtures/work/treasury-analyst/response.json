@@ -1,0 +1,234 @@
+{
+ "answer": "Cash lasts [F7] before the covenant floor, not the [F5] a simple runway suggests; drawing the facility would extend that to [F9], so the CFO should choose now between drawing it and cutting burn.",
+ "exec_summary": [
+  "Cash of [F1] at a burn of [F2] lasts [F5] in total.",
+  "The covenant floor of [F4] leaves [F6] usable, or [F7] of runway.",
+  "Adding the undrawn facility of [F3] lifts available liquidity to [F8], or [F9] of runway."
+ ],
+ "situation": "A company funding its operating losses from cash, with an undrawn bank facility.",
+ "complication": "The covenant floor shortens how long the cash really lasts.",
+ "key_question": "How long does the cash last within the covenant, and how should the runway be extended?",
+ "titles": {
+  "situation": "Cash covers operations for now, but the covenant sets a floor.",
+  "options": "Three ways to extend the cash runway.",
+  "recommendation": "Keep the facility ready and cut burn first.",
+  "roadmap": "Decide before the board meets, then track runway monthly.",
+  "kpis": "Two measures show whether runway is under control.",
+  "risks": "The main risk is the bank changing the facility terms."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Cash held",
+   "value": 4200000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "We hold $4.2 million in cash"
+  },
+  {
+   "id": "F2",
+   "label": "Monthly cash burn",
+   "value": 350000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "burn $350,000 a month"
+  },
+  {
+   "id": "F3",
+   "label": "Undrawn revolving credit facility",
+   "value": 1400000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "credit facility of $1.4 million"
+  },
+  {
+   "id": "F4",
+   "label": "Covenant minimum cash balance",
+   "value": 700000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "minimum cash balance of $700,000"
+  },
+  {
+   "id": "F5",
+   "label": "Runway on all cash",
+   "value": 12,
+   "unit": "months",
+   "basis": "computed",
+   "operation": "ratio",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Cash usable above the covenant floor",
+   "value": 3500000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F4"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Runway to the covenant floor",
+   "value": 10,
+   "unit": "months",
+   "basis": "computed",
+   "operation": "ratio",
+   "inputs": [
+    "F6",
+    "F2"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Usable liquidity with the facility",
+   "value": 4900000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "sum",
+   "inputs": [
+    "F6",
+    "F3"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Runway with the facility drawn",
+   "value": 14,
+   "unit": "months",
+   "basis": "computed",
+   "operation": "ratio",
+   "inputs": [
+    "F8",
+    "F2"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Runway within the covenant",
+   "finding": "The covenant floor cuts the real runway.",
+   "points": [
+    "All cash lasts [F5] at the current burn.",
+    "Only [F6] sits above the floor of [F4], which lasts [F7]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The simple runway overstates how long cash lasts.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "Planning should use [F7], not [F5].",
+   "chart": {
+    "title": "The covenant floor shortens the cash runway.",
+    "figure_ids": [
+     "F5",
+     "F7",
+     "F9"
+    ],
+    "labels": [
+     "All cash",
+     "To the floor",
+     "With the facility"
+    ]
+   }
+  },
+  {
+   "branch": "Sources of more runway",
+   "finding": "The facility adds runway, and cutting burn is the other lever.",
+   "points": [
+    "Drawing the facility of [F3] lifts usable liquidity to [F8]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The facility can be drawn when needed.",
+     "verdict": "untested"
+    },
+    {
+     "text": "Burn can be cut without harming the business.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The CFO should decide on both levers while runway is still long.",
+   "chart": {
+    "title": "Usable liquidity rises once the facility is drawn.",
+    "figure_ids": [
+     "F6",
+     "F8"
+    ],
+    "labels": [
+     "Cash above floor",
+     "With the facility"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Cut burn, keep the facility ready",
+   "description": "Agree spending cuts now and keep the facility undrawn as a backstop.",
+   "effort": "medium"
+  },
+  {
+   "name": "Draw the facility now",
+   "description": "Draw the full facility now to hold more cash.",
+   "effort": "low"
+  },
+  {
+   "name": "Raise new equity",
+   "description": "Start raising equity to fund operations.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Cut burn, keep the facility ready",
+  "rationale": "Runway to the floor is [F7]; cutting burn extends it without adding debt, and the facility still adds liquidity up to [F8] if needed; the CFO decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Bring the runway figures and the two levers to the board meeting.",
+    "Confirm with the bank that the facility can be drawn on current terms."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Track burn monthly against any cuts the CFO approves."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Refresh the runway with actual cash and update the board."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Runway to the covenant floor",
+   "target": "Above [F7] after cuts"
+  },
+  {
+   "name": "Monthly cash burn",
+   "target": "Below [F2]"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The bank changes the facility terms.",
+   "mitigation": "Confirm drawing conditions in writing before relying on it."
+  },
+  {
+   "risk": "Spending cuts take longer to land than planned.",
+   "mitigation": "Phase the cuts and track them monthly."
+  }
+ ]
+}

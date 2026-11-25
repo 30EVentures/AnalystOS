@@ -1,0 +1,238 @@
+{
+ "answer": "Attack waiting time first: invoices spend [F8] of their approval time in approvers' inboxes, and late approval costs [F11] a month in late fees. Whether this alone reaches the [F4] target is untested.",
+ "exec_summary": [
+  "[F2] of [F1] invoices a month are approved within terms, [F3], against a target of [F4].",
+  "An invoice takes [F6] days to approve, [F7] of them waiting in inboxes.",
+  "[F9] invoices a month, [F10], have no purchase order and need an approver found by email.",
+  "Late payments cost [F11] a month in supplier late fees."
+ ],
+ "situation": "A hospital group whose accounts payable team routes supplier invoices to budget holders by email.",
+ "complication": "Many invoices miss payment terms, the group pays late fees, and reminders helped only a little.",
+ "key_question": "Where does invoice approval time go, and what would lift approval within terms?",
+ "titles": {
+  "situation": "Many invoices are approved after payment terms.",
+  "options": "Two ways to speed up invoice approval.",
+  "recommendation": "Set approval rules with escalation to cut waiting.",
+  "roadmap": "Change the rules first, then measure against the target.",
+  "kpis": "Two measures show approval is faster.",
+  "risks": "The main risk is approvers rubber-stamping invoices."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Supplier invoices a month",
+   "value": 5000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "receives 5,000 supplier invoices a month"
+  },
+  {
+   "id": "F2",
+   "label": "Invoices approved within terms",
+   "value": 3500,
+   "unit": "count",
+   "basis": "client",
+   "quote": "only 3,500 are approved within our payment terms"
+  },
+  {
+   "id": "F3",
+   "label": "Share approved within terms",
+   "value": 70,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F4",
+   "label": "Target share approved within terms",
+   "value": 95,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "Approve 95% of invoices"
+  },
+  {
+   "id": "F5",
+   "label": "Gap to the target",
+   "value": 25,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F4",
+    "F3"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Average days from receipt to approval",
+   "value": 24,
+   "unit": "other",
+   "basis": "client",
+   "quote": "takes 24 days on average"
+  },
+  {
+   "id": "F7",
+   "label": "Days waiting in approvers' inboxes",
+   "value": 18,
+   "unit": "other",
+   "basis": "client",
+   "quote": "18 days are spent waiting"
+  },
+  {
+   "id": "F8",
+   "label": "Share of approval time spent waiting",
+   "value": 75,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F7",
+    "F6"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Invoices a month without a purchase order",
+   "value": 1200,
+   "unit": "count",
+   "basis": "client",
+   "quote": "1,200 invoices a month have no purchase order"
+  },
+  {
+   "id": "F10",
+   "label": "Share of invoices without a purchase order",
+   "value": 24,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F9",
+    "F1"
+   ]
+  },
+  {
+   "id": "F11",
+   "label": "Monthly supplier late fees",
+   "value": 14000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "cost us $14,000 a month"
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Waiting",
+   "finding": "Invoices spend most of their approval time waiting in inboxes.",
+   "points": [
+    "[F7] of [F6] days are spent waiting, [F8] of the time."
+   ],
+   "hypotheses": [
+    {
+     "text": "Approvers cannot tell which invoices are urgent.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Cutting waiting is the biggest lever on approval time.",
+   "chart": {
+    "title": "Approval within terms now and the target.",
+    "figure_ids": [
+     "F3",
+     "F4"
+    ],
+    "labels": [
+     "Now",
+     "Target"
+    ]
+   }
+  },
+  {
+   "branch": "Routing",
+   "finding": "Invoices without a purchase order have no obvious approver.",
+   "points": [
+    "[F9] invoices a month, [F10], need an approver found by email."
+   ],
+   "hypotheses": [
+    {
+     "text": "These invoices are the slowest to approve.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Clear routing rules would remove the hunt for an approver."
+  },
+  {
+   "branch": "Reminders",
+   "finding": "Reminder emails did little for approval times.",
+   "points": [
+    "Reminders sent last quarter helped only a little."
+   ],
+   "hypotheses": [
+    {
+     "text": "More reminders alone will reach the target.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The evidence points to the rules rather than more emails."
+  }
+ ],
+ "options": [
+  {
+   "name": "Rules and escalation",
+   "description": "Route each invoice by cost centre, set approval limits, and escalate invoices left waiting too long.",
+   "effort": "medium"
+  },
+  {
+   "name": "Purchase orders first",
+   "description": "Require a purchase order for all spend except agreed exemptions.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Rules and escalation",
+  "rationale": "It targets waiting, which is [F8] of approval time, and the [F11] monthly late fees without a new system; the finance director decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Map cost centres to approvers and draft approval limits and escalation rules.",
+    "Give the finance director the plan within the four weeks."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "If approved, apply the rules to invoices without a purchase order first."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Measure approval within terms and days waiting against the target."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Invoices approved within terms",
+   "target": "Rising towards the target"
+  },
+  {
+   "name": "Days waiting in approvers' inboxes",
+   "target": "Falling every month"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Approvers approve without checking to beat escalation.",
+   "mitigation": "Sample approved invoices each month."
+  },
+  {
+   "risk": "Budget holders resist new approval limits.",
+   "mitigation": "Agree limits with the finance director before launch."
+  }
+ ]
+}

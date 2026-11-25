@@ -1,0 +1,209 @@
+{
+ "answer": "Build a self-service returns flow that captures order, item and reason up front: returns cost about [F3] a month in agent time, and the target cut is worth about [F7] a month.",
+ "exec_summary": [
+  "The retailer handles [F1] email returns a month at about [F2] each, about [F3] a month.",
+  "[F4] returns, [F5] of them, needed a second email last month.",
+  "The success target is a [F6] cut in agent cost and second emails under [F8]."
+ ],
+ "situation": "An online homeware retailer that handles every return by email.",
+ "complication": "Returns arrive without the details agents need, so many need a second email.",
+ "key_question": "What must a self-service returns flow do to cut agent cost and second emails?",
+ "titles": {
+  "situation": "Returns run on email and cost agent time.",
+  "options": "Two ways to fix returns.",
+  "recommendation": "Build a self-service returns flow with required fields.",
+  "roadmap": "Write requirements first, then build and measure.",
+  "kpis": "Two measures show the flow works.",
+  "risks": "The main risk is a flow customers skip."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Returns handled each month",
+   "value": 3000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We handle 3,000 returns a month"
+  },
+  {
+   "id": "F2",
+   "label": "Agent cost per email return",
+   "value": 6,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "costs us about $6 in agent time"
+  },
+  {
+   "id": "F3",
+   "label": "Monthly agent cost of returns",
+   "value": 18000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F4",
+   "label": "Returns needing a second email last month",
+   "value": 540,
+   "unit": "count",
+   "basis": "client",
+   "quote": "540 returns needed a second email"
+  },
+  {
+   "id": "F5",
+   "label": "Share of returns needing a second email",
+   "value": 18,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F4",
+    "F1"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Target cut in agent cost",
+   "value": 60,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "Cut agent cost on returns by 60%"
+  },
+  {
+   "id": "F7",
+   "label": "Monthly saving at the target",
+   "value": 10800,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F3",
+    "F6"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Target share needing a second email",
+   "value": 5,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "under 5% of returns"
+  },
+  {
+   "id": "F9",
+   "label": "Gap to the second-email target",
+   "value": 13,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F5",
+    "F8"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Missing details",
+   "finding": "Returns arrive without the details agents need.",
+   "points": [
+    "[F5] of returns needed a second email last month.",
+    "That is [F9] above the target."
+   ],
+   "hypotheses": [
+    {
+     "text": "The old form left out details agents need.",
+     "verdict": "supported"
+    }
+   ],
+   "so_what": "The new flow must require order, item and reason before submitting.",
+   "chart": {
+    "title": "Second emails now and the target.",
+    "figure_ids": [
+     "F5",
+     "F8"
+    ],
+    "labels": [
+     "Now",
+     "Target"
+    ]
+   }
+  },
+  {
+   "branch": "Agent cost",
+   "finding": "Email returns cost real agent time every month.",
+   "points": [
+    "Returns cost about [F3] a month in agent time.",
+    "A [F6] cut would save about [F7] a month."
+   ],
+   "hypotheses": [
+    {
+     "text": "Most agent time goes on chasing missing details.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The flow should hand agents only the returns that need judgment."
+  }
+ ],
+ "options": [
+  {
+   "name": "Self-service flow",
+   "description": "Build a returns flow with required order, item and reason fields linked to orders.",
+   "effort": "medium"
+  },
+  {
+   "name": "Better email template",
+   "description": "Send customers a template listing the details agents need.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Self-service flow",
+  "rationale": "It removes the missing-details problem at the source and targets about [F7] a month; the head of customer service decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Write and agree requirements with the head of customer service within the four weeks.",
+    "Map which order system fields the flow needs."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Build the flow with the developer and test it on a share of returns."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Compare second emails and agent cost against the targets."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Returns needing a second email",
+   "target": "Below the target share"
+  },
+  {
+   "name": "Agent cost on returns",
+   "target": "Down by the target cut"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Customers keep emailing instead.",
+   "mitigation": "Link the flow from every order confirmation."
+  },
+  {
+   "risk": "The order system cannot share item details.",
+   "mitigation": "Confirm the fields with the developer before building."
+  }
+ ]
+}

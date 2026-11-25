@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "product-analyst-associate-product-manager"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Only 30% of new users of our budgeting app finish setting up their first budget.",
+ "answers": {
+  "common.decision": "What the product team builds or fixes next in onboarding; the head of product decides.",
+  "common.deadline": "Sprint planning in two weeks.",
+  "common.audience": "The head of product and the onboarding squad.",
+  "common.materials": "We had 12,000 sign-ups last month. Of users who finish setup, 60% are still active a month later; for those who do not, 10% are still active. We received 1,500 support tickets about setup, and 900 were about connecting a bank account.",
+  "data-analytics.data": "Product event data for last month's sign-ups and support tickets tagged by topic.",
+  "data-analytics.question": "Where new users drop out of setup and what to fix first."
+ }
+}

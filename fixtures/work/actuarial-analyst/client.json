@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "actuarial-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Claims on our pet insurance book came in at $6.3 million last year against earned premium of $9 million.",
+ "answers": {
+  "common.decision": "Whether to propose a rate increase; our appointed actuary signs off any rate or reserve change.",
+  "common.deadline": "Rate filings for next year are due in two months.",
+  "common.audience": "The appointed actuary and the head of pricing.",
+  "common.materials": "We priced the book for a loss ratio of 60%. Claim counts rose from 4,000 to 4,500, and the average claim rose from $1,200 to $1,400.",
+  "finance-modeling.purpose": "Explain why the loss ratio missed its target and size the gap.",
+  "finance-modeling.data": "Last year's claims and premium by month, with claim counts and average claim size, in US dollars."
+ }
+}

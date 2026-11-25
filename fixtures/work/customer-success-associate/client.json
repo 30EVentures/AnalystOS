@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "customer-success-associate"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our largest customer, a wholesale business, renews next quarter and their active users fell from 250 to 150 this year.",
+ "answers": {
+  "common.decision": "How to approach the renewal; the customer success manager approves every customer message.",
+  "common.deadline": "Before the renewal next quarter.",
+  "common.audience": "The customer success manager.",
+  "common.materials": "They pay for 250 seats at $384 a seat a year. They opened 18 support tickets last quarter, most about the reporting module.",
+  "sales-customer-coordination.targets": "Our existing customer accounts, starting with the largest.",
+  "sales-customer-coordination.approver": "The customer success manager approves every message to a customer."
+ }
+}

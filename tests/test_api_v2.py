@@ -67,8 +67,8 @@ class ApiV2Test(unittest.TestCase):
             self.assertTrue(any(q["id"] == "common.decision" for q in role["questions"]))
         tested = {r["id"]: r["tested"] for r in doc["roles"]}
         self.assertEqual(tested["management-consulting-analyst"], "mock")
-        self.assertEqual(tested["financial-equity-research-analyst"], "mock-family")
-        self.assertEqual(sum(v == "mock" for v in tested.values()), 23)  # Slice 127: 10 work examples
+        self.assertEqual(tested["financial-equity-research-analyst"], "mock")
+        self.assertEqual(sum(v == "mock" for v in tested.values()), 73)  # Slice 129: every role has its own example
 
     def test_hiring_returns_a_verified_deck(self):
         response = self.post(body())

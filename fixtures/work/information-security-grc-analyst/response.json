@@ -1,0 +1,259 @@
+{
+ "answer": "Fix remote sign-in and patching first, then finish access reviews: [F9] remote users lack multi-factor authentication, [F6] of servers miss critical patches against a limit of [F7], and [F10] critical systems had no access review.",
+ "exec_summary": [
+  "[F9] remote users sign in without the multi-factor authentication the policy requires.",
+  "[F5] of [F4] servers miss critical patches, [F6], against a policy limit of [F7].",
+  "Access reviews were done for [F2] of [F1] critical systems, [F3]; [F10] remain."
+ ],
+ "situation": "A business preparing for customer security audits next quarter.",
+ "complication": "Three controls fall short of its own security policy.",
+ "key_question": "Where do security controls fall short of policy, and what should be fixed first?",
+ "titles": {
+  "situation": "Three controls fall short of the business's security policy.",
+  "options": "Two ways to close the gaps before the audits.",
+  "recommendation": "Close sign-in and patching gaps first, then access reviews.",
+  "roadmap": "Fix exposure first, then complete reviews.",
+  "kpis": "Two measures show the controls meet policy.",
+  "risks": "The main risk is an attacker using a gap first."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Critical systems",
+   "value": 20,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We have 20 critical systems"
+  },
+  {
+   "id": "F2",
+   "label": "Critical systems with an access review this year",
+   "value": 14,
+   "unit": "count",
+   "basis": "client",
+   "quote": "for 14 of them"
+  },
+  {
+   "id": "F3",
+   "label": "Share of critical systems reviewed",
+   "value": 70,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F4",
+   "label": "Servers",
+   "value": 1500,
+   "unit": "count",
+   "basis": "client",
+   "quote": "Of our 1,500 servers"
+  },
+  {
+   "id": "F5",
+   "label": "Servers missing critical patches",
+   "value": 135,
+   "unit": "count",
+   "basis": "client",
+   "quote": "135 are missing critical patches"
+  },
+  {
+   "id": "F6",
+   "label": "Share of servers missing critical patches",
+   "value": 9,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F5",
+    "F4"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Policy limit on servers missing patches",
+   "value": 2,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "no more than 2% of servers"
+  },
+  {
+   "id": "F8",
+   "label": "Patching gap against policy",
+   "value": 7,
+   "unit": "points",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F6",
+    "F7"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Remote users without multi-factor authentication",
+   "value": 300,
+   "unit": "count",
+   "basis": "client",
+   "quote": "300 remote users"
+  },
+  {
+   "id": "F10",
+   "label": "Critical systems without an access review this year",
+   "value": 6,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Remote sign-in",
+   "finding": "Some remote users sign in without the required second factor.",
+   "points": [
+    "[F9] remote users have no multi-factor authentication."
+   ],
+   "hypotheses": [
+    {
+     "text": "These accounts have been misused.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "This is the most direct route in for an attacker."
+  },
+  {
+   "branch": "Patching",
+   "finding": "Far more servers miss patches than policy allows.",
+   "points": [
+    "[F6] of servers miss critical patches, [F8] over the limit."
+   ],
+   "hypotheses": [
+    {
+     "text": "Patching falls behind on a few server groups.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Patching must reach the policy limit before the audits.",
+   "chart": {
+    "title": "Servers missing patches against the policy limit.",
+    "figure_ids": [
+     "F6",
+     "F7"
+    ],
+    "labels": [
+     "Now",
+     "Policy limit"
+    ]
+   }
+  },
+  {
+   "branch": "Access reviews",
+   "finding": "Some critical systems had no access review this year.",
+   "points": [
+    "[F2] of [F1] critical systems were reviewed, [F3]; [F10] were not."
+   ],
+   "hypotheses": [
+    {
+     "text": "Unreviewed systems hold leavers' accounts.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The remaining reviews are needed before the audits."
+  }
+ ],
+ "options": [
+  {
+   "name": "Exposure first",
+   "description": "Enforce multi-factor sign-in and clear critical patches, then finish access reviews.",
+   "effort": "medium"
+  },
+  {
+   "name": "All in parallel",
+   "description": "Run all three fixes at once with equal priority.",
+   "effort": "high"
+  }
+ ],
+ "recommendation": {
+  "option": "Exposure first",
+  "rationale": "It closes the gaps an attacker can use soonest, then completes the reviews auditors will ask for; the chief information security officer decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Enforce multi-factor sign-in for remaining remote users.",
+    "Patch the most exposed servers first."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Bring patching within the policy limit.",
+    "Complete access reviews for the remaining critical systems."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Collect evidence for the customer audits before next quarter."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Servers missing critical patches",
+   "target": "Within the policy limit"
+  },
+  {
+   "name": "Remote users without multi-factor sign-in",
+   "target": "None"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Enforcing multi-factor sign-in locks users out.",
+   "mitigation": "Enrol users before enforcement and staff the help desk."
+  },
+  {
+   "risk": "Patches break production systems.",
+   "mitigation": "Test patches on a small group of servers first."
+  }
+ ],
+ "work": [
+  {
+   "kind": "register",
+   "title": "Information security control gaps register",
+   "rows": [
+    {
+     "item": "Remote users without multi-factor authentication: [F9].",
+     "rating": "high",
+     "owner": "Identity and access manager",
+     "status": "open",
+     "action": "Enrol and enforce multi-factor sign-in for every remote user."
+    },
+    {
+     "item": "Servers missing critical patches: [F6] against a limit of [F7].",
+     "rating": "high",
+     "owner": "Infrastructure manager",
+     "status": "open",
+     "action": "Patch the most exposed servers first and report weekly."
+    },
+    {
+     "item": "Critical systems without an access review this year: [F10] of [F1].",
+     "rating": "medium",
+     "owner": "System owners",
+     "status": "open",
+     "action": "Complete reviews for the remaining systems before the audits."
+    }
+   ]
+  }
+ ]
+}

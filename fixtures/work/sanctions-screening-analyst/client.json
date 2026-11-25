@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "sanctions-screening-analyst"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our overnight sanctions screening of 8,000 outgoing payments produced 64 potential matches, and 16 are still unresolved.",
+ "answers": {
+  "common.decision": "Which potential matches to clear and which to escalate; the sanctions compliance officer decides each one.",
+  "common.deadline": "Before tomorrow's payment cut-off.",
+  "common.audience": "The sanctions compliance officer.",
+  "common.materials": "12 of the unresolved matches name a beneficiary whose date of birth is not on file. Payments held for the unresolved matches total $384,000.",
+  "financial-crime.case": "Outgoing payment screening against the sanctions lists under our sanctions policy.",
+  "financial-crime.decider": "The sanctions compliance officer clears or escalates each potential match."
+ }
+}

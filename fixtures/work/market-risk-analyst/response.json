@@ -1,0 +1,237 @@
+{
+ "answer": "The book breaks its rate limit: a rise of [F3] would cost about [F7], [F9] over the [F4] limit, so hedge about [F10] of its rate exposure.",
+ "exec_summary": [
+  "Bonds worth [F1] with a duration of [F2] lose about [F7] if rates rise by [F3].",
+  "The policy caps that loss at [F4], so the book is [F9] over its limit.",
+  "A rise of [F5], which rates have seen in a year, would cost about [F8]."
+ ],
+ "situation": "A trading book of corporate bonds managed against a rate loss limit.",
+ "complication": "The book's rate exposure is larger than the policy allows.",
+ "key_question": "How large is the book's loss from a rise in rates, and how should it be brought within the limit?",
+ "titles": {
+  "situation": "The bond book carries more rate risk than the policy allows.",
+  "options": "Three ways to bring the book within its limit.",
+  "recommendation": "Hedge part of the book's rate exposure.",
+  "roadmap": "Bring the book within limit, then monitor it daily.",
+  "kpis": "Two measures show the book stays within its limit.",
+  "risks": "The main risk is the hedge not moving with the bonds."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Corporate bonds in the book",
+   "value": 40000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "$40 million of corporate bonds"
+  },
+  {
+   "id": "F2",
+   "label": "Average duration in years",
+   "value": 6,
+   "unit": "other",
+   "basis": "client",
+   "quote": "an average duration of 6 years"
+  },
+  {
+   "id": "F3",
+   "label": "Rate rise in the policy test",
+   "value": 1,
+   "unit": "points",
+   "basis": "client",
+   "quote": "a rate rise of 1 percentage point"
+  },
+  {
+   "id": "F4",
+   "label": "Loss limit for the policy test",
+   "value": 2000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "more than $2 million"
+  },
+  {
+   "id": "F5",
+   "label": "Largest rate move in a year",
+   "value": 2,
+   "unit": "points",
+   "basis": "client",
+   "quote": "as much as 2 percentage points"
+  },
+  {
+   "id": "F6",
+   "label": "Book value times duration",
+   "value": 240000000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Loss from the policy rate rise",
+   "value": 2400000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F6",
+    "F3"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Loss from the largest yearly move",
+   "value": 4800000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "percent_of",
+   "inputs": [
+    "F6",
+    "F5"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Loss above the limit",
+   "value": 400000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F7",
+    "F4"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Share of rate exposure to hedge",
+   "value": 16.7,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F9",
+    "F7"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Against the limit",
+   "finding": "The book's loss from the policy test is above the limit.",
+   "points": [
+    "Value times duration is [F6], so a rise of [F3] costs about [F7].",
+    "That is [F9] over the [F4] limit."
+   ],
+   "hypotheses": [
+    {
+     "text": "The book is within its rate limit.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "The book must be brought back within the limit.",
+   "chart": {
+    "title": "The book's rate loss exceeds the policy limit.",
+    "figure_ids": [
+     "F4",
+     "F7"
+    ],
+    "labels": [
+     "Limit",
+     "Policy test loss"
+    ]
+   }
+  },
+  {
+   "branch": "Larger moves",
+   "finding": "A move rates have already seen would cost far more.",
+   "points": [
+    "A rise of [F5] would cost about [F8]."
+   ],
+   "hypotheses": [
+    {
+     "text": "A move that large is likely this year.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The limit is the floor for action, not the worst case.",
+   "chart": {
+    "title": "A larger yearly move would cost far more than the limit.",
+    "figure_ids": [
+     "F4",
+     "F7",
+     "F8"
+    ],
+    "labels": [
+     "Limit",
+     "Policy test",
+     "Largest yearly move"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Hedge part of the exposure",
+   "description": "Hedge about [F10] of the book's rate exposure with interest rate swaps.",
+   "effort": "medium"
+  },
+  {
+   "name": "Sell longer bonds",
+   "description": "Sell enough long-dated bonds to bring duration down.",
+   "effort": "medium"
+  },
+  {
+   "name": "Ask for a higher limit",
+   "description": "Ask the risk committee to raise the limit.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Hedge part of the exposure",
+  "rationale": "Hedging about [F10] of rate exposure brings the policy test loss down to the [F4] limit without selling bonds; the head of trading decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Report the breach of [F9] and the hedge proposal to the next risk committee."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Put the agreed hedge in place and recheck the policy test."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Add the policy test to the daily risk report."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Loss from the policy rate rise",
+   "target": "At or below [F4]"
+  },
+  {
+   "name": "Days over the limit",
+   "target": "None after the hedge"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The hedge does not move with corporate bond prices.",
+   "mitigation": "Test the hedge against the book's history before sizing it."
+  },
+  {
+   "risk": "The book grows and breaks the limit again.",
+   "mitigation": "Run the policy test daily."
+  }
+ ]
+}

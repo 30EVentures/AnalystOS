@@ -1,0 +1,216 @@
+{
+ "answer": "Test lower branded bids and fix the main page title, for the marketing manager's approval: cost per lead rose [F5], and [F3] a month goes on searches that already name the business.",
+ "exec_summary": [
+  "Paid search spend is [F1] a month.",
+  "Cost per lead rose from [F4] to [F2], up [F5].",
+  "That spend buys about [F7] leads a month.",
+  "Branded keywords take [F3], [F6] of spend."
+ ],
+ "situation": "A software business selling online booking to clinics through paid and organic search.",
+ "complication": "Paid leads now cost more than before, and the main product page wastes its ranking with a weak title.",
+ "key_question": "Which search changes would lower the client's cost per lead?",
+ "titles": {
+  "situation": "Paid search leads are getting more expensive.",
+  "options": "Two ways to lower the cost of a lead.",
+  "recommendation": "Test lower branded bids and fix the main page title.",
+  "roadmap": "Fix the title and ads first, then test branded bids.",
+  "kpis": "Two measures show search is getting cheaper per lead.",
+  "risks": "The main risk is losing branded leads to competitors."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Paid search spend per month",
+   "value": 30000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "spend is $30,000 a month"
+  },
+  {
+   "id": "F2",
+   "label": "Cost per lead now",
+   "value": 75,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "to $75"
+  },
+  {
+   "id": "F3",
+   "label": "Monthly spend on branded keywords",
+   "value": 6000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "take $6,000 of the monthly spend"
+  },
+  {
+   "id": "F4",
+   "label": "Cost per lead before",
+   "value": 60,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "rose from $60"
+  },
+  {
+   "id": "F5",
+   "label": "Rise in cost per lead",
+   "value": 25,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "growth_percent",
+   "inputs": [
+    "F4",
+    "F2"
+   ]
+  },
+  {
+   "id": "F6",
+   "label": "Share of spend on branded keywords",
+   "value": 20,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F3",
+    "F1"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Paid leads per month",
+   "value": 400,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "ratio",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Paid search cost",
+   "finding": "Each paid lead now costs noticeably more.",
+   "points": [
+    "Cost per lead rose from [F4] to [F2].",
+    "Spend of [F1] buys about [F7] leads."
+   ],
+   "hypotheses": [
+    {
+     "text": "Competitors bid up the client's core terms.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Without changes the same budget buys fewer leads.",
+   "chart": {
+    "title": "Cost per lead rose from its earlier level.",
+    "figure_ids": [
+     "F4",
+     "F2"
+    ],
+    "labels": [
+     "Before",
+     "Now"
+    ]
+   }
+  },
+  {
+   "branch": "Branded spend",
+   "finding": "A large slice of spend goes on searches that already name the business.",
+   "points": [
+    "Branded keywords take [F3], [F6] of spend."
+   ],
+   "hypotheses": [
+    {
+     "text": "Branded searchers would find the business through organic results anyway.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "A controlled test shows whether that spend can move to new searches."
+  },
+  {
+   "branch": "The main page title",
+   "finding": "The main product page wastes its ranking on a weak title.",
+   "points": [
+    "The page ranks for the client's core term, but its title is just the word Home."
+   ],
+   "hypotheses": [
+    {
+     "text": "A descriptive title would win more clicks from the same ranking.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "A clear title and description cost nothing in ad spend."
+  }
+ ],
+ "options": [
+  {
+   "name": "Rebalance and retitle",
+   "description": "Test lower branded bids, move the savings to core terms, and rewrite the main page title and ads.",
+   "effort": "low"
+  },
+  {
+   "name": "Cut spend",
+   "description": "Reduce the monthly budget until cost per lead falls.",
+   "effort": "low"
+  }
+ ],
+ "recommendation": {
+  "option": "Rebalance and retitle",
+  "rationale": "It tackles [F3] of branded spend and a free organic fix together; the marketing manager approves every page, ad and bid change before it goes live."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Send the new page title, description and ads to the marketing manager for approval."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Test lower branded bids on part of the account once approved."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Report cost per lead and organic clicks at the campaign review."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Cost per lead",
+   "target": "Back below today's level"
+  },
+  {
+   "name": "Organic clicks to the main product page",
+   "target": "Rising each month"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Competitors take branded clicks.",
+   "mitigation": "Lower branded bids on a test basis and restore them if leads drop."
+  },
+  {
+   "risk": "A new title lowers the page's ranking.",
+   "mitigation": "Keep the core search term at the start of the title."
+  }
+ ],
+ "work": [
+  {
+   "kind": "draft",
+   "title": "Main product page title, description and search ads",
+   "for": "The marketing manager to approve before publishing",
+   "body": [
+    "Items in curly braces are product claims or offers for the marketing manager to confirm, or cut, before anything is published.",
+    "Page title: Online Booking Software for Clinics | {Main benefit to confirm}",
+    "Meta description: Let patients book their appointments online instead of calling the front desk. {Confirm which features to name, such as reminders or rescheduling.}",
+    "Search ad one. Headline: Online Booking for Clinics. Second headline: Patients Book Themselves. Description: Online booking software for clinic managers. Patients choose a time online. {Confirm any time-saving claim before use.}",
+    "Search ad two. Headline: Clinic Booking Software. Second headline: {Offer to confirm, such as a demo}. Description: Simple online booking built for clinics. {One confirmed feature to name here.}"
+   ]
+  }
+ ]
+}

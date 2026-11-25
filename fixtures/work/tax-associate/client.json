@@ -1,0 +1,19 @@
+{
+ "note": "A synthetic client (Slice 129 worked example). Not a real company.",
+ "roles": [
+  "tax-associate"
+ ],
+ "requested_by": {
+  "kind": "person",
+  "ref": "example-client"
+ },
+ "problem": "Our accounting profit before tax this year is $2,400,000. We need the corporate tax computation organised for our outside tax preparer, who will review, sign and file the return.",
+ "answers": {
+  "common.decision": "How much tax to provide for and what to give the preparer; the preparer signs and files the return.",
+  "common.deadline": "The preparer needs our pack in three weeks.",
+  "common.audience": "The finance director and our outside tax preparer.",
+  "common.materials": "Entertainment costs of $60,000 are not deductible. Tax depreciation exceeds book depreciation by $180,000. The tax rate is 21%. We paid $400,000 in estimated tax during the year.",
+  "accounting-operations.systems": "Our accounting system, the financial year just ended, standard chart of accounts.",
+  "accounting-operations.approver": "The finance director approves our numbers; the outside preparer signs and files the return."
+ }
+}

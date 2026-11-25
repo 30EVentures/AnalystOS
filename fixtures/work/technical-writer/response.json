@@ -1,0 +1,192 @@
+{
+ "answer": "Rewrite the export help article as a short step-by-step guide: export questions were [F4] of tickets and cost about [F6] last month.",
+ "exec_summary": [
+  "Support answered [F1] export tickets out of [F2] in total, [F4].",
+  "At about [F5] a ticket, export tickets cost about [F6] last month.",
+  "Only [F3] of readers rate the current article helpful."
+ ],
+ "situation": "An invoicing software business whose support team answers customer tickets.",
+ "complication": "Export questions are a large share of tickets, and few readers rate the current export article helpful.",
+ "key_question": "What help content would let customers export reports without contacting support?",
+ "titles": {
+  "situation": "Export questions fill the support queue.",
+  "options": "Two ways to cut export tickets.",
+  "recommendation": "Rewrite the export article as a step-by-step guide.",
+  "roadmap": "Rewrite, publish, then measure tickets and ratings.",
+  "kpis": "Two measures show the article works.",
+  "risks": "The main risk is the article drifting from the product."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Export tickets last month",
+   "value": 900,
+   "unit": "count",
+   "basis": "client",
+   "quote": "answered 900 tickets"
+  },
+  {
+   "id": "F2",
+   "label": "Tickets in total last month",
+   "value": 3600,
+   "unit": "count",
+   "basis": "client",
+   "quote": "out of 3,600 tickets"
+  },
+  {
+   "id": "F3",
+   "label": "Readers rating the export article helpful",
+   "value": 40,
+   "unit": "percent",
+   "basis": "client",
+   "quote": "rated helpful by 40% of readers"
+  },
+  {
+   "id": "F4",
+   "label": "Share of tickets about exporting",
+   "value": 25,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F5",
+   "label": "Cost to answer a ticket",
+   "value": 12,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "about $12 to answer"
+  },
+  {
+   "id": "F6",
+   "label": "Cost of export tickets last month",
+   "value": 10800,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F1",
+    "F5"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "The size of the problem",
+   "finding": "Export questions are a large share of support work.",
+   "points": [
+    "Export tickets were [F4] of the total.",
+    "They cost about [F6] last month."
+   ],
+   "hypotheses": [
+    {
+     "text": "Most export tickets ask the same few questions.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Better help content would free support time.",
+   "chart": {
+    "title": "Export tickets within all tickets.",
+    "figure_ids": [
+     "F2",
+     "F1"
+    ],
+    "labels": [
+     "All tickets",
+     "Export tickets"
+    ]
+   }
+  },
+  {
+   "branch": "The current article",
+   "finding": "Most readers do not find the current article helpful.",
+   "points": [
+    "Only [F3] rate it helpful."
+   ],
+   "hypotheses": [
+    {
+     "text": "The article describes an older version of the export screen.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "A rewrite should follow the screen as customers see it today."
+  }
+ ],
+ "options": [
+  {
+   "name": "Rewrite the article",
+   "description": "Replace the article with a short step-by-step guide and a troubleshooting section.",
+   "effort": "low"
+  },
+  {
+   "name": "Add an in-app tip",
+   "description": "Add a tip on the export screen that links to the article.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Rewrite the article",
+  "rationale": "It targets the [F1] export tickets at low effort; the support manager decides what is published."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Read a sample of export tickets and list the common questions.",
+    "Send the rewritten article to the support manager for review."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Publish the approved article and link to it from ticket replies."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Compare export tickets and the helpful rating with last month."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Export tickets",
+   "target": "Falling each month"
+  },
+  {
+   "name": "Readers rating the article helpful",
+   "target": "Most of them"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The product changes and the article goes stale.",
+   "mitigation": "Ask the product team to flag export screen changes."
+  },
+  {
+   "risk": "Customers still cannot find the article.",
+   "mitigation": "Link it from the export screen and from ticket replies."
+  }
+ ],
+ "work": [
+  {
+   "kind": "draft",
+   "title": "Export a report to a spreadsheet",
+   "for": "Customers using the invoicing software, help article for the support manager to review",
+   "body": [
+    "Check against the current screen: menu names, report names and button positions below are placeholders for the support manager to confirm before publishing.",
+    "You can export any report to a spreadsheet file to share it or work with the numbers yourself.",
+    "To export a report: open {Reports menu name} from the main menu. Choose the report you want, such as {a common report}. Set the date range and any filters, then select {Apply button name}. Select {Export button and its position} and choose the spreadsheet option. The file downloads to your computer.",
+    "If the export button is greyed out, run the report first. {Confirm that export needs a report with results.}",
+    "If the file opens with all the data in one column, open your spreadsheet program first and use its import option. {Confirm the file type and the separator to choose.}",
+    "If some invoices are missing, check the date range and filters. {Confirm whether the export includes only what the report shows on screen.}",
+    "Still stuck? Contact support {from where support is reached} and say which report you were exporting."
+   ]
+  }
+ ]
+}

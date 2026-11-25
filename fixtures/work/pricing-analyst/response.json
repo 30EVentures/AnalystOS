@@ -1,0 +1,292 @@
+{
+ "answer": "Do not cut the price on sales' volume estimate: monthly gross margin would fall from [F9] to [F10], a loss of [F11], and volume would need to reach [F12] just to break even.",
+ "exec_summary": [
+  "Price changes by [F6], from [F1] to [F2].",
+  "Unit margin falls from [F7] to [F8], a much sharper fall than the price.",
+  "At the expected [F5] units a month margin drops by [F11]; breaking even needs [F12] units."
+ ],
+ "situation": "A maker of a premium coffee machine reviewing a price cut proposed by sales.",
+ "complication": "Every dollar of the price cut comes out of the unit margin, because the unit cost stays at [F3], and the expected volume gain does not replace it.",
+ "key_question": "Does the proposed price cut raise or lower monthly gross margin?",
+ "titles": {
+  "situation": "Sales proposes a lower price on the premium machine.",
+  "options": "Three ways to respond to the price cut proposal.",
+  "recommendation": "Keep the current price and test a targeted offer.",
+  "roadmap": "Decide at the pricing committee, then test a narrower offer.",
+  "kpis": "Two measures show whether pricing protects margin.",
+  "risks": "The main risk is losing volume to competitors at the current price."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Current price",
+   "value": 800,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "from $800"
+  },
+  {
+   "id": "F2",
+   "label": "Proposed price",
+   "value": 720,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "to $720 to win volume"
+  },
+  {
+   "id": "F3",
+   "label": "Unit cost",
+   "value": 520,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "It costs us $520 to make"
+  },
+  {
+   "id": "F4",
+   "label": "Units sold a month now",
+   "value": 2000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We sell 2,000 units a month"
+  },
+  {
+   "id": "F5",
+   "label": "Units a month expected at the lower price",
+   "value": 2400,
+   "unit": "count",
+   "basis": "client",
+   "quote": "lift volume to 2,400 units a month"
+  },
+  {
+   "id": "F6",
+   "label": "Price change",
+   "value": -10,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "growth_percent",
+   "inputs": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Unit margin now",
+   "value": 280,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F1",
+    "F3"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "Unit margin at the lower price",
+   "value": 200,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F3"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "Monthly gross margin now",
+   "value": 560000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F4",
+    "F7"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Monthly gross margin at the lower price",
+   "value": 480000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F5",
+    "F8"
+   ]
+  },
+  {
+   "id": "F11",
+   "label": "Monthly gross margin lost",
+   "value": 80000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F9",
+    "F10"
+   ]
+  },
+  {
+   "id": "F12",
+   "label": "Units a month needed to break even",
+   "value": 2800,
+   "unit": "count",
+   "basis": "computed",
+   "operation": "ratio",
+   "inputs": [
+    "F9",
+    "F8"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Effect on unit margin",
+   "finding": "The price cut takes a far larger share of margin than of price.",
+   "points": [
+    "Price changes by [F6], from [F1] to [F2].",
+    "Unit margin falls from [F7] to [F8] because cost of [F3] does not move."
+   ],
+   "hypotheses": [
+    {
+     "text": "The cut is small enough to leave margin largely intact.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "Each machine sold at the lower price earns much less.",
+   "chart": {
+    "title": "Unit margin falls sharply at the lower price.",
+    "figure_ids": [
+     "F7",
+     "F8"
+    ],
+    "labels": [
+     "Current price",
+     "Lower price"
+    ]
+   }
+  },
+  {
+   "branch": "Effect on monthly margin",
+   "finding": "The expected volume gain does not make up for the lower margin.",
+   "points": [
+    "At [F5] units a month, margin would be [F10] against [F9] today.",
+    "Breaking even needs [F12] units a month against [F4] today."
+   ],
+   "hypotheses": [
+    {
+     "text": "Sales' expected volume gain pays for the cut.",
+     "verdict": "refuted"
+    },
+    {
+     "text": "Customers will buy far more at the lower price.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The cut only pays if volume rises well beyond sales' own estimate.",
+   "chart": {
+    "title": "Monthly gross margin falls even with the expected volume gain.",
+    "figure_ids": [
+     "F9",
+     "F10"
+    ],
+    "labels": [
+     "Now",
+     "At the lower price"
+    ]
+   }
+  },
+  {
+   "branch": "Volume needed to break even",
+   "finding": "Volume would have to rise far more than sales expects.",
+   "points": [
+    "Break-even volume is [F12] against the expected [F5]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Volume can reach the break-even level.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The committee should ask sales for evidence before approving any cut.",
+   "chart": {
+    "title": "Break-even volume is well above what sales expects.",
+    "figure_ids": [
+     "F4",
+     "F5",
+     "F12"
+    ],
+    "labels": [
+     "Today",
+     "Sales' estimate",
+     "Break-even"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Hold price, test an offer",
+   "description": "Keep the current price and test a limited offer with one customer group.",
+   "effort": "low"
+  },
+  {
+   "name": "Approve the cut",
+   "description": "Cut the price for all customers as sales proposes.",
+   "effort": "low"
+  },
+  {
+   "name": "Bundle instead of cut",
+   "description": "Keep the price and add accessories to win volume.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Hold price, test an offer",
+  "rationale": "The full cut loses [F11] of margin a month at sales' own volume estimate; a limited test shows whether demand responds before margin is given away. The commercial director decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Present the margin figures at next week's pricing committee.",
+    "Agree a test group and offer with sales."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Run the limited offer and track units and margin weekly."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Compare the test group's volume with [F12] and recommend a final price."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Monthly gross margin",
+   "target": "At or above [F9]"
+  },
+  {
+   "name": "Units sold in the test group",
+   "target": "Rising enough to reach break-even volume"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Competitors cut prices and volume falls at the current price.",
+   "mitigation": "Track volume weekly and revisit the price if it falls."
+  },
+  {
+   "risk": "The test is too small to show a clear result.",
+   "mitigation": "Agree the test size with sales before it starts."
+  }
+ ]
+}

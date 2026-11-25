@@ -31,6 +31,9 @@ ROOT = Path(__file__).resolve().parents[1]
 CATALOG = load_catalog()
 ROLES = {r["id"]: r for r in CATALOG["roles"]}
 EXAMPLES = sorted(d for d in (ROOT / "fixtures" / "work").iterdir() if d.is_dir())
+FAMILY_EXAMPLE_ROLES = {json.loads(p.read_text())["roles"][0]
+                        for p in [*(ROOT / "fixtures" / "roles").glob("*/client.json"),
+                                  ROOT / "fixtures" / "consulting" / "churn-clinics" / "client.json"]}
 # A draft that reads as already acted on: sent, emailed, posted, booked, filed or signed (Slice 127 review).
 _ACTED = r"(?:sent|emailed|posted|booked|filed|signed|submitted)"
 DONE = re.compile(r"\b(?:has|have|had|was|were)\s+(?:already\s+)?(?:been\s+)?" + _ACTED + r"\b"
@@ -82,15 +85,21 @@ def reconciliation_totals(data):
 
 
 class WorkExamplesTest(unittest.TestCase):
-    def test_each_example_is_for_a_role_that_owes_work(self):
-        self.assertEqual(len(EXAMPLES), 10)
+    def test_every_role_has_a_worked_example_of_its_own(self):
+        # Slice 129: the 13 family examples plus one example per other role, 73 in all.
+        self.assertEqual(len(FAMILY_EXAMPLE_ROLES), 13)
+        self.assertEqual({d.name for d in EXAMPLES} | FAMILY_EXAMPLE_ROLES, set(ROLES))
+        self.assertEqual({d.name for d in EXAMPLES} & FAMILY_EXAMPLE_ROLES, set())
+
+    def test_each_example_carries_exactly_its_roles_work(self):
         for directory in EXAMPLES:
             client, response = load(directory)
             with self.subTest(example=directory.name):
                 self.assertEqual(client["roles"], [directory.name])
                 owed = work.required_kinds(ROLES[directory.name])
-                self.assertTrue(owed)
-                self.assertEqual(sorted({item["kind"] for item in response["work"]}), owed)
+                self.assertEqual(sorted({item["kind"] for item in response.get("work", [])}), owed)
+                if not owed:
+                    self.assertNotIn("work", response)
                 self.assertIn("Not a real company", client["note"])
 
     def test_each_example_verifies_first_time_and_renders_in_its_role_format(self):
@@ -102,7 +111,7 @@ class WorkExamplesTest(unittest.TestCase):
                 data, fmt = formats.render(spec, record, CATALOG)
                 self.assertEqual(fmt, formats.format_of(ROLES[directory.name]))
                 text = rendered_text(data, fmt)
-                for item in spec["content"]["work"]:
+                for item in spec["content"].get("work", []):
                     self.assertIn(work.title_of(item).split(":")[0], text)
                 self.assertEqual(leftover_numbers(without_code(text, spec), spec), "")
 
@@ -110,7 +119,7 @@ class WorkExamplesTest(unittest.TestCase):
         seen = 0
         for directory in EXAMPLES:
             _, response = load(directory)
-            if not any(item["kind"] == "reconciliation" for item in response["work"]):
+            if not any(item["kind"] == "reconciliation" for item in response.get("work", [])):
                 continue
             with self.subTest(example=directory.name):
                 spec, record = build(directory)
@@ -123,14 +132,14 @@ class WorkExamplesTest(unittest.TestCase):
                     self.assertAlmostEqual(rows["Side A adjusted"], rows["Side B adjusted"])
                     self.assertAlmostEqual(rows["Difference"], 0)
                     seen += 1
-        self.assertEqual(seen, 2)
+        self.assertEqual(seen, sum("reconciliation" in work.required_kinds(ROLES[d.name]) for d in EXAMPLES))
 
     def test_drafts_are_written_for_approval_and_never_read_as_done(self):
         seen = 0
         for directory in EXAMPLES:
             _, response = load(directory)
             boundary = ROLES[directory.name]["boundary"]
-            for item in response["work"]:
+            for item in response.get("work", []):
                 if item["kind"] != "draft":
                     continue
                 with self.subTest(example=directory.name):
@@ -141,7 +150,7 @@ class WorkExamplesTest(unittest.TestCase):
                     body = " ".join(item["body"])
                     self.assertIsNone(DONE.search(body), body)
                     seen += 1
-        self.assertEqual(seen, 3)
+        self.assertEqual(seen, sum(work.required_kinds(ROLES[d.name]).count("draft") for d in EXAMPLES))
 
     def test_the_done_pattern_catches_the_review_examples(self):
         for text in ("This notice has been sent and signed.", "We have already emailed this to you and posted both entries.",
@@ -152,11 +161,114 @@ class WorkExamplesTest(unittest.TestCase):
     def test_case_files_ask_a_qualified_person(self):
         for directory in EXAMPLES:
             _, response = load(directory)
-            for item in response["work"]:
+            for item in response.get("work", []):
                 if item["kind"] == "case_file":
                     with self.subTest(example=directory.name):
                         self.assertTrue(item["for_decision"].startswith("Should the "))
                         self.assertTrue(item["for_decision"].endswith("?"))
+
+
+class DistinctTest(unittest.TestCase):
+    """Slice 129 review: every role's example is its own, never another role's renamed."""
+
+    def all_examples(self):
+        dirs = list(EXAMPLES) + [d for d in (ROOT / "fixtures" / "roles").iterdir() if d.is_dir()]
+        return dirs + [ROOT / "fixtures" / "consulting" / "churn-clinics"]
+
+    def test_no_sentence_prints_two_different_values_the_same(self):
+        # Slice 129 re-review: "moves from [F8] to [F9]" printed "from 20 to 20" (19.95 rounded).
+        from analystos.l4 import deck
+        tag = re.compile(r"\[(F[1-9][0-9]{0,2})\]")
+        for directory in self.all_examples():
+            _, response = load(directory)
+            figures = {f["id"]: f for f in response["figures"]}
+            texts = [t for _, t in c._texts(response)] + [t for _, t in work.work_texts(response.get("work"))]
+            for text in texts:
+                ids = list(dict.fromkeys(tag.findall(text or "")))
+                for i, a in enumerate(ids):
+                    for b in ids[i + 1:]:
+                        if figures[a]["value"] != figures[b]["value"]:
+                            with self.subTest(example=directory.name, text=text):
+                                self.assertNotEqual(deck.format_value(figures[a]), deck.format_value(figures[b]))
+
+    def test_every_client_problem_and_answer_is_different(self):
+        problems, answers, questions = set(), set(), set()
+        for directory in self.all_examples():
+            client, response = load(directory)
+            problems.add(client["problem"])
+            answers.add(response["answer"])
+            questions.add(response["key_question"])
+        self.assertEqual((len(problems), len(answers), len(questions)), (73, 73, 73))
+
+
+class HelperTest(unittest.TestCase):
+    def test_a_blank_code_line_does_not_hide_stray_numbers(self):
+        spec = {"content": {"work": [{"kind": "code", "code": "x = 1\n\ny = 2\n"}]}}
+        self.assertEqual(without_code("x = 1 and 42", spec).split(), ["and", "42"])
+
+
+class SignWordTest(unittest.TestCase):
+    """Slice 129 review: "fell [F3]" with a negative F3 printed "fell -40%"."""
+
+    FIGS = {"F1": {"value": -40, "unit": "percent"}, "F2": {"value": 40, "unit": "percent"},
+            "F3": {"value": 1, "unit": "points"}}
+
+    def test_a_fall_word_before_a_negative_figure_is_refused_with_the_fix(self):
+        for text in ("Users fell [F1].", "Active users are down [F1].", "Margin fell by [F1].", "Users dropped [F1]"):
+            with self.subTest(text=text):
+                problems = c.sign_problems("answer", text, self.FIGS)
+                self.assertEqual(len(problems), 1, problems)
+                self.assertIn("double negative", problems[0])
+                self.assertIn("changed by [F1]", problems[0])
+
+    def test_a_rise_word_before_a_negative_figure_is_refused(self):
+        self.assertIn("says it went up", c.sign_problems("answer", "Users rose [F1].", self.FIGS)[0])
+
+    def test_plain_or_positive_wording_passes(self):
+        for text in ("Users fell [F2].", "Users changed by [F1].", "Users rose [F2].", "Users fell to [F1].",
+                     "The fall was [F1]."):
+            with self.subTest(text=text):
+                self.assertEqual(c.sign_problems("answer", text, self.FIGS), [])
+
+    def test_the_verifier_runs_it_on_prose_and_work(self):
+        directory = ROOT / "fixtures" / "work" / "customer-success-associate"
+        _, response = load(directory)
+        response["answer"] = "Active seats fell [F1] last quarter, so check in before the renewal."
+        response["figures"] = [{"id": "F1", "label": "x", "value": -40, "unit": "percent", "basis": "assumption",
+                                "rationale": "a test value"}] + [f for f in response["figures"] if f["id"] != "F1"]
+        problems = c.verify_content(c._normalize(response), "", None)
+        self.assertTrue(any("double negative" in p for p in problems), problems)
+
+    def test_the_verifier_runs_it_on_work_text_too(self):
+        directory = ROOT / "fixtures" / "work" / "customer-success-associate"
+        _, response = load(directory)
+        response["work"][0]["body"][0] = "Active users fell [F1] since the last review."
+        response["figures"] = [{"id": "F1", "label": "x", "value": -40, "unit": "percent", "basis": "assumption",
+                                "rationale": "a test value"}] + [f for f in response["figures"] if f["id"] != "F1"]
+        problems = c.verify_content(c._normalize(response), "", None)
+        self.assertTrue(any(p.startswith("work[0]") and "double negative" in p for p in problems), problems)
+
+    def test_one_point_is_singular(self):
+        from analystos.l4 import deck
+        self.assertEqual(deck.format_value({"value": 1, "unit": "points"}), "1 pt")
+        self.assertEqual(deck.format_value({"value": -1, "unit": "points"}), "-1 pt")
+        self.assertEqual(deck.format_value({"value": 2, "unit": "points"}), "2 pts")
+        self.assertEqual(deck.format_value({"value": 1.04, "unit": "points"}), "1 pt")  # chosen on the printed text
+        self.assertEqual(deck.format_value({"value": 1.5, "unit": "points"}), "1.5 pts")
+        self.assertEqual(deck.exact_value({"value": 1, "unit": "points"}), "1 pt")
+        self.assertEqual(deck.exact_value({"value": 1.04, "unit": "points"}), "1.04 pts")
+        from analystos.l4 import workbook
+        self.assertEqual(workbook.NUMBER_FORMATS["points"], '[=1]0" pt";0.0##" pts"')
+
+    def test_a_ratio_followed_by_times_is_refused(self):
+        figs = {"F1": {"value": 4, "unit": "ratio"}, "F2": {"value": 4, "unit": "count"}}
+        self.assertIn("prints the ratio's x", c.ratio_word_problems("answer", "Debt is [F1] times profit.", figs)[0])
+        self.assertEqual(c.ratio_word_problems("answer", "Debt is [F1] profit; [F2] times a year.", figs), [])
+
+    def test_dollars_per_item_may_be_dollars(self):
+        self.assertIn("usd", c.derived_units("ratio", ["usd", "count"]))
+        self.assertNotIn("usd", c.derived_units("ratio", ["usd", "usd"]))
+        self.assertNotIn("usd", c.derived_units("ratio", ["count", "usd"]))
 
 
 class CoverageTest(unittest.TestCase):
@@ -168,7 +280,7 @@ class CoverageTest(unittest.TestCase):
             covered |= {(family, item["kind"]) for item in response.get("work", [])}
         for directory in EXAMPLES:
             _, response = load(directory)
-            covered |= {(ROLES[directory.name]["family"], item["kind"]) for item in response["work"]}
+            covered |= {(ROLES[directory.name]["family"], item["kind"]) for item in response.get("work", [])}
         self.assertEqual(sorted(owed - covered), [])
         self.assertEqual(len(owed), 20)
 

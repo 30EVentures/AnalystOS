@@ -1,0 +1,241 @@
+{
+ "answer": "The borrower can carry the loan on last year's numbers: using EBITDA as a stand-in for cash available for debt service, cover would be [F7] against a policy floor of [F5]; the credit committee decides whether to lend and on what terms.",
+ "exec_summary": [
+  "Using EBITDA of [F2] as a stand-in for cash available for debt service, it would have to cover total debt service of [F6] once the loan is added.",
+  "That gives cover of [F7], well above the policy floor of [F5].",
+  "EBITDA could fall by [F9], or [F10], before cover reaches the floor."
+ ],
+ "situation": "A chain of dental clinics asking for a term loan to buy imaging equipment.",
+ "complication": "The new loan adds debt service to a borrower that already carries debt, so the committee needs to know if cash flow still covers it.",
+ "key_question": "Can the borrower service the new loan alongside its existing debt, and how much room is left?",
+ "titles": {
+  "situation": "A dental clinic chain wants a term loan for imaging equipment.",
+  "options": "Three ways to put the request to the credit committee.",
+  "recommendation": "Put the loan to the committee with a cover covenant.",
+  "roadmap": "Prepare the committee paper, then monitor cover after drawdown.",
+  "kpis": "Two measures show whether the borrower stays within policy.",
+  "risks": "The main risk is EBITDA falling faster than the cushion allows."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Term loan requested",
+   "value": 2000000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "a $2,000,000 term loan"
+  },
+  {
+   "id": "F2",
+   "label": "Borrower EBITDA last year",
+   "value": 1800000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "EBITDA last year was $1,800,000"
+  },
+  {
+   "id": "F3",
+   "label": "Existing annual debt service",
+   "value": 600000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "existing debt service is $600,000"
+  },
+  {
+   "id": "F4",
+   "label": "Annual debt service on the new loan",
+   "value": 300000,
+   "unit": "usd",
+   "basis": "client",
+   "quote": "add $300,000 a year in debt service"
+  },
+  {
+   "id": "F5",
+   "label": "Policy minimum debt service cover",
+   "value": 1.25,
+   "unit": "ratio",
+   "basis": "client",
+   "quote": "debt service cover of at least 1.25x"
+  },
+  {
+   "id": "F6",
+   "label": "Total annual debt service with the loan",
+   "value": 900000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "sum",
+   "inputs": [
+    "F3",
+    "F4"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Debt service cover with the loan",
+   "value": 2,
+   "unit": "ratio",
+   "basis": "computed",
+   "operation": "ratio",
+   "inputs": [
+    "F2",
+    "F6"
+   ]
+  },
+  {
+   "id": "F8",
+   "label": "EBITDA needed to meet the policy floor",
+   "value": 1125000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "product",
+   "inputs": [
+    "F6",
+    "F5"
+   ]
+  },
+  {
+   "id": "F9",
+   "label": "EBITDA cushion above the policy floor",
+   "value": 675000,
+   "unit": "usd",
+   "basis": "computed",
+   "operation": "difference",
+   "inputs": [
+    "F2",
+    "F8"
+   ]
+  },
+  {
+   "id": "F10",
+   "label": "Cushion as a share of EBITDA",
+   "value": 37.5,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F9",
+    "F2"
+   ]
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Cover with the new loan",
+   "finding": "Cover stays well above the policy floor after the loan is added.",
+   "points": [
+    "The loan of [F1] adds [F4] to existing debt service of [F3].",
+    "EBITDA of [F2] covers total debt service of [F6] by [F7]."
+   ],
+   "hypotheses": [
+    {
+     "text": "The new loan pushes cover below the policy floor.",
+     "verdict": "refuted"
+    }
+   ],
+   "so_what": "On last year's numbers the request meets the lending policy.",
+   "chart": {
+    "title": "Cover with the loan sits well above the policy floor.",
+    "figure_ids": [
+     "F5",
+     "F7"
+    ],
+    "labels": [
+     "Policy floor",
+     "With the loan"
+    ]
+   }
+  },
+  {
+   "branch": "Room for a weaker year",
+   "finding": "EBITDA has a sizeable cushion before cover hits the floor.",
+   "points": [
+    "Meeting the floor needs EBITDA of [F8].",
+    "Actual EBITDA is [F9] above that, a cushion of [F10]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Last year's EBITDA will hold up over the loan's life.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The committee should weigh how stable the clinics' earnings and cash flow are.",
+   "chart": {
+    "title": "EBITDA sits well above the level the policy requires.",
+    "figure_ids": [
+     "F2",
+     "F8"
+    ],
+    "labels": [
+     "EBITDA last year",
+     "Needed for the floor"
+    ]
+   }
+  }
+ ],
+ "options": [
+  {
+   "name": "Propose with a cover covenant",
+   "description": "Present the loan with a covenant that cover stays at or above the policy floor, tested each year.",
+   "effort": "low"
+  },
+  {
+   "name": "Propose on standard terms",
+   "description": "Present the loan with no extra covenant.",
+   "effort": "low"
+  },
+  {
+   "name": "Propose a smaller loan",
+   "description": "Present a smaller amount that leaves an even wider cushion.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Propose with a cover covenant",
+  "rationale": "Cover of [F7] clears the floor of [F5] with a cushion of [F10], and a covenant gives early warning if earnings slip; the credit committee decides whether to lend and on what terms."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Complete the credit paper before the next credit committee meeting.",
+    "Ask the borrower for current year-to-date results."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Answer the committee's questions on the paper."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "If the committee approves, set up an annual cover test against the policy floor."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Debt service cover",
+   "target": "At or above [F5] at every annual test"
+  },
+  {
+   "name": "EBITDA against last year",
+   "target": "No large fall from [F2]"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "Earnings fall in a weak year for the clinics.",
+   "mitigation": "Test cover each year and flag any fall early."
+  },
+  {
+   "risk": "EBITDA overstates the cash available for debt service.",
+   "mitigation": "Ask for a cash flow statement and test cover on operating cash flow too."
+  },
+  {
+   "risk": "The equipment costs more than planned and the borrower asks for more.",
+   "mitigation": "Treat any increase as a new request with fresh cover figures."
+  }
+ ]
+}

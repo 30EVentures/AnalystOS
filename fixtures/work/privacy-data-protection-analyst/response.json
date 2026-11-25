@@ -1,0 +1,226 @@
+{
+ "answer": "Stop sharing with the agency until an agreement is signed, delete or anonymise the [F5] records past retention unless a reason to keep them applies, such as an open claim, and fix the subject access process that answered [F3] of requests late.",
+ "exec_summary": [
+  "[F2] of [F1] subject access requests were answered late, [F3].",
+  "[F5] of [F4] customer records are past the retention period, [F6].",
+  "[F7] marketing lists went to an agency without a data processing agreement."
+ ],
+ "situation": "A home insurance broker reviewing how it handles personal data.",
+ "complication": "Requests run late, old records are kept too long and data is shared without an agreement.",
+ "key_question": "Where does the broker's handling of personal data fall short, and what should be fixed first?",
+ "titles": {
+  "situation": "Personal data handling falls short in three areas.",
+  "options": "Two ways to order the fixes.",
+  "recommendation": "Stop unprotected sharing first, then retention and requests.",
+  "roadmap": "Stop the sharing now, then clean data and fix requests.",
+  "kpis": "Two measures show the fixes are working.",
+  "risks": "The main risks are agency misuse and deleting records still needed."
+ },
+ "figures": [
+  {
+   "id": "F1",
+   "label": "Subject access requests last year",
+   "value": 240,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We received 240 subject access requests"
+  },
+  {
+   "id": "F2",
+   "label": "Requests answered late",
+   "value": 36,
+   "unit": "count",
+   "basis": "client",
+   "quote": "36 were answered after"
+  },
+  {
+   "id": "F3",
+   "label": "Share of requests answered late",
+   "value": 15,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F2",
+    "F1"
+   ]
+  },
+  {
+   "id": "F4",
+   "label": "Customer records held",
+   "value": 400000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "holds 400,000 records"
+  },
+  {
+   "id": "F5",
+   "label": "Records past the retention period",
+   "value": 140000,
+   "unit": "count",
+   "basis": "client",
+   "quote": "of which 140,000 belong"
+  },
+  {
+   "id": "F6",
+   "label": "Share of records past retention",
+   "value": 35,
+   "unit": "percent",
+   "basis": "computed",
+   "operation": "percent_of_total",
+   "inputs": [
+    "F5",
+    "F4"
+   ]
+  },
+  {
+   "id": "F7",
+   "label": "Marketing lists shared without an agreement",
+   "value": 3,
+   "unit": "count",
+   "basis": "client",
+   "quote": "We found 3 marketing lists"
+  }
+ ],
+ "issue_tree": [
+  {
+   "branch": "Sharing",
+   "finding": "Customer data went to an agency without the required agreement.",
+   "points": [
+    "[F7] marketing lists were shared without a data processing agreement."
+   ],
+   "hypotheses": [
+    {
+     "text": "The agency still holds the lists.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Sharing must stop until an agreement is in place."
+  },
+  {
+   "branch": "Retention",
+   "finding": "Many records are kept past the retention period.",
+   "points": [
+    "[F5] records, [F6] of the database, are past retention."
+   ],
+   "hypotheses": [
+    {
+     "text": "Some old records must be kept for open claims.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "Old records should be deleted or anonymised unless a reason to keep them applies.",
+   "chart": {
+    "title": "Records held and records past retention.",
+    "figure_ids": [
+     "F4",
+     "F5"
+    ],
+    "labels": [
+     "All records",
+     "Past retention"
+    ]
+   }
+  },
+  {
+   "branch": "Subject access",
+   "finding": "Some requests miss the legal deadline.",
+   "points": [
+    "[F2] of [F1] requests were answered late, [F3]."
+   ],
+   "hypotheses": [
+    {
+     "text": "Late answers come from searching several systems by hand.",
+     "verdict": "untested"
+    }
+   ],
+   "so_what": "The request process needs tracking against the deadline."
+  }
+ ],
+ "options": [
+  {
+   "name": "Sharing first",
+   "description": "Stop agency sharing now, then clean old records and fix the request process.",
+   "effort": "medium"
+  },
+  {
+   "name": "Records first",
+   "description": "Start with deleting old records, then sharing and requests.",
+   "effort": "medium"
+  }
+ ],
+ "recommendation": {
+  "option": "Sharing first",
+  "rationale": "It deals first with data that left the business without an agreement, while record clean-up and request fixes follow; the data protection officer decides."
+ },
+ "roadmap": [
+  {
+   "horizon": "First 30 days",
+   "actions": [
+    "Stop sharing with the agency and ask what it holds.",
+    "Report findings to the data protection officer within four weeks."
+   ]
+  },
+  {
+   "horizon": "Days 31-60",
+   "actions": [
+    "Delete or anonymise records past retention unless a reason to keep them applies."
+   ]
+  },
+  {
+   "horizon": "Days 61-90",
+   "actions": [
+    "Track every subject access request against the legal deadline."
+   ]
+  }
+ ],
+ "kpis": [
+  {
+   "name": "Requests answered on time",
+   "target": "All of them"
+  },
+  {
+   "name": "Records past retention",
+   "target": "None without a reason to keep them"
+  }
+ ],
+ "risks": [
+  {
+   "risk": "The agency misuses the lists.",
+   "mitigation": "Ask it to confirm deletion or sign an agreement."
+  },
+  {
+   "risk": "Records still needed, such as for open claims, are deleted.",
+   "mitigation": "Check open claims before deleting any record."
+  }
+ ],
+ "work": [
+  {
+   "kind": "register",
+   "title": "Personal data handling register",
+   "rows": [
+    {
+     "item": "Marketing lists shared without an agreement: [F7].",
+     "rating": "high",
+     "owner": "Head of marketing",
+     "status": "open",
+     "action": "Stop sharing and get an agreement signed or the data deleted."
+    },
+    {
+     "item": "Records past retention: [F5], [F6] of the database.",
+     "rating": "high",
+     "owner": "Head of data",
+     "status": "open",
+     "action": "Delete or anonymise unless a reason to keep them is recorded."
+    },
+    {
+     "item": "Subject access requests answered late: [F3].",
+     "rating": "medium",
+     "owner": "Customer service manager",
+     "status": "open",
+     "action": "Log each request and track it against the legal deadline."
+    }
+   ]
+  }
+ ]
+}

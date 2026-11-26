@@ -27,6 +27,31 @@
     "site/.well-known/devlog.fragment.json: unreadable, or a top-level field other than ('generated', 'entries') changed",
     "site/.well-known/devlog.fragment.json: 28 past entries changed or removed"
    ]
+  },
+  {
+   "date": "2026-11-26",
+   "reason": "Slice 132 (Phase 0 of the AnalystOS x Flashy plan, C-ID-6, C-MESH-1, C-MESH-2, C-MESH-6, C-MESH-9): serve the seal key as /.well-known/jwks.json; the handshake advertises the eight x-capability slugs beside the role names (owner's decision 2026-11-26); ops/flashy_declare.py rebuilt to the published @flashyos/agent@0.21.0 request shapes after the first live call answered 400, then used with the owner's yes to declare the eight capabilities (all 201, verified on the public directory); ops/mesh_ids.py guards; llms.txt role count; FlashyOS's AAO corpus run against analystos/aao (13/13).",
+   "moved": [
+    "file changed: site/.well-known/flashyos.json",
+    "file changed: tools/build_flashyos_handshake.py",
+    "file changed: tools/build_jwks.py",
+    "file changed: tools/aao_differential.py",
+    "file changed: tools/flashy_freeze.py",
+    "file changed: docs/aao.md",
+    "file changed: docs/mesh-identity.md",
+    "file changed: site/docs/aao.md",
+    "file changed: site/docs/mesh-identity.md",
+    "file changed: analystos/aao/kit.py",
+    "file changed: analystos/aao/validate.py",
+    "file added inside a fenced directory: conformance/flashyos-aao-0.1.json",
+    "file added inside a fenced directory: ops/mesh_ids.py",
+    "file changed: ops/README.md",
+    "file changed: ops/flashy_decide.py",
+    "file changed: ops/flashy_declare.py",
+    "file added to site/.well-known/ (publishing a new document is a fence move): site/.well-known/jwks.json",
+    "vercel.json: a block serving a fenced path or /api/v1 was added, changed or removed",
+    "site/llms.txt: the 'Identity and the FlashyOS mesh' section changed"
+   ]
   }
  ],
  "files": {
@@ -36,7 +61,7 @@
   ".checkpoint/config.json": "6a9d24018f51c83ae474221ea16745580b14aec4d53bfb463a46eca3668592a5",
   "tools/emit_record.mjs": "c4815f687802dd799a724020d8ed2d6e0fa2a4a40c1bcafad6685f3e000fc56d",
   "solwayholdings.aao.json": "f85915cfa9ffb8c4f83ba35b54fda8a389a05dd23f6107930689967c3dd95349",
-  "site/.well-known/flashyos.json": "ea993d703894b9daf27106f37f9aed6aa25063b3aab76e72d6af0da7abca69b0",
+  "site/.well-known/flashyos.json": "b47cea76a39ef50c70e3d41cbadf2c12fcda877510d6b8ecf396c1fcd2b5af6f",
   "site/.well-known/flashyos-charter.json": "53a6e57a66c2bbbbbcf6be48cd86aae978ab8142e8b62385375a134231392dfe",
   "site/.well-known/analystos-seal-key.json": "34d3d672e6f4ca70b067e40cf70a825ebbd420e9f79528c22090972e2bbce83a",
   "site/flashyos.roles.json": "53a6e57a66c2bbbbbcf6be48cd86aae978ab8142e8b62385375a134231392dfe",
@@ -47,21 +72,23 @@
   "analystos/l4/seal_schema.py": "a817693c37951186f39298d948ce777eb00a6b2df6cfc2918d840e1894c393b1",
   "analystos/l4/seal_verify.py": "2d279da3ab6762748471c27710fd9f57e723051929fc280d96301b08cbdbf69e",
   "analystos/l4/acceptance.py": "44d047c9dcdf4b1166b66a81ec83997e1ea35e7501dd837dc0685facb22b8cd3",
-  "tools/build_flashyos_handshake.py": "fc4918b56bb182e6d0a91801d3e48fdb12cde78bac15c744d3a5835ca425224a",
+  "tools/build_flashyos_handshake.py": "f7a3867c99dad7da050643824cfe089a9d3c3ef0c296700a09ad0e4b8cf9d8a1",
   "tools/build_conformance_corpus.py": "3943e25432e2ec1e14f0f6a4b4941c21f709faed02ea6bc96b9004ab2ebb2fbd",
   "tools/build_measures.py": "e2d130205aacfe6063bdf108542a0052c5f615957ecbc5eb4235415fb97a3ae5",
   "tools/defined_proxy_validator.py": "79c6589f92ddc623d5c8ff65c81e5b755edb09aa93becdf7b1c9afac2bf175c4",
   "tools/redact_served_devlog.py": "985419f84d9b329b00c5cdace75b6f8bfc57b7678b0c039a31db57153e29cd15",
   "tools/seal_key_file.py": "2f4f0991ce0473265329822b065c4c906c7c4b8e7e98022c5c0750ab9fba1743",
+  "tools/build_jwks.py": "50cc7a9be51e91818e74484dfdb9c257e1bd80f96ac5cdc3df996c848716c260",
+  "tools/aao_differential.py": "01dcbc8fec2181515beebdffc0b1b87b4ec38538bdc526e4cd877c2500f293a3",
   "tools/seal_facts_check.mjs": "de188998ed65eb113f4a395f3fa92a26c76b2f1cc1ad9e19e5653970de6b1277",
-  "tools/flashy_freeze.py": "7fdaa60e2b171be87e83c6dc2bc3b48f38472f8066af7ad535c96ffb37e86146",
-  "docs/aao.md": "173f5e69c730d19dbed96c5e7672340f094a82dee41d28a9a23d49c226a152a3",
-  "docs/mesh-identity.md": "0509fe4df83837f100032f428d7c737c649abc5028698bea0b6a9221988c8e31",
+  "tools/flashy_freeze.py": "bb0eb7bc0083c0c963f824ca6fae891d3d17fd00f7c55f2a59e17604eb53a2b0",
+  "docs/aao.md": "25bd9ea1290feb4798b6088c866257b3f8dbf3be94d2470f0340723c37d8dede",
+  "docs/mesh-identity.md": "45ab7af937e46b9a01040f2f55213e9e476e4b6e19e99030189708b282dedbaf",
   "docs/seal.md": "ebbf8df7d6a8880815bc757012bb3e8efd0694a1070186f58ee70ef20c622731",
   "docs/flashyos-alignment-2026-09-25.md": "7c37b13892e9484e2088a7e102bb7772796e8a647c99f3ab4426e5a7e995b28c",
   "docs/flashyos-spec-notes-2026-09-25.md": "6aa7571b231840bc494f0c6f6568b1a7716dcabf52152e2f3ef89979160d2479",
-  "site/docs/aao.md": "173f5e69c730d19dbed96c5e7672340f094a82dee41d28a9a23d49c226a152a3",
-  "site/docs/mesh-identity.md": "0509fe4df83837f100032f428d7c737c649abc5028698bea0b6a9221988c8e31",
+  "site/docs/aao.md": "25bd9ea1290feb4798b6088c866257b3f8dbf3be94d2470f0340723c37d8dede",
+  "site/docs/mesh-identity.md": "45ab7af937e46b9a01040f2f55213e9e476e4b6e19e99030189708b282dedbaf",
   "site/docs/seal.md": "ebbf8df7d6a8880815bc757012bb3e8efd0694a1070186f58ee70ef20c622731"
  },
  "dirs": {
@@ -69,10 +96,11 @@
    "analystos/aao/__init__.py": "8c5bd256e8a0d4aef42e5344d1ae20603fca28b73dbf8cff54a26d426561c817",
    "analystos/aao/__main__.py": "0a1d571e0e29168845696ae4c1c6a6e3f99bf476e6f1316b63ecd5986886e04f",
    "analystos/aao/aao.schema.json": "99f520bb9244e83a7ef7eb5e505ad4f3b999b7a3fd9d0519a54e8274c748df69",
-   "analystos/aao/kit.py": "e1d13fe099b172e73609eeb49d227173334633d7e31ed25ddfec3c8bfb1d3f71",
-   "analystos/aao/validate.py": "682a2d8f68e7991061a2a4fe98b4d978bc9ec122b3d3d6631552482ee5f75e0c"
+   "analystos/aao/kit.py": "a58688b24cceab5545c4ccc3cb957ae23eff480ea735485f8c34d9b86585f7cb",
+   "analystos/aao/validate.py": "e704e133ed7ca97a55eb159f80fa2796d706f454f626d99fc5419ca482139111"
   },
   "conformance": {
+   "conformance/flashyos-aao-0.1.json": "9bf33dc5e74d4dd5dbbc4e1f8216940b3ffaffb509be52ff11bc8ee92b97f1da",
    "conformance/seal-1.json": "2ab68d484d65ebcebc4f28fe85d136b2ceff7a7198d2dc9613bcf881e71febc2"
   },
   "drafts": {
@@ -98,9 +126,10 @@
    "mcp-server/untrusted.mjs": "24837773dfe1d57ac587f0fc926de8808a2b444e0d23a6df7c0c3078318b6506"
   },
   "ops": {
-   "ops/README.md": "7ebb47221589208e0cd6f6bc01d728411fd90da85ff2cf721c2bd92395c02746",
-   "ops/flashy_decide.py": "c34f04650468049862bee677ca468c2ec6502e9545eb509b78b412a36b704216",
-   "ops/flashy_declare.py": "d5e9f1eacc6e1531ab8c65a95fc94262d55fbcf6cc0ee4a672f044ad8ec14721"
+   "ops/README.md": "7c017fe14be09c7bf8c2283ee68a026e2ab5746eb37878f7d5f531fb0a6bda4f",
+   "ops/flashy_decide.py": "062a917204f03321b70744c3df8c5ffb64d746d3a047c76aca5a0ce17f9756b0",
+   "ops/flashy_declare.py": "b8d220326f07e558699247423d0888ec69641d031d423d46fe7bae32f17ed1bb",
+   "ops/mesh_ids.py": "8bab6c37b71f926672bd223f002b8ef1d60d1e70f2dd4fbd95f6ddb8b4f92d8c"
   },
   "tools/flashyos-check": {
    "tools/flashyos-check/package.json": "92aa67e5faf110afd9208c3cf3f8ac6f61a3452e8ad47af962ce7f6952e713de"
@@ -114,6 +143,7 @@
    "site/.well-known/devlog.fragment.json",
    "site/.well-known/flashyos-charter.json",
    "site/.well-known/flashyos.json",
+   "site/.well-known/jwks.json",
    "site/.well-known/shiplog.json"
   ]
  },
@@ -129,6 +159,7 @@
   "72a4aea51c3c965a35a194d94b1d1daaf652e2f842e843d295a17af319459ece",
   "7b44a587a7e3b723348d6f7468eb0f9ff2fa37919384e997f4a037a8c4c0ef42",
   "8c17763d3e854c9a15163ec4fb213a75905ec5005fd1422a2a1dbddc2315a6e8",
+  "a0d8a10d4862fca2aa75f843492437b451df3c15cf9320dcefff1ea01cf549c6",
   "a6c6d2e3b8b3d91775ce5bff45b42284232bd8495a6a763850541ce5c2f38d5b",
   "b93f209a18a3d144838129d9909b35f907a4c6279efe8dc6ec8d7cecdd9ff6ce",
   "c0ff7bed6f63848e9260df354db38842a31c0fe4c51e7f21bb3d60bb33610be5",
@@ -136,7 +167,7 @@
   "e5152b96cc8827430511f91543c32053a6d7894080648dd1e9901926b04c10be",
   "ebbc4dd2226029595019ca652cfb0ebf740c4de5b2a754c3d28f1204cd4a6809"
  ],
- "llms_section": "760e98def2b5aef429c94ef3a0e38e998d5a4d30aa5e404ecf99d085f2d932dd",
+ "llms_section": "d35fb767aceefa780608dc2577341a187c0f06a194ac2da329c4c4160b353fea",
  "append_only": {
   "site/.well-known/shiplog.json": {
    "header": "d027ee66d402759db0e080f961c4c9802debd1606ded04b80e5189d0307ec19c",

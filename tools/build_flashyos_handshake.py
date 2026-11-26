@@ -13,15 +13,15 @@ a governance fact already published in the charter, not an endpoint claim. Decla
 callable; it took their own `auditProperty` from level 1 to level 2 with zero issues
 when they ran it (see docs/decisions.md, Slice 94).
 
-The *discovery slugs* each role's `x-capability` would carry (`document-analysis`,
-`figure-verification`, `sealed-report`, ...) are a different thing - those really do
-claim something is callable - and docs/mesh-identity.md's rule still applies to them:
-they are added only once the endpoint is deployed and an agent token exists. This tool
-never writes them.
+The *discovery slugs* each role's `x-capability` carries (`document-analysis`,
+`figure-verification`, `sealed-report`, ...) were withheld here until an endpoint was
+deployed. Owner's decision, 2026-11-26 (Slice 132): follow Flashy's 2026-11-25 plan
+(C-MESH-6) and advertise them too, so the handshake, the charter and the mesh use one
+vocabulary. The charter still says which role answers for each slug.
 
 Two files, so this never drifts: the charter is the only thing anyone hand-edits;
-the handshake's `capabilities` array is always exactly the charter's role names, sorted,
-derived here. A hand-typed `capabilities` array in flashyos.json would be a second copy
+the handshake's `capabilities` array is always exactly the charter's role names plus
+each role's `x-capability` slugs, sorted, derived here. A hand-typed `capabilities` array in flashyos.json would be a second copy
 of a fact the charter already states, and the two would eventually disagree.
 """
 
@@ -35,9 +35,14 @@ HANDSHAKE_PATH = ROOT / "site" / ".well-known" / "flashyos.json"
 
 
 def derive_capabilities(charter: dict) -> list:
-    """Role names only - never x-capability slugs. See module docstring."""
-    names = [role["name"] for role in charter.get("roles", [])]
-    return sorted(set(names))
+    """Role names plus each role's x-capability slugs (a string or a list), sorted.
+    Every advertised capability is answered for by a role. See module docstring."""
+    found = set()
+    for role in charter.get("roles", []):
+        found.add(role["name"])
+        extra = role.get("x-capability", [])
+        found.update([extra] if isinstance(extra, str) else extra)
+    return sorted(found)
 
 
 def build_handshake(charter_path: Path = CHARTER_PATH, existing_path: Path = HANDSHAKE_PATH) -> dict:

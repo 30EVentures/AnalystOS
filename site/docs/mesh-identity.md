@@ -34,18 +34,20 @@ measure must be computable from what the API's audit log records
 ```json
 { "mesh": "flashyos/1",
   "org": { "slug": "analystos", "name": "AnalystOS", "profile": "https://analystos.dev" },
-  "capabilities": ["analysis", "evidence", "verification"] }
+  "capabilities": ["analysis", "analyst-briefing", "analytics", "client-delivery", ...] }
 ```
 
-**Two different claims, not one** (Slice 94, 2026-11-21; see `docs/decisions.md`).
-A **role name** restates a governance fact the charter above already publishes and
-claims nothing callable - FlashyOS's own `auditProperty` checker reads it that way,
-taking a handshake from level 1 ("declares nothing it can do") to level 2 with zero
-issues. A **discovery slug** (`document-analysis`, `figure-verification`,
-`sealed-report`) claims an endpoint can actually be called, and the old rule still
-applies to those: add one only after `docs/api.md`'s matching endpoint is deployed
-and an agent token exists. Never hand-type this array - `tools/build_flashyos_handshake.py`
-derives it from the charter's role names, `tools/refresh.py --check` catches drift.
+**Role names and discovery slugs, one vocabulary** (Slice 94, 2026-11-21; changed
+Slice 132, 2026-11-26; see `docs/decisions.md`). A **role name** restates a
+governance fact the charter publishes. A **discovery slug** (`document-analysis`,
+`figure-verification`, `sealed-report`, ...) is the subject a buyer searches for.
+Slice 94 withheld slugs until their endpoint was deployed. The owner's decision of
+2026-11-26 follows Flashy's 2026-11-25 plan instead: the handshake advertises every
+role name and every `x-capability` slug, so the handshake, the charter and the mesh
+directory say the same thing. The charter still names the role that answers for each
+slug, and `docs/api.md` says which endpoints are deployed today. Never hand-type this
+array - `tools/build_flashyos_handshake.py` derives it from the charter,
+`tools/refresh.py --check` catches drift.
 
 ## Check it
 

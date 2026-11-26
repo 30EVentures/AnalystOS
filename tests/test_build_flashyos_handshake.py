@@ -39,6 +39,14 @@ class DerivationTest(unittest.TestCase):
         charter = {"roles": [{"name": "analysis"}, {"name": "analysis"}]}
         self.assertEqual(derive_capabilities(charter), ["analysis"])
 
+    def test_x_capability_slugs_are_advertised_beside_role_names(self):
+        # Owner's decision 2026-11-26 (Slice 132): one vocabulary across handshake,
+        # charter and mesh. A string or a list are both read.
+        charter = {"roles": [{"name": "analysis", "x-capability": ["document-analysis", "analytics"]},
+                             {"name": "evidence", "x-capability": "sealed-report"}]}
+        self.assertEqual(derive_capabilities(charter),
+                         ["analysis", "analytics", "document-analysis", "evidence", "sealed-report"])
+
     def test_no_roles_means_no_capabilities(self):
         self.assertEqual(derive_capabilities({"roles": []}), [])
 

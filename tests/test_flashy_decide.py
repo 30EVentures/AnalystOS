@@ -63,7 +63,7 @@ class CliDryRunTest(unittest.TestCase):
     def test_dry_run_prints_the_request_and_touches_no_network(self):
         result = subprocess.run(
             [sys.executable, str(SCRIPT), "deploy the charter", "--tier", "2",
-             "--org-id", "analystos", "--agent-name", "analystos-agent", "--token", "fake-token-for-testing"],
+             "--org-id", "cmtkurcbs00je12tigb1rc6t1", "--agent-name", "analystos-agent", "--token", "fake-token-for-testing"],
             capture_output=True, text=True, timeout=15,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -82,7 +82,7 @@ class CliDryRunTest(unittest.TestCase):
     def test_tier_one_is_low_impact(self):
         result = subprocess.run(
             [sys.executable, str(SCRIPT), "read a public page", "--tier", "1",
-             "--org-id", "analystos", "--agent-name", "analystos-agent", "--token", "fake-token-for-testing"],
+             "--org-id", "cmtkurcbs00je12tigb1rc6t1", "--agent-name", "analystos-agent", "--token", "fake-token-for-testing"],
             capture_output=True, text=True, timeout=15,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -102,7 +102,7 @@ class ExecuteFlagTest(unittest.TestCase):
         with patch.object(mod, "send_request", return_value={"status": 200, "body": {"decision": {"id": "d1", "status": "PENDING"}}}) as mock_send:
             code = mod.main([
                 "deploy the charter", "--tier", "2",
-                "--org-id", "analystos", "--agent-name", "analystos-agent",
+                "--org-id", "cmtkurcbs00je12tigb1rc6t1", "--agent-name", "analystos-agent",
                 "--token", "fake-token-for-testing", "--execute",
             ])
         self.assertEqual(code, 0)
@@ -119,7 +119,7 @@ class ExecuteFlagTest(unittest.TestCase):
         with patch.object(mod, "send_request") as mock_send:
             code = mod.main([
                 "deploy the charter",
-                "--org-id", "analystos", "--agent-name", "analystos-agent",
+                "--org-id", "cmtkurcbs00je12tigb1rc6t1", "--agent-name", "analystos-agent",
                 "--token", "fake-token-for-testing",
             ])
         self.assertEqual(code, 0)

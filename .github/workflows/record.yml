@@ -1,0 +1,80 @@
+# Refresh AnalystOS's public record after every merge to main (Slice 134).
+#
+# Appends the new merges to the shipped/1 and devlog/1 records with
+# tools/emit_record.mjs (privacy rules run before sealing), rebuilds the
+# checkpoint/1 head, verifies every seal and every leaf, and commits the result
+# to main so Vercel deploys it. An emit is append-only: past entries are never
+# rewritten, because Flashy's log never forgets a leaf.
+#
+# The commit subject is exactly "shipped/1: refresh the log", which the emitter
+# treats as its own bookkeeping, so the refresh never appears in the record it
+# refreshes. A push made with GITHUB_TOKEN does not start another workflow run.
+# There is no skip marker on the commit: the refreshed record must deploy.
+name: record
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: record
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    # Only ever main: a manual run from another branch must not push that branch's
+    # state to main.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # the record is derived from the whole first-parent history
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Emit the record (append-only)
+        id: emit
+        run: |
+          node tools/emit_record.mjs
+          if git diff --quiet -- site/.well-known/shiplog.json site/.well-known/devlog.fragment.json DEVLOG.md; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Rebuild the checkpoint head
+        # Only when the record changed: the head carries the time it was built, so
+        # rebuilding it over an unchanged record would commit and deploy for nothing.
+        if: steps.emit.outputs.changed == 'true'
+        run: node vendor-checkpoint.mjs emit && rm -f checkpoint.json
+      - name: Verify every seal and every leaf
+        run: |
+          node vendor-shiplog.mjs verify site/.well-known/shiplog.json
+          node vendor-checkpoint.mjs verify site/.well-known/checkpoint.json
+          python3 tools/redact_served_devlog.py --check
+      - name: Commit the refreshed record
+        if: steps.emit.outputs.changed == 'true'
+        run: |
+          git add site/.well-known/shiplog.json site/.well-known/devlog.fragment.json site/.well-known/checkpoint.json DEVLOG.md
+          if git diff --cached --quiet; then
+            echo "record already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "shipped/1: refresh the log"
+          if ! git push origin HEAD:main; then
+            # Rejected because main moved on during this run: the run for that newer
+            # push refreshes the record, so this one stands down. Any other push
+            # failure (auth, protection) still fails the job.
+            git fetch -q origin main
+            if [ "$(git rev-parse origin/main)" != "$GITHUB_SHA" ]; then
+              echo "main moved on; the run for the newer push refreshes the record"
+              exit 0
+            fi
+            exit 1
+          fi

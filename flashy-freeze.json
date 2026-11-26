@@ -52,6 +52,14 @@
     "vercel.json: a block serving a fenced path or /api/v1 was added, changed or removed",
     "site/llms.txt: the 'Identity and the FlashyOS mesh' section changed"
    ]
+  },
+  {
+   "date": "2026-11-26",
+   "reason": "Slice 134 (Flashy plan C-REC-9): .github/workflows/record.yml refreshes the public record after every push to main (main only; emit append-only; checkpoint rebuilt and commit made only when the record changed; verify every seal and leaf; commit as github-actions[bot] under the emitter's own bookkeeping subject). The repository's first workflow and first automated commit to main; owner's go-ahead 2026-11-26, decided by merging.",
+   "moved": [
+    "file changed: .github/workflows/record.yml",
+    "file changed: tools/flashy_freeze.py"
+   ]
   }
  ],
  "files": {
@@ -60,6 +68,7 @@
   "vendor-checkpoint.mjs": "05af4820382a000ab15da581e16ab994cfbe672aeb637f49a1b3e4334046a907",
   ".checkpoint/config.json": "6a9d24018f51c83ae474221ea16745580b14aec4d53bfb463a46eca3668592a5",
   "tools/emit_record.mjs": "c4815f687802dd799a724020d8ed2d6e0fa2a4a40c1bcafad6685f3e000fc56d",
+  ".github/workflows/record.yml": "70e51d9c8e4815308db5920beb2d6a6f5924270b2520203486124002213e7775",
   "solwayholdings.aao.json": "f85915cfa9ffb8c4f83ba35b54fda8a389a05dd23f6107930689967c3dd95349",
   "site/.well-known/flashyos.json": "b47cea76a39ef50c70e3d41cbadf2c12fcda877510d6b8ecf396c1fcd2b5af6f",
   "site/.well-known/flashyos-charter.json": "53a6e57a66c2bbbbbcf6be48cd86aae978ab8142e8b62385375a134231392dfe",
@@ -81,7 +90,7 @@
   "tools/build_jwks.py": "50cc7a9be51e91818e74484dfdb9c257e1bd80f96ac5cdc3df996c848716c260",
   "tools/aao_differential.py": "01dcbc8fec2181515beebdffc0b1b87b4ec38538bdc526e4cd877c2500f293a3",
   "tools/seal_facts_check.mjs": "de188998ed65eb113f4a395f3fa92a26c76b2f1cc1ad9e19e5653970de6b1277",
-  "tools/flashy_freeze.py": "bb0eb7bc0083c0c963f824ca6fae891d3d17fd00f7c55f2a59e17604eb53a2b0",
+  "tools/flashy_freeze.py": "4183830cf7bb36fdbc530f4a98a06e83cc3e4b008541c1f7d2be5c6e579ab362",
   "docs/aao.md": "25bd9ea1290feb4798b6088c866257b3f8dbf3be94d2470f0340723c37d8dede",
   "docs/mesh-identity.md": "45ab7af937e46b9a01040f2f55213e9e476e4b6e19e99030189708b282dedbaf",
   "docs/seal.md": "ebbf8df7d6a8880815bc757012bb3e8efd0694a1070186f58ee70ef20c622731",

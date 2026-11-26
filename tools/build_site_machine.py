@@ -23,6 +23,7 @@ GUIDES = [
     ("mesh-identity.md", "Mesh identity", "The handshake and charter AnalystOS publishes, and what it does not"),
     ("architecture.md", "Architecture", "The layer model (L0-L6) and what is built"),
     ("using-analystos.md", "Using AnalystOS", "Running it yourself from the command line"),
+    ("hiring-api.md", "Hiring API guide", "Hire a role through /api/v2: questions, a budget that only narrows, usage and the receipt"),
 ]
 
 
@@ -67,7 +68,10 @@ def generated_files():
               f"- [Role catalog]({BASE}/api/v2/catalog): every role you can hire, its limits, how it was tested, and its questions",
               f"- `POST {BASE}/api/v2/engagements`: hire a role for one problem (access code required; each request is a paid model call). "
               "The response is the role's format (its catalog `delivers_today`): .pptx, .docx or .xlsx, named in the "
-              "`X-AnalystOS-Format` header; with `?format=json` it is `output` {format, media_type, filename, base64}",
+              "`X-AnalystOS-Format` header; with `?format=json` it is `output` {format, media_type, filename, base64}. "
+              "An optional `budget` can only narrow the limits (2 model calls, 8192 output tokens per call); every "
+              "engagement taken on gets an unsigned `analystos-receipt/1` with measured usage",
+              _guide_line("hiring-api.md"),
               f"- [{GUIDES[0][1]}]({BASE}/docs/{GUIDES[0][0]}): {GUIDES[0][2]}", ""]
     lines += ["## Verifying a report", "",
               f"- [{GUIDES[1][1]}]({BASE}/docs/{GUIDES[1][0]}): {GUIDES[1][2]}",

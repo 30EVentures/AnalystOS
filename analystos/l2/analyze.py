@@ -908,6 +908,12 @@ def _spend_ceiling():
         return None
 
 
+class SpendCeilingReached(ValueError):
+    """The internal call ceiling refused a call before it was sent (Slice 133: so a meter
+    can tell a refused call, which costs nothing, from a sent one). Same message and base
+    class as before, so every existing caller behaves exactly as it did."""
+
+
 def _enforce_spend_ceiling():
     """Raise ``ValueError`` - the same clean failure shape a real
     ``anthropic.APIError`` already becomes - if the configured ceiling is
@@ -923,7 +929,7 @@ def _enforce_spend_ceiling():
                 f"({_api_call_count}/{ceiling}) - refusing before dispatch",
                 file=sys.stderr,
             )
-            raise ValueError(
+            raise SpendCeilingReached(
                 "analysis is temporarily unavailable - please try again shortly"
             )
 

@@ -19,6 +19,7 @@ from pathlib import Path
 from analystos.l2.analyze import (
     _OPERATIONS,
     _close_enough,
+    SpendCeilingReached,
     _create_message,
     _recompute,
     _resolve_client,
@@ -1073,16 +1074,45 @@ def system_prompt(role, briefs=None):
     return "\n\n".join(lines)
 
 
-def _request(client, user_content, system):
-    response = _create_message(
-        client,
-        model=model_name(),
-        max_tokens=MAX_TOKENS,
-        system=system,
-        tools=[TOOL],
-        tool_choice={"type": "tool", "name": TOOL_NAME},
-        messages=[{"role": "user", "content": user_content}],
-    )
+def _reported(usage, name):
+    value = getattr(usage, name, None) if usage is not None else None
+    return value if isinstance(value, int) and not isinstance(value, bool) and value >= 0 else None
+
+
+def _input_tokens(usage):
+    """All input the call processed: uncached input plus any written to or read from the
+    prompt cache (none is used today). None when the uncached count was not reported."""
+    base = _reported(usage, "input_tokens")
+    if base is None:
+        return None
+    return base + sum(_reported(usage, f) or 0 for f in ("cache_creation_input_tokens", "cache_read_input_tokens"))
+
+
+def _request(client, user_content, system, max_tokens=MAX_TOKENS, meter=None):
+    """One model call. ``meter`` (a list), when given, gets one entry per call sent: the token
+    counts the model reported, or None where it reported none (Slice 133). A call the spend
+    ceiling refuses before sending is not metered: it was never made."""
+    try:
+        response = _create_message(
+            client,
+            model=model_name(),
+            max_tokens=max_tokens,
+            system=system,
+            tools=[TOOL],
+            tool_choice={"type": "tool", "name": TOOL_NAME},
+            messages=[{"role": "user", "content": user_content}],
+        )
+    except SpendCeilingReached:
+        raise
+    except Exception:
+        if meter is not None:
+            meter.append({"input_tokens": None, "output_tokens": None, "stop_reason": None})
+        raise
+    if meter is not None:
+        usage = getattr(response, "usage", None)
+        meter.append({"input_tokens": _input_tokens(usage),
+                      "output_tokens": _reported(usage, "output_tokens"),
+                      "stop_reason": getattr(response, "stop_reason", None)})
     block = next((b for b in getattr(response, "content", []) or []
                   if getattr(b, "type", None) == "tool_use" and getattr(b, "name", None) == TOOL_NAME), None)
     if block is None or not isinstance(getattr(block, "input", None), dict):
@@ -1091,11 +1121,14 @@ def _request(client, user_content, system):
 
 
 class VerificationFailed(ValueError):
-    """The content failed verification twice; ``problems`` holds every problem found."""
+    """The content failed verification on every attempt the budget allowed (normally two);
+    ``problems`` holds every problem found."""
 
-    def __init__(self, problems):
+    def __init__(self, problems, attempts=2):
         self.problems = list(problems)
-        super().__init__(f"the content failed verification twice ({len(self.problems)} problems): "
+        self.attempts = attempts
+        times = "twice" if attempts == 2 else "on its only attempt"
+        super().__init__(f"the content failed verification {times} ({len(self.problems)} problems): "
                          + "; ".join(self.problems[:5]))
 
 
@@ -1115,8 +1148,20 @@ def work_role(engagement, catalog):
     return None
 
 
-def build_deck_spec(engagement, catalog, client=None):
-    """A verified ``analystos-deck-spec/1`` for an accepted engagement, or ValueError."""
+MAX_MODEL_CALLS = 2  # one attempt and one repair
+
+
+def build_deck_spec(engagement, catalog, client=None, max_model_calls=MAX_MODEL_CALLS,
+                    max_tokens=MAX_TOKENS, meter=None):
+    """A verified ``analystos-deck-spec/1`` for an accepted engagement, or ValueError.
+
+    ``max_model_calls`` (1 or 2) and ``max_tokens`` narrow the server's limits and are
+    never widened: 1 call means no repair attempt. ``meter`` collects each call's usage."""
+    if (isinstance(max_model_calls, bool) or not isinstance(max_model_calls, int)
+            or not 1 <= max_model_calls <= MAX_MODEL_CALLS):
+        raise ValueError(f"max_model_calls must be 1 to {MAX_MODEL_CALLS}")
+    if isinstance(max_tokens, bool) or not isinstance(max_tokens, int) or not 1 <= max_tokens <= MAX_TOKENS:
+        raise ValueError(f"max_tokens must be 1 to {MAX_TOKENS}")
     problems = validate_engagement(engagement, catalog)
     if problems:
         raise ValueError("engagement is not valid: " + "; ".join(problems[:3]))
@@ -1130,16 +1175,18 @@ def build_deck_spec(engagement, catalog, client=None):
     client = _resolve_client(client)
     client_text = client_text_of(engagement)
     prompt = build_prompt(engagement)
-    content = _normalize(_request(client, prompt, system))
+    content = _normalize(_request(client, prompt, system, max_tokens, meter))
     attempts = 1
     found = verify_content(content, client_text, work_kinds) if content is not None else ["the model returned no content"]
+    if found and max_model_calls < 2:
+        raise VerificationFailed(found + ["the budget allowed no repair attempt (max_model_calls 1)"], attempts=1)
     if found:
         previous = neutralize(json.dumps(content, ensure_ascii=False)[:20000])
         checks = "\n".join(f"- {neutralize(p)}" for p in found[:40])
         repair = (prompt + "\n\nYour previous content failed these checks. Fix every one and submit the full "
                   "content again.\n<<PREVIOUS>>\n" + previous + "\n<</PREVIOUS>>\n<<CHECKS>>\n" + checks
                   + "\n<</CHECKS>>")
-        content = _normalize(_request(client, repair, system))
+        content = _normalize(_request(client, repair, system, max_tokens, meter))
         attempts = 2
         found = (verify_content(content, client_text, work_kinds) if content is not None
                  else ["the model returned no content"])

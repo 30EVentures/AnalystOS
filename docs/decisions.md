@@ -2,6 +2,19 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-25 — Slice 130: dropdown navigation, the AnalystOS footer, an institutional look
+
+The owner asked for his 30E Ventures site comments to be applied here: less
+AI-generated, Fortune-10 navigation with dropdowns, a footer with concepts, glossary
+and press, more glossary. AnalystOS now uses the studio's own system rather than a
+look of its own, so the two read as one company: system serif and sans (no Google
+Fonts request), ink on paper, square buttons, rules over rounded cards. Shared terms
+(concepts, the wider glossary, press) link to the studio site rather than being
+copied; only AnalystOS's own vocabulary gets a page here. The footer reuses the
+branch the 30E session built and never merged, updated to today's product. Menus
+need a small same-origin script. Without it the menus do not open, but the footer
+still links every page's main sections (not every menu item).
+
 ## 2026-11-24 — Slice 129: a worked example for every one of the 73 roles
 
 After Slice 128 the owner saw five accounting roles show the same bookkeeper sample

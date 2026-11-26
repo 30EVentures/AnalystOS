@@ -7,112 +7,90 @@
 <meta name="description" content="Hire a specialist for one problem and get finished work you can use (a memo, a workbook or a deck), with every number traced to your own words, a calculation it shows, or a labelled assumption. 73 roles; people and agents hire the same way.">
 <link rel="api-catalog" href="https://analystos.dev/.well-known/api-catalog">
 <link rel="alternate" type="text/plain" href="https://analystos.dev/llms.txt" title="llms.txt">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#eef1f4; --paper:#ffffff; --ink:#0f1b2d; --muted:#556172; --line:#cfd6df;
-  --tick:#0a7d5a; --tick-soft:#dcf1e9; --slate-soft:#e0e6f2;
-  --display:'Bricolage Grotesque','Avenir Next','Segoe UI',system-ui,sans-serif;
-  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  /* Slice 130: the 30E Ventures institutional system - ink on paper, serif headings, rules over cards */
+  --bg:#ffffff; --paper:#ffffff; --canvas:#f4f3ef; --ink:#0e1726; --ink-2:#37425a; --muted:#5b6678; --line:#dcdfe5;
+  --tick:#07694b; --tick-soft:#e4efe9; --slate-soft:#eef1f5;
   padding-top:env(safe-area-inset-top,0px);
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#0c1320; --paper:#131c2c; --ink:#e7ecf3; --muted:#9aa8bb; --line:#26334a;
-    --tick:#46c99e; --tick-soft:#103528; --slate-soft:#1c2540;
-  }
 }
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:72px;-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.6 var(--sans)}
-h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.02em;line-height:1.08}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;letter-spacing:-.012em;line-height:1.1}
 p{margin:0 0 12px}
 a{color:inherit}
-:focus-visible{outline:3px solid var(--tick);outline-offset:2px;border-radius:3px}
-.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-.top{border-bottom:1px solid var(--line)}
-.topin{max-width:1080px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:18px}
-.brand{font-family:var(--display);font-weight:800;font-size:20px;text-decoration:none}
-.brand span{color:var(--tick)}
-.top{position:sticky;top:0;z-index:20;background:var(--bg)}
-.links{display:flex;gap:4px;flex:1;font-size:15px;overflow-x:auto;scrollbar-width:none}
-.links::-webkit-scrollbar{display:none}
-.links a{text-decoration:none;color:var(--muted);padding:6px 11px;border-radius:999px;white-space:nowrap}
-.links a:hover{color:var(--ink);background:var(--paper)}
-.links a:hover{color:var(--ink)}
-.btn{display:inline-block;background:var(--ink);color:var(--bg);border:1px solid var(--ink);border-radius:999px;padding:11px 22px;
-  font-weight:600;font-size:15.5px;text-decoration:none;white-space:nowrap}
+:focus-visible{outline:2px solid var(--tick);outline-offset:3px;border-radius:2px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 clamp(20px,4vw,48px)}
+.btn{display:inline-block;background:var(--ink);color:#fff;border:1px solid var(--ink);border-radius:3px;padding:13px 20px;
+  font-weight:600;font-size:15px;text-decoration:none;white-space:nowrap}
+.btn:hover{background:#1d2a42}
 .btn.ghost{background:transparent;color:var(--ink)}
+.btn.ghost:hover{background:var(--canvas)}
 .btn.sm{padding:7px 16px;font-size:14.5px;margin-left:auto}
 .fine{font-size:13.5px;color:var(--muted)}
 .muted{color:var(--muted)}
-.ready{display:inline-flex;align-items:center;gap:8px;background:var(--tick-soft);color:var(--tick);font-weight:600;font-size:13.5px;
-  border-radius:999px;padding:5px 12px}
-.ready::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--tick)}
+.ready{display:block;color:var(--tick);font-weight:600;font-size:12.5px;letter-spacing:.09em;text-transform:uppercase}
 
-.hero{padding:64px 0 40px}
+.hero{padding:72px 0 48px}
 .hero .cols{display:grid;grid-template-columns:1fr 1.05fr;gap:44px;align-items:center}
-h1{font-size:clamp(38px,5.4vw,60px);margin-top:16px}
-.roles{font-weight:600;color:var(--tick);margin:12px 0 0;font-size:15.5px}
-.sub{font-size:19px;color:var(--muted);margin:18px 0 24px;max-width:30em}
+h1{font-size:clamp(40px,5.4vw,62px);margin-top:14px}
+.roles{font-weight:500;color:var(--ink-2);margin:14px 0 0;font-size:15.5px}
+.sub{font-size:19px;color:var(--ink-2);margin:18px 0 26px;max-width:30em}
 .actions{display:flex;gap:12px;flex-wrap:wrap}
 
 /* the sample deck's summary slide, drawn in HTML */
-.slide{background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 40px -22px rgba(15,27,45,.35);
+.slide{background:var(--paper);border:1px solid var(--line);border-radius:2px;box-shadow:0 24px 40px -28px rgba(14,23,38,.32);
   padding:22px 24px;aspect-ratio:16/9;display:flex;flex-direction:column;gap:10px;font-size:13px;line-height:1.45;overflow:hidden}
-.slide .t{font-family:var(--display);font-weight:700;font-size:17px;line-height:1.2}
+.slide .t{font-family:var(--display);font-weight:600;font-size:17px;line-height:1.22}
 .slide ul{margin:0;padding-left:16px}
 .slide li{margin-bottom:5px}
 .slide .n{font-weight:700}
 .slide .ref{color:var(--muted);font-size:10px;margin-left:2px}
 .slide .tiles{display:flex;gap:10px;margin-top:auto}
-.slide .tile{flex:1;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
-.slide .tile b{display:block;font-family:var(--display);font-size:20px}
+.slide .tile{flex:1;border-top:2px solid var(--ink);padding:8px 2px 0}
+.slide .tile b{display:block;font-family:var(--display);font-weight:600;font-size:20px}
 .slide .tile span{font-size:10.5px;color:var(--muted)}
 .slide .foot{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
 figure{margin:0}
 figcaption{margin-top:10px}
 
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:36px 0 0}
-.step{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
-.step h3{font-size:19px;margin-bottom:6px}
-.band{margin-top:52px}
-.band h2{font-size:26px;margin-bottom:14px}
-.chip{display:inline-block;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 13px;margin:0 8px 8px 0;
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin:36px 0 0}
+.step{border-top:2px solid var(--ink);padding:18px 0 0}
+.step h3{font-size:22px;margin-bottom:8px}
+.band{margin-top:72px}
+.band h2{font-size:34px;margin-bottom:14px}
+.chip{display:inline-block;border:1px solid var(--line);background:var(--paper);border-radius:3px;padding:7px 13px;margin:0 8px 8px 0;
   font-size:14.5px;text-decoration:none}
 .chip:hover{border-color:var(--ink)}
-.cta{margin-top:52px;background:var(--ink);color:var(--bg);border-radius:16px;padding:30px 32px;display:flex;align-items:center;
+.cta{margin-top:72px;background:var(--ink);color:#fff;border-radius:0;padding:36px 40px;display:flex;align-items:center;
   justify-content:space-between;gap:20px;flex-wrap:wrap}
-.cta h2{font-size:26px}
-.cta .btn{background:var(--bg);color:var(--ink);border-color:var(--bg)}
+.cta h2{font-size:32px;color:#fff}
+.cta .btn{background:#fff;color:var(--ink);border-color:#fff}
 
-footer{border-top:1px solid var(--line);margin-top:64px;padding:22px 0 40px;font-size:14px;color:var(--muted)}
-footer a{color:var(--muted)}
-.more{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:12px}
 
 .lead{margin:-4px 0 10px}
-.today{background:var(--paper);border-left:3px solid var(--tick);border-radius:6px;padding:10px 14px;margin:0 0 16px;font-size:15.5px}
-.fams{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;margin-bottom:16px}
-.fam{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 14px;font:500 14.5px var(--sans);
+.today{background:var(--canvas);border-left:3px solid var(--tick);border-radius:0;padding:14px 18px;margin:0 0 20px;font-size:15.5px}
+.fams{display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin;margin-bottom:20px;border-bottom:1px solid var(--line)}
+.fam{border:0;border-bottom:2px solid transparent;background:none;color:var(--ink-2);border-radius:0;padding:10px 12px;font:500 15px var(--sans);
   white-space:nowrap;cursor:pointer}
-.fam[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.explorer{display:grid;grid-template-columns:.85fr 1.15fr;gap:28px;align-items:start;background:var(--paper);border:1px solid var(--line);
-  border-radius:16px;padding:24px}
+.fam:hover{color:var(--ink)}
+.fam[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.explorer{display:grid;grid-template-columns:.85fr 1.15fr;gap:36px;align-items:start;background:var(--paper);border:1px solid var(--line);
+  border-radius:0;padding:28px}
 .eyebrow{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--tick);margin:0 0 6px}
 .who h3{font-size:24px;margin-bottom:12px}
 .asked{font-size:15.5px}
 .others{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
 .rolechips{display:flex;flex-wrap:wrap;gap:6px}
-.rchip{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:5px 11px;font:500 13px var(--sans);cursor:pointer;text-align:left}
+.rchip{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:3px;padding:6px 11px;font:500 13px var(--sans);cursor:pointer;text-align:left}
 .rchip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .rchip .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--tick);margin-right:6px;vertical-align:1px}
 .rchip[aria-pressed="true"] .dot{background:var(--bg)}
 .rchip.borrow{color:var(--muted);border-style:dashed}
 .rchip.borrow[aria-pressed="true"]{color:var(--bg)}
-.borrowed{border:1px dashed var(--muted);border-radius:8px;padding:7px 10px;margin:0 0 10px;font-size:13px;color:var(--ink);background:var(--paper)}
-.shared{background:var(--bg);border-radius:8px;padding:8px 10px}
+.borrowed{border:1px dashed var(--muted);border-radius:0;padding:7px 10px;margin:0 0 10px;font-size:13px;color:var(--ink);background:var(--paper)}
+.shared{background:var(--canvas);border-radius:0;padding:8px 10px}
 .wk p{margin:0 0 7px}
 .wk .src td:first-child{white-space:normal}
 .wk .lab{font-size:11px;font-weight:600;color:var(--tick);margin:8px 0 3px}
@@ -130,7 +108,7 @@ footer a{color:var(--muted)}
 .src td{border-top:1px solid var(--line);padding:4px 6px 4px 0;vertical-align:top}
 .src td:first-child{color:var(--muted);white-space:nowrap}
 .pager{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
-.pg{border:1px solid var(--line);background:var(--paper);border-radius:999px;width:40px;height:40px;cursor:pointer;font-size:17px;color:var(--ink)}
+.pg{border:1px solid var(--line);background:var(--paper);border-radius:3px;width:40px;height:40px;cursor:pointer;font-size:17px;color:var(--ink)}
 
 @media (max-width:820px){
   .explorer{grid-template-columns:1fr;padding:18px}
@@ -143,6 +121,54 @@ footer a{color:var(--muted)}
   body{font-size:16px}
 }
 /* studio:css:start */
+:root{--display:"Iowan Old Style","Charter","Source Serif 4","Palatino Linotype",Georgia,serif;--serif:"Iowan Old Style","Charter","Source Serif 4","Palatino Linotype",Georgia,serif;--sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,Helvetica,Arial,sans-serif;--font-display:"Iowan Old Style","Charter","Source Serif 4","Palatino Linotype",Georgia,serif;--font-sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,Helvetica,Arial,sans-serif;--font-mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace}
+.an-head{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #dcdfe5;font-family:var(--sans)}
+.an-bar{max-width:1200px;margin:0 auto;padding:0 clamp(20px,4vw,48px);display:flex;align-items:center;height:68px;gap:28px}
+.an-brand{font:600 20px/1 var(--sans);letter-spacing:-.01em;color:#0e1726;text-decoration:none;flex:none}
+.an-brand span{color:#07694b}
+.an-primary{flex:1}
+.an-primary>ul{display:flex;gap:2px;list-style:none;margin:0;padding:0}
+.an-has>button{appearance:none;background:none;border:0;font:500 15px/1 var(--sans);color:#0e1726;padding:25px 13px;cursor:pointer;display:flex;align-items:center;gap:7px;position:relative}
+.an-has>button::after{content:"";position:absolute;left:13px;right:13px;bottom:-1px;height:2px;background:transparent}
+.an-has.open>button::after,.an-has>button:hover::after{background:#0e1726}
+.an-has>button svg{width:11px;height:11px;transition:transform .15s}
+.an-has.open>button svg{transform:rotate(180deg)}
+.an-head a,.af a{border-bottom:0}
+.an-cta{flex:none;font:600 14px/1 var(--sans);text-decoration:none;padding:12px 16px;border-radius:3px;background:#0e1726;color:#fff;border:1px solid #0e1726}
+.an-cta:hover{background:#1d2a42}
+.an-burger{display:none;appearance:none;background:none;border:1px solid #c6cbd4;border-radius:3px;padding:9px 10px;margin-left:auto;cursor:pointer}
+.an-burger span{display:block;width:20px;height:2px;background:#0e1726;margin:4px 0}
+.an-mega{display:none;position:absolute;left:0;right:0;top:100%;background:#fff;color:#0e1726;border-top:1px solid #dcdfe5;border-bottom:1px solid #dcdfe5;box-shadow:0 24px 40px -24px rgba(14,23,38,.28)}
+.an-has.open .an-mega{display:block}
+.an-in{max-width:1200px;margin:0 auto;padding:32px clamp(20px,4vw,48px) 36px;display:grid;grid-template-columns:250px 1fr 290px;gap:44px}
+.an-wide .an-in{grid-template-columns:250px 1fr}
+.an-mega h3{font:600 12px/1 var(--sans);letter-spacing:.09em;text-transform:uppercase;color:#5b6678;margin:0 0 14px}
+.an-lead{font:400 23px/1.25 var(--serif);margin:0 0 10px;letter-spacing:-.005em}
+.an-sub{color:#37425a;font-size:15px;line-height:1.5;margin:0 0 16px}
+.an-head .an-all{font-weight:600;font-size:15px;text-decoration:none;color:#0e1726;border-bottom:1px solid #0e1726}
+.an-mega ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:2px 28px;align-content:start}
+.an-wide ul{grid-template-columns:1fr 1fr 1fr}
+.an-mega li a{display:block;padding:11px 0;border-bottom:1px solid #dcdfe5;text-decoration:none;color:#0e1726}
+.an-mega li a:hover b{text-decoration:underline;text-underline-offset:3px}
+.an-mega li b{font:600 15.5px/1.3 var(--sans);display:block}
+.an-mega li span{display:block;color:#37425a;font-size:14px;line-height:1.45;margin-top:2px}
+.an-feat{background:#f4f3ef;padding:22px 22px 20px;border-left:3px solid #07694b}
+.an-feat h4{font:400 20px/1.25 var(--serif);margin:0 0 8px}
+.an-feat p{font-size:14.5px;line-height:1.5;color:#37425a;margin:0 0 14px}
+.an-go{font-weight:600;font-size:14.5px;color:#0e1726}
+@media (max-width:980px){.an-in{grid-template-columns:200px 1fr;gap:28px}.an-feat{display:none}.an-wide ul{grid-template-columns:1fr 1fr}}
+@media (max-width:860px){
+  .an-burger{display:block}.an-cta{display:none}
+  .an-primary{display:none;position:absolute;left:0;right:0;top:100%;background:#fff;border-bottom:1px solid #dcdfe5;max-height:calc(100vh - 110px);overflow:auto;padding:6px clamp(20px,4vw,48px) 22px}
+  .an-head.nav-open .an-primary{display:block}
+  .an-primary>ul{flex-direction:column}
+  .an-has>button{width:100%;justify-content:space-between;padding:17px 0;border-bottom:1px solid #dcdfe5;font-size:17px}
+  .an-has>button::after{display:none}
+  .an-mega{position:static;box-shadow:none;border:0}
+  .an-in{display:block;padding:4px 0 12px}.an-mega h3,.an-lead,.an-sub,.an-all{display:none}
+  .an-mega ul,.an-wide ul{grid-template-columns:1fr}
+}
+@media print{.an-head{display:none}}
 .studio-bar{background:#030508;color:#e8f4ff;font:500 13px/1 system-ui,-apple-system,'Segoe UI',sans-serif;border-bottom:1px solid #16202c}
 .studio-in{max-width:1100px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:18px}
 .studio-brand{display:flex;align-items:center;gap:9px;color:#e8f4ff;text-decoration:none;font-weight:700;letter-spacing:.14em}
@@ -152,8 +178,24 @@ footer a{color:var(--muted)}
 .studio-links{margin-left:auto;display:flex;gap:16px}
 .studio-links a{color:#e8f4ff;text-decoration:none;opacity:.85}
 .studio-links a:hover,.studio-links a:focus-visible{opacity:1;text-decoration:underline}
-.studio-foot{margin:14px 0 0;font-size:.85rem;opacity:.9}
-.studio-foot a{color:inherit;text-decoration:underline}
+.af{background:#0f1b2d;color:#c9d3e3;margin:64px 0 0;padding:56px 0 26px;border:0;font:400 15px/1.55 var(--sans,system-ui,-apple-system,'Segoe UI',sans-serif)}
+.af-in{max-width:1100px;margin:0 auto;padding:0 20px}
+.af-grid{display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:36px;padding-bottom:40px;border-bottom:1px solid #26354f}
+.af-name{font:800 22px/1 var(--display,system-ui,sans-serif);letter-spacing:-.02em;color:#fff;text-decoration:none}
+.af-line{font:400 18px/1.45 var(--serif,Georgia,serif);color:#fff;margin:16px 0 18px;max-width:17em}
+.af-pill{display:flex;gap:8px;align-items:flex-start;background:#1a2a44;border:1px solid #2c3f60;border-radius:4px;padding:10px 12px;font-size:13.5px;line-height:1.4;color:#e8d9b0;max-width:20em}
+.af-pill::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:#e0a62e;margin-top:6px}
+.af h2{font:600 12px/1 var(--sans,system-ui,sans-serif);letter-spacing:.09em;text-transform:uppercase;color:#8da0bd;margin:4px 0 18px}
+.af ul{list-style:none;margin:0;padding:0}.af li{margin:0 0 11px}
+.af a{color:#e8eef8;text-decoration:none}.af li a:hover,.af li a:focus-visible,.af-mid a:hover{text-decoration:underline;text-underline-offset:3px}
+.af li small{display:block;color:#8da0bd;font-size:12.5px;margin-top:1px}
+.af-note{padding:22px 0 0;font-size:13.5px;line-height:1.7;color:#aab8cf;max-width:70ch}
+.af-note p,.af-note .fine{margin:0 0 8px;font:inherit;color:inherit;max-width:none}
+.af-mid{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:22px 0;font-size:14.5px;color:#aab8cf}
+.af-mid a{color:#fff}
+.af-bot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13.5px;color:#8da0bd}
+@media (max-width:900px){.af-grid{grid-template-columns:1fr 1fr}.af-grid>div:first-child{grid-column:1/-1}}
+@media print{.af{background:#fff;color:#000}.af a,.af-name,.af-line{color:#000}}
 @media (max-width:640px){.studio-line,.studio-sub{display:none}.studio-in{padding:9px 14px;gap:12px}.studio-links{gap:12px}}
 @media print{.studio-bar{display:none}}
 /* studio:css:end */
@@ -161,21 +203,11 @@ footer a{color:var(--muted)}
 </head>
 <body>
 <!-- studio:bar:start -->
-<div class="studio-bar" role="navigation" aria-label="30E Ventures"><div class="studio-in"><a class="studio-brand" href="https://30eventures.com"><svg class="studio-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="3" height="18" fill="#f2f6fa"/><rect x="6" y="3" width="15" height="3" fill="#f2f6fa"/><rect x="6" y="10.5" width="10" height="3" fill="#f2f6fa"/><rect x="6" y="18" width="15" height="3" fill="#2fd4ff"/></svg><span>30E<span class="studio-sub">VENTURES</span></span></a><span class="studio-line">AnalystOS is a 30E Ventures product</span><span class="studio-links"><a href="https://30eventures.com/portfolio">Portfolio</a><a href="https://30eventures.com/about">About</a><a href="https://30eventures.com/press">Press</a></span></div></div>
+<div class="studio-bar" role="navigation" aria-label="30E Ventures"><div class="studio-in"><a class="studio-brand" href="https://www.30eventures.com/"><svg class="studio-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="3" height="18" fill="#f2f6fa"/><rect x="6" y="3" width="15" height="3" fill="#f2f6fa"/><rect x="6" y="10.5" width="10" height="3" fill="#f2f6fa"/><rect x="6" y="18" width="15" height="3" fill="#2fd4ff"/></svg><span>30E<span class="studio-sub">VENTURES</span></span></a><span class="studio-line">AnalystOS is a 30E Ventures product</span><span class="studio-links"><a href="https://www.30eventures.com/portfolio/">Portfolio</a><a href="https://www.30eventures.com/about/">About</a><a href="https://www.30eventures.com/press/">Press</a></span></div></div>
 <!-- studio:bar:end -->
-<header class="top">
-  <div class="topin">
-    <a class="brand" href="/">Analyst<span>OS</span></a>
-    <nav class="links" aria-label="Sections">
-      <a href="#how">How it works</a>
-      <a href="#samples">Samples</a>
-      <a href="#roles">Roles</a>
-      <a href="llms.txt">For agents</a>
-      <a href="details.html">Full details</a>
-    </nav>
-    <a class="btn sm" href="hire.html">Hire a specialist</a>
-  </div>
-</header>
+<!-- product:nav:start -->
+<header class="an-head" id="an-head"><div class="an-bar"><a class="an-brand" href="/">Analyst<span>OS</span></a><button class="an-burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="an-primary"><span></span><span></span><span></span></button><nav class="an-primary" id="an-primary" aria-label="Sections"><ul><li class="an-has"><button type="button" aria-expanded="false" aria-controls="an-m-roles">Roles<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><div class="an-mega an-wide" id="an-m-roles" role="region" aria-label="Roles"><div class="an-in"><div><h3>Roles</h3><p class="an-lead">73 roles in 13 families.</p><p class="an-sub">Every role asks the same core questions plus its family's own, and delivers in its family's format.</p><a class="an-all" href="/hire.html">Hire a specialist</a></div><ul><li><a href="/?family=research-reporting#samples"><b>Research and reporting</b><span>5 roles · Word memo</span></a></li><li><a href="/?family=consulting#samples"><b>Consulting</b><span>8 roles · PowerPoint deck</span></a></li><li><a href="/?family=finance-modeling#samples"><b>Finance and modeling</b><span>11 roles · Excel workbook</span></a></li><li><a href="/?family=data-analytics#samples"><b>Data and analytics</b><span>7 roles · Excel workbook</span></a></li><li><a href="/?family=accounting-operations#samples"><b>Accounting and finance operations</b><span>8 roles · Excel workbook</span></a></li><li><a href="/?family=risk-audit-controls#samples"><b>Risk, audit and controls</b><span>7 roles · Word memo</span></a></li><li><a href="/?family=financial-crime#samples"><b>Financial crime</b><span>5 roles · Word memo</span></a></li><li><a href="/?family=legal-contracts-procurement#samples"><b>Legal, contracts and procurement</b><span>5 roles · Word memo</span></a></li><li><a href="/?family=content-communications#samples"><b>Content and communications</b><span>5 roles · PowerPoint deck</span></a></li><li><a href="/?family=people-hr#samples"><b>People and HR</b><span>4 roles · Word memo</span></a></li><li><a href="/?family=software-it#samples"><b>Software and IT</b><span>3 roles · PowerPoint deck</span></a></li><li><a href="/?family=insurance#samples"><b>Insurance</b><span>2 roles · Word memo</span></a></li><li><a href="/?family=sales-customer-coordination#samples"><b>Sales, customer and coordination</b><span>3 roles · PowerPoint deck</span></a></li></ul></div></div></li><li class="an-has"><button type="button" aria-expanded="false" aria-controls="an-m-samples">Samples<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><div class="an-mega" id="an-m-samples" role="region" aria-label="Samples"><div class="an-in"><div><h3>Samples</h3><p class="an-lead">See the finished work before you hire.</p><p class="an-sub">Every role has a sample of its own, built from a worked example.</p><a class="an-all" href="/#samples">Open the explorer</a></div><ul><li><a href="/?family=legal-contracts-procurement#samples"><b>Word memos</b><span>Legal, research, audit, HR, insurance and financial crime.</span></a></li><li><a href="/?family=finance-modeling#samples"><b>Excel workbooks</b><span>Finance, accounting and data, with live formulas.</span></a></li><li><a href="/?family=consulting#samples"><b>PowerPoint decks</b><span>Consulting, content, sales and software.</span></a></li><li><a href="/?family=accounting-operations&role=accounts-payable-receivable-clerk#samples"><b>Role-written work</b><span>Drafts, registers, case files, reconciliations, plans and code.</span></a></li><li><a href="/#sample"><b>Every number traced</b><span>Each figure points to the client's words, a calculation or an assumption.</span></a></li></ul><aside class="an-feat"><h3>Download</h3><h4>The consulting deck</h4><p>A full sample deck, every number traced.</p><a class="an-go" href="/samples/consulting.pptx">Download the deck</a></aside></div></div></li><li class="an-has"><button type="button" aria-expanded="false" aria-controls="an-m-how">How it works<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><div class="an-mega" id="an-m-how" role="region" aria-label="How it works"><div class="an-in"><div><h3>How it works</h3><p class="an-lead">Describe the problem. Get finished work.</p><p class="an-sub">Answer first, sources last, in the format the role's work is read in.</p><a class="an-all" href="/#how">How it works</a></div><ul><li><a href="/#how"><b>The three steps</b><span>Describe it, answer a few questions, use the file.</span></a></li><li><a href="/details.html#trust"><b>How numbers are checked</b><span>Code checks every figure before anything is drawn.</span></a></li><li><a href="/glossary.html#boundary"><b>Who decides</b><span>Drafts for your approval; qualified people decide.</span></a></li><li><a href="/details.html#proof"><b>Evidence and limits</b><span>What has been measured, and what has not.</span></a></li><li><a href="/details.html#faq"><b>Questions</b><span>Privacy, documents and what it cannot do yet.</span></a></li></ul><aside class="an-feat"><h3>Full details</h3><h4>How it stays honest</h4><p>Privacy, known limits and the evidence behind each claim.</p><a class="an-go" href="/details.html">Read the details</a></aside></div></div></li><li class="an-has"><button type="button" aria-expanded="false" aria-controls="an-m-agents">For agents<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><div class="an-mega" id="an-m-agents" role="region" aria-label="For agents"><div class="an-in"><div><h3>For agents</h3><p class="an-lead">Software can hire through the API.</p><p class="an-sub">Published contracts, a role catalog and an index for language models.</p><a class="an-all" href="/llms.txt">Read llms.txt</a></div><ul><li><a href="/docs/api.md"><b>API guide</b><span>The document API (v1): send a document, get a checked report.</span></a></li><li><a href="/api/v1/openapi.json"><b>OpenAPI</b><span>The machine-readable API description.</span></a></li><li><a href="/api/v2/catalog"><b>Role catalog</b><span>Every role, its questions and its format, as JSON.</span></a></li><li><a href="/llms.txt"><b>llms.txt</b><span>An index for language models, with the endpoint that hires a role.</span></a></li><li><a href="/docs/seal.md"><b>Seal specification</b><span>Re-check a sealed report offline, against a key you pin.</span></a></li><li><a href="/.well-known/api-catalog"><b>API catalog</b><span>Where each API and its documents live.</span></a></li></ul></div></div></li><li class="an-has"><button type="button" aria-expanded="false" aria-controls="an-m-learn">Learn<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><div class="an-mega" id="an-m-learn" role="region" aria-label="Learn"><div class="an-in"><div><h3>Learn</h3><p class="an-lead">The words and ideas behind the work.</p><p class="an-sub">Plain definitions, and the studio's thinking on the agentic internet.</p><a class="an-all" href="/glossary.html">Read the glossary</a></div><ul><li><a href="/glossary.html"><b>AnalystOS glossary</b><span>Figure tags, work products, boundaries and more.</span></a></li><li><a href="https://www.30eventures.com/concepts/"><b>Concepts</b><span>Seven ideas the studio's products are built on.</span></a></li><li><a href="https://www.30eventures.com/why/"><b>Why we build</b><span>What is changing, what breaks, and what is needed.</span></a></li><li><a href="https://www.30eventures.com/faq/"><b>FAQ</b><span>What 30E Ventures is, and where each product stands.</span></a></li><li><a href="https://www.30eventures.com/press/"><b>Press</b><span>Boilerplate, fact sheet, logos and a press contact.</span></a></li></ul><aside class="an-feat"><h3>Start here</h3><h4>Verifiable by a stranger</h4><p>A claim anyone can check without trusting whoever made it.</p><a class="an-go" href="https://www.30eventures.com/concepts/#verifiable">Read the concept</a></aside></div></div></li></ul></nav><a class="an-cta" href="/hire.html">Hire a specialist</a></div></header><script src="/nav.js" defer></script>
+<!-- product:nav:end -->
 
 <main class="wrap" id="top">
 
@@ -410,24 +442,21 @@ footer a{color:var(--muted)}
       b.setAttribute('aria-controls', 'explorer'); b.id = 'tab-' + s.family.id;
       b.addEventListener('click', function () { show(i); }); fams.appendChild(b);
     });
-    var start = data.findIndex(function (s) { return s.family.id === 'consulting'; });
+    // ?family=<id>&role=<id> opens the explorer there (the header menus link this way); anything unknown falls back.
+    var params = new URLSearchParams(location.search);
+    var want = params.get('family') || 'consulting';
+    var start = data.findIndex(function (s) { return s.family.id === want; });
+    if (start < 0) start = data.findIndex(function (s) { return s.family.id === 'consulting'; });
     box.hidden = false; show(start < 0 ? 0 : start);
+    var wantRole = params.get('role');
+    var r = wantRole && data[current].roles.find(function (x) { return x.id === wantRole; });
+    if (r) pick(r);
   }).catch(function () { fams.textContent = 'The samples could not be loaded; every deck is listed in samples/samples.json.'; });
 })();
 </script>
 
-<footer>
-  <div class="wrap">
-    <div class="more">
-      <a href="details.html">Full details: how it works, privacy and known limits</a>
-      <a href="upload.html">Have a document? Get a verified report from it</a>
-      <a href="llms.txt">For agents: llms.txt</a>
-      <a href="/api/v2/catalog">Role catalog (JSON)</a>
-    </div>
 <!-- studio:footer:start -->
-<p class="studio-foot">AnalystOS is built by <a href="https://30eventures.com">30E Ventures</a>, a machine-native venture studio in Toronto building the agentic internet. <a href="https://30eventures.com/portfolio">Portfolio</a> &middot; <a href="https://30eventures.com/about">About</a> &middot; <a href="https://30eventures.com/brand">Brand</a> &middot; <a href="https://30eventures.com/press">Press</a> &middot; <a href="https://30eventures.com/contact">Contact</a></p>
+<footer class="af"><div class="af-in"><div class="af-grid"><div><a class="af-name" href="/">AnalystOS</a><p class="af-line">Specialist work, ready the moment you need it.</p><div class="af-pill"><span>Early stage. Not for confidential documents yet. Limits are published.</span></div></div><div><h2>Product</h2><ul><li><a href="/#how">How it works</a></li><li><a href="/#samples">Samples for every role</a><small>73 roles, 13 families</small></li><li><a href="/hire.html">Hire a specialist</a><small>access code</small></li><li><a href="/upload.html">Upload a document</a><small>access code</small></li><li><a href="/details.html">Details, privacy and known limits</a></li></ul></div><div><h2>Developers</h2><ul><li><a href="/api/v1/openapi.json">API reference</a><small>OpenAPI 3.1</small></li><li><a href="/docs/api.md">API guide</a></li><li><a href="/docs/seal.md">Seal specification</a><small>re-verify offline</small></li><li><a href="/api/v2/catalog">Role catalog</a><small>JSON</small></li><li><a href="/.well-known/api-catalog">API catalog</a></li><li><a href="/llms.txt">llms.txt</a><small>for agents</small></li></ul></div><div><h2>Learn</h2><ul><li><a href="/glossary.html">AnalystOS glossary</a><small>figure tag, work product, boundary</small></li><li><a href="https://www.30eventures.com/concepts/">Concepts</a><small>verifiable by a stranger, and six more</small></li><li><a href="https://www.30eventures.com/learn/">Studio glossary</a><small>agents to settlement</small></li><li><a href="https://www.30eventures.com/why/">Why we build</a></li><li><a href="https://www.30eventures.com/faq/">FAQ</a></li></ul></div><div><h2>30E Ventures</h2><ul><li><a href="https://www.30eventures.com/about/">About the studio</a></li><li><a href="https://www.30eventures.com/portfolio/">Portfolio</a></li><li><a href="https://www.30eventures.com/press/">Press</a></li><li><a href="https://www.30eventures.com/brand/">Brand</a></li><li><a href="https://www.30eventures.com/contact/">Contact</a></li></ul></div></div><div class="af-note"><!-- studio:note:start --><!-- studio:note:end --></div><div class="af-mid"><span>AnalystOS is built by <a href="https://www.30eventures.com/">30E Ventures</a>, a machine-native venture studio in Toronto building the agentic internet.</span><span>Status: <b>live, early stage</b>.</span></div><div class="af-bot"><span>&copy; 2026 30E Ventures &middot; Toronto, Canada</span><span>Use non-confidential documents only.</span></div></div></footer>
 <!-- studio:footer:end -->
-  </div>
-</footer>
 </body>
 </html>

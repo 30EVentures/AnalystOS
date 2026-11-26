@@ -23,6 +23,10 @@
 - [Mesh identity](https://analystos.dev/docs/mesh-identity.md): The handshake and charter AnalystOS publishes, and what it does not
 - [AAO charter checking](https://analystos.dev/docs/aao.md): The FlashyOS AAO 0.1 charter checker, its rule codes and its limits
 
+## Learn
+
+- [AnalystOS glossary](https://analystos.dev/glossary.html): roles, traced figures, work products and who decides, defined plainly
+
 ## Limits, stated plainly
 
 - [Trust and known limits](https://analystos.dev/details.html#trust): what leaves your environment, what is and is not checked

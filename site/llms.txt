@@ -15,11 +15,12 @@
 - [Seal specification](https://analystos.dev/docs/seal.md): How a report is sealed and how anyone re-verifies it offline; includes a worked test vector
 - `POST https://analystos.dev/api/v1/verify`: stateless verification of any seal bundle, no account
 - [Seal verification key](https://analystos.dev/.well-known/analystos-seal-key.json): the public key seals are signed with (analystos-seal-key/1)
+- [Signing keys](https://analystos.dev/.well-known/jwks.json): the same public keys as a standard JWKS (Ed25519, kid = key_id)
 
 ## Identity and the FlashyOS mesh
 
 - [Handshake](https://analystos.dev/.well-known/flashyos.json): flashyos/1
-- [Charter](https://analystos.dev/.well-known/flashyos-charter.json): AAO 0.1, three roles, each with a measure
+- [Charter](https://analystos.dev/.well-known/flashyos-charter.json): AAO 0.1, seven roles, each with a measure
 - [Mesh identity](https://analystos.dev/docs/mesh-identity.md): The handshake and charter AnalystOS publishes, and what it does not
 - [AAO charter checking](https://analystos.dev/docs/aao.md): The FlashyOS AAO 0.1 charter checker, its rule codes and its limits
 

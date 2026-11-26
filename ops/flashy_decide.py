@@ -5,7 +5,7 @@ that needs the owner's explicit yes each time, regardless of how confirmed
 the endpoint is. See ops/README.md.
 
     python3 ops/flashy_decide.py "deploy the seven-role charter" --tier 2 \
-        --org-id analystos --agent-name analystos-agent \
+        --org-id cmtkurcbs00je12tigb1rc6t1 --agent-name analystos-agent \
         --token "$FLASHYOS_AGENT_TOKEN"        # prints the request, sends nothing
 
     ... --execute                                # actually sends it (needs --execute AND a real token)
@@ -30,6 +30,11 @@ import os
 import sys
 import urllib.error
 import urllib.request
+
+try:  # run as `python3 ops/<script>.py`, or imported as `ops.<script>` by the tests
+    from mesh_ids import agent_name_problem, org_id_problem
+except ImportError:
+    from ops.mesh_ids import agent_name_problem, org_id_problem
 
 API_BASE = "https://api.flashyos.com"
 
@@ -106,6 +111,11 @@ def main(argv=None):
 
     if not args.token:
         print("no token given (--token or FLASHYOS_AGENT_TOKEN) - cannot even build a redacted preview meaningfully")
+        return 2
+
+    problem = org_id_problem(args.org_id) or agent_name_problem(args.agent_name)
+    if problem:
+        print(f"refused: {problem}")
         return 2
 
     impact = TIER_TO_IMPACT[args.tier]

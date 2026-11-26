@@ -27,6 +27,19 @@ GUIDES = [
 
 
 
+
+_NUMBER_WORDS = ("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten")
+
+
+def _role_count_words():
+    """The served charter's role count, in words. It read "three" after the
+    charter grew to seven roles (Slice 103); derived now, so it cannot lag."""
+    path = ROOT / "site" / ".well-known" / "flashyos-charter.json"
+    if not path.is_file():
+        return "its"  # no charter to count: "AAO 0.1, its roles, each with a measure"
+    n = len(json.loads(path.read_text(encoding="utf-8"))["roles"])
+    return _NUMBER_WORDS[n] if n < len(_NUMBER_WORDS) else str(n)
+
 def _guide_line(name):
     """The llms.txt link line for one guide, looked up by file name, not position, so
     adding a guide cannot shift the FlashyOS section (which the Slice 107 fence pins)."""
@@ -62,10 +75,12 @@ def generated_files():
     # Only advertised once the file exists: a link to a 404 is worse than no link (Slice 86).
     if (ROOT / "site" / ".well-known" / "analystos-seal-key.json").is_file():
         lines.append(f"- [Seal verification key]({BASE}/.well-known/analystos-seal-key.json): the public key seals are signed with (analystos-seal-key/1)")
+    if (ROOT / "site" / ".well-known" / "jwks.json").is_file():
+        lines.append(f"- [Signing keys]({BASE}/.well-known/jwks.json): the same public keys as a standard JWKS (Ed25519, kid = key_id)")
     lines.append("")
     lines += ["## Identity and the FlashyOS mesh", "",
               f"- [Handshake]({BASE}/.well-known/flashyos.json): flashyos/1",
-              f"- [Charter]({BASE}/.well-known/flashyos-charter.json): AAO 0.1, three roles, each with a measure",
+              f"- [Charter]({BASE}/.well-known/flashyos-charter.json): AAO 0.1, {_role_count_words()} roles, each with a measure",
               _guide_line("mesh-identity.md"),
               _guide_line("aao.md"), ""]
     lines += ["## Learn", "",

@@ -3260,3 +3260,55 @@ double the record on their log, so this is accepted as is. Git history still
 holds the old unredacted files; rewriting a public repository's history is a
 separate decision for the owner. Registering the record with Flashy (F-REC-1)
 waits for this to merge and deploy, and for the owner's yes.
+
+## 2026-11-26 — Slice 132: signing keys as a JWKS, two mesh mistakes made impossible, and the charter differential
+
+Phase 0 of the AnalystOS x Flashy plan. `site/.well-known/jwks.json` now serves
+the report-seal key as a standard Ed25519 JWK, derived by `tools/build_jwks.py`
+from `analystos-seal-key.json` (kid = key_id), so the two files cannot
+disagree. Only that one key: Flashy's plan asks for one key per purpose, and a
+key is added here when something signs with it.
+
+`ops/mesh_ids.py` makes two of Flashy's 2026-11-25 measurements impossible to
+repeat from this repository: the documented `--org-id analystos` would have
+answered 404 (the routes take the id, `cmtkurcbs00je12tigb1rc6t1`), and a
+capability that is not in the served charter is refused before anything is
+built, because a declared capability cannot be withdrawn yet.
+
+Owner's decision, 2026-11-26 ("do Flashy's list"): Flashy's C-MESH-6 asks the
+handshake to advertise all eight discovery slugs, which Slice 94's rule had
+withheld until each endpoint was deployed (at least `source-research`,
+`cross-document-synthesis` and `analyst-briefing` have none). The owner chose
+Flashy's list: one vocabulary across handshake, charter and mesh. The handshake
+now carries the seven role names and the eight slugs, derived from the charter,
+and `docs/mesh-identity.md` says so; Flashy's published `auditProperty` still
+grades it level 2 with no issues. Declaring the slugs on the live mesh (C-MESH-2)
+is a separate, permanent act and needs the owner's yes on the exact requests.
+
+The charter differential (C-MESH-9): FlashyOS's AAO corpus, now public, was run
+through `analystos/aao`. 11 of 13 verdicts agreed. Both disagreements were
+ours: the checker did not ask two static L2 questions that the published
+`@flashyos/aao@0.4.2` asks (a charter with no gated role; a one-word capability
+over 12 characters). They are added as `aao.approval.none_gated` and
+`aao.capability.vague`, asked only with `questions=True` (the conformance-kit
+adapter uses it), because the schema-level verdict is a separate layer and an
+existing test pins it. Now 13 of 13. One new disagreement goes back to Flashy:
+this checker refuses an `x-` key on a repository, which every FlashyOS copy
+accepts. Codes are not compared: FlashyOS's expected codes include English
+sentences, which a second implementation cannot match (their F-MESH-6).
+
+Declared on the live mesh, 2026-11-26, owner's yes: the eight capabilities, each
+under the role that answers for it (coordination, research, analysis,
+verification, synthesis, evidence, client-delivery), with the role's charter
+`purpose` as the description, through the re-minted join grant. The first call
+used the body Flashy's 21 Nov reply described (`{"capabilities": [...]}`) and
+was refused with 400 "capability and description are required"; nothing was
+written. `ops/flashy_declare.py` was rebuilt from the published
+`@flashyos/agent@0.21.0` client (one request per capability,
+`{capability, description}`; offers org-level at `/orgs/{id}/offers`), and all
+eight then answered 201, each recording `declaredVia: join-grant` and the
+issuing person. Verified on the public directory, not on the response: every
+capability lists AnalystOS under its role, and `/public/ask?need=document-analysis`
+returns AnalystOS. A stale `analytics` row under an agent named `AnalystOS`
+remains; removing it is Flashy's (F-MESH-8). No role agent exists yet: the
+declarations attach when the role agents are minted (C-ID-4).

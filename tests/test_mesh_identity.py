@@ -85,13 +85,19 @@ class HandshakeTest(unittest.TestCase):
         self.assertTrue(0 < len(org["name"]) <= 120)
         self.assertTrue(org["profile"].startswith("https://"))
 
-    def test_capabilities_are_exactly_the_charter_role_names(self):
+    def test_capabilities_are_the_role_names_and_their_discovery_slugs(self):
+        # Owner's decision 2026-11-26 (Slice 132, Flashy plan C-MESH-6): advertise the
+        # x-capability slugs beside the role names, one vocabulary everywhere.
         self.assertIn("capabilities", HANDSHAKE)
-        self.assertEqual(set(HANDSHAKE["capabilities"]), {r["name"] for r in CHARTER["roles"]})
-
-    def test_capabilities_carry_no_discovery_slug_not_yet_callable(self):
+        names = {r["name"] for r in CHARTER["roles"]}
         slugs = {c for role in CHARTER["roles"] for c in role.get("x-capability", [])}
-        self.assertEqual(set(HANDSHAKE["capabilities"]) & slugs, set())
+        self.assertEqual(len(slugs), 8)
+        self.assertEqual(set(HANDSHAKE["capabilities"]), names | slugs)
+
+    def test_every_advertised_capability_is_answered_for_by_a_role(self):
+        answered = {r["name"] for r in CHARTER["roles"]} | {
+            c for role in CHARTER["roles"] for c in role.get("x-capability", [])}
+        self.assertEqual(set(HANDSHAKE["capabilities"]) - answered, set())
 
     def test_any_url_it_carries_is_https(self):
         for key in ("api", "join", "wants"):

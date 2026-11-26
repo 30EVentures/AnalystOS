@@ -229,15 +229,46 @@ def _naming_problems(doc):
     return out
 
 
-def validate_charter(doc):
+# The single-word length past which a capability reads as a department, not an
+# action ("administration"), mirroring @flashyos/aao 0.4.2's `capabilities-declared`.
+_VAGUE_SINGLE_WORD = 12
+
+
+def _question_problems(doc):
+    """Two of FlashyOS's static L2 questions that are errors in its published
+    corpus (aao-0.1 conformance, cases `no-role-gated` and `vague-capability`).
+    Found missing here by running that corpus against this checker (Slice 133)."""
+    out = []
+    roles = [r for r in doc.get("roles", []) if isinstance(r, dict)] if isinstance(doc.get("roles"), list) else []
+    if roles and not any(r.get("humanApprovalAtOrAbove") for r in roles):
+        out.append(Problem("aao.approval.none_gated", ERROR, "/roles",
+                           "no role requires human approval at any impact level: automated, not governed"))
+    for i, role in enumerate(doc.get("roles", []) if isinstance(doc.get("roles"), list) else []):
+        caps = role.get("capabilities") if isinstance(role, dict) else None
+        for j, cap in enumerate(caps if isinstance(caps, list) else []):
+            if isinstance(cap, str) and "-" not in cap and len(cap) > _VAGUE_SINGLE_WORD:
+                out.append(Problem("aao.capability.vague", ERROR, f"/roles/{i}/capabilities/{j}",
+                                   f"capability {cap!r} is one word over {_VAGUE_SINGLE_WORD} characters: "
+                                   "name an action, not a department"))
+    return out
+
+
+def validate_charter(doc, questions=False):
     """Every problem with ``doc``, errors and warnings, as ``Problem`` objects.
-    A document with no *error* is valid; warnings are advice, not a rule."""
+    A document with no *error* is valid; warnings are advice, not a rule.
+
+    ``questions=True`` also asks FlashyOS's static L2 questions that its
+    published conformance corpus treats as errors (``_question_problems``).
+    Off by default, mirroring FlashyOS's own split between validating a charter
+    against the schema and auditing it at L2."""
     if not isinstance(doc, dict):
         return [Problem("aao.schema.type", ERROR, "", "a charter must be a JSON object")]
     schema = load_schema()
     problems = _schema_problems(doc, schema, schema, [])
     problems += _cross_field_problems(doc)
     problems += _naming_problems(doc)
+    if questions:
+        problems += _question_problems(doc)
     return problems
 
 

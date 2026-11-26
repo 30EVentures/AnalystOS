@@ -16,6 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 STEPS = [
     "build_flashyos_handshake.py",
+    "build_jwks.py",
     "build_site_machine.py",
     "build_specs_index.py",
     "site_counts.py",

@@ -1,0 +1,5 @@
+{
+  "origin": "repo/analystos",
+  "fragments": ["site/.well-known/shiplog.json"],
+  "serve": "site/.well-known/checkpoint.json"
+}

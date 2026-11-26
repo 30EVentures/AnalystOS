@@ -1,537 +1,316 @@
 {
-  "shipped": "1",
+  "devlog": "1",
   "source": "repo/analystos",
   "org": "org/analystos",
-  "generated": "2026-11-22T23:11:22.039Z",
+  "generated": "2026-11-26T15:51:41.640Z",
   "entries": [
     {
-      "id": "ship/analystos/af8be6eae054",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/73198f378e4a",
+      "at": "2026-11-26T10:38:04-05:00",
+      "summary": "Merge pull request #109 from 30EVentures/slice-130-site-nav",
+      "commitSha": "73198f378e4a9955d56e761aefb0b153cfa53b34",
+      "ref": "https://github.com/30EVentures/analystos/commit/73198f378e4a9955d56e761aefb0b153cfa53b34"
+    },
+    {
+      "id": "devlog/analystos/dc53a58e36c3",
+      "at": "2026-11-25T18:58:08-05:00",
+      "summary": "Merge pull request #108 from 30EVentures/slice-129-every-role-sample",
+      "commitSha": "dc53a58e36c3b65f27dbf18cfca174734e3e6cfd",
+      "ref": "https://github.com/30EVentures/analystos/commit/dc53a58e36c3b65f27dbf18cfca174734e3e6cfd"
+    },
+    {
+      "id": "devlog/analystos/b934ec7517b5",
+      "at": "2026-11-25T18:57:56-05:00",
+      "summary": "Merge pull request #107 from 30EVentures/slice-128-role-samples",
+      "commitSha": "b934ec7517b5fb45357567343e75461f29294127",
+      "ref": "https://github.com/30EVentures/analystos/commit/b934ec7517b5fb45357567343e75461f29294127"
+    },
+    {
+      "id": "devlog/analystos/4a4a1f0eabcd",
+      "at": "2026-11-24T11:31:29-05:00",
+      "summary": "Merge pull request #106 from 30EVentures/slice-127-worked-examples",
+      "commitSha": "4a4a1f0eabcd6daa12736cdf0851f2fa6f3262e6",
+      "ref": "https://github.com/30EVentures/analystos/commit/4a4a1f0eabcd6daa12736cdf0851f2fa6f3262e6"
+    },
+    {
+      "id": "devlog/analystos/7f1e5bc5b13b",
+      "at": "2026-11-24T08:59:24-05:00",
+      "summary": "Merge pull request #105 from 30EVentures/slice-126-work-products",
+      "commitSha": "7f1e5bc5b13ba1ae421250c8dc22e6b639abd1c4",
+      "ref": "https://github.com/30EVentures/analystos/commit/7f1e5bc5b13ba1ae421250c8dc22e6b639abd1c4"
+    },
+    {
+      "id": "devlog/analystos/97bd340088a1",
+      "at": "2026-11-23T22:15:09-05:00",
+      "summary": "Merge pull request #104 from 30EVentures/slice-125-deck-quality",
+      "commitSha": "97bd340088a18f24855e0a92573a531d898c49d4",
+      "ref": "https://github.com/30EVentures/analystos/commit/97bd340088a18f24855e0a92573a531d898c49d4"
+    },
+    {
+      "id": "devlog/analystos/54a81e42af2c",
+      "at": "2026-11-23T21:56:00-05:00",
+      "summary": "Merge pull request #103 from 30EVentures/slice-122-124-homepage-and-formats",
+      "commitSha": "54a81e42af2c7c6364450a1ebb8357ee617fc171",
+      "ref": "https://github.com/30EVentures/analystos/commit/54a81e42af2c7c6364450a1ebb8357ee617fc171"
+    },
+    {
+      "id": "devlog/analystos/3dbdde6dea7f",
+      "at": "2026-11-23T20:21:41-05:00",
+      "summary": "Merge pull request #102 from 30EVentures/slice-121-actionable-problems",
+      "commitSha": "3dbdde6dea7f9c08fb54256b2517302f9c066767",
+      "ref": "https://github.com/30EVentures/analystos/commit/3dbdde6dea7f9c08fb54256b2517302f9c066767"
+    },
+    {
+      "id": "devlog/analystos/88efa7f3d868",
+      "at": "2026-11-23T20:09:46-05:00",
+      "summary": "Merge pull request #101 from 30EVentures/slice-120-review-100-fixes",
+      "commitSha": "88efa7f3d868ce3e720b2718052a112c668cf1e4",
+      "ref": "https://github.com/30EVentures/analystos/commit/88efa7f3d868ce3e720b2718052a112c668cf1e4"
+    },
+    {
+      "id": "devlog/analystos/267351023408",
+      "at": "2026-11-23T17:56:16-05:00",
+      "summary": "Merge pull request #100 from 30EVentures/slice-119-live-model-tolerance",
+      "commitSha": "26735102340863b0c84907ecc942424f77ab9948",
+      "ref": "https://github.com/30EVentures/analystos/commit/26735102340863b0c84907ecc942424f77ab9948"
+    },
+    {
+      "id": "devlog/analystos/212c32e7f408",
+      "at": "2026-11-23T15:53:06-05:00",
+      "summary": "Merge pull request #99 from 30EVentures/slice-112-118-all-roles",
+      "commitSha": "212c32e7f4084bc56796968b1d1102a2e943d583",
+      "ref": "https://github.com/30EVentures/analystos/commit/212c32e7f4084bc56796968b1d1102a2e943d583"
+    },
+    {
+      "id": "devlog/analystos/e1c5f54251d6",
+      "at": "2026-11-23T13:49:05-05:00",
+      "summary": "Merge pull request #98 from 30EVentures/slice-111-homepage-honest-counts",
+      "commitSha": "e1c5f54251d6eade99d61fd244c7bf61963c6a99",
+      "ref": "https://github.com/30EVentures/analystos/commit/e1c5f54251d6eade99d61fd244c7bf61963c6a99"
+    },
+    {
+      "id": "devlog/analystos/be2125fd0c1c",
+      "at": "2026-11-23T13:45:54-05:00",
+      "summary": "Merge pull request #97 from 30EVentures/slice-110-intake-hardening",
+      "commitSha": "be2125fd0c1c220b9959555862a71965553cfd88",
+      "ref": "https://github.com/30EVentures/analystos/commit/be2125fd0c1c220b9959555862a71965553cfd88"
+    },
+    {
+      "id": "devlog/analystos/d9a42a8af5da",
+      "at": "2026-11-23T13:30:17-05:00",
+      "summary": "Merge pull request #96 from 30EVentures/slice-109-engagement-intake",
+      "commitSha": "d9a42a8af5daa6da62e3f390600a312d937b8371",
+      "ref": "https://github.com/30EVentures/analystos/commit/d9a42a8af5daa6da62e3f390600a312d937b8371"
+    },
+    {
+      "id": "devlog/analystos/1a25daa7327d",
+      "at": "2026-11-23T13:20:08-05:00",
+      "summary": "Merge pull request #95 from 30EVentures/slice-108-role-catalog",
+      "commitSha": "1a25daa7327dbd717363d27f8bb68f08d6d90e8e",
+      "ref": "https://github.com/30EVentures/analystos/commit/1a25daa7327dbd717363d27f8bb68f08d6d90e8e"
+    },
+    {
+      "id": "devlog/analystos/15ee52f9c9c1",
+      "at": "2026-11-23T12:53:38-05:00",
+      "summary": "Merge pull request #94 from 30EVentures/slice-107-flashy-freeze",
+      "commitSha": "15ee52f9c9c1a7c465ed3e19084b0a65dcd38194",
+      "ref": "https://github.com/30EVentures/analystos/commit/15ee52f9c9c1a7c465ed3e19084b0a65dcd38194"
+    },
+    {
+      "id": "devlog/analystos/5bd6c18e2c2e",
+      "at": "2026-11-22T18:16:18-05:00",
+      "summary": "Merge pull request #93 from 30EVentures/flashyos-shiplog-public-2026-11-22",
+      "commitSha": "5bd6c18e2c2e09d89521d187e47f5f940f5014a6",
+      "ref": "https://github.com/30EVentures/analystos/commit/5bd6c18e2c2e09d89521d187e47f5f940f5014a6"
+    },
+    {
+      "id": "devlog/analystos/af8be6eae054",
       "at": "2026-11-22T17:48:05-05:00",
-      "kind": "feature",
-      "title": "Merge pull request #92 from 30EVentures/flashyos-coordination-endpoint-2026-11-22",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Slice 105: coordination role's accept/assign/schedule/escalate",
-      "refs": {
-        "commit": "af8be6eae054d58f2cb2667812f93ab3db488444",
-        "pr": "https://github.com/30EVentures/analystos/pull/92"
-      },
-      "digest": "f7821d69a0b02cc49dae2f36c7fc930c40bc52ec9cde17c958cba44586a3e989"
+      "summary": "Merge pull request #92 from 30EVentures/flashyos-coordination-endpoint-2026-11-22",
+      "commitSha": "af8be6eae054d58f2cb2667812f93ab3db488444",
+      "ref": "https://github.com/30EVentures/analystos/commit/af8be6eae054d58f2cb2667812f93ab3db488444"
     },
     {
-      "id": "ship/analystos/96a347330e94",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/96a347330e94",
       "at": "2026-11-22T17:47:43-05:00",
-      "kind": "feature",
-      "title": "Merge pull request #91 from 30EVentures/flashyos-decision-records-2026-11-22",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Resolve token rotation, confirm and prepare decision records (Slice 104)",
-      "refs": {
-        "commit": "96a347330e9439883fdced35940649cee1f64758",
-        "pr": "https://github.com/30EVentures/analystos/pull/91"
-      },
-      "digest": "79de80a58cc2ddba12e8340682383131d668460a3b225377d850ce53e9af81c9"
+      "summary": "Merge pull request #91 from 30EVentures/flashyos-decision-records-2026-11-22",
+      "commitSha": "96a347330e9439883fdced35940649cee1f64758",
+      "ref": "https://github.com/30EVentures/analystos/commit/96a347330e9439883fdced35940649cee1f64758"
     },
     {
-      "id": "ship/analystos/c3c8392550b0",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/c3c8392550b0",
       "at": "2026-11-21T15:08:05-05:00",
-      "kind": "feature",
-      "title": "Merge pull request #90 from 30EVentures/flashyos-standardization-2026-11-21",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Scale the bare table number, switch to the seven-role charter, drop decision-grade",
-      "refs": {
-        "commit": "c3c8392550b0790b4b556dd2f6eff03b03b197e7",
-        "pr": "https://github.com/30EVentures/analystos/pull/90"
-      },
-      "digest": "edbecfbac296a8252753b0b7a2319e798d7d35f5c3ef9d34cfe29406f87b1a0e"
+      "summary": "Merge pull request #90 from 30EVentures/flashyos-standardization-2026-11-21",
+      "commitSha": "c3c8392550b0790b4b556dd2f6eff03b03b197e7",
+      "ref": "https://github.com/30EVentures/analystos/commit/c3c8392550b0790b4b556dd2f6eff03b03b197e7"
     },
     {
-      "id": "ship/analystos/d2107d957b0e",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/d2107d957b0e",
       "at": "2026-11-20T13:54:13-05:00",
-      "kind": "feature",
-      "title": "Merge pull request #89 from 30EVentures/publish-seal-key",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Publish the seal public key (key_id 5d31bfc65a326e3c)",
-      "refs": {
-        "commit": "d2107d957b0e2d08be67ede4703fc4f704d5735a",
-        "pr": "https://github.com/30EVentures/analystos/pull/89"
-      },
-      "digest": "ff544ad5062246ae79405645e7b012a39fd7db287e34a5b9d2681c249dfad110"
+      "summary": "Merge pull request #89 from 30EVentures/publish-seal-key",
+      "commitSha": "d2107d957b0e2d08be67ede4703fc4f704d5735a",
+      "ref": "https://github.com/30EVentures/analystos/commit/d2107d957b0e2d08be67ede4703fc4f704d5735a"
     },
     {
-      "id": "ship/analystos/083ef0fd6b31",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/083ef0fd6b31",
       "at": "2026-11-20T10:09:59-05:00",
-      "kind": "feature",
-      "title": "Merge pull request #87 from 30EVentures/slice-93-strict-audit-lines",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Slice 93: audit lines are strict JSON; corpus cases for non-finite numbers",
-      "refs": {
-        "commit": "083ef0fd6b3171722dd9cd2af5542d7f772b49e4",
-        "pr": "https://github.com/30EVentures/analystos/pull/87"
-      },
-      "digest": "7d4b9919dcee6d177086a5af4f2372c602425aa0e069d4e15c993c0d986c2b75"
+      "summary": "Merge pull request #87 from 30EVentures/slice-93-strict-audit-lines",
+      "commitSha": "083ef0fd6b3171722dd9cd2af5542d7f772b49e4",
+      "ref": "https://github.com/30EVentures/analystos/commit/083ef0fd6b3171722dd9cd2af5542d7f772b49e4"
     },
     {
-      "id": "ship/analystos/3c4a3cd96345",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/3c4a3cd96345",
       "at": "2026-11-20T10:09:08-05:00",
-      "kind": "feature",
-      "title": "Merge pull request #88 from 30EVentures/roadmap-log-2026-11-18",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "ROADMAP: session log through PR #86 (2026-11-18)",
-      "refs": {
-        "commit": "3c4a3cd96345b5b5cd03aa7f8b29bf341c812ef7",
-        "pr": "https://github.com/30EVentures/analystos/pull/88"
-      },
-      "digest": "61bfb1655d543632737b975fb968e54401efe970cb9c214c2830f5dee71ec385"
+      "summary": "Merge pull request #88 from 30EVentures/roadmap-log-2026-11-18",
+      "commitSha": "3c4a3cd96345b5b5cd03aa7f8b29bf341c812ef7",
+      "ref": "https://github.com/30EVentures/analystos/commit/3c4a3cd96345b5b5cd03aa7f8b29bf341c812ef7"
     },
     {
-      "id": "ship/analystos/9db9c008e416",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/9db9c008e416",
       "at": "2026-11-19T08:21:40-05:00",
-      "kind": "feature",
-      "title": "Merge pull request #86 from 30EVentures/slice-92-hardening",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Slice 92: size cap before the paid call, no upload text in the audit log, a logged verifier fault",
-      "refs": {
-        "commit": "9db9c008e416103f0341ea292698fd127ee7de17",
-        "pr": "https://github.com/30EVentures/analystos/pull/86"
-      },
-      "digest": "b1b705aaf1b0f05c761f8710d45a8b6d8b34d44fac7cdf760201d1c97daab33e"
+      "summary": "Merge pull request #86 from 30EVentures/slice-92-hardening",
+      "commitSha": "9db9c008e416103f0341ea292698fd127ee7de17",
+      "ref": "https://github.com/30EVentures/analystos/commit/9db9c008e416103f0341ea292698fd127ee7de17"
     },
     {
-      "id": "ship/analystos/076cdd9c72ec",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/076cdd9c72ec",
       "at": "2026-10-16T16:27:15-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #84 from 30EVentures/slice-91-absolute-machine-links",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Slice 91: homepage machine-discovery links are absolute",
-      "refs": {
-        "commit": "076cdd9c72ec73f8195593b184c998ff80a0496c",
-        "pr": "https://github.com/30EVentures/analystos/pull/84"
-      },
-      "digest": "9390a7c477126ce1992c6d3821de245fadf0e6c74ef6ed81b7142d9ef14992a6"
+      "summary": "Merge pull request #84 from 30EVentures/slice-91-absolute-machine-links",
+      "commitSha": "076cdd9c72ec73f8195593b184c998ff80a0496c",
+      "ref": "https://github.com/30EVentures/analystos/commit/076cdd9c72ec73f8195593b184c998ff80a0496c"
     },
     {
-      "id": "ship/analystos/c0a84e97e634",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/c0a84e97e634",
       "at": "2026-10-13T21:22:37-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #85 from 30EVentures/overnight/analystos-bugs",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Overnight bug hunt: 18 fixes across 6 lenses (uploads, verifier, LLM boundary, numbers, API, tests)",
-      "refs": {
-        "commit": "c0a84e97e6349ff8ae4b76c759fb30c4ba173e43",
-        "pr": "https://github.com/30EVentures/analystos/pull/85"
-      },
-      "digest": "60b088ce4b4422f2b53605e5f5f23f79f3ff4351b6063b94c53e211d4628f19c"
+      "summary": "Merge pull request #85 from 30EVentures/overnight/analystos-bugs",
+      "commitSha": "c0a84e97e6349ff8ae4b76c759fb30c4ba173e43",
+      "ref": "https://github.com/30EVentures/analystos/commit/c0a84e97e6349ff8ae4b76c759fb30c4ba173e43"
     },
     {
-      "id": "ship/analystos/68e38ed07b50",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/68e38ed07b50",
       "at": "2026-10-12T17:22:13-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #82 from 30EVentures/docs/roadmap-session-log-through-slice-89",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Roadmap: session log through Slice 89",
-      "refs": {
-        "commit": "68e38ed07b50e149f27b56eb8c320368decc8ff1",
-        "pr": "https://github.com/30EVentures/analystos/pull/82"
-      },
-      "digest": "af11e854fd045cf9f0e21583d8270905873d2e78319d2408c512e0f0270dd7de"
+      "summary": "Merge pull request #82 from 30EVentures/docs/roadmap-session-log-through-slice-89",
+      "commitSha": "68e38ed07b50e149f27b56eb8c320368decc8ff1",
+      "ref": "https://github.com/30EVentures/analystos/commit/68e38ed07b50e149f27b56eb8c320368decc8ff1"
     },
     {
-      "id": "ship/analystos/d52027916b29",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/d52027916b29",
       "at": "2026-10-12T15:38:14-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #83 from 30EVentures/seal-key-pinning-hardening",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Slice 90: pin the seal key out of band, hidden seed prompt, --require-authentic",
-      "refs": {
-        "commit": "d52027916b293ac37466b3c8afca4b9745aa10dc",
-        "pr": "https://github.com/30EVentures/analystos/pull/83"
-      },
-      "digest": "b9d722b1f9da7e1001e97a1e7ffb8ab719fb7e1a24cab2e8d6f762ecc24f713b"
+      "summary": "Merge pull request #83 from 30EVentures/seal-key-pinning-hardening",
+      "commitSha": "d52027916b293ac37466b3c8afca4b9745aa10dc",
+      "ref": "https://github.com/30EVentures/analystos/commit/d52027916b293ac37466b3c8afca4b9745aa10dc"
     },
     {
-      "id": "ship/analystos/3184b152c122",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/3184b152c122",
       "at": "2026-10-08T18:03:43-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #81 from 30EVentures/flashy-integration-a1",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Slices 87-89: seal/audit conformance corpus, site consistency test, smoke --deployed",
-      "refs": {
-        "commit": "3184b152c1225adf7bde9caf673b7ad7ff26eea0",
-        "pr": "https://github.com/30EVentures/analystos/pull/81"
-      },
-      "digest": "51ff13751cafb1b9c7b4f48a008dba3397322df61bd4a5c6e6c7451303d0a28c"
+      "summary": "Merge pull request #81 from 30EVentures/flashy-integration-a1",
+      "commitSha": "3184b152c1225adf7bde9caf673b7ad7ff26eea0",
+      "ref": "https://github.com/30EVentures/analystos/commit/3184b152c1225adf7bde9caf673b7ad7ff26eea0"
     },
     {
-      "id": "ship/analystos/d346660039a7",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/d346660039a7",
       "at": "2026-10-02T15:17:41-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #80 from 30EVentures/a2-seal-verification-key",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Slice 86: analystos-seal-key/1 public key file, fail-closed --key-fil\u2026",
-      "refs": {
-        "commit": "d346660039a7d2211dcdad248d6a8ad1891d23c4",
-        "pr": "https://github.com/30EVentures/analystos/pull/80"
-      },
-      "digest": "d8ec96ceffcb7ccdc8c6d1554281b8e97cdbb07981165c79e653e7c9a1459e84"
+      "summary": "Merge pull request #80 from 30EVentures/a2-seal-verification-key",
+      "commitSha": "d346660039a7d2211dcdad248d6a8ad1891d23c4",
+      "ref": "https://github.com/30EVentures/analystos/commit/d346660039a7d2211dcdad248d6a8ad1891d23c4"
     },
     {
-      "id": "ship/analystos/6e8f64bb996a",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/6e8f64bb996a",
       "at": "2026-10-02T15:04:38-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #79 from 30EVentures/hardening-a1-a3-a4-a5",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Hardening a1 a3 a4 a5",
-      "refs": {
-        "commit": "6e8f64bb996a5c725ae0e10a6c1ea0318620dd16",
-        "pr": "https://github.com/30EVentures/analystos/pull/79"
-      },
-      "digest": "60bbd9dfb0c573199fe5f541a69f2ec28367f9c59224f21f01d3d86c32a3e4ae"
+      "summary": "Merge pull request #79 from 30EVentures/hardening-a1-a3-a4-a5",
+      "commitSha": "6e8f64bb996a5c725ae0e10a6c1ea0318620dd16",
+      "ref": "https://github.com/30EVentures/analystos/commit/6e8f64bb996a5c725ae0e10a6c1ea0318620dd16"
     },
     {
-      "id": "ship/analystos/bc165178d7a2",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/bc165178d7a2",
       "at": "2026-10-01T18:05:06-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #78 from 30EVentures/slice-81-upload-filename-traversal",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Slice 81: an upload's filename never decides where it is saved",
-      "refs": {
-        "commit": "bc165178d7a2a5e5194bff060a2e3b6b0c4ff006",
-        "pr": "https://github.com/30EVentures/analystos/pull/78"
-      },
-      "digest": "ffa323788f7c45c993941c0066b138663b1740b59dac5958ff5e974714a769bb"
+      "summary": "Merge pull request #78 from 30EVentures/slice-81-upload-filename-traversal",
+      "commitSha": "bc165178d7a2a5e5194bff060a2e3b6b0c4ff006",
+      "ref": "https://github.com/30EVentures/analystos/commit/bc165178d7a2a5e5194bff060a2e3b6b0c4ff006"
     },
     {
-      "id": "ship/analystos/9ffb8ae87c81",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/9ffb8ae87c81",
       "at": "2026-09-29T10:46:33-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #77 from 30EVentures/slice-80-studio-contact",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Slice 80: one public identity - 30E Ventures and 30eventures@gmail.com",
-      "refs": {
-        "commit": "9ffb8ae87c81d09eeb669210fc2cdc682eae51a1",
-        "pr": "https://github.com/30EVentures/analystos/pull/77"
-      },
-      "digest": "db1a5c1a789ca599930ead8f92ee61bd23fbc2c51c3c46fc261ed81d16306ff3"
+      "summary": "Merge pull request #77 from 30EVentures/slice-80-studio-contact",
+      "commitSha": "9ffb8ae87c81d09eeb669210fc2cdc682eae51a1",
+      "ref": "https://github.com/30EVentures/analystos/commit/9ffb8ae87c81d09eeb669210fc2cdc682eae51a1"
     },
     {
-      "id": "ship/analystos/2ee340160cf9",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/2ee340160cf9",
       "at": "2026-09-29T10:07:21-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #76 from 30EVentures/slice-79-studio-credit",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Slice 79: the homepage credits 30E Ventures, not an individual",
-      "refs": {
-        "commit": "2ee340160cf94070e408df5d8f1a28f428458c9c",
-        "pr": "https://github.com/30EVentures/analystos/pull/76"
-      },
-      "digest": "6cb74844d932275cb3af3fa4a552af25f8dd23c2231619d960a9674cdefc9d28"
+      "summary": "Merge pull request #76 from 30EVentures/slice-79-studio-credit",
+      "commitSha": "2ee340160cf94070e408df5d8f1a28f428458c9c",
+      "ref": "https://github.com/30EVentures/analystos/commit/2ee340160cf94070e408df5d8f1a28f428458c9c"
     },
     {
-      "id": "ship/analystos/f9a3b905bceb",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/f9a3b905bceb",
       "at": "2026-09-29T09:56:28-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #75 from 30EVentures/slice-78-studio-chrome",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Slice 78: 30E Ventures studio bar and footer line on the public site",
-      "refs": {
-        "commit": "f9a3b905bcebee0241638e53c4eb269eaeedfd64",
-        "pr": "https://github.com/30EVentures/analystos/pull/75"
-      },
-      "digest": "80813fd10c87f07fb81d025ad1247596f12736ebdd9aaf1b317a5b85b00c0430"
+      "summary": "Merge pull request #75 from 30EVentures/slice-78-studio-chrome",
+      "commitSha": "f9a3b905bcebee0241638e53c4eb269eaeedfd64",
+      "ref": "https://github.com/30EVentures/analystos/commit/f9a3b905bcebee0241638e53c4eb269eaeedfd64"
     },
     {
-      "id": "ship/analystos/05007783def4",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/05007783def4",
       "at": "2026-09-29T09:47:46-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #74 from 30EVentures/slice-77-non-python-fact-checker",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Slice 77: dependency-free Node checker for a seal's facts against Sea\u2026",
-      "refs": {
-        "commit": "05007783def41c401fbe0003aef198edb558dd6b",
-        "pr": "https://github.com/30EVentures/analystos/pull/74"
-      },
-      "digest": "b8cab81246604bfbb796627e0f765316be484c0a1a7de174ec912a54f11148f3"
+      "summary": "Merge pull request #74 from 30EVentures/slice-77-non-python-fact-checker",
+      "commitSha": "05007783def41c401fbe0003aef198edb558dd6b",
+      "ref": "https://github.com/30EVentures/analystos/commit/05007783def41c401fbe0003aef198edb558dd6b"
     },
     {
-      "id": "ship/analystos/6b14ecc5517f",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/6b14ecc5517f",
       "at": "2026-09-29T09:38:34-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #73 from 30EVentures/slice-76-seal-fact-schema",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Slice 76: published JSON Schema (SealFact) for a sealed report's facts",
-      "refs": {
-        "commit": "6b14ecc5517f9ba8aeb09f89d231e8a4b92d5137",
-        "pr": "https://github.com/30EVentures/analystos/pull/73"
-      },
-      "digest": "402e9380617a5ba7eef94e597485dd1a705fb413955c2da820350c42d00dbd1b"
+      "summary": "Merge pull request #73 from 30EVentures/slice-76-seal-fact-schema",
+      "commitSha": "6b14ecc5517f9ba8aeb09f89d231e8a4b92d5137",
+      "ref": "https://github.com/30EVentures/analystos/commit/6b14ecc5517f9ba8aeb09f89d231e8a4b92d5137"
     },
     {
-      "id": "ship/analystos/d32e96c96649",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/d32e96c96649",
       "at": "2026-09-28T20:40:22-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #72 from 30EVentures/fix-slice-73-numbering-collision",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Fix: two concurrent sessions both merged a \"Slice 73\"",
-      "refs": {
-        "commit": "d32e96c96649b6c2d647c210ebfb41557055bdb8",
-        "pr": "https://github.com/30EVentures/analystos/pull/72"
-      },
-      "digest": "af1eca0b55795e6344a85f53d3d2d9448b69e53300149c404dca17c092b60036"
+      "summary": "Merge pull request #72 from 30EVentures/fix-slice-73-numbering-collision",
+      "commitSha": "d32e96c96649b6c2d647c210ebfb41557055bdb8",
+      "ref": "https://github.com/30EVentures/analystos/commit/d32e96c96649b6c2d647c210ebfb41557055bdb8"
     },
     {
-      "id": "ship/analystos/1ab9991e7c85",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/1ab9991e7c85",
       "at": "2026-09-28T20:32:31-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #71 from 30EVentures/slice-74-async-jobs",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Slice 74 async jobs",
-      "refs": {
-        "commit": "1ab9991e7c85db5ae5862bfba03e701cf29f5c16",
-        "pr": "https://github.com/30EVentures/analystos/pull/71"
-      },
-      "digest": "aac81e4de29ca8e36bd87e9dfa091d6a778d7ab8c9dd2d6c39e9434521861822"
+      "summary": "Merge pull request #71 from 30EVentures/slice-74-async-jobs",
+      "commitSha": "1ab9991e7c85db5ae5862bfba03e701cf29f5c16",
+      "ref": "https://github.com/30EVentures/analystos/commit/1ab9991e7c85db5ae5862bfba03e701cf29f5c16"
     },
     {
-      "id": "ship/analystos/e13525e5791e",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/e13525e5791e",
       "at": "2026-09-28T11:52:24-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #70 from 30EVentures/slice-73-seal-verifier-fidelity",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Slice 73: citation matching stops accepting a number inside a bigger one",
-      "refs": {
-        "commit": "e13525e5791ed778232d4af8481d76872f935ffe",
-        "pr": "https://github.com/30EVentures/analystos/pull/70"
-      },
-      "digest": "f1223a4fe4ef993401a0b3505c22f660454acbef1022c4dfd8ff4c456fbca4d9"
+      "summary": "Merge pull request #70 from 30EVentures/slice-73-seal-verifier-fidelity",
+      "commitSha": "e13525e5791ed778232d4af8481d76872f935ffe",
+      "ref": "https://github.com/30EVentures/analystos/commit/e13525e5791ed778232d4af8481d76872f935ffe"
     },
     {
-      "id": "ship/analystos/ca5cf8d3fe4f",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/ca5cf8d3fe4f",
       "at": "2026-09-27T11:04:39-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #69 from 30EVentures/roadmap-loop-2026-09-27",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Roadmap loop 2026 09 27",
-      "refs": {
-        "commit": "ca5cf8d3fe4fc4a0ca2bfc3746ff938881e1c23b",
-        "pr": "https://github.com/30EVentures/analystos/pull/69"
-      },
-      "digest": "b1fbe51942e9f5d390044ac5e8f0c5eb3ca4561781940a24a903968b17d37a94"
+      "summary": "Merge pull request #69 from 30EVentures/roadmap-loop-2026-09-27",
+      "commitSha": "ca5cf8d3fe4fc4a0ca2bfc3746ff938881e1c23b",
+      "ref": "https://github.com/30EVentures/analystos/commit/ca5cf8d3fe4fc4a0ca2bfc3746ff938881e1c23b"
     },
     {
-      "id": "ship/analystos/2d430f6362e5",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/2d430f6362e5",
       "at": "2026-09-26T10:38:23-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #68 from 30EVentures/docs-verified-live-2026-09-26",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Docs: record live verification and FlashyOS Level 2 pass; fix stale n\u2026",
-      "refs": {
-        "commit": "2d430f6362e5729339b6420ea915cd20e3d6b7d5",
-        "pr": "https://github.com/30EVentures/analystos/pull/68"
-      },
-      "digest": "60a84eb4e4bc1a08d3263300041002447677be6701032997c7623cd9b0f912d7"
+      "summary": "Merge pull request #68 from 30EVentures/docs-verified-live-2026-09-26",
+      "commitSha": "2d430f6362e5729339b6420ea915cd20e3d6b7d5",
+      "ref": "https://github.com/30EVentures/analystos/commit/2d430f6362e5729339b6420ea915cd20e3d6b7d5"
     },
     {
-      "id": "ship/analystos/af72152ce0f1",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/af72152ce0f1",
       "at": "2026-09-26T10:20:01-04:00",
-      "kind": "feature",
-      "title": "Merge pull request #67 from 30EVentures/slice-63-downloads",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "Slice 63 downloads",
-      "refs": {
-        "commit": "af72152ce0f1ad7f2b0745c3ec8bfa8ee5c590ea",
-        "pr": "https://github.com/30EVentures/analystos/pull/67"
-      },
-      "digest": "922fef842aa481332b5919b7fef2e53102cacf0cb5289a4e8dc12fdbc60c733c"
+      "summary": "Merge pull request #67 from 30EVentures/slice-63-downloads",
+      "commitSha": "af72152ce0f1ad7f2b0745c3ec8bfa8ee5c590ea",
+      "ref": "https://github.com/30EVentures/analystos/commit/af72152ce0f1ad7f2b0745c3ec8bfa8ee5c590ea"
     },
     {
-      "id": "ship/analystos/572370f44a16",
-      "repo": "repo/analystos",
-      "at": "2026-09-05T21:02:38+00:00",
-      "kind": "other",
-      "title": "Fail clean on Anthropic API errors; reconcile ROADMAP.md through Slice 26",
-      "by": [
-        "agent/claude"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "detail": "analystos/l2/analyze.py: analyze_document now catches\nanthropic.APIError (the common base for every SDK-raised failure - a\nhit spend limit, a bad/revoked key, a rate limit, an outage) around\nthe one API call and re-raises as a clean ValueError, never echoing\nthe raw exception. Without this, any of those failures would have\npassed through api/analyze.py's ValueError-only except block\nuncaught, surfacing as a raw, unhandled 500 instead of the same clean\n{\"error\": \"...\"} shape every other pipeline failure already gets.\nPrompted directly by setting up a real ANTHROPIC_API_KEY and a\nmonthly spend cap - hitting that cap needed to fail the same honest\nway as everything else.\n\nTests added at both layers (analyze_document directly, and through\nthe Flask route) using a real anthropic.APIConnectionError raised\nfrom a mocked client - still no real API call, no cost.\n\nROADMAP.md: reconciled through Slice 26 - it previously stopped at\nSlice 24. Adds Slice 25 (universal upload) and Slice 26 (narrated\nanalysis) under a new \"Beyond the original MVP\" heading, since both\nwent past what the tracked phase originally scoped.",
-      "refs": {
-        "commit": "572370f44a16cb902b85c35fcb2bba3799aaeb85"
-      },
-      "digest": "4c85ef3d4733a5657f37eadc2b011ad43d229e779139148ea366d55a51df31d3"
-    },
-    {
-      "id": "ship/analystos/94706e7c4ca5",
-      "repo": "repo/analystos",
+      "id": "devlog/analystos/94706e7c4ca5",
       "at": "2026-08-27T21:30:53-04:00",
-      "kind": "infra",
-      "title": "Initial commit",
-      "by": [
-        "person/accountable-human"
-      ],
-      "asserted": "2026-11-22",
-      "assertedBy": "agent/analystos-ci",
-      "visibility": "public",
-      "refs": {
-        "commit": "94706e7c4ca5d89d8b60935f725c7f1e2c7738df"
-      },
-      "digest": "d680072271f9ed1390733cef5f4e83821ba22a0f02055d45d703583f2ce8d919"
+      "summary": "Initial commit",
+      "commitSha": "94706e7c4ca5d89d8b60935f725c7f1e2c7738df",
+      "ref": "https://github.com/30EVentures/analystos/commit/94706e7c4ca5d89d8b60935f725c7f1e2c7738df"
     }
   ]
 }

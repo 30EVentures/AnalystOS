@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
-"""Clean the served devlog/1 projection after `node vendor-shiplog.mjs emit`
-(Slice 106). Run this every time after re-emitting, before committing.
+"""A guard over the served devlog/1 projection (Slice 106; demoted in Slice 131).
+
+Since Slice 131 the privacy rules run BEFORE sealing, in tools/emit_record.mjs,
+because cleaning a sealed entry afterwards broke its seal. This tool stays as a
+second check: `--check` must report "already clean". Do not use it to fix a
+shipped/1 file; re-emit instead.
 
     python3 tools/redact_served_devlog.py              # fixes in place
     python3 tools/redact_served_devlog.py --check       # exit 1 if it would change anything
@@ -34,6 +38,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SERVED_PATH = ROOT / "site" / ".well-known" / "devlog.fragment.json"
+# Slice 131: the sealed shipped/1 record is checked too (check only: never rewrite a sealed file).
+SHIPLOG_PATH = ROOT / "site" / ".well-known" / "shiplog.json"
 
 _PERSONAL_RE = re.compile(r"(?i)caleb|solway")
 _TRAILER_RE = re.compile(r"\n\s*(Co-Authored-By|Claude-Session):.*", re.DOTALL)
@@ -70,6 +76,12 @@ def clean(document: dict) -> dict:
 
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
+    if SHIPLOG_PATH.exists():
+        sealed = json.loads(SHIPLOG_PATH.read_text(encoding="utf-8"))
+        if clean(sealed) != sealed:
+            print("redact_served_devlog.py: site/.well-known/shiplog.json names the owner or carries a commit "
+                  "trailer - re-emit with tools/emit_record.mjs; never edit a sealed record")
+            return 1
     if not SERVED_PATH.exists():
         print(f"{SERVED_PATH} does not exist - nothing to clean")
         return 0

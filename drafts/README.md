@@ -95,6 +95,13 @@ before serving this anywhere; see `ROADMAP.md`.
 
 ## `devlog.fragment.json` - moved, 2026-11-22
 
+**Superseded by Slice 131 (2026-11-26).** The root `shiplog.fragment.json` and
+`devlog.fragment.json` were not private: this repository is public. They are
+removed, the record is emitted by `tools/emit_record.mjs` with the privacy
+rules applied before sealing, and it is served as `shiplog.json`,
+`devlog.fragment.json` and `checkpoint.json` under `site/.well-known/`. The
+history below is kept as written.
+
 **No longer here.** The served projection of this repository's real
 `shipped/1`/`devlog/1` record now lives at `site/.well-known/devlog.fragment.json`
 (root `shiplog.fragment.json` and `devlog.fragment.json` stay the full, private

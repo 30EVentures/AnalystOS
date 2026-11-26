@@ -142,3 +142,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 128 | per-role samples in the homepage role explorer | [spec](slice-128/spec.md) |
 | 129 | every role has a worked example and a sample of its own | [spec](slice-129/spec.md) |
 | 130 | dropdown navigation, the AnalystOS footer, an institutional look, a glossary | [spec](slice-130/spec.md) |
+| 131 | correct the record once, then serve it where Flashy reads it | [spec](slice-131/spec.md) |

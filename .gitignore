@@ -35,3 +35,8 @@ tools/flashyos-check/package-lock.json
 # AnalystOS's own MCP server (Slice 100): real npm deps, not committed
 mcp-server/node_modules/
 mcp-server/package-lock.json
+
+# Slice 131: the full record is never committed; the served public record is the state.
+/shiplog.fragment.json
+/devlog.fragment.json
+/checkpoint.json

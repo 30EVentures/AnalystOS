@@ -4,10 +4,13 @@
   tested (``eval.method``), pricing, what it delivers today, and the scoping
   questions it will ask. People and agents read the same document.
 - ``POST /api/v2/engagements`` access code required (``X-Access-Code``). JSON body
-  ``{"role", "problem", "answers": {question id: text}, "requested_by": {"kind", "ref"}}``.
+  ``{"role", "problem", "answers": {question id: text}, "requested_by": {"kind", "ref"},
+  "budget"?: {"max_model_calls", "max_output_tokens_per_call"}}``.
   Runs intake, the acceptance gate, the verified pipeline (one model call, at most
-  one repair retry, under the existing spend ceiling) and the renderer, and returns
-  the PowerPoint deck - or, with ``?format=json``, the verified deck spec.
+  one repair retry, under the existing spend ceiling; a budget may only narrow these)
+  and the renderer, and returns the role's file - or, with ``?format=json``, the
+  verified spec and the file as base64. Every engagement taken on gets
+  an ``analystos-receipt/1`` (Slice 133; ``docs/hiring-api.md``), failures included.
 
 Every request that passes the gate is a paid model call on the operator's account;
 the access code is what limits who can make one. Price: to be determined - no price
@@ -19,6 +22,7 @@ from datetime import datetime, timezone
 
 from flask import Blueprint, Response, jsonify, request
 
+from analystos.api_v2 import receipt as receipts
 from analystos.catalog import load_catalog
 from analystos.l3 import engagement as eng
 from analystos.l4.deck import spec_digest
@@ -45,6 +49,17 @@ def register(app, rate_limit=None, access_denied=None):
 
 def _err(status, code, message, **extra):
     return jsonify(error=dict({"code": code, "message": message}, **extra)), status
+
+
+def _now():
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _failed(status, code, message, record, budget, meter, **extra):
+    """An error after the model was reached: the receipt says what was spent."""
+    outcome = "unavailable" if status == 503 else "not_verified"
+    receipt = receipts.build(record, outcome, budget, meter, _now())
+    return _err(status, code, message, receipt=receipt, receipt_sha256=receipts.digest(receipt), **extra)
 
 
 def questions_for_role(role_id, catalog, scoping):
@@ -94,12 +109,16 @@ def create_engagement():
     requested_by = body.get("requested_by", {"kind": "person", "ref": "web"})
     if not isinstance(answers, dict):
         return _err(400, "bad_request", "answers must be an object of question id to text")
+    budget, budget_problems = receipts.parse_budget(body.get("budget"))
+    if budget_problems:
+        return _err(422, "bad_budget", "the budget was refused before any model call",
+                    problems=budget_problems, limits=receipts.LIMITS)
 
     cat = load_catalog()
     try:
         record = eng.new_engagement(
             engagement_id=eng.new_id(),
-            created=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            created=_now(),
             requested_by=requested_by, problem=body.get("problem"), roles=[role], catalog=cat)
         for qid, text in answers.items():
             if isinstance(text, str) and not text.strip():
@@ -112,24 +131,31 @@ def create_engagement():
         return _err(422, "not_accepted", "the engagement cannot be taken on yet", problems=problems,
                     open_questions=eng.open_questions(record))
 
+    meter = []
     try:
         client = client_factory() if client_factory else None
-        spec = consulting.build_deck_spec(accepted, cat, client=client)
+        spec = consulting.build_deck_spec(accepted, cat, client=client, meter=meter,
+                                          max_model_calls=budget["max_model_calls"],
+                                          max_tokens=budget["max_output_tokens_per_call"])
         data, fmt = formats.render(spec, accepted, cat)
     except consulting.VerificationFailed as exc:
-        return _err(502, "not_verified", f"the work could not be verified, so nothing was delivered "
-                    f"({len(exc.problems)} problems)", problems=exc.problems[:100])
+        return _failed(502, "not_verified", f"the work could not be verified, so nothing was delivered "
+                       f"({len(exc.problems)} problems)", accepted, budget, meter, problems=exc.problems[:100])
     except ValueError as exc:
         message = str(exc)
         if "temporarily unavailable" in message:
-            return _err(503, "unavailable", message)
-        return _err(502, "not_verified", "the work could not be verified, so nothing was delivered: " + message[:300])
+            return _failed(503, "unavailable", message, accepted, budget, meter)
+        return _failed(502, "not_verified", "the work could not be verified, so nothing was delivered: "
+                       + message[:300], accepted, budget, meter)
 
+    digest = spec_digest(spec)
+    receipt = receipts.build(accepted, "delivered", budget, meter, _now(), spec_sha256=digest, output=data, fmt=fmt)
     filename = f'analystos-{spec["role"]}-{accepted["id"][:8]}.{fmt["extension"]}'
     if request.args.get("format") == "json":
-        body = {"engagement": accepted, "spec": spec, "spec_sha256": spec_digest(spec),
+        body = {"engagement": accepted, "spec": spec, "spec_sha256": digest,
                 "output": {"format": fmt["name"], "media_type": fmt["media_type"], "filename": filename,
-                           "base64": base64.b64encode(data).decode("ascii")}}
+                           "base64": base64.b64encode(data).decode("ascii")},
+                "receipt": receipt, "receipt_sha256": receipts.digest(receipt)}
         if fmt["name"] == "deck":
             body["deck_base64"] = body["output"]["base64"]  # kept for clients written before Slice 124
         return jsonify(body)
@@ -137,5 +163,7 @@ def create_engagement():
     response.headers["Content-Disposition"] = f'attachment; filename="{filename}"'
     response.headers["X-AnalystOS-Format"] = fmt["name"]
     response.headers["X-AnalystOS-Engagement"] = accepted["id"]
-    response.headers["X-AnalystOS-Spec-Sha256"] = spec_digest(spec)
+    response.headers["X-AnalystOS-Spec-Sha256"] = digest
+    response.headers["X-AnalystOS-Receipt"] = receipts.header_value(receipt)
+    response.headers["X-AnalystOS-Receipt-Sha256"] = receipts.digest(receipt)
     return response

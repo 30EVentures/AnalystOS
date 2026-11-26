@@ -144,3 +144,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 130 | dropdown navigation, the AnalystOS footer, an institutional look, a glossary | [spec](slice-130/spec.md) |
 | 131 | correct the record once, then serve it where Flashy reads it | [spec](slice-131/spec.md) |
 | 132 | signing keys as a JWKS, two mesh mistakes made impossible, and the charter differential | [spec](slice-132/spec.md) |
+| 133 | metered hiring: a budget that only narrows, usage, and a receipt | [spec](slice-133/spec.md) |

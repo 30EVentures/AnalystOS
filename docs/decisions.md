@@ -2,6 +2,21 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-26 — Slice 133: metered hiring without prices
+
+Phase 5 (hiring) needs rates, and no price has been set for anything. So this
+slice meters in what is measured today - model calls and the tokens the model
+reports - and leaves money out entirely: receipts say `pricing: "tbd"` and
+`charged_cents: 0`. An engagement hour can be defined over these units once a
+price exists. A caller's budget may only narrow the server's limits (2 calls,
+8192 output tokens per call). A wider request is refused, not clamped, because
+an agent acting for someone must learn that its authority was smaller than it
+asked for, not discover it afterwards. Usage totals are `null` when any call
+went unreported, never estimated. Receipts are unsigned (`signed: false`) until
+a published key signs them; the Flashy Phase 0 session owns the key work, so
+this slice does not touch keys. The API catalog stays as it is: it is inside the
+Slice 107 fence.
+
 ## 2026-11-25 — Slice 130: dropdown navigation, the AnalystOS footer, an institutional look
 
 The owner asked for his 30E Ventures site comments to be applied here: less

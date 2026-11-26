@@ -2,8 +2,84 @@
   "shipped": "1",
   "source": "repo/analystos",
   "org": "org/analystos",
-  "generated": "2026-11-26T15:51:41.639Z",
+  "generated": "2026-11-26T22:26:46.774Z",
   "entries": [
+    {
+      "id": "ship/analystos/a2e32e32492b",
+      "repo": "repo/analystos",
+      "at": "2026-11-26T17:26:38-05:00",
+      "kind": "feature",
+      "title": "Merge pull request #114 from 30EVentures/slice-134-record-ci",
+      "by": [
+        "person/30e-founder"
+      ],
+      "asserted": "2026-11-26",
+      "assertedBy": "agent/analystos-ci",
+      "visibility": "public",
+      "detail": "Slice 134: the public record refreshes itself after every merge",
+      "refs": {
+        "commit": "a2e32e32492b8c0d68e16aa287bd5ab1705c2053",
+        "pr": "https://github.com/30EVentures/analystos/pull/114"
+      },
+      "digest": "3dd6fcf557a899a165457b3818911066bd128fc3bca8a019ece2d42b64011c4d"
+    },
+    {
+      "id": "ship/analystos/60d3cee2ed9d",
+      "repo": "repo/analystos",
+      "at": "2026-11-26T17:17:41-05:00",
+      "kind": "feature",
+      "title": "Merge pull request #113 from 30EVentures/slice-133-metered-hiring",
+      "by": [
+        "person/30e-founder"
+      ],
+      "asserted": "2026-11-26",
+      "assertedBy": "agent/analystos-ci",
+      "visibility": "public",
+      "detail": "Slice 133: metered hiring - a budget that only narrows, measured usage, a receipt",
+      "refs": {
+        "commit": "60d3cee2ed9d28a48b8a506663a652b2fe41de4a",
+        "pr": "https://github.com/30EVentures/analystos/pull/113"
+      },
+      "digest": "6cfd4bbd523c50a7943d0ecde0199a8c020df447ffae41722fc1453074eb7b48"
+    },
+    {
+      "id": "ship/analystos/679f478757ca",
+      "repo": "repo/analystos",
+      "at": "2026-11-26T16:50:41-05:00",
+      "kind": "feature",
+      "title": "Merge pull request #112 from 30EVentures/slice-132-keys-and-docs",
+      "by": [
+        "person/30e-founder"
+      ],
+      "asserted": "2026-11-26",
+      "assertedBy": "agent/analystos-ci",
+      "visibility": "public",
+      "detail": "Slice 132 to main (re-land: #111 merged into the Slice 131 branch, not main)",
+      "refs": {
+        "commit": "679f478757ca4f6d4402f2f25b6f13db1d08d6a8",
+        "pr": "https://github.com/30EVentures/analystos/pull/112"
+      },
+      "digest": "83cf65176cc4a181d8fb498c037df213779a2e02ef043f2930623d66a616fc25"
+    },
+    {
+      "id": "ship/analystos/41c139f0c84c",
+      "repo": "repo/analystos",
+      "at": "2026-11-26T12:45:00-05:00",
+      "kind": "feature",
+      "title": "Merge pull request #110 from 30EVentures/slice-131-record-correction",
+      "by": [
+        "person/30e-founder"
+      ],
+      "asserted": "2026-11-26",
+      "assertedBy": "agent/analystos-ci",
+      "visibility": "public",
+      "detail": "Slice 131: correct the record once, before Flashy registers it",
+      "refs": {
+        "commit": "41c139f0c84c7276ce200e7de5c95b9d6724c245",
+        "pr": "https://github.com/30EVentures/analystos/pull/110"
+      },
+      "digest": "2bbaabc97e4d6f67e752d0763198384046d477fa656d92fe4ba198c415887fca"
+    },
     {
       "id": "ship/analystos/73198f378e4a",
       "repo": "repo/analystos",

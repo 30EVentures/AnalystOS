@@ -2,8 +2,36 @@
   "devlog": "1",
   "source": "repo/analystos",
   "org": "org/analystos",
-  "generated": "2026-11-26T15:51:41.640Z",
+  "generated": "2026-11-26T22:26:46.774Z",
   "entries": [
+    {
+      "id": "devlog/analystos/a2e32e32492b",
+      "at": "2026-11-26T17:26:38-05:00",
+      "summary": "Merge pull request #114 from 30EVentures/slice-134-record-ci",
+      "commitSha": "a2e32e32492b8c0d68e16aa287bd5ab1705c2053",
+      "ref": "https://github.com/30EVentures/analystos/commit/a2e32e32492b8c0d68e16aa287bd5ab1705c2053"
+    },
+    {
+      "id": "devlog/analystos/60d3cee2ed9d",
+      "at": "2026-11-26T17:17:41-05:00",
+      "summary": "Merge pull request #113 from 30EVentures/slice-133-metered-hiring",
+      "commitSha": "60d3cee2ed9d28a48b8a506663a652b2fe41de4a",
+      "ref": "https://github.com/30EVentures/analystos/commit/60d3cee2ed9d28a48b8a506663a652b2fe41de4a"
+    },
+    {
+      "id": "devlog/analystos/679f478757ca",
+      "at": "2026-11-26T16:50:41-05:00",
+      "summary": "Merge pull request #112 from 30EVentures/slice-132-keys-and-docs",
+      "commitSha": "679f478757ca4f6d4402f2f25b6f13db1d08d6a8",
+      "ref": "https://github.com/30EVentures/analystos/commit/679f478757ca4f6d4402f2f25b6f13db1d08d6a8"
+    },
+    {
+      "id": "devlog/analystos/41c139f0c84c",
+      "at": "2026-11-26T12:45:00-05:00",
+      "summary": "Merge pull request #110 from 30EVentures/slice-131-record-correction",
+      "commitSha": "41c139f0c84c7276ce200e7de5c95b9d6724c245",
+      "ref": "https://github.com/30EVentures/analystos/commit/41c139f0c84c7276ce200e7de5c95b9d6724c245"
+    },
     {
       "id": "devlog/analystos/73198f378e4a",
       "at": "2026-11-26T10:38:04-05:00",

@@ -5,6 +5,10 @@ _see `devlog/1` in `packages/shiplog/SPEC.md` if that reads like it needs reconc
 
 ## 2026-11-26
 
+- Merge pull request #114 from 30EVentures/slice-134-record-ci ([`a2e32e32492b`](https://github.com/30EVentures/analystos/commit/a2e32e32492b8c0d68e16aa287bd5ab1705c2053))
+- Merge pull request #113 from 30EVentures/slice-133-metered-hiring ([`60d3cee2ed9d`](https://github.com/30EVentures/analystos/commit/60d3cee2ed9d28a48b8a506663a652b2fe41de4a))
+- Merge pull request #112 from 30EVentures/slice-132-keys-and-docs ([`679f478757ca`](https://github.com/30EVentures/analystos/commit/679f478757ca4f6d4402f2f25b6f13db1d08d6a8))
+- Merge pull request #110 from 30EVentures/slice-131-record-correction ([`41c139f0c84c`](https://github.com/30EVentures/analystos/commit/41c139f0c84c7276ce200e7de5c95b9d6724c245))
 - Merge pull request #109 from 30EVentures/slice-130-site-nav ([`73198f378e4a`](https://github.com/30EVentures/analystos/commit/73198f378e4a9955d56e761aefb0b153cfa53b34))
 
 ## 2026-11-25

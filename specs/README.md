@@ -146,3 +146,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 132 | signing keys as a JWKS, two mesh mistakes made impossible, and the charter differential | [spec](slice-132/spec.md) |
 | 133 | metered hiring: a budget that only narrows, usage, and a receipt | [spec](slice-133/spec.md) |
 | 134 | the public record refreshes itself after every merge | [spec](slice-134/spec.md) |
+| 135 | preflight: check a hire before spending anything | [spec](slice-135/spec.md) |

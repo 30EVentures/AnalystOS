@@ -214,6 +214,7 @@ dd a{color:var(--ink)}
       <dl>
         <div class="g-term" id="agent-caller"><dt>Agent caller</dt><dd>Software that hires a role through the API rather than a person using the website. It gets the same checks and the same limits.</dd></div>
         <div class="g-term" id="budget"><dt>Budget</dt><dd>What one hire may use, in model calls and output tokens. A caller can only narrow this server's limits, never widen them; asking for more is refused before any call. There is no money in it: no price has been set.</dd></div>
+        <div class="g-term" id="preflight"><dt>Preflight</dt><dd>A free check of a hire before it is sent: the same checks, with no model call and no access code. It says whether the hire would be taken on, the reasons it would be refused, and the most it could use.</dd></div>
         <div class="g-term" id="receipt"><dt>Receipt</dt><dd>A record of one hire: who the caller said it was, the role, the budget, the usage the model reported, and the fingerprint of the file delivered, or that nothing was. Receipts are not signed yet, so they are this server's account, not proof. See the <a href="/docs/hiring-api.md">hiring API guide</a>.</dd></div>
         <div class="g-term" id="role-catalog"><dt>Role catalog</dt><dd>Every role, its family, questions, format and limits, as JSON at <a href="/api/v2/catalog">/api/v2/catalog</a>.</dd></div>
         <div class="g-term" id="llms-txt"><dt>llms.txt</dt><dd>A short plain-text index of the site for language models, at <a href="/llms.txt">/llms.txt</a>.</dd></div>

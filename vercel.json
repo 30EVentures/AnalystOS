@@ -239,6 +239,10 @@
     {
       "source": "/api/v1/jobs/:job/escalate",
       "destination": "/api/v1/jobs?id=:job&escalate=true"
+    },
+    {
+      "source": "/api/v2/engagements/preflight",
+      "destination": "/api/v2/engagements?preflight=true"
     }
   ]
 }

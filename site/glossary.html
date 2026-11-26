@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AnalystOS glossary</title>
+<meta name="description" content="The words AnalystOS uses, defined plainly: roles and families, traced figures, work products, who decides, and the machine-readable parts for agents.">
+<link rel="canonical" href="https://analystos.dev/glossary.html">
+<link rel="api-catalog" href="https://analystos.dev/.well-known/api-catalog">
+<link rel="alternate" type="text/plain" href="https://analystos.dev/llms.txt" title="llms.txt">
+<style>
+:root{--bg:#ffffff;--canvas:#f4f3ef;--ink:#0e1726;--ink-2:#37425a;--muted:#5b6678;--line:#dcdfe5;--tick:#07694b}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:90px;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.6 var(--sans)}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--tick);outline-offset:3px;border-radius:2px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 clamp(20px,4vw,48px)}
+.g-hero{padding:64px 0 28px;border-bottom:1px solid var(--line)}
+.eyebrow{color:var(--tick);font-weight:600;font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;margin:0 0 12px}
+h1{font:400 clamp(38px,5vw,56px)/1.08 var(--display);letter-spacing:-.012em;margin:0 0 14px}
+.g-intro{font-size:19px;color:var(--ink-2);max-width:40em;margin:0}
+.g-body{display:grid;grid-template-columns:220px 1fr;gap:56px;padding:36px 0 0}
+.g-side{position:sticky;top:96px;align-self:start}
+.g-side label{display:block;font-size:12.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.g-side input{width:100%;font:inherit;font-size:15px;padding:10px 12px;border:1px solid #c6cbd4;border-radius:3px;background:#fff;color:var(--ink)}
+.g-side ul{list-style:none;margin:22px 0 0;padding:0;font-size:15px}
+.g-side li{margin:0 0 8px}
+.g-side a{text-decoration:none;color:var(--ink-2)}.g-side a:hover{color:var(--ink);text-decoration:underline}
+.g-count{font-size:13.5px;color:var(--muted);margin:12px 0 0}
+.g-group{margin:0 0 44px}
+.g-group h2{font:400 30px/1.15 var(--display);letter-spacing:-.01em;margin:0 0 6px;padding-top:4px}
+.g-group>p{color:var(--ink-2);margin:0 0 14px}
+dl{margin:0;border-top:2px solid var(--ink)}
+.g-term{display:grid;grid-template-columns:240px 1fr;gap:28px;padding:16px 0;border-bottom:1px solid var(--line)}
+dt{font-weight:600;font-size:16.5px}
+dd{margin:0;color:var(--ink-2);font-size:16px}
+dd a{color:var(--ink)}
+.g-none{color:var(--muted);display:none}
+@media (max-width:860px){.g-body{grid-template-columns:1fr;gap:24px}.g-side{position:static}.g-side ul{display:none}.g-term{grid-template-columns:1fr;gap:4px}}
+/* studio:css:start */
+:root{--display:"Iowan Old Style","Charter","Source Serif 4","Palatino Linotype",Georgia,serif;--serif:"Iowan Old Style","Charter","Source Serif 4","Palatino Linotype",Georgia,serif;--sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,Helvetica,Arial,sans-serif;--font-display:"Iowan Old Style","Charter","Source Serif 4","Palatino Linotype",Georgia,serif;--font-sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,Helvetica,Arial,sans-serif;--font-mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace}
+.an-head{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #dcdfe5;font-family:var(--sans)}
+.an-bar{max-width:1200px;margin:0 auto;padding:0 clamp(20px,4vw,48px);display:flex;align-items:center;height:68px;gap:28px}
+.an-brand{font:600 20px/1 var(--sans);letter-spacing:-.01em;color:#0e1726;text-decoration:none;flex:none}
+.an-brand span{color:#07694b}
+.an-primary{flex:1}
+.an-primary>ul{display:flex;gap:2px;list-style:none;margin:0;padding:0}
+.an-has>button{appearance:none;background:none;border:0;font:500 15px/1 var(--sans);color:#0e1726;padding:25px 13px;cursor:pointer;display:flex;align-items:center;gap:7px;position:relative}
+.an-has>button::after{content:"";position:absolute;left:13px;right:13px;bottom:-1px;height:2px;background:transparent}
+.an-has.open>button::after,.an-has>button:hover::after{background:#0e1726}
+.an-has>button svg{width:11px;height:11px;transition:transform .15s}
+.an-has.open>button svg{transform:rotate(180deg)}
+.an-cta{flex:none;font:600 14px/1 var(--sans);text-decoration:none;padding:12px 16px;border-radius:3px;background:#0e1726;color:#fff;border:1px solid #0e1726}
+.an-cta:hover{background:#1d2a42}
+.an-burger{display:none;appearance:none;background:none;border:1px solid #c6cbd4;border-radius:3px;padding:9px 10px;margin-left:auto;cursor:pointer}
+.an-burger span{display:block;width:20px;height:2px;background:#0e1726;margin:4px 0}
+.an-mega{display:none;position:absolute;left:0;right:0;top:100%;background:#fff;color:#0e1726;border-top:1px solid #dcdfe5;border-bottom:1px solid #dcdfe5;box-shadow:0 24px 40px -24px rgba(14,23,38,.28)}
+.an-has.open .an-mega{display:block}
+.an-in{max-width:1200px;margin:0 auto;padding:32px clamp(20px,4vw,48px) 36px;display:grid;grid-template-columns:250px 1fr 290px;gap:44px}
+.an-wide .an-in{grid-template-columns:250px 1fr}
+.an-mega h3{font:600 12px/1 var(--sans);letter-spacing:.09em;text-transform:uppercase;color:#5b6678;margin:0 0 14px}
+.an-lead{font:400 23px/1.25 var(--serif);margin:0 0 10px;letter-spacing:-.005em}
+.an-sub{color:#37425a;font-size:15px;line-height:1.5;margin:0 0 16px}
+.an-all{font-weight:600;font-size:15px;text-decoration:none;color:#0e1726;border-bottom:1px solid #0e1726}
+.an-mega ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:2px 28px;align-content:start}
+.an-wide ul{grid-template-columns:1fr 1fr 1fr}
+.an-mega li a{display:block;padding:11px 0;border-bottom:1px solid #dcdfe5;text-decoration:none;color:#0e1726}
+.an-mega li a:hover b{text-decoration:underline;text-underline-offset:3px}
+.an-mega li b{font:600 15.5px/1.3 var(--sans);display:block}
+.an-mega li span{display:block;color:#37425a;font-size:14px;line-height:1.45;margin-top:2px}
+.an-feat{background:#f4f3ef;padding:22px 22px 20px;border-left:3px solid #07694b}
+.an-feat h4{font:400 20px/1.25 var(--serif);margin:0 0 8px}
+.an-feat p{font-size:14.5px;line-height:1.5;color:#37425a;margin:0 0 14px}
+.an-go{font-weight:600;font-size:14.5px;color:#0e1726}
+@media (max-width:980px){.an-in{grid-template-columns:200px 1fr;gap:28px}.an-feat{display:none}.an-wide ul{grid-template-columns:1fr 1fr}}
+@media (max-width:860px){
+  .an-burger{display:block}.an-cta{display:none}
+  .an-primary{display:none;position:absolute;left:0;right:0;top:100%;background:#fff;border-bottom:1px solid #dcdfe5;max-height:calc(100vh - 110px);overflow:auto;padding:6px clamp(20px,4vw,48px) 22px}
+  .an-head.nav-open .an-primary{display:block}
+  .an-primary>ul{flex-direction:column}
+  .an-has>button{width:100%;justify-content:space-between;padding:17px 0;border-bottom:1px solid #dcdfe5;font-size:17px}
+  .an-has>button::after{display:none}
+  .an-mega{position:static;box-shadow:none;border:0}
+  .an-in{display:block;padding:4px 0 12px}.an-mega h3,.an-lead,.an-sub,.an-all{display:none}
+  .an-mega ul,.an-wide ul{grid-template-columns:1fr}
+}
+@media print{.an-head{display:none}}
+.studio-bar{background:#030508;color:#e8f4ff;font:500 13px/1 system-ui,-apple-system,'Segoe UI',sans-serif;border-bottom:1px solid #16202c}
+.studio-in{max-width:1100px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:18px}
+.studio-brand{display:flex;align-items:center;gap:9px;color:#e8f4ff;text-decoration:none;font-weight:700;letter-spacing:.14em}
+.studio-mark{width:16px;height:16px;flex:none}
+.studio-sub{margin-left:.6em;font-weight:400;font-size:.85em;letter-spacing:.3em;color:#7d8fa3}
+.studio-line{color:#7d8fa3}
+.studio-links{margin-left:auto;display:flex;gap:16px}
+.studio-links a{color:#e8f4ff;text-decoration:none;opacity:.85}
+.studio-links a:hover,.studio-links a:focus-visible{opacity:1;text-decoration:underline}
+.af{background:#0f1b2d;color:#c9d3e3;margin:64px 0 0;padding:56px 0 26px;border:0;font:400 15px/1.55 var(--sans,system-ui,-apple-system,'Segoe UI',sans-serif)}
+.af-in{max-width:1100px;margin:0 auto;padding:0 20px}
+.af-grid{display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:36px;padding-bottom:40px;border-bottom:1px solid #26354f}
+.af-name{font:800 22px/1 var(--display,system-ui,sans-serif);letter-spacing:-.02em;color:#fff;text-decoration:none}
+.af-line{font:400 18px/1.45 var(--serif,Georgia,serif);color:#fff;margin:16px 0 18px;max-width:17em}
+.af-pill{display:flex;gap:8px;align-items:flex-start;background:#1a2a44;border:1px solid #2c3f60;border-radius:4px;padding:10px 12px;font-size:13.5px;line-height:1.4;color:#e8d9b0;max-width:20em}
+.af-pill::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:#e0a62e;margin-top:6px}
+.af h2{font:600 12px/1 var(--sans,system-ui,sans-serif);letter-spacing:.09em;text-transform:uppercase;color:#8da0bd;margin:4px 0 18px}
+.af ul{list-style:none;margin:0;padding:0}.af li{margin:0 0 11px}
+.af a{color:#e8eef8;text-decoration:none}.af li a:hover,.af li a:focus-visible,.af-mid a:hover{text-decoration:underline;text-underline-offset:3px}
+.af li small{display:block;color:#8da0bd;font-size:12.5px;margin-top:1px}
+.af-note{padding:22px 0 0;font-size:13.5px;line-height:1.7;color:#aab8cf;max-width:70ch}
+.af-note p,.af-note .fine{margin:0 0 8px;font:inherit;color:inherit;max-width:none}
+.af-mid{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:22px 0;font-size:14.5px;color:#aab8cf}
+.af-mid a{color:#fff}
+.af-bot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13.5px;color:#8da0bd}
+@media (max-width:900px){.af-grid{grid-template-columns:1fr 1fr}.af-grid>div:first-child{grid-column:1/-1}}
+@media print{.af{background:#fff;color:#000}.af a,.af-name,.af-line{color:#000}}
+@media (max-width:640px){.studio-line,.studio-sub{display:none}.studio-in{padding:9px 14px;gap:12px}.studio-links{gap:12px}}
+@media print{.studio-bar{display:none}}
+/* studio:css:end */
+</style>
+</head>
+<body>
+<!-- studio:bar:start -->
+<div class="studio-bar" role="navigation" aria-label="30E Ventures"><div class="studio-in"><a class="studio-brand" href="https://www.30eventures.com/"><svg class="studio-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="3" height="18" fill="#f2f6fa"/><rect x="6" y="3" width="15" height="3" fill="#f2f6fa"/><rect x="6" y="10.5" width="10" height="3" fill="#f2f6fa"/><rect x="6" y="18" width="15" height="3" fill="#2fd4ff"/></svg><span>30E<span class="studio-sub">VENTURES</span></span></a><span class="studio-line">AnalystOS is a 30E Ventures product</span><span class="studio-links"><a href="https://www.30eventures.com/portfolio/">Portfolio</a><a href="https://www.30eventures.com/about/">About</a><a href="https://www.30eventures.com/press/">Press</a></span></div></div>
+<!-- studio:bar:end -->
+<!-- product:nav:start -->
+<header class="an-head" id="an-head"><div class="an-bar"><a class="an-brand" href="/">Analyst<span>OS</span></a><button class="an-burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="an-primary"><span></span><span></span><span></span></button><nav class="an-primary" id="an-primary" aria-label="Sections"><ul><li class="an-has"><button type="button" aria-expanded="false" aria-controls="an-m-roles">Roles<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><div class="an-mega an-wide" id="an-m-roles" role="region" aria-label="Roles"><div class="an-in"><div><h3>Roles</h3><p class="an-lead">73 roles in 13 families.</p><p class="an-sub">Each role asks its own questions and delivers in its family's format.</p><a class="an-all" href="/hire.html">Hire a specialist</a></div><ul><li><a href="/?family=research-reporting#samples"><b>Research and reporting</b><span>5 roles · Word memo</span></a></li><li><a href="/?family=consulting#samples"><b>Consulting</b><span>8 roles · PowerPoint deck</span></a></li><li><a href="/?family=finance-modeling#samples"><b>Finance and modeling</b><span>11 roles · Excel workbook</span></a></li><li><a href="/?family=data-analytics#samples"><b>Data and analytics</b><span>7 roles · Excel workbook</span></a></li><li><a href="/?family=accounting-operations#samples"><b>Accounting and finance operations</b><span>8 roles · Excel workbook</span></a></li><li><a href="/?family=risk-audit-controls#samples"><b>Risk, audit and controls</b><span>7 roles · Word memo</span></a></li><li><a href="/?family=financial-crime#samples"><b>Financial crime</b><span>5 roles · Word memo</span></a></li><li><a href="/?family=legal-contracts-procurement#samples"><b>Legal, contracts and procurement</b><span>5 roles · Word memo</span></a></li><li><a href="/?family=content-communications#samples"><b>Content and communications</b><span>5 roles · PowerPoint deck</span></a></li><li><a href="/?family=people-hr#samples"><b>People and HR</b><span>4 roles · Word memo</span></a></li><li><a href="/?family=software-it#samples"><b>Software and IT</b><span>3 roles · PowerPoint deck</span></a></li><li><a href="/?family=insurance#samples"><b>Insurance</b><span>2 roles · Word memo</span></a></li><li><a href="/?family=sales-customer-coordination#samples"><b>Sales, customer and coordination</b><span>3 roles · PowerPoint deck</span></a></li></ul></div></div></li><li class="an-has"><button type="button" aria-expanded="false" aria-controls="an-m-samples">Samples<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><div class="an-mega" id="an-m-samples" role="region" aria-label="Samples"><div class="an-in"><div><h3>Samples</h3><p class="an-lead">See the finished work before you hire.</p><p class="an-sub">Every role has a sample of its own, built from a worked example.</p><a class="an-all" href="/#samples">Open the explorer</a></div><ul><li><a href="/?family=legal-contracts-procurement#samples"><b>Word memos</b><span>Legal, research, audit, HR, insurance and financial crime.</span></a></li><li><a href="/?family=finance-modeling#samples"><b>Excel workbooks</b><span>Finance, accounting and data, with live formulas.</span></a></li><li><a href="/?family=consulting#samples"><b>PowerPoint decks</b><span>Consulting, content, sales and software.</span></a></li><li><a href="/?family=accounting-operations&role=accounts-payable-receivable-clerk#samples"><b>Role-written work</b><span>Drafts, registers, case files, reconciliations, plans and code.</span></a></li><li><a href="/#sample"><b>Every number traced</b><span>Each figure points to the client's words, a calculation or an assumption.</span></a></li></ul><aside class="an-feat"><h3>Download</h3><h4>The consulting deck</h4><p>A full sample deck, every number traced.</p><a class="an-go" href="/samples/consulting.pptx">Download the deck</a></aside></div></div></li><li class="an-has"><button type="button" aria-expanded="false" aria-controls="an-m-how">How it works<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><div class="an-mega" id="an-m-how" role="region" aria-label="How it works"><div class="an-in"><div><h3>How it works</h3><p class="an-lead">Describe the problem. Get finished work.</p><p class="an-sub">Answer first, sources last, in the format the role's work is read in.</p><a class="an-all" href="/#how">How it works</a></div><ul><li><a href="/#how"><b>The three steps</b><span>Describe it, answer a few questions, use the file.</span></a></li><li><a href="/details.html#trust"><b>How numbers are checked</b><span>Code checks every figure before anything is drawn.</span></a></li><li><a href="/glossary.html#boundary"><b>Who decides</b><span>Drafts for your approval; qualified people decide.</span></a></li><li><a href="/details.html#proof"><b>Evidence and limits</b><span>What has been measured, and what has not.</span></a></li><li><a href="/details.html#faq"><b>Questions</b><span>Privacy, documents and what it cannot do yet.</span></a></li></ul><aside class="an-feat"><h3>Full details</h3><h4>How it stays honest</h4><p>Privacy, known limits and the evidence behind each claim.</p><a class="an-go" href="/details.html">Read the details</a></aside></div></div></li><li class="an-has"><button type="button" aria-expanded="false" aria-controls="an-m-agents">For agents<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><div class="an-mega" id="an-m-agents" role="region" aria-label="For agents"><div class="an-in"><div><h3>For agents</h3><p class="an-lead">Software can hire through the API.</p><p class="an-sub">Published contracts, a role catalog and an index for language models.</p><a class="an-all" href="/docs/api.md">Read the API guide</a></div><ul><li><a href="/docs/api.md"><b>API guide</b><span>How to open, scope and fetch an engagement.</span></a></li><li><a href="/api/v1/openapi.json"><b>OpenAPI</b><span>The machine-readable API description.</span></a></li><li><a href="/api/v2/catalog"><b>Role catalog</b><span>Every role, its questions and its format, as JSON.</span></a></li><li><a href="/llms.txt"><b>llms.txt</b><span>A short index of the site for language models.</span></a></li><li><a href="/docs/seal.md"><b>Seal specification</b><span>Re-check a sealed report offline, against a key you pin.</span></a></li><li><a href="/.well-known/api-catalog"><b>API catalog</b><span>Where each API and its documents live.</span></a></li></ul></div></div></li><li class="an-has"><button type="button" aria-expanded="false" aria-controls="an-m-learn">Learn<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><div class="an-mega" id="an-m-learn" role="region" aria-label="Learn"><div class="an-in"><div><h3>Learn</h3><p class="an-lead">The words and ideas behind the work.</p><p class="an-sub">Plain definitions, and the studio's thinking on the agentic internet.</p><a class="an-all" href="/glossary.html">Read the glossary</a></div><ul><li><a href="/glossary.html"><b>AnalystOS glossary</b><span>Figure tags, work products, boundaries and more.</span></a></li><li><a href="https://www.30eventures.com/concepts/"><b>Concepts</b><span>Seven ideas the studio's products are built on.</span></a></li><li><a href="https://www.30eventures.com/why/"><b>Why we build</b><span>What is changing, what breaks, and what is needed.</span></a></li><li><a href="https://www.30eventures.com/faq/"><b>FAQ</b><span>What 30E Ventures is, and where each product stands.</span></a></li><li><a href="https://www.30eventures.com/press/"><b>Press</b><span>Boilerplate, fact sheet, logos and a press contact.</span></a></li></ul><aside class="an-feat"><h3>Start here</h3><h4>Verifiable by a stranger</h4><p>A claim anyone can check without trusting whoever made it.</p><a class="an-go" href="https://www.30eventures.com/concepts/#verifiable">Read the concept</a></aside></div></div></li></ul></nav><a class="an-cta" href="/hire.html">Hire a specialist</a></div></header><script src="/nav.js" defer></script>
+<!-- product:nav:end -->
+
+<main class="wrap" id="top">
+<section class="g-hero">
+  <p class="eyebrow">Learn</p>
+  <h1>AnalystOS glossary</h1>
+  <p class="g-intro">The words this site uses, defined plainly. For the wider vocabulary of agents, trust and settlement, see the <a href="https://www.30eventures.com/learn/">30E Ventures glossary</a>.</p>
+</section>
+
+<div class="g-body">
+  <aside class="g-side">
+    <label for="g-filter">Find a term</label>
+    <input id="g-filter" type="search" placeholder="e.g. figure, draft" autocomplete="off">
+    <p class="g-count" id="g-count" aria-live="polite"></p>
+    <ul>
+      <li><a href="#hiring">Hiring a role</a></li>
+      <li><a href="#numbers">How numbers are traced</a></li>
+      <li><a href="#outputs">What you get back</a></li>
+      <li><a href="#boundaries">Who decides</a></li>
+      <li><a href="#agents">For agents</a></li>
+    </ul>
+  </aside>
+
+  <div id="g-list">
+    <section class="g-group" id="hiring">
+      <h2>Hiring a role</h2>
+      <p>How a problem becomes a piece of work.</p>
+      <dl>
+        <div class="g-term" id="role"><dt>Role</dt><dd>One of 73 entry-level white-collar jobs AnalystOS can do, such as FP&amp;A analyst, paralegal or claims adjuster. Each role has its own focus, its own questions and its own limits.</dd></div>
+        <div class="g-term" id="family"><dt>Family</dt><dd>A group of related roles, such as finance and modeling or legal, contracts and procurement. There are 13. Roles in a family share a delivery format and some intake questions.</dd></div>
+        <div class="g-term" id="engagement"><dt>Engagement</dt><dd>One piece of work: the problem you describe, your answers to the role's questions, and the file you get back.</dd></div>
+        <div class="g-term" id="intake-questions"><dt>Intake questions</dt><dd>What a role asks before it starts: the decision the work supports, the deadline, who will read it, the materials, and questions specific to the family.</dd></div>
+        <div class="g-term" id="acceptance"><dt>Acceptance</dt><dd>The check that every required question has an answer. Work starts only after it.</dd></div>
+        <div class="g-term" id="worked-example"><dt>Worked example</dt><dd>A synthetic client's problem and a response run through the real checks, with no model call. Every role has one; it is what the role's sample is made from.</dd></div>
+        <div class="g-term" id="sample"><dt>Sample</dt><dd>The file the homepage shows for a role, built from its worked example, in the role's own format. The client in it is not a real company.</dd></div>
+      </dl>
+    </section>
+
+    <section class="g-group" id="numbers">
+      <h2>How numbers are traced</h2>
+      <p>Every number in the output has to come from somewhere you can check.</p>
+      <dl>
+        <div class="g-term" id="figure"><dt>Figure</dt><dd>A number in the work, recorded with an id (F1, F2 and so on), a label, a value, a unit and where it comes from. The text never contains a number that is not a figure.</dd></div>
+        <div class="g-term" id="figure-tag"><dt>Figure tag</dt><dd>The small reference printed after each number, such as F3, so a reader can find its source in the sources table.</dd></div>
+        <div class="g-term" id="client-figure"><dt>Client figure</dt><dd>A number taken from your own words. Its quote must appear in what you wrote, and the number in the quote must equal the figure.</dd></div>
+        <div class="g-term" id="calculated-figure"><dt>Calculated figure</dt><dd>A number worked out from earlier figures by a named operation, such as a difference or a share. Code redoes the arithmetic before anything is drawn.</dd></div>
+        <div class="g-term" id="assumption"><dt>Labelled assumption</dt><dd>A number you did not give, marked as an assumption with its reason, so it is never mistaken for a fact.</dd></div>
+        <div class="g-term" id="verifier"><dt>Verifier</dt><dd>The code that checks the model's work before any file is drawn: quotes, arithmetic, units, stray numbers, and the role's own rules. It refuses work rather than quietly fixing it.</dd></div>
+        <div class="g-term" id="repair"><dt>Repair</dt><dd>When the verifier refuses the work, the model is told each problem in plain words and gets one more attempt. If that fails too, no file is made.</dd></div>
+        <div class="g-term" id="fail-closed"><dt>Fail closed</dt><dd>When a check cannot be completed, the answer is no, not yes. A file that cannot be re-checked is not delivered.</dd></div>
+        <div class="g-term" id="spec-digest"><dt>Spec digest</dt><dd>A fingerprint of the checked content, written into each file's properties, so the file can be tied back to exactly what was verified.</dd></div>
+      </dl>
+    </section>
+
+    <section class="g-group" id="outputs">
+      <h2>What you get back</h2>
+      <p>Finished work in the format the role's work is read in.</p>
+      <dl>
+        <div class="g-term" id="format"><dt>Format</dt><dd>A Word memo for legal, research, audit, HR, insurance and financial crime; an Excel workbook for finance, accounting and data; a PowerPoint deck for consulting, content, sales and software.</dd></div>
+        <div class="g-term" id="live-formula"><dt>Live formula</dt><dd>In a workbook, each calculated figure is an Excel formula over the inputs, so you can change an input and see the result move.</dd></div>
+        <div class="g-term" id="work-product"><dt>Work product</dt><dd>The role's own work, inside the file: a draft, register, case file, reconciliation, plan or draft code. 40 of the 73 roles deliver one or more.</dd></div>
+        <div class="g-term" id="draft"><dt>Draft</dt><dd>Copy written for you to use, such as an email, a post or a notice. It is never written as if it had already been sent.</dd></div>
+        <div class="g-term" id="register"><dt>Register</dt><dd>A table of items to track, each with a rating, an owner, a status and an action.</dd></div>
+        <div class="g-term" id="case-file"><dt>Case file</dt><dd>The facts, the evidence and the open questions on one matter, ending in a question for the person who decides. It never decides.</dd></div>
+        <div class="g-term" id="reconciliation"><dt>Reconciliation</dt><dd>Two balances and the items that explain the difference between them. Code checks that the sides agree; any journal entries are proposals for approval.</dd></div>
+        <div class="g-term" id="plan"><dt>Plan</dt><dd>Steps with when, who and how you will know each is done.</dd></div>
+        <div class="g-term" id="code-draft"><dt>Draft code</dt><dd>A short piece of code labelled as not run or reviewed. Numbers inside code are the one thing the figure rules do not cover, and the file says so.</dd></div>
+        <div class="g-term" id="placeholder"><dt>Placeholder</dt><dd>A detail in curly braces, such as {start date to confirm}, left for you to fill in because you did not give it. A draft never invents it.</dd></div>
+      </dl>
+    </section>
+
+    <section class="g-group" id="boundaries">
+      <h2>Who decides</h2>
+      <p>Each role states what it may and may not do.</p>
+      <dl>
+        <div class="g-term" id="boundary"><dt>Boundary</dt><dd>What a role is allowed to do. Every role is one of three kinds: it delivers work only, it drafts for approval, or it prepares a decision for a qualified person.</dd></div>
+        <div class="g-term" id="deliverable-only"><dt>Delivers work only</dt><dd>The role hands over analysis or a draft and acts on nothing.</dd></div>
+        <div class="g-term" id="approval-gated"><dt>Drafts for approval</dt><dd>The role prepares messages, entries or bookings, and nothing is sent, posted or paid until a named person approves.</dd></div>
+        <div class="g-term" id="human-decides"><dt>A qualified person decides</dt><dd>The role prepares the decision, and a named person, such as counsel, an underwriter or a compliance officer, makes it. The work says who.</dd></div>
+      </dl>
+    </section>
+
+    <section class="g-group" id="agents">
+      <h2>For agents</h2>
+      <p>The parts of the site made for software as well as people.</p>
+      <dl>
+        <div class="g-term" id="agent-caller"><dt>Agent caller</dt><dd>Software that hires a role through the API rather than a person using the website. It gets the same checks and the same limits.</dd></div>
+        <div class="g-term" id="role-catalog"><dt>Role catalog</dt><dd>Every role, its family, questions, format and limits, as JSON at <a href="/api/v2/catalog">/api/v2/catalog</a>.</dd></div>
+        <div class="g-term" id="llms-txt"><dt>llms.txt</dt><dd>A short plain-text index of the site for language models, at <a href="/llms.txt">/llms.txt</a>.</dd></div>
+        <div class="g-term" id="api-catalog"><dt>API catalog</dt><dd>A machine-readable list of where each API and its documents live, at <a href="/.well-known/api-catalog">/.well-known/api-catalog</a>.</dd></div>
+        <div class="g-term" id="seal"><dt>Seal</dt><dd>A signed bundle for a report from the document-upload path, so someone who did not run AnalystOS can check it offline against a public key they pin. See the <a href="/docs/seal.md">seal specification</a>.</dd></div>
+      </dl>
+    </section>
+    <p class="g-none" id="g-none">No term matches. Try a shorter word.</p>
+  </div>
+</div>
+</main>
+
+<script>
+(function () {
+  // Filter terms by name or definition, with textContent only.
+  var input = document.getElementById('g-filter'), count = document.getElementById('g-count');
+  var terms = [].slice.call(document.querySelectorAll('.g-term')), groups = [].slice.call(document.querySelectorAll('.g-group'));
+  function run() {
+    var q = input.value.trim().toLowerCase(), shown = 0;
+    terms.forEach(function (t) { var hit = !q || t.textContent.toLowerCase().indexOf(q) >= 0; t.hidden = !hit; if (hit) shown++; });
+    groups.forEach(function (g) { g.hidden = !g.querySelector('.g-term:not([hidden])'); });
+    document.getElementById('g-none').style.display = shown ? 'none' : 'block';
+    count.textContent = q ? shown + ' of ' + terms.length + ' terms' : terms.length + ' terms';
+  }
+  input.addEventListener('input', run); run();
+})();
+</script>
+
+<!-- studio:footer:start -->
+<footer class="af"><div class="af-in"><div class="af-grid"><div><a class="af-name" href="/">AnalystOS</a><p class="af-line">Specialist work, ready the moment you need it.</p><div class="af-pill"><span>Early stage. Not for confidential documents yet. Limits are published.</span></div></div><div><h2>Product</h2><ul><li><a href="/#how">How it works</a></li><li><a href="/#samples">Samples for every role</a><small>73 roles, 13 families</small></li><li><a href="/hire.html">Hire a specialist</a><small>access code</small></li><li><a href="/upload.html">Upload a document</a><small>access code</small></li><li><a href="/details.html">Details, privacy and known limits</a></li></ul></div><div><h2>Developers</h2><ul><li><a href="/api/v1/openapi.json">API reference</a><small>OpenAPI 3.1</small></li><li><a href="/docs/api.md">API guide</a></li><li><a href="/docs/seal.md">Seal specification</a><small>re-verify offline</small></li><li><a href="/api/v2/catalog">Role catalog</a><small>JSON</small></li><li><a href="/.well-known/api-catalog">API catalog</a></li><li><a href="/llms.txt">llms.txt</a><small>for agents</small></li></ul></div><div><h2>Learn</h2><ul><li><a href="/glossary.html">AnalystOS glossary</a><small>figure tag, work product, boundary</small></li><li><a href="https://www.30eventures.com/concepts/">Concepts</a><small>verifiable by a stranger, and six more</small></li><li><a href="https://www.30eventures.com/learn/">Studio glossary</a><small>agents to settlement</small></li><li><a href="https://www.30eventures.com/why/">Why we build</a></li><li><a href="https://www.30eventures.com/faq/">FAQ</a></li></ul></div><div><h2>30E Ventures</h2><ul><li><a href="https://www.30eventures.com/about/">About the studio</a></li><li><a href="https://www.30eventures.com/portfolio/">Portfolio</a></li><li><a href="https://www.30eventures.com/press/">Press</a></li><li><a href="https://www.30eventures.com/brand/">Brand</a></li><li><a href="https://www.30eventures.com/contact/">Contact</a></li></ul></div></div><div class="af-note"><!-- studio:note:start --><!-- studio:note:end --></div><div class="af-mid"><span>AnalystOS is built by <a href="https://www.30eventures.com/">30E Ventures</a>, a machine-native venture studio in Toronto building the agentic internet.</span><span>Status: <b>live, early stage</b>.</span></div><div class="af-bot"><span>&copy; 2026 30E Ventures &middot; Toronto, Canada</span><span>Use non-confidential documents only.</span></div></div></footer>
+<!-- studio:footer:end -->
+</body>
+</html>

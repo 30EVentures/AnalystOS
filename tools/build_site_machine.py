@@ -68,6 +68,8 @@ def generated_files():
               f"- [Charter]({BASE}/.well-known/flashyos-charter.json): AAO 0.1, three roles, each with a measure",
               _guide_line("mesh-identity.md"),
               _guide_line("aao.md"), ""]
+    lines += ["## Learn", "",
+              f"- [AnalystOS glossary]({BASE}/glossary.html): roles, traced figures, work products and who decides, defined plainly", ""]
     lines += ["## Limits, stated plainly", "",
               f"- [Trust and known limits]({BASE}/details.html#trust): what leaves your environment, what is and is not checked",
               "- Every figure is proven; only some relationships between figures are checked",
@@ -83,7 +85,8 @@ def generated_files():
         full += [f"<!-- source: {BASE}/docs/{name} -->", "", (ROOT / "docs" / name).read_text(encoding="utf-8").rstrip(), "", "---", ""]
     out["llms-full.txt"] = "\n".join(full)
 
-    urls = [f"{BASE}/", f"{BASE}/details.html", f"{BASE}/upload.html", f"{BASE}/hire.html", f"{BASE}/llms.txt", f"{BASE}/llms-full.txt",
+    urls = [f"{BASE}/", f"{BASE}/details.html", f"{BASE}/upload.html", f"{BASE}/hire.html", f"{BASE}/glossary.html",
+            f"{BASE}/llms.txt", f"{BASE}/llms-full.txt",
             f"{BASE}/api/v1/openapi.json"] + [f"{BASE}/docs/{n}" for n, _, _ in GUIDES]
     out["sitemap.xml"] = (
         '<?xml version="1.0" encoding="UTF-8"?>\n'

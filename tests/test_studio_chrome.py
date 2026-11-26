@@ -77,7 +77,8 @@ class TheBlocksAreHonestAndSelfContainedTest(unittest.TestCase):
 class FooterNoteTest(unittest.TestCase):
     def test_a_pages_own_fine_print_survives_regeneration(self):
         page = "<!-- studio:footer:start -->\n" + studio_chrome.render_footer("<p>KEEP ME</p>") + "\n<!-- studio:footer:end -->"
-        text = "/* studio:css:start */\n/* studio:css:end */<!-- studio:bar:start --><!-- studio:bar:end -->" + page
+        text = ("/* studio:css:start */\n/* studio:css:end */<!-- studio:bar:start --><!-- studio:bar:end -->"
+                "<!-- product:nav:start --><!-- product:nav:end -->" + page)
         once, problems = studio_chrome.apply(text)
         self.assertEqual(problems, [])
         self.assertIn("<p>KEEP ME</p>", once)
@@ -98,7 +99,7 @@ class FooterNoteTest(unittest.TestCase):
 class ApplyTest(unittest.TestCase):
     SAMPLE = (
         "<style>a{}\n/* studio:css:start */\nOLD\n/* studio:css:end */\n</style><body>\n"
-        "<!-- studio:bar:start -->\nOLD\n<!-- studio:bar:end -->\nkeep me\n<footer><div>x"
+        "<!-- studio:bar:start -->\nOLD\n<!-- studio:bar:end -->\n<!-- product:nav:start -->\nOLD\n<!-- product:nav:end -->\nkeep me\n<footer><div>x"
         "<!-- studio:footer:start -->\nOLD\n<!-- studio:footer:end -->\n</div></footer>"
     )
 

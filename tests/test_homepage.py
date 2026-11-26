@@ -56,15 +56,11 @@ class HomepageTest(unittest.TestCase):
             with self.subTest(href=href):
                 self.assertTrue((SITE / href.lstrip("/")).is_file(), href)
 
-    def test_the_top_menu_has_a_few_sections_that_all_exist(self):
-        menu = re.search(r'<nav class="links".*?</nav>', PAGE, re.S).group(0)
-        links = re.findall(r'href="([^"]+)"', menu)
-        self.assertTrue(4 <= len(links) <= 6, links)  # some sections, not the old twelve
-        for href in links:
-            if href.startswith("#"):
-                with self.subTest(anchor=href):
-                    self.assertIn(f'id="{href[1:]}"', PAGE)
-        self.assertNotIn("display:none", re.search(r"\.links\{[^}]*\}", PAGE).group(0))  # never hidden
+    def test_the_top_menu_has_a_few_sections_each_a_dropdown(self):
+        # Slice 130: a few sections, not the old twelve, and every one opens a menu (tests/test_site_nav.py)
+        menu = re.search(r'<nav class="an-primary".*?</nav>', PAGE, re.S).group(0)
+        self.assertTrue(4 <= menu.count('class="an-has"') <= 6)
+        self.assertEqual(menu.count('class="an-has"'), menu.count('class="an-mega'))
 
     def test_it_says_no_price_has_been_set(self):
         self.assertIn("Price: to be determined.", PAGE)

@@ -6,9 +6,6 @@
 <title>AnalystOS: every number in the report, proven</title>
 <link rel="api-catalog" href="https://analystos.dev/.well-known/api-catalog">
 <link rel="alternate" type="text/plain" href="https://analystos.dev/llms.txt" title="llms.txt">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#eef1f4; --paper:#ffffff; --ink:#0f1b2d; --muted:#556172; --line:#cfd6df;
@@ -44,7 +41,7 @@ button{font:inherit;color:inherit}
 .wrap{max-width:1100px;margin:0 auto;padding:0 20px}
 
 /* header */
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.top{position:sticky;top:68px;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
 .topin{max-width:1100px;margin:0 auto;padding:8px 20px;display:flex;align-items:center;gap:14px}
 .brand{font-family:var(--display);font-weight:800;font-size:19px;text-decoration:none;white-space:nowrap}
 .brand span{color:var(--tick)}
@@ -239,6 +236,53 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
   .sum{box-shadow:none;border-color:#000}
 }
 /* studio:css:start */
+:root{--display:"Iowan Old Style","Charter","Source Serif 4","Palatino Linotype",Georgia,serif;--serif:"Iowan Old Style","Charter","Source Serif 4","Palatino Linotype",Georgia,serif;--sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,Helvetica,Arial,sans-serif;--font-display:"Iowan Old Style","Charter","Source Serif 4","Palatino Linotype",Georgia,serif;--font-sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,Helvetica,Arial,sans-serif;--font-mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace}
+.an-head{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #dcdfe5;font-family:var(--sans)}
+.an-bar{max-width:1200px;margin:0 auto;padding:0 clamp(20px,4vw,48px);display:flex;align-items:center;height:68px;gap:28px}
+.an-brand{font:600 20px/1 var(--sans);letter-spacing:-.01em;color:#0e1726;text-decoration:none;flex:none}
+.an-brand span{color:#07694b}
+.an-primary{flex:1}
+.an-primary>ul{display:flex;gap:2px;list-style:none;margin:0;padding:0}
+.an-has>button{appearance:none;background:none;border:0;font:500 15px/1 var(--sans);color:#0e1726;padding:25px 13px;cursor:pointer;display:flex;align-items:center;gap:7px;position:relative}
+.an-has>button::after{content:"";position:absolute;left:13px;right:13px;bottom:-1px;height:2px;background:transparent}
+.an-has.open>button::after,.an-has>button:hover::after{background:#0e1726}
+.an-has>button svg{width:11px;height:11px;transition:transform .15s}
+.an-has.open>button svg{transform:rotate(180deg)}
+.an-cta{flex:none;font:600 14px/1 var(--sans);text-decoration:none;padding:12px 16px;border-radius:3px;background:#0e1726;color:#fff;border:1px solid #0e1726}
+.an-cta:hover{background:#1d2a42}
+.an-burger{display:none;appearance:none;background:none;border:1px solid #c6cbd4;border-radius:3px;padding:9px 10px;margin-left:auto;cursor:pointer}
+.an-burger span{display:block;width:20px;height:2px;background:#0e1726;margin:4px 0}
+.an-mega{display:none;position:absolute;left:0;right:0;top:100%;background:#fff;color:#0e1726;border-top:1px solid #dcdfe5;border-bottom:1px solid #dcdfe5;box-shadow:0 24px 40px -24px rgba(14,23,38,.28)}
+.an-has.open .an-mega{display:block}
+.an-in{max-width:1200px;margin:0 auto;padding:32px clamp(20px,4vw,48px) 36px;display:grid;grid-template-columns:250px 1fr 290px;gap:44px}
+.an-wide .an-in{grid-template-columns:250px 1fr}
+.an-mega h3{font:600 12px/1 var(--sans);letter-spacing:.09em;text-transform:uppercase;color:#5b6678;margin:0 0 14px}
+.an-lead{font:400 23px/1.25 var(--serif);margin:0 0 10px;letter-spacing:-.005em}
+.an-sub{color:#37425a;font-size:15px;line-height:1.5;margin:0 0 16px}
+.an-all{font-weight:600;font-size:15px;text-decoration:none;color:#0e1726;border-bottom:1px solid #0e1726}
+.an-mega ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:2px 28px;align-content:start}
+.an-wide ul{grid-template-columns:1fr 1fr 1fr}
+.an-mega li a{display:block;padding:11px 0;border-bottom:1px solid #dcdfe5;text-decoration:none;color:#0e1726}
+.an-mega li a:hover b{text-decoration:underline;text-underline-offset:3px}
+.an-mega li b{font:600 15.5px/1.3 var(--sans);display:block}
+.an-mega li span{display:block;color:#37425a;font-size:14px;line-height:1.45;margin-top:2px}
+.an-feat{background:#f4f3ef;padding:22px 22px 20px;border-left:3px solid #07694b}
+.an-feat h4{font:400 20px/1.25 var(--serif);margin:0 0 8px}
+.an-feat p{font-size:14.5px;line-height:1.5;color:#37425a;margin:0 0 14px}
+.an-go{font-weight:600;font-size:14.5px;color:#0e1726}
+@media (max-width:980px){.an-in{grid-template-columns:200px 1fr;gap:28px}.an-feat{display:none}.an-wide ul{grid-template-columns:1fr 1fr}}
+@media (max-width:860px){
+  .an-burger{display:block}.an-cta{display:none}
+  .an-primary{display:none;position:absolute;left:0;right:0;top:100%;background:#fff;border-bottom:1px solid #dcdfe5;max-height:calc(100vh - 110px);overflow:auto;padding:6px clamp(20px,4vw,48px) 22px}
+  .an-head.nav-open .an-primary{display:block}
+  .an-primary>ul{flex-direction:column}
+  .an-has>button{width:100%;justify-content:space-between;padding:17px 0;border-bottom:1px solid #dcdfe5;font-size:17px}
+  .an-has>button::after{display:none}
+  .an-mega{position:static;box-shadow:none;border:0}
+  .an-in{display:block;padding:4px 0 12px}.an-mega h3,.an-lead,.an-sub,.an-all{display:none}
+  .an-mega ul,.an-wide ul{grid-template-columns:1fr}
+}
+@media print{.an-head{display:none}}
 .studio-bar{background:#030508;color:#e8f4ff;font:500 13px/1 system-ui,-apple-system,'Segoe UI',sans-serif;border-bottom:1px solid #16202c}
 .studio-in{max-width:1100px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:18px}
 .studio-brand{display:flex;align-items:center;gap:9px;color:#e8f4ff;text-decoration:none;font-weight:700;letter-spacing:.14em}
@@ -275,9 +319,11 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
 <!-- studio:bar:start -->
 <div class="studio-bar" role="navigation" aria-label="30E Ventures"><div class="studio-in"><a class="studio-brand" href="https://www.30eventures.com/"><svg class="studio-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="3" height="18" fill="#f2f6fa"/><rect x="6" y="3" width="15" height="3" fill="#f2f6fa"/><rect x="6" y="10.5" width="10" height="3" fill="#f2f6fa"/><rect x="6" y="18" width="15" height="3" fill="#2fd4ff"/></svg><span>30E<span class="studio-sub">VENTURES</span></span></a><span class="studio-line">AnalystOS is a 30E Ventures product</span><span class="studio-links"><a href="https://www.30eventures.com/portfolio/">Portfolio</a><a href="https://www.30eventures.com/about/">About</a><a href="https://www.30eventures.com/press/">Press</a></span></div></div>
 <!-- studio:bar:end -->
-<header class="top">
+<!-- product:nav:start -->
+<header class="an-head" id="an-head"><div class="an-bar"><a class="an-brand" href="/">Analyst<span>OS</span></a><button class="an-burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="an-primary"><span></span><span></span><span></span></button><nav class="an-primary" id="an-primary" aria-label="Sections"><ul><li class="an-has"><button type="button" aria-expanded="false" aria-controls="an-m-roles">Roles<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><div class="an-mega an-wide" id="an-m-roles" role="region" aria-label="Roles"><div class="an-in"><div><h3>Roles</h3><p class="an-lead">73 roles in 13 families.</p><p class="an-sub">Each role asks its own questions and delivers in its family's format.</p><a class="an-all" href="/hire.html">Hire a specialist</a></div><ul><li><a href="/?family=research-reporting#samples"><b>Research and reporting</b><span>5 roles · Word memo</span></a></li><li><a href="/?family=consulting#samples"><b>Consulting</b><span>8 roles · PowerPoint deck</span></a></li><li><a href="/?family=finance-modeling#samples"><b>Finance and modeling</b><span>11 roles · Excel workbook</span></a></li><li><a href="/?family=data-analytics#samples"><b>Data and analytics</b><span>7 roles · Excel workbook</span></a></li><li><a href="/?family=accounting-operations#samples"><b>Accounting and finance operations</b><span>8 roles · Excel workbook</span></a></li><li><a href="/?family=risk-audit-controls#samples"><b>Risk, audit and controls</b><span>7 roles · Word memo</span></a></li><li><a href="/?family=financial-crime#samples"><b>Financial crime</b><span>5 roles · Word memo</span></a></li><li><a href="/?family=legal-contracts-procurement#samples"><b>Legal, contracts and procurement</b><span>5 roles · Word memo</span></a></li><li><a href="/?family=content-communications#samples"><b>Content and communications</b><span>5 roles · PowerPoint deck</span></a></li><li><a href="/?family=people-hr#samples"><b>People and HR</b><span>4 roles · Word memo</span></a></li><li><a href="/?family=software-it#samples"><b>Software and IT</b><span>3 roles · PowerPoint deck</span></a></li><li><a href="/?family=insurance#samples"><b>Insurance</b><span>2 roles · Word memo</span></a></li><li><a href="/?family=sales-customer-coordination#samples"><b>Sales, customer and coordination</b><span>3 roles · PowerPoint deck</span></a></li></ul></div></div></li><li class="an-has"><button type="button" aria-expanded="false" aria-controls="an-m-samples">Samples<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><div class="an-mega" id="an-m-samples" role="region" aria-label="Samples"><div class="an-in"><div><h3>Samples</h3><p class="an-lead">See the finished work before you hire.</p><p class="an-sub">Every role has a sample of its own, built from a worked example.</p><a class="an-all" href="/#samples">Open the explorer</a></div><ul><li><a href="/?family=legal-contracts-procurement#samples"><b>Word memos</b><span>Legal, research, audit, HR, insurance and financial crime.</span></a></li><li><a href="/?family=finance-modeling#samples"><b>Excel workbooks</b><span>Finance, accounting and data, with live formulas.</span></a></li><li><a href="/?family=consulting#samples"><b>PowerPoint decks</b><span>Consulting, content, sales and software.</span></a></li><li><a href="/?family=accounting-operations&role=accounts-payable-receivable-clerk#samples"><b>Role-written work</b><span>Drafts, registers, case files, reconciliations, plans and code.</span></a></li><li><a href="/#sample"><b>Every number traced</b><span>Each figure points to the client's words, a calculation or an assumption.</span></a></li></ul><aside class="an-feat"><h3>Download</h3><h4>The consulting deck</h4><p>A full sample deck, every number traced.</p><a class="an-go" href="/samples/consulting.pptx">Download the deck</a></aside></div></div></li><li class="an-has"><button type="button" aria-expanded="false" aria-controls="an-m-how">How it works<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><div class="an-mega" id="an-m-how" role="region" aria-label="How it works"><div class="an-in"><div><h3>How it works</h3><p class="an-lead">Describe the problem. Get finished work.</p><p class="an-sub">Answer first, sources last, in the format the role's work is read in.</p><a class="an-all" href="/#how">How it works</a></div><ul><li><a href="/#how"><b>The three steps</b><span>Describe it, answer a few questions, use the file.</span></a></li><li><a href="/details.html#trust"><b>How numbers are checked</b><span>Code checks every figure before anything is drawn.</span></a></li><li><a href="/glossary.html#boundary"><b>Who decides</b><span>Drafts for your approval; qualified people decide.</span></a></li><li><a href="/details.html#proof"><b>Evidence and limits</b><span>What has been measured, and what has not.</span></a></li><li><a href="/details.html#faq"><b>Questions</b><span>Privacy, documents and what it cannot do yet.</span></a></li></ul><aside class="an-feat"><h3>Full details</h3><h4>How it stays honest</h4><p>Privacy, known limits and the evidence behind each claim.</p><a class="an-go" href="/details.html">Read the details</a></aside></div></div></li><li class="an-has"><button type="button" aria-expanded="false" aria-controls="an-m-agents">For agents<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><div class="an-mega" id="an-m-agents" role="region" aria-label="For agents"><div class="an-in"><div><h3>For agents</h3><p class="an-lead">Software can hire through the API.</p><p class="an-sub">Published contracts, a role catalog and an index for language models.</p><a class="an-all" href="/docs/api.md">Read the API guide</a></div><ul><li><a href="/docs/api.md"><b>API guide</b><span>How to open, scope and fetch an engagement.</span></a></li><li><a href="/api/v1/openapi.json"><b>OpenAPI</b><span>The machine-readable API description.</span></a></li><li><a href="/api/v2/catalog"><b>Role catalog</b><span>Every role, its questions and its format, as JSON.</span></a></li><li><a href="/llms.txt"><b>llms.txt</b><span>A short index of the site for language models.</span></a></li><li><a href="/docs/seal.md"><b>Seal specification</b><span>Re-check a sealed report offline, against a key you pin.</span></a></li><li><a href="/.well-known/api-catalog"><b>API catalog</b><span>Where each API and its documents live.</span></a></li></ul></div></div></li><li class="an-has"><button type="button" aria-expanded="false" aria-controls="an-m-learn">Learn<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><div class="an-mega" id="an-m-learn" role="region" aria-label="Learn"><div class="an-in"><div><h3>Learn</h3><p class="an-lead">The words and ideas behind the work.</p><p class="an-sub">Plain definitions, and the studio's thinking on the agentic internet.</p><a class="an-all" href="/glossary.html">Read the glossary</a></div><ul><li><a href="/glossary.html"><b>AnalystOS glossary</b><span>Figure tags, work products, boundaries and more.</span></a></li><li><a href="https://www.30eventures.com/concepts/"><b>Concepts</b><span>Seven ideas the studio's products are built on.</span></a></li><li><a href="https://www.30eventures.com/why/"><b>Why we build</b><span>What is changing, what breaks, and what is needed.</span></a></li><li><a href="https://www.30eventures.com/faq/"><b>FAQ</b><span>What 30E Ventures is, and where each product stands.</span></a></li><li><a href="https://www.30eventures.com/press/"><b>Press</b><span>Boilerplate, fact sheet, logos and a press contact.</span></a></li></ul><aside class="an-feat"><h3>Start here</h3><h4>Verifiable by a stranger</h4><p>A claim anyone can check without trusting whoever made it.</p><a class="an-go" href="https://www.30eventures.com/concepts/#verifiable">Read the concept</a></aside></div></div></li></ul></nav><a class="an-cta" href="/hire.html">Hire a specialist</a></div></header><script src="/nav.js" defer></script>
+<!-- product:nav:end -->
+<div class="top subnav">
   <div class="topin">
-    <a class="brand" href="#top">Analyst<span>OS</span></a>
     <nav class="nav" id="nav" aria-label="Sections">
       <a href="#how">How it works</a>
       <a href="#walkthrough">Walkthrough</a>
@@ -295,7 +341,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
     <a class="btn no-print" href="upload.html" style="padding:7px 16px;font-size:14.5px;white-space:nowrap">Try it</a>
     <button class="iconbtn" id="themeBtn" aria-label="Switch between light and dark theme" title="Switch theme">&#9680;</button>
   </div>
-</header>
+</div>
 
 <main id="top">
 
@@ -326,9 +372,9 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
 
     <div class="stats">
       <div class="stat"><strong>5</strong><span>file formats read: CSV, Excel, Word, PowerPoint, PDF</span></div>
-      <div class="stat"><strong>1577</strong><span>automated tests in the suite</span></div>
+      <div class="stat"><strong>1596</strong><span>automated tests in the suite</span></div>
       <div class="stat"><strong>3</strong><span>report tiers, so a weak AI draft degrades quality, not trust</span></div>
-      <div class="stat"><strong>123</strong><span>written specs behind the build</span></div>
+      <div class="stat"><strong>124</strong><span>written specs behind the build</span></div>
     </div>
   </div>
 </section>
@@ -499,7 +545,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
     <details>
       <summary><span>Testing <span class="tag t-built">Built</span></span></summary>
       <div class="dbody"><ul>
-        <li>1577 automated tests with mocked calls: no network, no cost, the whole suite runs in about two minutes. Tests that need Node.js are skipped on a machine without it.</li>
+        <li>1596 automated tests with mocked calls: no network, no cost, the whole suite runs in about two minutes. Tests that need Node.js are skipped on a machine without it.</li>
         <li>A separate manual suite makes real, paid model calls against four fixed test documents, under a hard $1.00 spend ceiling.</li>
       </ul></div>
     </details>
@@ -630,9 +676,9 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
     <div class="sh"><h2>Evidence, and what hasn&rsquo;t been measured</h2></div>
     <p class="lede">Only figures found in the project are shown here.</p>
     <div class="grid g3">
-      <div class="card"><b style="font-family:var(--display);font-size:28px">1577 automated tests</b><p class="note" style="margin:4px 0 0">in the suite, all mocked, run in about two minutes; tests that need Node.js are skipped where it is not installed</p></div>
+      <div class="card"><b style="font-family:var(--display);font-size:28px">1596 automated tests</b><p class="note" style="margin:4px 0 0">in the suite, all mocked, run in about two minutes; tests that need Node.js are skipped where it is not installed</p></div>
       <div class="card"><b style="font-family:var(--display);font-size:28px">4 fixed test documents</b><p class="note" style="margin:4px 0 0">generated for testing, run in a live suite with paid model calls, capped at $1.00 and typically a few cents to a few tens of cents per full run</p></div>
-      <div class="card"><b style="font-family:var(--display);font-size:28px">123 specs</b><p class="note" style="margin:4px 0 0">each with a &ldquo;done when&rdquo; check, almost all written before the code they describe</p></div>
+      <div class="card"><b style="font-family:var(--display);font-size:28px">124 specs</b><p class="note" style="margin:4px 0 0">each with a &ldquo;done when&rdquo; check, almost all written before the code they describe</p></div>
       <div class="card"><b style="font-family:var(--display);font-size:28px">4 fixed test documents</b><p class="note" style="margin:4px 0 0">generated for testing, run in a live suite with paid model calls, capped at $1.00 and typically a few cents to a few tens of cents per full run</p></div>
     </div>
     <div class="card" style="margin-top:16px">
@@ -704,7 +750,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
     <details><summary>Which files does it accept?</summary><div class="dbody">CSV, Excel, Word, PowerPoint and PDF. Scanned, image-only PDFs that need OCR are not supported yet.</div></details>
     <details><summary>Can it compare against peers or market data?</summary><div class="dbody">No. It sees one document, by design for now, and has no integration with market data, news or accounting systems.</div></details>
     <details><summary>Is it ready for confidential production data?</summary><div class="dbody">Not yet. Access is a single shared code and there are no per-user accounts, audit log or policy engine, and no SOC 2 or external security review. That is why the pilot starts with non-confidential documents. Those controls are on the roadmap.</div></details>
-    <details><summary>How do you know it works?</summary><div class="dbody">1577 automated tests, a live suite of real model calls on four fixed test documents, and a defect log with root causes and proof of each fix. What does not exist yet is an accuracy benchmark on writing quality, which is one of the things a pilot would create.</div></details>
+    <details><summary>How do you know it works?</summary><div class="dbody">1596 automated tests, a live suite of real model calls on four fixed test documents, and a defect log with root causes and proof of each fix. What does not exist yet is an accuracy benchmark on writing quality, which is one of the things a pilot would create.</div></details>
   </div>
 </section>
 
@@ -743,7 +789,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
       <h4>Why it is different</h4>
       <p>A model proposes facts, but ordinary code proves each one and discards the rest. The writing step can cite facts by index and cannot type a number. Two independent quality gates and a three-tier fallback mean a weak draft lowers a report&rsquo;s quality, never its trustworthiness.</p>
       <h4>Where it stands</h4>
-      <p>Built by 30E Ventures, early stage. Reading, verification, writing, PDF and HTML delivery and a live upload page work, backed by 1577 automated tests. Writing quality is still being tuned. Accounts, audit log, policy engine and SOC 2 are planned, not built.</p>
+      <p>Built by 30E Ventures, early stage. Reading, verification, writing, PDF and HTML delivery and a live upload page work, backed by 1596 automated tests. Writing quality is still being tuned. Accounts, audit log, policy engine and SOC 2 are planned, not built.</p>
       <h4>What has not been measured</h4>
       <p>No accuracy benchmark for writing quality, no adoption data, no commercial metrics.</p>
       <h4>Proposed next step</h4>
@@ -760,7 +806,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
 </main>
 
 <!-- studio:footer:start -->
-<footer class="af"><div class="af-in"><div class="af-grid"><div><a class="af-name" href="/">AnalystOS</a><p class="af-line">Every figure in the report, proven against its source.</p><div class="af-pill"><span>Early stage. Not for confidential documents yet. Limits are published.</span></div></div><div><h2>Product</h2><ul><li><a href="/#how">How it works</a></li><li><a href="/#samples">Sample reports</a></li><li><a href="/hire.html">Hire a role</a><small>access code</small></li><li><a href="/upload.html">Upload a document</a><small>access code</small></li><li><a href="/details.html">Details, privacy and known limits</a></li></ul></div><div><h2>Developers</h2><ul><li><a href="/api/v1/openapi.json">API reference</a><small>OpenAPI 3.1</small></li><li><a href="/docs/api.md">API guide</a></li><li><a href="/docs/seal.md">Seal specification</a><small>re-verify offline</small></li><li><a href="/api/v2/catalog">Role catalog</a><small>JSON</small></li><li><a href="/.well-known/api-catalog">API catalog</a></li><li><a href="/llms.txt">llms.txt</a><small>for agents</small></li></ul></div><div><h2>Learn</h2><ul><li><a href="https://www.30eventures.com/concepts/">Concepts</a><small>verifiable by a stranger, and six more</small></li><li><a href="https://www.30eventures.com/learn/">Glossary</a><small>seal, verifier, fail closed</small></li><li><a href="https://www.30eventures.com/why/">Why we build</a></li><li><a href="https://www.30eventures.com/faq/">FAQ</a></li></ul></div><div><h2>30E Ventures</h2><ul><li><a href="https://www.30eventures.com/about/">About the studio</a></li><li><a href="https://www.30eventures.com/portfolio/">Portfolio</a></li><li><a href="https://www.30eventures.com/press/">Press</a></li><li><a href="https://www.30eventures.com/brand/">Brand</a></li><li><a href="https://www.30eventures.com/contact/">Contact</a></li></ul></div></div><div class="af-note"><!-- studio:note:start -->Statuses reflect the project&rsquo;s own code, tests and documents as of 2026-09-21. Examples marked illustrative use synthetic or public data. Roadmap timing is a set of targets, not results.<!-- studio:note:end --></div><div class="af-mid"><span>AnalystOS is built by <a href="https://www.30eventures.com/">30E Ventures</a>, a machine-native venture studio in Toronto building the agentic internet.</span><span>Status: <b>live, early stage</b>.</span></div><div class="af-bot"><span>&copy; 2026 30E Ventures &middot; Toronto, Canada</span><span>Use non-confidential documents only.</span></div></div></footer>
+<footer class="af"><div class="af-in"><div class="af-grid"><div><a class="af-name" href="/">AnalystOS</a><p class="af-line">Specialist work, ready the moment you need it.</p><div class="af-pill"><span>Early stage. Not for confidential documents yet. Limits are published.</span></div></div><div><h2>Product</h2><ul><li><a href="/#how">How it works</a></li><li><a href="/#samples">Samples for every role</a><small>73 roles, 13 families</small></li><li><a href="/hire.html">Hire a specialist</a><small>access code</small></li><li><a href="/upload.html">Upload a document</a><small>access code</small></li><li><a href="/details.html">Details, privacy and known limits</a></li></ul></div><div><h2>Developers</h2><ul><li><a href="/api/v1/openapi.json">API reference</a><small>OpenAPI 3.1</small></li><li><a href="/docs/api.md">API guide</a></li><li><a href="/docs/seal.md">Seal specification</a><small>re-verify offline</small></li><li><a href="/api/v2/catalog">Role catalog</a><small>JSON</small></li><li><a href="/.well-known/api-catalog">API catalog</a></li><li><a href="/llms.txt">llms.txt</a><small>for agents</small></li></ul></div><div><h2>Learn</h2><ul><li><a href="/glossary.html">AnalystOS glossary</a><small>figure tag, work product, boundary</small></li><li><a href="https://www.30eventures.com/concepts/">Concepts</a><small>verifiable by a stranger, and six more</small></li><li><a href="https://www.30eventures.com/learn/">Studio glossary</a><small>agents to settlement</small></li><li><a href="https://www.30eventures.com/why/">Why we build</a></li><li><a href="https://www.30eventures.com/faq/">FAQ</a></li></ul></div><div><h2>30E Ventures</h2><ul><li><a href="https://www.30eventures.com/about/">About the studio</a></li><li><a href="https://www.30eventures.com/portfolio/">Portfolio</a></li><li><a href="https://www.30eventures.com/press/">Press</a></li><li><a href="https://www.30eventures.com/brand/">Brand</a></li><li><a href="https://www.30eventures.com/contact/">Contact</a></li></ul></div></div><div class="af-note"><!-- studio:note:start -->Statuses reflect the project&rsquo;s own code, tests and documents as of 2026-09-21. Examples marked illustrative use synthetic or public data. Roadmap timing is a set of targets, not results.<!-- studio:note:end --></div><div class="af-mid"><span>AnalystOS is built by <a href="https://www.30eventures.com/">30E Ventures</a>, a machine-native venture studio in Toronto building the agentic internet.</span><span>Status: <b>live, early stage</b>.</span></div><div class="af-bot"><span>&copy; 2026 30E Ventures &middot; Toronto, Canada</span><span>Use non-confidential documents only.</span></div></div></footer>
 <!-- studio:footer:end -->
 
 <script>
@@ -961,7 +1007,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:14px}
     {name:'Provable facts', st:'built', stl:'Built', when:'Working today',
      out:'A set of facts, each a verbatim quote or an independently recomputed calculation, with a footnote to its exact source.',
      build:'Evidence store, readers for five formats, fact extraction and verification, and the zero-model fallback.',
-     meas:'1577 mocked tests in the suite, plus a live suite of real model calls on four fixed test documents under a $1.00 ceiling.',
+     meas:'1596 mocked tests in the suite, plus a live suite of real model calls on four fixed test documents under a $1.00 ceiling.',
      ctl:'PDF tables need a person\u2019s confirmation before citing. Unproven facts are discarded.'},
     {name:'Written like an analyst', st:'prog', stl:'In progress', today:true, when:'Active now. Latest fixes dated 2026-09-12.',
      out:'An executive summary, sectioned analysis, a chart, a disclosure-gap section and a separate outlook block, in prose that connects facts into judgments.',

@@ -41,7 +41,7 @@ class HomepageTest(unittest.TestCase):
     def test_the_new_homepage_credits_the_studio_and_links_the_full_page(self):  # Slice 122
         text = PAGES["index.html"]
         self.assertIn("AnalystOS is built by", text)
-        self.assertIn('href="details.html"', text)
+        self.assertIn('href="/details.html"', text)  # Slice 130: in the header menus and the footer
 
 
 if __name__ == "__main__":

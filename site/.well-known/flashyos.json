@@ -7,10 +7,18 @@
   },
   "capabilities": [
     "analysis",
+    "analyst-briefing",
+    "analytics",
     "client-delivery",
     "coordination",
+    "cross-document-synthesis",
+    "document-analysis",
+    "engagement-coordination",
     "evidence",
+    "figure-verification",
     "research",
+    "sealed-report",
+    "source-research",
     "synthesis",
     "verification"
   ]

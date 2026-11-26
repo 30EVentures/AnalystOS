@@ -24,7 +24,7 @@ def serve(lines, out):
             continue
         if not isinstance(case, dict) or "id" not in case:
             continue
-        refusals = errors(validate_charter(case.get("input")))
+        refusals = errors(validate_charter(case.get("input"), questions=True))
         out.write(json.dumps({
             "id": case["id"],
             "valid": not refusals,

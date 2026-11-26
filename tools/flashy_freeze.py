@@ -57,6 +57,8 @@ EXACT_FILES = (
     "tools/defined_proxy_validator.py",
     "tools/redact_served_devlog.py",
     "tools/seal_key_file.py",
+    "tools/build_jwks.py",
+    "tools/aao_differential.py",
     "tools/seal_facts_check.mjs",
     "tools/flashy_freeze.py",  # the fence itself: weakening it is a fence move too
     "docs/aao.md",
@@ -90,6 +92,7 @@ SERVED_PATHS = (
     "/.well-known/flashyos.json",
     "/.well-known/flashyos-charter.json",
     "/.well-known/analystos-seal-key.json",
+    "/.well-known/jwks.json",
     "/.well-known/devlog.fragment.json",
     "/.well-known/shiplog.json",
     "/.well-known/checkpoint.json",

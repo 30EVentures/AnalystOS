@@ -7,17 +7,26 @@ needing the owner's explicit yes regardless. **Nothing here has been run against
 
 ## `flashy_declare.py` - capability and offer declaration
 
-Ready to run, once re-minted tokens exist (the ones Michael minted 2026-11-21 are
-compromised - they travelled through a terminal log into a chat; ask for
-replacements). Confirmed endpoint, from Flashy's 21 Nov reply:
+A re-minted join grant arrived 2026-11-25 (scopes `capabilities:declare` and
+`offers:declare`, expires 2026-12-25). It is kept outside this repository and
+passed in through `FLASHY_JOIN_GRANT_TOKEN`; it cannot mint agents. Confirmed
+endpoint, from Flashy's 21 Nov reply:
 
-    POST /api/v1/orgs/{orgId}/agents/{agentName}/capabilities
+    POST /api/v1/orgs/{orgId}/agents/{agentName}/capabilities   one request per capability
     header: x-join-grant: <token>
-    body: {"capabilities": [...]}
+    body: {"capability": "<slug>", "description": "<the answering role's purpose>"}
+
+    POST /api/v1/orgs/{orgId}/offers                            the org's whole offer list
+    body: {"offers": [...]}
+
+Both shapes are read from the published `@flashyos/agent@0.21.0` client. The
+21 Nov reply had described `{"capabilities": [...]}`; the first live call
+(2026-11-26) answered 400 "capability and description are required" to it,
+and nothing was written.
 
 ```
 python3 ops/flashy_declare.py capabilities analysis evidence verification \
-    --org-id analystos --agent-name analystos-agent \
+    --org-id cmtkurcbs00je12tigb1rc6t1 --agent-name analystos-agent \
     --token "$FLASHY_JOIN_GRANT_TOKEN"        # prints the request, sends nothing
 
 ... --execute                                  # sends it for real
@@ -26,11 +35,26 @@ python3 ops/flashy_declare.py capabilities analysis evidence verification \
 Defaults to a dry run: it always prints the exact request first, and refuses to
 send anything unless `--execute` is also given. The token is never printed.
 
-**The `offers` path is this script's own guess**, not a path Flashy confirmed -
-they gave the scope name (`offers:declare`) but not the exact endpoint. The
-script prints a warning every time `offers` is used and before it ever
-constructs the real request; confirm the path with Flashy before passing
-`--execute` on it.
+Two guards run before anything is built (Slice 132, `ops/mesh_ids.py`), both
+from Flashy's 2026-11-25 measurements:
+
+- `--org-id` must be the organisation's id (`cmtkurcbs00je12tigb1rc6t1` for
+  analystos), never the slug: a slug in the path answers 404.
+- Every capability must already be in the served charter, as a role name or an
+  `x-capability`, and be a lowercase hyphenated slug. A declared capability
+  cannot be withdrawn yet, so a typo would be permanent. More than 20 offers is
+  refused, because Flashy silently keeps only 20.
+
+A refusal from the live route is explained: 401 invalid or expired grant, 403
+wrong organisation or scope, 404 wrong path, 501 grants switched off.
+
+Which capabilities to declare is still the owner's decision. `docs/mesh-identity.md`'s
+rule is that a discovery slug is declared only once its endpoint is deployed
+and smoke-tested. Do not use `npx @flashyos/agent declare`: it publishes every
+role's bare verbs and drops array-valued `x-capability`.
+
+**Offers are organisation-level** (`/orgs/{orgId}/offers`), not per agent, and one
+call replaces the whole list; `--agent-name` is ignored for them.
 
 ## Token rotation - resolved, no script needed
 
@@ -58,7 +82,7 @@ so AnalystOS's own tooling can log a decision without depending on Node.
 
 ```
 python3 ops/flashy_decide.py "deploy the seven-role charter" --tier 2 \
-    --org-id analystos --agent-name analystos-agent \
+    --org-id cmtkurcbs00je12tigb1rc6t1 --agent-name analystos-agent \
     --token "$FLASHYOS_AGENT_TOKEN"        # prints the request, sends nothing
 
 ... --execute                                # sends it for real

@@ -41,9 +41,48 @@ npx @flashyos/conformance-kit <corpus.json> -- python3 -m analystos.aao.kit
 ```
 
 The adapter follows the kit's line protocol (`{id,set,input}` in,
-`{id,valid,codes}` out). A document with only warnings is valid. **No AAO
-corpus is public**: the kit ships one bundled corpus, for `frontdoor/1`, which
-this adapter would (correctly) disagree with everywhere - it checks charters.
+`{id,valid,codes}` out). A document with only warnings is valid. The adapter
+also asks FlashyOS's static L2 questions (`validate_charter(doc,
+questions=True)`), because FlashyOS's corpus counts their failures as errors.
+
+## Against FlashyOS's own corpus (Slice 132)
+
+FlashyOS now serves its AAO corpus (13 cases, `conformance/1`) at
+`https://flashyos.com/.well-known/conformance/aao-0.1.json`. A snapshot with its
+sha256 is in `conformance/flashyos-aao-0.1.json`; run
+
+```
+python3 tools/aao_differential.py
+```
+
+Only verdicts are compared: FlashyOS's expected codes are its question ids and,
+for some cases, English sentences, so the two vocabularies cannot be matched by
+string. Measured 2026-11-26:
+
+| | Verdicts agreeing |
+|---|---|
+| Before this slice | 11 of 13 (`no-role-gated`, `vague-capability` accepted here, refused there) |
+| After | 13 of 13 |
+
+Both disagreements were this checker's: it did not ask two questions that the
+published `@flashyos/aao@0.4.2` asks (`approval-thresholds-considered` and the
+vague-capability half of `capabilities-declared`). They are now
+`aao.approval.none_gated` and `aao.capability.vague`, asked only with
+`questions=True`, so the schema-level verdict is unchanged.
+
+Five inputs Flashy's 2026-11-25 plan names as divergent, run here:
+
+| Input | Here | FlashyOS, per its plan |
+|---|---|---|
+| numeric `name` | invalid, `aao.schema.type` | its packages throw |
+| a `null` role | invalid, `aao.schema.type` | its packages throw |
+| role named `nova` | valid | refused on `main` (codename denylist) |
+| role named `qwen-router` | valid | refused on `main`, accepted by npm 0.4.2 |
+| `x-` key on a repository | **invalid**, `aao.schema.unknown_key` | FlashyOS's JS validator accepts it; its published 0.4.2 schema file refuses it, as this checker does |
+
+The last row is a disagreement inside FlashyOS's own release, not with this
+checker: its schema file and its validator give different verdicts. This checker
+follows the schema file it pins.
 
 ## What is checked
 
@@ -53,6 +92,7 @@ this adapter would (correctly) disagree with everywhere - it checks charters.
 | Cross-field | duplicate role names; `worksIn` naming an undeclared repository; `escalation` naming a missing role; more than one default repository; a repository no role owns | the schema's own description text |
 | Naming | at most three words; a **partial** vendor list; placeholder names; `you@example.com` | FlashyOS's documented role-naming rules and the `accountableTo` description |
 | Advice | a role with no `measure` (warning) | schema: "strongly encouraged" |
+| L2 questions (`questions=True`) | no role gated at any impact level; a one-word capability over 12 characters | `@flashyos/aao@0.4.2`'s static questions, found missing by the differential |
 
 Not checked: FlashyOS's codename denylist (we do not have it - a role called
 `nova` passes here and may not pass theirs), and whether an org's handshake,
@@ -61,8 +101,8 @@ grades; see `docs/flashyos-alignment-2026-09-25.md`).
 
 ## Rule codes
 
-These are AnalystOS's, not FlashyOS's (their corpus is not public, so their
-codes are unknown to us).
+These are AnalystOS's, not FlashyOS's. FlashyOS's corpus names its findings
+by question id or sentence; see the differential above.
 
 | Code | Level | Meaning |
 |---|---|---|
@@ -78,6 +118,8 @@ codes are unknown to us).
 | `aao.role.worksin_undeclared` | error | `worksIn` names an undeclared repository |
 | `aao.role.name.too_many_words` | error | more than three hyphen-separated words |
 | `aao.role.name.vendor` | error | a role name uses a model-vendor word |
+| `aao.approval.none_gated` | error | no role requires human approval at any impact level (L2 question) |
+| `aao.capability.vague` | error | a one-word capability over 12 characters (L2 question) |
 | `aao.role.name.placeholder` | error | a role name is a placeholder |
 | `aao.escalation.unknown_role` | error | `escalation` names no role |
 | `aao.repository.multiple_default` | error | more than one default repository |

@@ -12,8 +12,8 @@ Fonts request), ink on paper, square buttons, rules over rounded cards. Shared t
 (concepts, the wider glossary, press) link to the studio site rather than being
 copied; only AnalystOS's own vocabulary gets a page here. The footer reuses the
 branch the 30E session built and never merged, updated to today's product. Menus
-need a small same-origin script; every menu link is also in the footer, so the site
-still works without it.
+need a small same-origin script. Without it the menus do not open, but the footer
+still links every page's main sections (not every menu item).
 
 ## 2026-11-24 — Slice 129: a worked example for every one of the 73 roles
 

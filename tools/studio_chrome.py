@@ -62,7 +62,7 @@ def family_items():
 def menus():
     return [
         ("roles", "Roles", "Roles", "73 roles in 13 families.",
-         "Each role asks its own questions and delivers in its family's format.", ("Hire a specialist", "/hire.html"),
+         "Every role asks the same core questions plus its family's own, and delivers in its family's format.", ("Hire a specialist", "/hire.html"),
          family_items(), None),
         ("samples", "Samples", "Samples", "See the finished work before you hire.",
          "Every role has a sample of its own, built from a worked example.", ("Open the explorer", "/#samples"),
@@ -82,11 +82,11 @@ def menus():
           ("Questions", "/details.html#faq", "Privacy, documents and what it cannot do yet.")],
          ("Full details", "How it stays honest", "Privacy, known limits and the evidence behind each claim.", ("Read the details", "/details.html"))),
         ("agents", "For agents", "For agents", "Software can hire through the API.",
-         "Published contracts, a role catalog and an index for language models.", ("Read the API guide", "/docs/api.md"),
-         [("API guide", "/docs/api.md", "How to open, scope and fetch an engagement."),
+         "Published contracts, a role catalog and an index for language models.", ("Read llms.txt", "/llms.txt"),
+         [("API guide", "/docs/api.md", "The document API (v1): send a document, get a checked report."),
           ("OpenAPI", "/api/v1/openapi.json", "The machine-readable API description."),
           ("Role catalog", "/api/v2/catalog", "Every role, its questions and its format, as JSON."),
-          ("llms.txt", "/llms.txt", "A short index of the site for language models."),
+          ("llms.txt", "/llms.txt", "An index for language models, with the endpoint that hires a role."),
           ("Seal specification", "/docs/seal.md", "Re-check a sealed report offline, against a key you pin."),
           ("API catalog", "/.well-known/api-catalog", "Where each API and its documents live.")], None),
         ("learn", "Learn", "Learn", "The words and ideas behind the work.",
@@ -140,6 +140,7 @@ NAV_CSS = """.an-head{position:sticky;top:0;z-index:50;background:#fff;border-bo
 .an-has.open>button::after,.an-has>button:hover::after{background:#0e1726}
 .an-has>button svg{width:11px;height:11px;transition:transform .15s}
 .an-has.open>button svg{transform:rotate(180deg)}
+.an-head a,.af a{border-bottom:0}
 .an-cta{flex:none;font:600 14px/1 var(--sans);text-decoration:none;padding:12px 16px;border-radius:3px;background:#0e1726;color:#fff;border:1px solid #0e1726}
 .an-cta:hover{background:#1d2a42}
 .an-burger{display:none;appearance:none;background:none;border:1px solid #c6cbd4;border-radius:3px;padding:9px 10px;margin-left:auto;cursor:pointer}
@@ -151,7 +152,7 @@ NAV_CSS = """.an-head{position:sticky;top:0;z-index:50;background:#fff;border-bo
 .an-mega h3{font:600 12px/1 var(--sans);letter-spacing:.09em;text-transform:uppercase;color:#5b6678;margin:0 0 14px}
 .an-lead{font:400 23px/1.25 var(--serif);margin:0 0 10px;letter-spacing:-.005em}
 .an-sub{color:#37425a;font-size:15px;line-height:1.5;margin:0 0 16px}
-.an-all{font-weight:600;font-size:15px;text-decoration:none;color:#0e1726;border-bottom:1px solid #0e1726}
+.an-head .an-all{font-weight:600;font-size:15px;text-decoration:none;color:#0e1726;border-bottom:1px solid #0e1726}
 .an-mega ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:2px 28px;align-content:start}
 .an-wide ul{grid-template-columns:1fr 1fr 1fr}
 .an-mega li a{display:block;padding:11px 0;border-bottom:1px solid #dcdfe5;text-decoration:none;color:#0e1726}

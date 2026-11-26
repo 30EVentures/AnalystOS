@@ -15,8 +15,9 @@ sections at the top". The owner approved the plan and then the local mock.
   sections, each a full-width dropdown in the 30E Ventures pattern - Roles (the 13
   families with role count and format, from the catalog), Samples, How it works, For
   agents, Learn - and a "Hire a specialist" button. `site/nav.js` opens on hover or
-  click, closes on Escape, outside click or tabbing away; a phone drawer below 860px.
-  Every menu link is also in the footer, so nothing depends on the script.
+  click, closes on Escape (focus returns to the menu's button), outside click or tabbing
+  away; a phone drawer below 860px. Without the script the menus do not open; the footer
+  still links every page's main sections.
 - **Footer**: the `analystos-footer` branch (built 2026-11-24 by the 30E site session,
   never merged), brought up to date: today's headline, roles and samples, the
   AnalystOS glossary, studio Concepts, glossary, Why, FAQ, Press.

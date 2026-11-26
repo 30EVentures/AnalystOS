@@ -94,12 +94,17 @@ class HeaderTest(unittest.TestCase):
         script = (SITE / "nav.js").read_text(encoding="utf-8")
         for unsafe in ("innerHTML", "outerHTML", "insertAdjacentHTML", "document.write", "eval(", "fetch("):
             self.assertNotIn(unsafe, script)
-        self.assertIn('e.key === "Escape"', script)
+        self.assertIn('e.key !== "Escape"', script)
+        self.assertIn("btn(openLi).focus()", script)  # Escape hands focus back to the menu's button
+        self.assertIn("burger.focus()", script)
+        self.assertIn('li.addEventListener("focusout"', script)  # each menu closes when focus leaves it
+        self.assertIn("li.hovered", script)  # a click after hover-open does not close the menu
 
     def test_the_explorer_opens_on_a_linked_family_and_role(self):
         page = (SITE / "index.html").read_text(encoding="utf-8")
         self.assertIn("params.get('family')", page)
         self.assertIn("params.get('role')", page)
+        self.assertRegex(page, r"var wantRole = params\.get\('role'\);[\s\S]{0,200}if \(r\) pick\(r\);")
 
 
 class LookTest(unittest.TestCase):
@@ -143,6 +148,19 @@ class GlossaryTest(unittest.TestCase):
         for fam_format in formats.FAMILY_FORMAT.values():
             counts[fam_format] = counts.get(fam_format, 0) + 1
         self.assertEqual(sorted(counts.values()), [3, 4, 6])
+
+    def test_its_filter_really_hides_terms(self):
+        # .g-term is display:grid, which beats the hidden attribute unless this rule exists
+        self.assertIn(".g-term[hidden],.g-group[hidden]{display:none}", GLOSSARY)
+        self.assertIn("t.hidden = !hit", GLOSSARY)
+
+    def test_it_claims_nothing_the_code_does_not_do(self):
+        for overclaim in ("its own questions", "share a delivery format and some", "refuses work rather than quietly fixing",
+                          "never invents", "never written as if", "until a named person approves",
+                          "never contains a number that is not a figure"):
+            self.assertNotIn(overclaim, GLOSSARY)
+        self.assertNotIn("its own questions", NAV)
+        self.assertNotIn("fetch an engagement", NAV)
 
     def test_its_own_links_are_served(self):
         for href in re.findall(r'href="(/[^"]*)"', GLOSSARY):

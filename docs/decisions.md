@@ -2,6 +2,21 @@
 
 Dated log, newest first. One entry per real choice, with the reason.
 
+## 2026-11-26 — Slice 135: preflight, a free check before a hire
+
+An agent preparing a hire had to send the real request to learn that an answer
+was missing or a budget too wide, and a request that passed made a paid model
+call at once. `POST /api/v2/engagements/preflight` runs the hire's own intake
+(one shared function, so the two cannot drift) and never makes a model call, so
+it needs no access code. It reports characters, not tokens, for the first call:
+a token count is only ever the model's own. It answers 200 with `ready` rather
+than mirroring the hire's 422s, so a caller reads one shape whatever is wrong,
+and it reports a refused budget and open questions together. Vercel serves one
+path per function, so a rewrite sends `/engagements/preflight` to the
+engagements function with `?preflight=true`, the same pattern as the v1 job
+routes; the branch comes before the access check and before anything that could
+make a call.
+
 ## 2026-11-26 — Slice 133: metered hiring without prices
 
 Phase 5 (hiring) needs rates, and no price has been set for anything. So this

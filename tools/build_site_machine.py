@@ -71,6 +71,8 @@ def generated_files():
               "`X-AnalystOS-Format` header; with `?format=json` it is `output` {format, media_type, filename, base64}. "
               "An optional `budget` can only narrow the limits (2 model calls, 8192 output tokens per call); every "
               "engagement taken on gets an unsigned `analystos-receipt/1` with measured usage",
+              f"- `POST {BASE}/api/v2/engagements/preflight`: the same body and checks as a hire, with no model call and "
+              "no access code: says whether it would be taken on, the reasons the hire would refuse it, and the most it could use",
               _guide_line("hiring-api.md"),
               f"- [{GUIDES[0][1]}]({BASE}/docs/{GUIDES[0][0]}): {GUIDES[0][2]}", ""]
     lines += ["## Verifying a report", "",

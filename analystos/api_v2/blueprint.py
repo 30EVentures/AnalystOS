@@ -3,6 +3,9 @@
 - ``GET  /api/v2/catalog``     public. Every role: its family, boundary, how it was
   tested (``eval.method``), pricing, what it delivers today, and the scoping
   questions it will ask. People and agents read the same document.
+- ``POST /api/v2/engagements/preflight`` public, free: the same checks as a hire, no
+  model call; says whether the hire would be taken on and what it would use at most
+  (Slice 135).
 - ``POST /api/v2/engagements`` access code required (``X-Access-Code``). JSON body
   ``{"role", "problem", "answers": {question id: text}, "requested_by": {"kind", "ref"},
   "budget"?: {"max_model_calls", "max_output_tokens_per_call"}}``.
@@ -18,6 +21,7 @@ has been set for any role, and nothing is charged here.
 """
 
 import base64
+import json
 from datetime import datetime, timezone
 
 from flask import Blueprint, Response, jsonify, request
@@ -92,8 +96,90 @@ def catalog():
     })
 
 
+def _intake(body):
+    """The one intake path hiring and preflight share (Slice 135), so they cannot disagree.
+    Never makes a model call. Checks run in the hire's order; a later check is skipped
+    only when an earlier one leaves nothing to check."""
+    out = {"bad_request": None, "budget": None, "budget_problems": [], "refused": None, "record": None,
+           "accepted": None, "problems": [], "open_questions": [], "catalog": load_catalog()}
+    answers = body.get("answers", {})
+    if not isinstance(answers, dict):
+        out["bad_request"] = "answers must be an object of question id to text"
+        return out
+    out["budget"], out["budget_problems"] = receipts.parse_budget(body.get("budget"))
+    try:
+        record = eng.new_engagement(
+            engagement_id=eng.new_id(), created=_now(),
+            requested_by=body.get("requested_by", {"kind": "person", "ref": "web"}),
+            problem=body.get("problem"), roles=[body.get("role")], catalog=out["catalog"])
+        for qid, text in answers.items():
+            if isinstance(text, str) and not text.strip():
+                continue
+            record = eng.answer(record, qid, text)
+    except ValueError as exc:
+        out["refused"] = str(exc)
+        return out
+    out["record"] = record
+    out["accepted"], out["problems"] = eng.accept(record, out["catalog"])
+    if out["accepted"] is None:
+        out["open_questions"] = eng.open_questions(record)
+    return out
+
+
+@bp.post("/engagements/preflight")
+def preflight_engagement():
+    """Everything a hire checks, with no model call, no reservation and no access code."""
+    if _rate_limit and (limited := _rate_limit()):
+        return limited
+    if (request.content_length or 0) > MAX_BODY_BYTES:
+        return _err(413, "too_large", f"request body over {MAX_BODY_BYTES} bytes")
+    body = request.get_json(silent=True)
+    if not isinstance(body, dict):
+        return _err(400, "bad_request", "send a JSON object")
+    intake = _intake(body)
+    if intake["bad_request"]:
+        return _err(400, "bad_request", intake["bad_request"])
+    cat, budget, accepted = intake["catalog"], intake["budget"], intake["accepted"]
+    problems = list(intake["budget_problems"])
+    if intake["refused"]:
+        problems.append(intake["refused"])
+    elif accepted is None:
+        problems += intake["problems"]
+    role = next((r for r in cat["roles"] if r["id"] == body.get("role")), None)
+    fmt = formats.format_of(role) if role else None
+    ready = not problems and accepted is not None
+    first_call = None
+    if ready:
+        work = consulting.work_role(accepted, cat)
+        first_call = {"system_characters": len(consulting.system_prompt(work)),
+                      "message_characters": len(consulting.build_prompt(accepted)),
+                      "tool_definition_characters": len(json.dumps(consulting.TOOL, ensure_ascii=False,
+                                                                  separators=(",", ":")))}
+    return jsonify({
+        "format": "analystos-preflight/1",
+        "ready": ready,
+        "role": role["id"] if role else None,
+        "problems": problems,
+        "open_questions": intake["open_questions"],
+        "budget": budget,
+        "limits": receipts.LIMITS,
+        "worst_case": None if budget is None else {
+            "model_calls": budget["max_model_calls"],
+            "output_tokens": budget["max_model_calls"] * budget["max_output_tokens_per_call"]},
+        "deliverable": None if fmt is None else {"format": fmt["name"], "media_type": fmt["media_type"],
+                                                 "extension": fmt["extension"]},
+        "first_call": first_call,
+        "pricing": "tbd",
+        "model_calls_made": 0,
+        "note": "A preflight makes no model call and reserves nothing. The hire repeats every check, "
+                "and needs the access code.",
+    })
+
+
 @bp.post("/engagements")
 def create_engagement():
+    if request.args.get("preflight") == "true":  # Vercel rewrites /engagements/preflight here (vercel.json)
+        return preflight_engagement()
     if _rate_limit and (limited := _rate_limit()):
         return limited
     if _access_denied is None:
@@ -105,31 +191,18 @@ def create_engagement():
     body = request.get_json(silent=True)
     if not isinstance(body, dict):
         return _err(400, "bad_request", "send a JSON object")
-    role, answers = body.get("role"), body.get("answers", {})
-    requested_by = body.get("requested_by", {"kind": "person", "ref": "web"})
-    if not isinstance(answers, dict):
-        return _err(400, "bad_request", "answers must be an object of question id to text")
-    budget, budget_problems = receipts.parse_budget(body.get("budget"))
-    if budget_problems:
+    intake = _intake(body)
+    if intake["bad_request"]:
+        return _err(400, "bad_request", intake["bad_request"])
+    if intake["budget_problems"]:
         return _err(422, "bad_budget", "the budget was refused before any model call",
-                    problems=budget_problems, limits=receipts.LIMITS)
-
-    cat = load_catalog()
-    try:
-        record = eng.new_engagement(
-            engagement_id=eng.new_id(),
-            created=_now(),
-            requested_by=requested_by, problem=body.get("problem"), roles=[role], catalog=cat)
-        for qid, text in answers.items():
-            if isinstance(text, str) and not text.strip():
-                continue
-            record = eng.answer(record, qid, text)
-    except ValueError as exc:
-        return _err(422, "refused", str(exc))
-    accepted, problems = eng.accept(record, cat)
-    if accepted is None:
-        return _err(422, "not_accepted", "the engagement cannot be taken on yet", problems=problems,
-                    open_questions=eng.open_questions(record))
+                    problems=intake["budget_problems"], limits=receipts.LIMITS)
+    if intake["refused"]:
+        return _err(422, "refused", intake["refused"])
+    if intake["accepted"] is None:
+        return _err(422, "not_accepted", "the engagement cannot be taken on yet", problems=intake["problems"],
+                    open_questions=intake["open_questions"])
+    cat, budget, accepted = intake["catalog"], intake["budget"], intake["accepted"]
 
     meter = []
     try:

@@ -1069,13 +1069,14 @@ To call AnalystOS from another program instead, see [`api.md`](api.md).
 
 # Hiring a role through the API (v2)
 
-Base: `https://analystos.dev/api/v2`. People and agents use the same two endpoints.
+Base: `https://analystos.dev/api/v2`. People and agents use the same endpoints.
 Price: to be determined. No price has been set for any role, and nothing is charged
 through this API.
 
 | Method and path | Auth | What |
 |---|---|---|
 | `GET /api/v2/catalog` | none | every role: family, boundary, how it was tested, what it delivers, and the questions it asks |
+| `POST /api/v2/engagements/preflight` | none | the same checks as a hire, with no model call: would it be taken on, and what would it use at most |
 | `POST /api/v2/engagements` | access code (`X-Access-Code`) | hire one role for one problem; answers in one request with the finished file |
 
 ## Hiring
@@ -1101,6 +1102,51 @@ through this API.
   `receipt` and `receipt_sha256`.
 - Every request that passes the checks makes a paid model call on the operator's
   account. The access code is what limits who can make one.
+
+## Preflight
+
+`POST /api/v2/engagements/preflight` takes exactly the body of a hire and runs the
+same checks, in the same code: role, problem, requester, answers, acceptance and
+budget. It makes no model call, reserves nothing, needs no access code and costs
+nothing, so check a hire here before you send it. A JSON object with `answers`
+(if any) as an object answers `200`; the exceptions are listed below:
+
+```json
+{
+  "format": "analystos-preflight/1",
+  "ready": false,
+  "role": "management-consulting-analyst",
+  "problems": ["budget.max_model_calls is 3, above this server's limit of 2; a budget can only narrow the limits",
+               "still scoping: unanswered consulting.success"],
+  "open_questions": ["consulting.success"],
+  "budget": null,
+  "limits": {"max_model_calls": 2, "max_output_tokens_per_call": 8192},
+  "worst_case": null,
+  "deliverable": {"format": "deck", "media_type": "...", "extension": "pptx"},
+  "first_call": null,
+  "pricing": "tbd",
+  "model_calls_made": 0,
+  "note": "..."
+}
+```
+
+- `ready: true` means the hire, sent as is, would be taken on: it would pass
+  every check and go on to the model, unless this server's own call limit is
+  spent or the model is unavailable (then the hire answers `503`). The hire
+  repeats every check, so a preflight is advice, not a reservation.
+- `problems` and `open_questions` are the reasons the hire would refuse it, in
+  the hire's own words. Intake stops at its first refusal (a bad role, problem,
+  requester or answer), so fix that and check again; a refused budget is always
+  reported alongside, and open questions are listed when intake got that far.
+- `worst_case` is the most the hire could use: `model_calls`, and `output_tokens`
+  (calls times the per-call token budget). `null` when the budget is refused.
+- `first_call` (only when ready) gives the character counts of the system
+  prompt and the message the first model call would send (exact), and of the
+  tool definition as compact JSON (the wire format may differ by whitespace).
+  These are characters, not tokens: AnalystOS reports a token count only when
+  the model has reported one.
+- Malformed JSON, or `answers` that is not an object, is `400`; a body over
+  64,000 bytes is `413`; it is rate limited like every endpoint.
 
 ## Budget
 

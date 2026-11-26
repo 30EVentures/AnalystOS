@@ -36,6 +36,9 @@ UNREADABLE = "<unreadable>"
 EXACT_FILES = (
     ".shiplog/config.json",
     "vendor-shiplog.mjs",
+    "vendor-checkpoint.mjs",
+    ".checkpoint/config.json",
+    "tools/emit_record.mjs",
     "solwayholdings.aao.json",
     "site/.well-known/flashyos.json",
     "site/.well-known/flashyos-charter.json",
@@ -88,6 +91,8 @@ SERVED_PATHS = (
     "/.well-known/flashyos-charter.json",
     "/.well-known/analystos-seal-key.json",
     "/.well-known/devlog.fragment.json",
+    "/.well-known/shiplog.json",
+    "/.well-known/checkpoint.json",
     "/flashyos.roles.json",
     "/docs/aao.md",
     "/docs/mesh-identity.md",
@@ -102,8 +107,7 @@ LLMS_HEADING = "## Identity and the FlashyOS mesh"
 
 # Records that grow by design: past entries frozen in order, new entries allowed.
 APPEND_ONLY = (
-    "devlog.fragment.json",
-    "shiplog.fragment.json",
+    "site/.well-known/shiplog.json",
     "site/.well-known/devlog.fragment.json",
 )
 APPEND_ONLY_FREE_KEYS = ("generated", "entries")

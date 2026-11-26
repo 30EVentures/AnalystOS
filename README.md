@@ -63,7 +63,7 @@ Run it on your own document: [`docs/using-analystos.md`](docs/using-analystos.md
 | `mcp-server/` | AnalystOS's own MCP server (Slice 100) - not routed through `@flashyos/mcp`, not deployed; `npm install --ignore-scripts` once, then `node --test test.mjs` |
 | `findings/` | the 30E Ventures findings register (Slice 101): schema, validator, generator. `registry.json` holds one template entry only - the real findings are not in this repository; see `findings/README.md` |
 | `ops/` | live-API scripts prepared but never executed (Slice 102) - dry run by default, needs `--execute` and a real credential nobody has given it; see `ops/README.md` |
-| `.shiplog/config.json`, `vendor-shiplog.mjs`, `shiplog.fragment.json`, `devlog.fragment.json`, `DEVLOG.md` | this repository's own shipped/1 and devlog/1 record, adopted with `@flashyos/shiplog` (Slice 99); committed and private, never served - `drafts/devlog.fragment.json` is the public projection, currently empty on purpose |
+| `.shiplog/config.json`, `vendor-shiplog.mjs`, `vendor-checkpoint.mjs`, `.checkpoint/config.json`, `tools/emit_record.mjs`, `DEVLOG.md` | this repository's own public record (Slices 99, 106, 131): `node tools/emit_record.mjs` then `node vendor-checkpoint.mjs emit` writes `site/.well-known/shiplog.json` (shipped/1), `devlog.fragment.json` (devlog/1) and `checkpoint.json` (checkpoint/1). Privacy rules run before sealing; no unredacted copy is committed |
 
 ## Working here
 

@@ -171,28 +171,28 @@ class FlashyFenceTest(unittest.TestCase):
             entry = dict(doc["entries"][0], id="new-entry", summary="Slice 108: something new")
             doc["entries"].insert(0, entry)
             doc["generated"] = "2026-12-01T00:00:00Z"
-        self.edit_json("devlog.fragment.json", change)
+        self.edit_json("site/.well-known/devlog.fragment.json", change)
         self.assertEqual(self.check(), [])
 
     def test_rewriting_a_past_devlog_entry_is_drift(self):
         def change(doc):
             doc["entries"][-1]["summary"] = "rewritten history"
-        self.edit_json("devlog.fragment.json", change)
-        self.assertDrift("devlog.fragment.json: 1 past entry changed or removed")
+        self.edit_json("site/.well-known/devlog.fragment.json", change)
+        self.assertDrift("site/.well-known/devlog.fragment.json: 1 past entry changed or removed")
 
     def test_removing_a_past_shiplog_entry_is_drift(self):
-        self.edit_json("shiplog.fragment.json", lambda doc: doc["entries"].pop())
-        self.assertDrift("shiplog.fragment.json: 1 past entry changed or removed")
+        self.edit_json("site/.well-known/shiplog.json", lambda doc: doc["entries"].pop())
+        self.assertDrift("site/.well-known/shiplog.json: 1 past entry changed or removed")
 
     def test_reordering_past_entries_is_drift(self):
-        self.edit_json("devlog.fragment.json", lambda doc: doc["entries"].reverse())
-        self.assertDrift("devlog.fragment.json: past entries were reordered")
+        self.edit_json("site/.well-known/devlog.fragment.json", lambda doc: doc["entries"].reverse())
+        self.assertDrift("site/.well-known/devlog.fragment.json: past entries were reordered")
 
     def test_a_duplicate_entry_id_is_drift(self):
         def change(doc):
             doc["entries"].insert(0, dict(doc["entries"][-1], summary="an edited copy"))
-        self.edit_json("devlog.fragment.json", change)
-        self.assertDrift("devlog.fragment.json: duplicate entry ids")
+        self.edit_json("site/.well-known/devlog.fragment.json", change)
+        self.assertDrift("site/.well-known/devlog.fragment.json: duplicate entry ids")
 
     def test_changing_an_append_only_header_is_drift(self):
         self.edit_json("site/.well-known/devlog.fragment.json", lambda doc: doc.update(org="someone-else"))
@@ -252,11 +252,12 @@ class FlashyFenceTest(unittest.TestCase):
         path = self.repo / "site/.well-known/flashyos-charter.json"
         path.write_bytes(path.read_bytes() + b" ")
         self.assertDrift("file changed: site/.well-known/flashyos-charter.json")
+        logged_before = len(fence.load_manifest(self.repo)["log"])
         code, _ = fence.update(self.repo, "Gate F: owner approved a new offer", "2026-12-01")
         self.assertEqual(code, 0)
         self.assertEqual(self.check(), [])
         log = fence.load_manifest(self.repo)["log"]
-        self.assertEqual(len(log), 2)
+        self.assertEqual(len(log), logged_before + 1)
         self.assertEqual(log[-1]["reason"], "Gate F: owner approved a new offer")
         self.assertIn("file changed: site/.well-known/flashyos-charter.json", log[-1]["moved"])
 
@@ -286,11 +287,11 @@ class FlashyFenceTest(unittest.TestCase):
     def test_unreadable_inputs_are_reported_not_raised(self):
         (self.repo / "vercel.json").write_text("{broken")
         (self.repo / fence.LLMS_FILE).unlink()
-        (self.repo / "devlog.fragment.json").write_text("[]")
+        (self.repo / "site/.well-known/devlog.fragment.json").write_text("[]")
         problems = self.check()
         self.assertTrue(any("vercel.json" in p for p in problems), problems)
         self.assertTrue(any(fence.LLMS_FILE in p for p in problems), problems)
-        self.assertTrue(any(p.startswith("devlog.fragment.json: unreadable") for p in problems), problems)
+        self.assertTrue(any(p.startswith("site/.well-known/devlog.fragment.json: unreadable") for p in problems), problems)
 
     # --- untracked files in a real checkout ----------------------------------
 

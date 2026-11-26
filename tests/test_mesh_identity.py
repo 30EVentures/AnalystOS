@@ -111,7 +111,8 @@ class VercelHeadersTest(unittest.TestCase):
     def test_both_paths_get_json_and_cors_headers(self):
         by_source = {h["source"]: {x["key"]: x["value"] for x in h["headers"]} for h in self.config["headers"]}
         for source in ("/.well-known/flashyos.json", "/.well-known/flashyos-charter.json", "/flashyos.roles.json",
-                       "/.well-known/devlog.fragment.json"):
+                       "/.well-known/devlog.fragment.json",
+                       "/.well-known/shiplog.json", "/.well-known/checkpoint.json"):
             with self.subTest(source=source):
                 headers = by_source[source]
                 self.assertTrue(headers["Content-Type"].startswith("application/json"))

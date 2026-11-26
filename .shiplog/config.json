@@ -2,12 +2,13 @@
   "source": "repo/analystos",
   "org": "org/analystos",
   "assertedBy": "agent/analystos-ci",
-  "defaultAuthor": "person/accountable-human",
+  "defaultAuthor": "person/30e-founder",
   "authors": {
     "noreply@anthropic.com": "agent/claude"
   },
   "visibility": "public",
   "lexicon": "imperative",
   "prBase": "https://github.com/30EVentures/analystos/pull/",
-  "serve": "site/.well-known/devlog.fragment.json"
+  "serve": "site/.well-known/shiplog.json",
+  "serveDevlog": "site/.well-known/devlog.fragment.json"
 }

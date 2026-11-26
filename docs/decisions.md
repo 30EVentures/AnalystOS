@@ -3214,3 +3214,49 @@ Testing discipline carried over from every other slice this session: no test
 makes a real call to `api.flashyos.com`. `tests/test_flashy_declare.py` proves
 `--execute` reaches the network-touching function with that function mocked,
 in-process (`unittest.mock.patch`), never a live request.
+
+## 2026-11-26 — Slice 131: the record, corrected once before Flashy registers it
+
+Phase 0 of the AnalystOS x Flashy two-sided plan (Flashy's document of
+2026-11-25, items C-ID-1, C-REC-1 to C-REC-4). Owner's decision: the author
+id is `person/30e-founder`, a pseudonymous id, because the plan's literal
+instruction (`person/<slug>` per human who merges) would have sealed the
+owner's name into a permanent public log.
+
+What was wrong, measured here before changing anything:
+
+- 27 of the 28 served entries were sealed with the placeholder
+  `person/accountable-human`.
+- The served file was `shipped/1` at the `devlog/1` path, so Flashy's fan-in
+  folds 0 of 28 as the kind the URL implies.
+- One seal (`ship/analystos/572370f44a16`) did not recompute. The cause, which
+  Flashy's review could not see from outside: Slice 106's
+  `tools/redact_served_devlog.py` stripped commit trailers from `detail` after
+  the emitter had sealed the entry. Every entry with a trailer broke; only one
+  survived the name filter.
+- The "private" full record (`shiplog.fragment.json`, `devlog.fragment.json`,
+  `DEVLOG.md`) was committed to this public repository with 66 entries naming
+  the owner. The site never served them (404), but GitHub does.
+
+The fix is one rule: privacy happens before sealing, never after.
+`tools/emit_record.mjs` wraps the vendored, unmodified `vendor-shiplog.mjs`
+(byte-equal to the published `@flashyos/shiplog@0.2.0`): it drops commits that
+name the owner and strips trailers from commit bodies before derivation, after
+co-author attribution is parsed, so `agent/claude` is still credited. There is
+no private copy any more; the state an append-only emit needs is the served
+public record itself.
+
+Served now, apex host: `/.well-known/shiplog.json` (shipped/1, 44 entries at the correction, 45 once Slice 130 merged;
+every seal recomputes), `/.well-known/devlog.fragment.json` (a real devlog/1),
+`/.well-known/checkpoint.json` (checkpoint/1, `vendor-checkpoint.mjs` byte-equal
+to the published `@flashyos/checkpoint@0.2.0`, size equal to the entry count, every leaf proves).
+Authors: 43 `person/30e-founder`, 1 `agent/claude`. The flashy freeze moved
+once, with the reason logged.
+
+Known and left alone: merged pull requests are sealed as kind `feature` and
+their devlog summary reads "Merge pull request #NN ...". Both are the published
+emitter's behaviour and Flashy's to fix (F-REC-8); re-deriving later would
+double the record on their log, so this is accepted as is. Git history still
+holds the old unredacted files; rewriting a public repository's history is a
+separate decision for the owner. Registering the record with Flashy (F-REC-1)
+waits for this to merge and deploy, and for the owner's yes.

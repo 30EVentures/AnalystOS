@@ -3327,3 +3327,25 @@ capability lists AnalystOS under its role, and `/public/ask?need=document-analys
 returns AnalystOS. A stale `analytics` row under an agent named `AnalystOS`
 remains; removing it is Flashy's (F-MESH-8). No role agent exists yet: the
 declarations attach when the role agents are minted (C-ID-4).
+
+## 2026-11-26 — Slice 134: the public record refreshes itself after every merge
+
+Flashy plan C-REC-9. Slice 131 corrected the record, but only a person running
+the emitter added new merges, so the served record stopped at Slice 130 while
+#110 and #112 merged after it. `.github/workflows/record.yml` now runs the same
+steps after every push to `main`: emit (append-only, privacy before sealing),
+rebuild the checkpoint, verify every seal, leaf and the redact guard, then
+commit the four record files as `github-actions[bot]` under the exact subject
+the vendored emitter treats as its own bookkeeping, so the refresh never
+appears in the record. The checkpoint is rebuilt, and anything committed, only
+when the record changed: the head carries its build time, and the first
+version (caught in review) would have committed and deployed after every push.
+Only `main` can run the job. Rehearsed on `origin/main` (679f478) three times
+in a row: one refresh commit (47 entries, all verify), then two runs that change
+nothing and commit nothing.
+
+This is the repository's first workflow and the first automated commit to
+`main`; merging this slice is the owner's decision that the "never commit to
+`main` directly" convention, which governs people and sessions, does not cover
+this one job. `main` is unprotected today; adding protection later needs a rule
+that lets this job push.

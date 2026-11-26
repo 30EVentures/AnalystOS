@@ -39,6 +39,7 @@ EXACT_FILES = (
     "vendor-checkpoint.mjs",
     ".checkpoint/config.json",
     "tools/emit_record.mjs",
+    ".github/workflows/record.yml",
     "solwayholdings.aao.json",
     "site/.well-known/flashyos.json",
     "site/.well-known/flashyos-charter.json",

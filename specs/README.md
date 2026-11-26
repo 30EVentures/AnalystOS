@@ -145,3 +145,4 @@ spec folder must appear below, and every slice without one must be marked.
 | 131 | correct the record once, then serve it where Flashy reads it | [spec](slice-131/spec.md) |
 | 132 | signing keys as a JWKS, two mesh mistakes made impossible, and the charter differential | [spec](slice-132/spec.md) |
 | 133 | metered hiring: a budget that only narrows, usage, and a receipt | [spec](slice-133/spec.md) |
+| 134 | the public record refreshes itself after every merge | [spec](slice-134/spec.md) |
